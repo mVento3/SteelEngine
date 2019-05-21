@@ -10,4 +10,4 @@ C++ Engine
 ## Building the Engine
 1. Clone the repository
 2. Open the downloaded folder using the VisualStudio Code
-3. Just compile the source code by pressing **Ctrl+Shift+B**
+3. Just compile the source code by pressing **Ctrl+Shift+B**. If you compile first time, you need to compile it twice, because first need to build ReflectionGenerator app, so just ignore the errors...
