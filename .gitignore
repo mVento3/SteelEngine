@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# My
+*.bin
+*.ipch
+*.exp
+*.ilk
+*.pdb
+*.idb
+.vscode/.ropeproject/objectdb
+*.log

@@ -1,0 +1,48 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/msys64/mingw64/include",
+                "C:/msys64/mingw64/include/c++/8.3.0"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:/msys64/mingw64/bin/clang++.exe",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+               "path": [
+                   "${workspaceRoot}",
+                   "${workspaceRoot}/include"
+               ]
+            }
+        },
+        {
+            "name": "Windows",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "SE_WINDOWS"
+            ],
+            "compilerPath": "D:/Programs/VS17/VC/Tools/MSVC/14.14.26428/bin/Hostx64/x64/cl.exe",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64",
+            "browse": {
+               "path": [
+                   "${workspaceRoot}",
+                   "${workspaceRoot}/include"
+               ]
+            }
+        }
+    ],
+    "version": 4
+}
