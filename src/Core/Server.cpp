@@ -127,9 +127,9 @@ namespace SteelEngine {
                         }
                         else
                         {
-                            const char* none = "NONE";
+                            std::string none = "NONE";
 
-                            Send(sock, none, bufferSize);
+                            Send(sock, none.c_str(), bufferSize);
                         }
                     }
                     else if(splitted[0] == "createSwapModule")

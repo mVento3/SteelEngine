@@ -465,7 +465,7 @@ namespace SteelEngine {
 
 		if(!getPerModule)
 		{
-			printf("GetPerModule in null!\n");
+			printf("GetPerModule is null!\n");
 
 			return;
 		}

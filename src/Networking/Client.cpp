@@ -1,6 +1,7 @@
 #include "Networking/Client.h"
 
 #include "Utils/Utils.h"
+#include "Utils/Time.h"
 
 #include "fstream"
 
@@ -116,13 +117,32 @@ namespace SteelEngine {
 
                     std::ofstream file(fin, std::ios::binary);
 
+                    float delta_ = 0;
+
                     for(size_t i = 0; i < size; i += bufferSize)
                     {
-                        Send(m_Socket, "get", bufferSize);
+                        //printf("Downloaded %f%...\n", (float)((i * 100) / size));
+                        //printf("Downloaded %i of %zu...\n", i, size);
 
-                        int bytesIn2 = recv(m_Socket, &fileBuf[0], bufferSize, 0);
+                        CHECK_SPEED(
+                            {
+                                Send(m_Socket, "get", bufferSize);
 
-                        file.write(&fileBuf[0], bytesIn2);
+                                int bytesIn2 = recv(m_Socket, &fileBuf[0], bufferSize, 0);
+
+                                file.write(&fileBuf[0], bytesIn2);
+                            },
+                            {
+                                delta_ += delta;
+
+                                if(delta_ >= 1)
+                                {
+                                    delta_ = 0;
+
+                                    printf("Downloaded %f...\n", (float)((i * 100) / size));
+                                }
+                            }
+                        )
                     }
 
                     file.close();

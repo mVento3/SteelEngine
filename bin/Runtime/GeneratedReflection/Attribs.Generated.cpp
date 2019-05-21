@@ -15,7 +15,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Attribs))
 .Enum<SteelEngine::Attribs::TestE>("TestE")
 (
 )
-.Values 
+.Values
 (
 SteelEngine::ReflectionValue("TEST1", SteelEngine::Attribs::TestE::TEST1)
 (

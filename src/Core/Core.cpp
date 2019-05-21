@@ -106,7 +106,7 @@ namespace SteelEngine {
         //     printf("c %i\n", meta3->Convert<int>());
         // }
 
-        SE_INFO("CZESC %i", 33);
+        //SE_INFO("CZESC %i", 33);
         //SE_FATAL("LOL");
 
         Sleep(100);
