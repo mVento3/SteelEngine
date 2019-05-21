@@ -106,11 +106,9 @@ namespace SteelEngine {
                 {
                     size_t size;
                     std::string fileBuf;
-                    std::string fileName = splitted[1];
+                    filesystem::path fileName = splitted[1];
 
-                    filesystem::path p = fileName;
-
-                    std::string fin = FileSystem::GetBinaryLocation().string() + "/Runtime/Swap/" + p.filename().string();
+                    std::string fin = FileSystem::GetBinaryLocation().string() + "/Runtime/Swap/" + fileName.filename().string();
 
                     fileBuf.resize(bufferSize);
 

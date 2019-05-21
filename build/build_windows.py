@@ -68,12 +68,9 @@ for type in project_types:
 
         for srcFile in source_files:
             if type[0] == project_name and os.path.splitext(os.path.basename(file))[0] == os.path.splitext(os.path.basename(srcFile))[0]:
-                hFile = file.replace('..' + os.sep, '../SteelEngine/')
-                cppFile = srcFile.replace('..' + os.sep, '../SteelEngine/')
-
-                if cppFile != '' and hFile != '':
+                if srcFile != '' and file != '':
                     try:
-                        subprocess.call(['bin/ReflectionGenerator.exe', 'bin', cppFile, hFile])
+                        subprocess.call(['bin/ReflectionGenerator.exe', 'bin', srcFile, file])
                     except:
                         print(os.sys.exc_info())
     
