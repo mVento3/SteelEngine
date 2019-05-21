@@ -27,11 +27,12 @@
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 
 # My
+Engine.exe
+ReflectionGenerator.exe
 *.bin
 *.ipch
 *.exp
