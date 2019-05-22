@@ -12,6 +12,7 @@
 
 #include "Networking/Config.h"
 #include "Networking/INetwork.h"
+#include "Networking/NetworkCommands.h"
 
 #include "RuntimeReflection/Reflection.h"
 #include "RuntimeReflection/Macro.h"
@@ -19,18 +20,28 @@
 
 #include "Server.Generated.h"
 
+#include "Event/localevent.h"
+
 namespace SteelEngine {
 
     SE_CLASS(SteelEngine::SE_SERVER_INFO = SteelEngine::ServerInfo(1024, 54000))
     class Server : public Interface::INetwork
     {
         GENERATED_BODY
-        typedef std::map<SOCKET, std::queue<std::string>> SocketMap;
+    public:
+        struct MessageData
+        {
+            char* m_Data;
+            size_t m_Size;
+        };
+
+        typedef std::map<SOCKET, std::queue<MessageData>> SocketMap2;
+
     private:
         fd_set m_Master;
         SOCKET m_ListeningSocket;
-        SocketMap m_PendingCommands;
         ServerInfo m_ServerInfo;
+        SocketMap2 m_Commands;
 
     public:
         Server();
@@ -47,7 +58,7 @@ namespace SteelEngine {
         SE_METHOD()
         int Receive(SOCKET sock, char* buffer, Type::uint32 size) override;
 
-        void operator()(const Networking::SendMessageEvent& event) override;
+        void operator()(NetworkCommands::INetworkCommand* event);
     };
     
 }

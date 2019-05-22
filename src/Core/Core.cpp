@@ -106,8 +106,17 @@ namespace SteelEngine {
         //     printf("c %i\n", meta3->Convert<int>());
         // }
 
-        //SE_INFO("CZESC %i", 33);
+        SE_INFO("CZESC %i", 33);
         //SE_FATAL("LOL");
+
+        // if(Reflection::GetType("Core")->GetMetaData(EngineInfo::IS_SERVER)->Convert<bool>())
+        // {
+        //     NetworkCommands::INetworkCommand* ev = new NetworkCommands::SwapModuleEvent("bin/Runtime/Swap/s83k.1.dll\0");
+
+        //     Event::GlobalEvent::Broadcast_(ev);
+
+        //     delete ev;
+        // }
 
         Sleep(100);
     }

@@ -12,7 +12,7 @@
 #include "RuntimeReflection/ReflectionGenerator.h"
 #include "RuntimeReflection/Macro.h"
 
-#include "Networking/SendMessageEvent.h"
+#include "Networking/NetworkCommands.h"
 #include "Networking/Config.h"
 
 #include "RuntimeCompiler.Generated.h"
@@ -58,7 +58,6 @@ namespace SteelEngine {
         Result SetupProcess();
 
         void GenerateModuleName();
-        void SendToOthers(const std::string& moduleName, const filesystem::path& changedFile);
 
     public:
         RuntimeCompiler();
@@ -66,6 +65,7 @@ namespace SteelEngine {
 
         bool m_IsCompileComplete;
         bool m_IsSwapComplete;
+        bool m_Error;
 
         HANDLE m_CmdProcessOutputRead;
 		HANDLE m_CmdProcessInputWrite;

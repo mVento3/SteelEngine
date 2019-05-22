@@ -172,67 +172,9 @@ namespace SteelEngine {
 #endif
 	}
 
-	void RuntimeCompiler::SendToOthers(const std::string& moduleName, const filesystem::path& changedFile)
-	{
-		Type::uint32 bufferSize = Reflection::GetType("Server")->GetMetaData(SE_SERVER_INFO)->Convert<ServerInfo>().m_BufferSize;
-
-		std::ifstream input(moduleName.c_str(), std::ios::binary);
-		std::stringstream ss;
-		input.seekg(0, input.end);
-		size_t length = input.tellg();
-		input.seekg(0, input.beg);
-
-		if(length == RuntimeDatabase::s_InvalidID)
-		{
-			if(input.is_open())
-			{
-				input.close();
-			}
-
-			printf("Failed to load file!\n");	
-
-			return;
-		}
-
-		ss << "createSwapModule " << moduleName.c_str() << " " << length;
-
-		Event::GlobalEvent::Broadcast(Networking::SendMessageEvent{ ss.str(), ss.str().size() + 1 });
-
-		std::string buf;
-
-		buf.resize(bufferSize);
-
-		for(size_t i = 0; i < length; i += bufferSize)
-		{
-			input.seekg(i);
-		 	input.read(&buf[0], bufferSize);
-
-		 	Event::GlobalEvent::Broadcast(Networking::SendMessageEvent{ buf, bufferSize });
-		}
-
-		input.close();
-
-		// {
-		// 	input.open(changedFile.string().c_str());
-
-		// 	std::string line;
-		// 	std::string file;
-		// 	std::vector<std::string> splitted = split(changedFile.string(), '\\');
-
-		// 	Event::GlobalEvent::Broadcast(Networking::SendMessageEvent{ "createFile " + changedFile.string(), bufferSize });
-
-		// 	while(std::getline(input, line))
-		// 	{
-		// 		Event::GlobalEvent::Broadcast(Networking::SendMessageEvent{ line, bufferSize });
-		// 	}
-
-		// 	Event::GlobalEvent::Broadcast(Networking::SendMessageEvent{ "DONE", bufferSize });
-		// }
-	}
-
     RuntimeCompiler::RuntimeCompiler()
     {
-        
+        m_Error = false;
     }
 
     RuntimeCompiler::~RuntimeCompiler()
@@ -328,6 +270,14 @@ namespace SteelEngine {
 							}
 						)
 
+						if(m_Error)
+						{
+							thread->m_Done = true;
+							m_Error = false;
+
+							return;
+						}
+
 						CHECK_SPEED(
 							{
 								SwapModule(m_BinaryLocation.string() + "/Runtime/Swap/" + m_ModuleName + ".dll");
@@ -338,9 +288,13 @@ namespace SteelEngine {
 						);
 
 #ifdef SE_WINDOWS
-						SendToOthers(m_BinaryLocation.string() + "/Runtime/Swap/" + m_ModuleName + ".dll", file);
+						NetworkCommands::INetworkCommand* ev = new NetworkCommands::SwapModuleEvent("bin/Runtime/Swap/" + m_ModuleName + ".dll\0");
+
+						Event::GlobalEvent::Broadcast_(ev);
+
+						delete ev;
 #else
-						SendToOthers(m_ModuleName);
+						//SendToOthers(m_ModuleName);
 #endif
 
 						thread->m_Done = true;
@@ -588,6 +542,8 @@ namespace SteelEngine {
 					if ((buffer.find("error") != std::string::npos) || (buffer.find("fatal error") != std::string::npos))
 					{
                         printf("Runtime Compiler: %s\n", buffer.c_str());
+
+						pImpl->m_Error = true;
                     }
 				}
 			}

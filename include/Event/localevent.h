@@ -51,7 +51,7 @@ namespace SteelEngine
 				m_Event.Remove(handler);
 			}
 
-			inline void Broadcast(tMessage message)
+			inline void Broadcast(const tMessage& message)
 			{
 				m_Event.Broadcast(message);
 			}

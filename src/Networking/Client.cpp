@@ -11,7 +11,7 @@ namespace SteelEngine {
 
     Client::Client()
     {
-        m_ServerInfo = Reflection::GetType("Server")->GetMetaData(SE_SERVER_INFO)->Convert<ServerInfo>();
+        m_ServerInfo = Reflection::GetType("Server")->GetMetaData(SE_SERVER_INFO);
     }
 
     Client::~Client()
@@ -43,7 +43,7 @@ namespace SteelEngine {
         sockaddr_in hint;
 
         hint.sin_family = AF_INET;
-        hint.sin_port = htons(m_ServerInfo.m_Port);
+        hint.sin_port = htons(m_ServerInfo->Convert<ServerInfo>().m_Port);
         
         inet_pton(AF_INET, ip, &hint.sin_addr);
 
@@ -58,7 +58,7 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
-        Event::GlobalEvent::Add<Networking::SendMessageEvent>(this);
+        Event::GlobalEvent::Add_<NetworkCommands::INetworkCommand>(this);
 
         return SE_TRUE;
     }
@@ -67,7 +67,7 @@ namespace SteelEngine {
     {
         m_Thread = new std::thread([this]()
         {
-            Type::uint32 bufferSize = m_ServerInfo.m_BufferSize;
+            Type::uint32 bufferSize = m_ServerInfo->Convert<ServerInfo>().m_BufferSize;
 
             while(1)
             {
@@ -75,81 +75,58 @@ namespace SteelEngine {
 
                 buf.resize(bufferSize);
 
-                if(!m_PendingCommands.empty())
+                if(!m_Commands.empty())
                 {
-                    while(!m_PendingCommands.empty())
+                    while(!m_Commands.empty())
                     {
-                        std::string command = m_PendingCommands.front();
+                        MessageData data = m_Commands.front();
 
-                        Send(m_Socket, command.c_str(), bufferSize);
+                        Send(m_Socket, data.m_Data, 1024);
 
-                        m_PendingCommands.pop();
+                        char header[HEADER_SIZE];
+
+                        for(int i = 0; i < HEADER_SIZE; i++)
+                        {
+                            header[i] = data.m_Data[i];
+                        }
+
+                        if(strcmp(header, "SwapModuleEvent") == 0)
+                        {
+                            NetworkCommands::SwapModuleEvent s;
+
+                            s.Deserialize(data.m_Data);
+
+                            s.ClientSide(this, m_Socket);
+                        }
+
+                        m_Commands.pop();
                     }
                 }
                 else
                 {
-                    Send(m_Socket, "get", bufferSize);
+                    Send(m_Socket, "GetEvent", bufferSize);
                 }
 
                 Receive(m_Socket, (char*)&buf[0], bufferSize);
 
-                std::vector<std::string> splitted = split(buf, ' ');
+                char header[HEADER_SIZE];
 
-                if(splitted[0] == "DONE")
+                for(int i = 0; i < HEADER_SIZE; i++)
+                {
+                    header[i] = buf[i];
+                }
+
+                if(strcmp(header, "NoneEvent") == 0)
                 {
 
                 }
-                else if(splitted[0] == "say")
+                else if(strcmp(header, "SwapModuleEvent") == 0)
                 {
-                    printf("%s\n", splitted[1].c_str());
-                }
-                else if(splitted[0] == "createSwapModule")
-                {
-                    size_t size;
-                    std::string fileBuf;
-                    filesystem::path fileName = splitted[1];
+                    NetworkCommands::SwapModuleEvent s;
 
-                    std::string fin = FileSystem::GetBinaryLocation().string() + "/Runtime/Swap/" + fileName.filename().string();
+                    s.Deserialize(&buf[0]);
 
-                    fileBuf.resize(bufferSize);
-
-                    sscanf(splitted[2].c_str(), "%zu", &size);
-
-                    std::ofstream file(fin, std::ios::binary);
-
-                    float delta_ = 0;
-
-                    for(size_t i = 0; i < size; i += bufferSize)
-                    {
-                        //printf("Downloaded %f%...\n", (float)((i * 100) / size));
-                        //printf("Downloaded %i of %zu...\n", i, size);
-
-                        CHECK_SPEED(
-                            {
-                                Send(m_Socket, "get", bufferSize);
-
-                                int bytesIn2 = recv(m_Socket, &fileBuf[0], bufferSize, 0);
-
-                                file.write(&fileBuf[0], bytesIn2);
-                            },
-                            {
-                                delta_ += delta;
-
-                                if(delta_ >= 1)
-                                {
-                                    delta_ = 0;
-
-                                    printf("Downloaded %f...\n", (float)((i * 100) / size));
-                                }
-                            }
-                        )
-                    }
-
-                    file.close();
-
-                    Send(m_Socket, "DONE", bufferSize);
-
-                    Event::GlobalEvent::Broadcast(SwapModuleEvent{ fin });
+                    s.ClientSide(this, m_Socket);
                 }
 
                 Sleep(1);
@@ -169,12 +146,21 @@ namespace SteelEngine {
 
     void Client::operator()(const RecompiledEvent& event)
     {
-        m_ServerInfo = Reflection::GetType("Server")->GetMetaData(SE_SERVER_INFO)->Convert<ServerInfo>();
+        
     }
 
-    void Client::operator()(const Networking::SendMessageEvent& event)
+    void Client::operator()(NetworkCommands::INetworkCommand* event)
     {
-        m_PendingCommands.push(event.m_Command);
+        MessageData data;
+
+        data.m_Size = event->m_Size;
+        data.m_Data = new char[data.m_Size];
+
+        event->m_Flow = NetworkCommands::CommunicationFlow::CLIENT_TO_SERVER;
+
+        event->Serialize(data.m_Data);
+
+        m_Commands.push(data);
     }
 
 }

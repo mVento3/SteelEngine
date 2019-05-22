@@ -7,7 +7,6 @@ REGISTER_REFLECTION
 {
 SteelEngine::Reflection::Register<SteelEngine::Client>("Client")
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Client))
 )
 .Constructor<>()
@@ -30,11 +29,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Client))
 
 void SteelEngine::Client::Serialize(SteelEngine::Interface::ISerializer* serializer)
 {
-SERIALIZE(SteelEngine::Client::m_Socket)
-SERIALIZE(SteelEngine::Client::m_Thread)
-SERIALIZE(SteelEngine::Client::m_PendingCommands)
-SERIALIZE(SteelEngine::Client::m_ServerInfo)
-SERIALIZE(SteelEngine::Client::m_SendingHugeBlock)
 }
 
 #ifdef RUNTIME_COMPILE

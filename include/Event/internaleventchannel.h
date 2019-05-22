@@ -18,7 +18,7 @@ namespace SteelEngine { namespace Event {
 	class InternalChannel
 	{
 	public:
-		typedef std::function<void(tMessage)> Handler;
+		typedef std::function<void(const tMessage&)> Handler;
 		typedef std::function<void(tMessage*)> Handler_;
 
 	private:
@@ -40,7 +40,7 @@ namespace SteelEngine { namespace Event {
 		{
 			std::lock_guard<std::mutex> lock(m_Mutex);
 
-			m_Handlers.push_back([handler](tMessage msg) { (*handler)(msg); });
+			m_Handlers.push_back([handler](const tMessage& msg) { (*handler)(msg); });
 			m_OriginalPtrs.push_back(handler);
 		}
 
@@ -74,17 +74,8 @@ namespace SteelEngine { namespace Event {
 			}
 		}
 
-		inline void Broadcast(tMessage msg)
+		inline void Broadcast(const tMessage& msg)
 		{
-			/*
-			std::vector<Handler> localQueue(m_Handlers.size());
-
-			{
-			std::lock_guard<std::mutex> lock(m_Mutex);
-			localQueue = m_Handlers;
-			}
-			*/
-
 			std::lock_guard<std::mutex> lock(m_Mutex);
 
 			for (auto& handler : m_Handlers)
@@ -93,15 +84,6 @@ namespace SteelEngine { namespace Event {
 
 		inline void Broadcast_(tMessage* msg)
 		{
-			/*
-			std::vector<Handler> localQueue(m_Handlers.size());
-
-			{
-			std::lock_guard<std::mutex> lock(m_Mutex);
-			localQueue = m_Handlers;
-			}
-			*/
-
 			std::lock_guard<std::mutex> lock(m_Mutex);
 
 			for (auto& handler : m_Handlers_)

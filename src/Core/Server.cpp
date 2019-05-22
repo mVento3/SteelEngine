@@ -48,7 +48,7 @@ namespace SteelEngine {
         FD_ZERO(&m_Master);
         FD_SET(m_ListeningSocket, &m_Master);
 
-        Event::GlobalEvent::Add<Networking::SendMessageEvent>(this);
+        Event::GlobalEvent::Add_<NetworkCommands::INetworkCommand>(this);
     }
 
     void Server::Update()
@@ -70,8 +70,6 @@ namespace SteelEngine {
                     (sockaddr*)&clientAddress,
                     &clientAddressSize
                 );
-
-                m_PendingCommands[client] = std::queue<std::string>();
 
                 FD_SET(client, &m_Master);
 
@@ -113,129 +111,52 @@ namespace SteelEngine {
                 }
                 else
                 {
-                    std::vector<std::string> splitted = split(buf, ' ');
+                    char header[HEADER_SIZE];
 
-                    if(splitted[0] == "get")
+                    for(int i = 0; i < HEADER_SIZE; i++)
                     {
-                        if(!m_PendingCommands[sock].empty())
+                        header[i] = buf[i];
+                    }
+
+                    if(strcmp(header, "GetEvent") == 0)
+                    {
+                        if(!m_Commands[sock].empty())
                         {
-                            std::string command = m_PendingCommands[sock].front();
+                            MessageData data = m_Commands[sock].front();
 
-                            Send(sock, command.c_str(), bufferSize);
+                            Send(sock, data.m_Data, data.m_Size);
 
-                            m_PendingCommands[sock].pop();
+                            char header[HEADER_SIZE];
+
+                            for(int i = 0; i < HEADER_SIZE; i++)
+                            {
+                                header[i] = data.m_Data[i];
+                            }
+
+                            if(strcmp(header, "SwapModuleEvent") == 0)
+                            {
+                                NetworkCommands::SwapModuleEvent s;
+
+                                // Nah
+                                s.Deserialize(data.m_Data);
+
+                                s.ServerSide(this, sock);
+                            }
+
+                            m_Commands[sock].pop();
                         }
                         else
                         {
-                            std::string none = "NONE";
-
-                            Send(sock, none.c_str(), bufferSize);
+                            Send(sock, "NoneEvent\0", bufferSize);
                         }
                     }
-                    else if(splitted[0] == "createSwapModule")
+                    else if(strcmp(header, "SwapModuleEvent") == 0)
                     {
-                        size_t size;
-                        std::string fileBuf;
-                        std::string fileName = splitted[1];
+                        NetworkCommands::SwapModuleEvent s;
 
-                        fileBuf.resize(bufferSize);
+                        s.Deserialize(buf);
 
-                        sscanf(splitted[2].c_str(), "%zu", &size);
-
-                        std::ofstream file(fileName, std::ios::binary);
-
-                        for(size_t i = 0; i < size; i += bufferSize)
-                        {
-                            int bytesIn2 = recv(sock, &fileBuf[0], bufferSize, 0);
-
-                            file.write(&fileBuf[0], bytesIn2);
-                        }
-
-                        file.close();
-
-                        Send(sock, "DONE", bufferSize);
-
-                        {
-                            std::ifstream input(fileName.c_str(), std::ios::binary);
-                            std::stringstream ss;
-                            input.seekg(0, input.end);
-                            size_t length = input.tellg();
-                            input.seekg(0, input.beg);
-
-                            ss << "createSwapModule " << fileName.c_str() << " " << length;
-
-                            for(SocketMap::iterator it = m_PendingCommands.begin(); it != m_PendingCommands.end(); ++it)
-                            {
-                                if(sock != it->first)
-                                {
-                                    it->second.push(ss.str());
-                                }
-                            }
-
-                            std::string buf;
-
-                            buf.resize(bufferSize);
-
-                            for(size_t i = 0; i < length; i += bufferSize)
-                            {
-                                input.seekg(i);
-                                input.read(&buf[0], bufferSize);
-
-                                for(SocketMap::iterator it = m_PendingCommands.begin(); it != m_PendingCommands.end(); ++it)
-                                {
-                                    if(sock != it->first)
-                                    {
-                                        it->second.push(buf);
-                                    }
-                                }
-                            }
-                        }
-
-                        Event::GlobalEvent::Broadcast(SwapModuleEvent{ fileName });
-                    }
-                    else if(splitted[0] == "say")
-                    {
-                        for(SocketMap::iterator it = m_PendingCommands.begin(); it != m_PendingCommands.end(); ++it)
-                        {
-                            if(it->first != sock)
-                            {
-                                it->second.push(buf);
-                            }
-                        }
-
-                        Send(sock, "DONE", bufferSize);
-                    }
-                    else if(splitted[0] == "createFile")
-                    {
-                        std::string fileName = splitted[1];
-                        std::string fileBuf;
-
-                        std::ofstream file(fileName, std::ios::binary);
-
-                        while(1)
-                        {
-                            int bytesIn2 = recv(sock, &fileBuf[0], bufferSize, 0);
-
-                            if(fileBuf != "DONE")
-                            {
-                                printf("%s\n", fileBuf.c_str());
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-
-                        // for(size_t i = 0; i < size; i += bufferSize)
-                        // {
-                        //     int bytesIn2 = recv(sock, &fileBuf[0], bufferSize, 0);
-
-                        //     file.write(&fileBuf[0], bytesIn2);
-                        // }
-
-                        file.close();
-
-                        Send(sock, "DONE", bufferSize);
+                        s.ServerSide(this, sock);
                     }
                 }
             }
@@ -257,11 +178,20 @@ namespace SteelEngine {
         m_ServerInfo = Reflection::GetType("Server")->GetMetaData(SE_SERVER_INFO)->Convert<ServerInfo>();
     }
 
-    void Server::operator()(const Networking::SendMessageEvent& event)
-    {
-        for(SocketMap::iterator it = m_PendingCommands.begin(); it != m_PendingCommands.end(); ++it)
+    void Server::operator()(NetworkCommands::INetworkCommand* event)
+    {  
+        MessageData data;
+
+        data.m_Size = event->m_Size;
+        data.m_Data = new char[data.m_Size];
+
+        event->m_Flow = NetworkCommands::CommunicationFlow::SERVER_TO_CLIENT;
+
+        event->Serialize(data.m_Data);
+
+        for(SocketMap2::iterator it = m_Commands.begin(); it != m_Commands.end(); ++it)
         {
-            it->second.push(event.m_Command);
+            it->second.push(data);
         }
     }
 
