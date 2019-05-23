@@ -42,6 +42,8 @@ namespace SteelEngine { namespace NetworkCommands {
         SE_METHOD()
         char* Deserialize(char* data) override
         {
+            m_ModuleName.clear();
+
             char* p = INetworkCommand::Deserialize(data);
 
             while(1)

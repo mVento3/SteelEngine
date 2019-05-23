@@ -61,12 +61,15 @@ namespace SteelEngine { namespace NetworkCommands {
                     m_HeaderComp[i] = data.m_Data[i];
                 }
 
-                if(strcmp(m_HeaderComp, "SwapModuleNetCommandEvent") == 0)
+                for(Type::uint32 i = 0; i < m_Commands->size(); i++)
                 {
-                    NetworkCommands::SwapModuleNetCommandEvent s;
+                    NetworkCommands::INetworkCommand* command = m_Commands->at(i);
 
-                    s.Deserialize(data.m_Data);
-                    s.ServerSide(network, sock);
+                    if(strcmp(command->m_Header, m_HeaderComp) == 0)
+                    {
+                        command->Deserialize(data.m_Data);
+                        command->ServerSide(network, sock);
+                    }
                 }
 
                 queue->pop();
@@ -98,12 +101,15 @@ namespace SteelEngine { namespace NetworkCommands {
                         m_HeaderComp[i] = data.m_Data[i];
                     }
 
-                    if(strcmp(m_HeaderComp, "SwapModuleNetCommandEvent") == 0)
+                    for(Type::uint32 i = 0; i < m_Commands->size(); i++)
                     {
-                        NetworkCommands::SwapModuleNetCommandEvent s;
+                        NetworkCommands::INetworkCommand* command = m_Commands->at(i);
 
-                        s.Deserialize(data.m_Data);
-                        s.ClientSide(network, sock);
+                        if(strcmp(command->m_Header, m_HeaderComp) == 0)
+                        {
+                            command->Deserialize(data.m_Data);
+                            command->ClientSide(network, sock);
+                        }
                     }
 
                     queue->pop();
@@ -120,18 +126,17 @@ namespace SteelEngine { namespace NetworkCommands {
             for(int i = 0; i < HEADER_SIZE; i++)
             {
                 m_HeaderComp[i] = m_Buffer[i];
-            }
+            }    
 
-            if(strcmp(m_HeaderComp, "NoneNetCommandEvent") == 0)
+            for(Type::uint32 i = 0; i < m_Commands->size(); i++)
             {
+                NetworkCommands::INetworkCommand* command = m_Commands->at(i);
 
-            }
-            else if(strcmp(m_HeaderComp, "SwapModuleNetCommandEvent") == 0)
-            {
-                NetworkCommands::SwapModuleNetCommandEvent s;
-
-                s.Deserialize(m_Buffer);
-                s.ClientSide(network, sock);
+                if(strcmp(command->m_Header, m_HeaderComp) == 0)
+                {
+                    command->Deserialize(m_Buffer);
+                    command->ClientSide(network, sock);
+                }
             }
         }
     };

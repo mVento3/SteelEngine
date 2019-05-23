@@ -11,6 +11,8 @@
 
 #include "Utils/Utils.h"
 
+#include "vector"
+
 #define HEADER_SIZE 50
 
 namespace SteelEngine { namespace NetworkCommands {
@@ -32,6 +34,7 @@ namespace SteelEngine { namespace NetworkCommands {
     {
         CommunicationFlow m_Flow;
         char m_Header[HEADER_SIZE];
+        std::vector<INetworkCommand*>* m_Commands;
 
         virtual char* Serialize(char *data)
         {

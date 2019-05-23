@@ -34,6 +34,7 @@ namespace SteelEngine {
         std::queue<NetworkCommands::MessageData> m_Commands;
         NetworkCommands::INetworkCommand* m_Command;
         Variant* m_ServerInfo;
+        std::vector<NetworkCommands::INetworkCommand*> m_CommandTypes;
 
     public:
         Client();

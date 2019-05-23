@@ -56,7 +56,11 @@ namespace SteelEngine {
 
             if(type->GetMetaData(ReflectionAttribute::SE_NETWORK_COMMAND)->Convert<bool>())
             {
-                m_CommandTypes.push_back((NetworkCommands::INetworkCommand*)type->Create());
+                NetworkCommands::INetworkCommand* comm = (NetworkCommands::INetworkCommand*)type->Create();
+
+                comm->m_Commands = &m_CommandTypes;
+
+                m_CommandTypes.push_back(comm);
             }
         }
 

@@ -58,7 +58,25 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
+        std::vector<IReflectionData*> types = Reflection::GetTypes();
+
+        for(Type::uint32 i = 0; i < types.size(); i++)
+        {
+            IReflectionData* type = types[i];
+
+            if(type->GetMetaData(ReflectionAttribute::SE_NETWORK_COMMAND)->Convert<bool>())
+            {
+                NetworkCommands::INetworkCommand* comm = (NetworkCommands::INetworkCommand*)type->Create();
+
+                comm->m_Commands = &m_CommandTypes;
+
+                m_CommandTypes.push_back(comm);
+            }
+        }
+
         m_Command = (NetworkCommands::INetworkCommand*)Reflection::CreateInstance("GetNetCommandEvent");
+
+        m_Command->m_Commands = &m_CommandTypes;
 
         Event::GlobalEvent::Add_<NetworkCommands::INetworkCommand>(this);
 
@@ -69,8 +87,6 @@ namespace SteelEngine {
     {
         m_Thread = new std::thread([this]()
         {
-            Type::uint32 bufferSize = m_ServerInfo->Convert<ServerInfo>().m_BufferSize;
-
             while(1)
             {
                 m_Command->ClientSide(this, m_Socket);
