@@ -65,7 +65,7 @@ namespace SteelEngine {
 
             std::string ip = Reflection::GetType("Core")->GetMetaData(EngineInfo::SERVER_IP)->Convert<std::string>();
 
-            if(Reflection::GetType("Client")->Invoke("Connect", m_Network, ip)->Convert<Result>() == SE_TRUE)
+            if(Reflection::GetType("Client")->Invoke("Connect", m_Network, ip).Convert<Result>() == SE_TRUE)
             {
                 SE_INFO("Connected successful!");
 
@@ -106,7 +106,7 @@ namespace SteelEngine {
         //     printf("c %i\n", meta3->Convert<int>());
         // }
 
-        SE_INFO("CZESC %i", 33);
+        //SE_INFO("CZESC %i", 33);
         //SE_FATAL("LOL");
 
         // if(Reflection::GetType("Core")->GetMetaData(EngineInfo::IS_SERVER)->Convert<bool>())

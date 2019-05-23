@@ -3,7 +3,7 @@
 #include "Networking/INetwork.h"
 #include "Networking/Config.h"
 
-#include "Networking/NetworkCommands.h"
+#include "Networking/GetNetCommandEvent.h"
 
 #include "RuntimeReflection/Macro.h"
 #include "RuntimeReflection/Reflection.h"
@@ -28,18 +28,11 @@ namespace SteelEngine {
     class Client : public Interface::INetwork
     {
         GENERATED_BODY
-    public:
-        struct MessageData
-        {
-            char* m_Data;
-            size_t m_Size;
-        };
-
     private:
         SOCKET m_Socket;
         std::thread* m_Thread;
-        std::queue<MessageData> m_Commands;
-
+        std::queue<NetworkCommands::MessageData> m_Commands;
+        NetworkCommands::INetworkCommand* m_Command;
         Variant* m_ServerInfo;
 
     public:
@@ -59,6 +52,9 @@ namespace SteelEngine {
 
         SE_METHOD()
         int Receive(SOCKET sock, char* buffer, Type::uint32 size) override;
+
+        SE_METHOD()
+        std::queue<NetworkCommands::MessageData>* GetCommands();
 
         void operator()(NetworkCommands::INetworkCommand* event);
     };

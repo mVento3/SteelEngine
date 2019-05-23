@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "RuntimeReflection/Reflection.h"
+#include "RuntimeReflection/ReflectionAttributes.h"
 
 #include "Utils/Utils.h"
 
@@ -277,9 +278,14 @@ namespace SteelEngine {
 						current.erase(current.begin(), current.begin() + strlen("SE_CLASS("));
 						current.erase(current.end() - 1, current.end());
 
-						if (current.find("SE_RUNTIME_SERIALIZE") != std::string::npos)
+						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
 						{
 							m_SerializeAll = true;
+						}
+
+						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_NO_SERIALIZE)) != std::string::npos)
+						{
+							m_GenerateSerializeFunction = false;
 						}
 
 						m_ClassMetaDataInfo = ParseMeta(current);
@@ -324,9 +330,14 @@ namespace SteelEngine {
 						current.erase(current.begin(), current.begin() + strlen("SE_STRUCT("));
 						current.erase(current.end() - 1, current.end());
 
-						if (current.find("SE_RUNTIME_SERIALIZE") != std::string::npos)
+						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
 						{
 							m_SerializeAll = true;
+						}
+
+						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_NO_SERIALIZE)) != std::string::npos)
+						{
+							m_GenerateSerializeFunction = false;
 						}
 
 						m_ClassMetaDataInfo = ParseMeta(current);
@@ -366,7 +377,7 @@ namespace SteelEngine {
 						current.erase(current.begin(), current.begin() + strlen("SE_VALUE("));
 						current.erase(current.end() - 1, current.end());
 
-						if (current.find("SE_RUNTIME_SERIALIZE") != std::string::npos)
+						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
 						{
 							serialize = true;
 						}
@@ -380,6 +391,15 @@ namespace SteelEngine {
 						replaceAll(current, "    ", "");
 						replaceAll(current, "\t", "");
 						replaceAll(current, ";", "");
+
+						size_t open = RuntimeDatabase::s_InvalidID;
+						size_t closed = RuntimeDatabase::s_InvalidID;
+
+						if((open = current.find("[")) != std::string::npos &&
+							(closed = current.find("]")) != std::string::npos)
+						{
+							current.erase(current.begin() + open, current.end());
+						}
 
 						std::vector<std::string> splitted = split(current, ' ');
 

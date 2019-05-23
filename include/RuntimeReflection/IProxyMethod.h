@@ -8,7 +8,7 @@ namespace SteelEngine {
 	template <typename... Args>
 	struct IProxyMethod : public IReflectionMethod
 	{
-		virtual Variant* Invoke(void* obj, Args...) { return 0; }
+		virtual Variant Invoke(void* obj, Args...) = 0;
 	};
 
 }

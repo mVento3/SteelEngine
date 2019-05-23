@@ -42,6 +42,11 @@ namespace SteelEngine {
 		{
 			m_Args = std::make_tuple(args...);
 		}
+
+		~Tuple()
+		{
+			
+		}
 	};
 
 	struct Tuple2 : public ITuple
@@ -50,7 +55,12 @@ namespace SteelEngine {
 		Tuple2(Args... args)
 		{
 			m_Tuple = new Tuple<Args...>(args...);
-	  }
+		}
+
+		~Tuple2()
+		{
+			
+		}
 	};
 
 	struct ConstrucedObject

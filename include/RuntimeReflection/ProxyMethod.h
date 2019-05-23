@@ -25,13 +25,16 @@ namespace SteelEngine {
 			return (obj.*m_FunctionCallback)(std::forward<Args>(args)...);
 		}
 
-		Variant* Invoke(void* obj, Args... args) override
+		Variant Invoke(void* obj, Args... args) override
 		{
 			T* type = (T*)obj;
 
 			Call(*type, args...);
 
-			return 0;
+			static Result noneRes(SE_FALSE, "NONE");
+			static Variant none(noneRes, typeid(noneRes).hash_code());
+
+			return none;
 		}
 	};
 
@@ -48,16 +51,17 @@ namespace SteelEngine {
 
 		}
 
-		R Call(T& obj, Args... args)
+		R Call(T* obj, Args... args)
 		{
-			return (obj.*m_FunctionCallback)(std::forward<Args>(args)...);
+			return (obj->*m_FunctionCallback)(std::forward<Args>(args)...);
 		}
 
-		Variant* Invoke(void* obj, Args... args) override
+		Variant Invoke(void* obj, Args... args) override
 		{
 			T* type = (T*)obj;
+			R r(Call(type, args...));
 
-			return new Variant(*(new R(Call(*type, args...))), typeid(R).hash_code());
+			return Variant(r, typeid(r).hash_code());
 		}
 	};
 

@@ -12,7 +12,7 @@
 
 #include "Networking/Config.h"
 #include "Networking/INetwork.h"
-#include "Networking/NetworkCommands.h"
+#include "Networking/GetNetCommandEvent.h"
 
 #include "RuntimeReflection/Reflection.h"
 #include "RuntimeReflection/Macro.h"
@@ -29,19 +29,16 @@ namespace SteelEngine {
     {
         GENERATED_BODY
     public:
-        struct MessageData
-        {
-            char* m_Data;
-            size_t m_Size;
-        };
-
-        typedef std::map<SOCKET, std::queue<MessageData>> SocketMap2;
+        typedef std::map<SOCKET, std::queue<NetworkCommands::MessageData>> SocketMap;
 
     private:
         fd_set m_Master;
         SOCKET m_ListeningSocket;
         ServerInfo m_ServerInfo;
-        SocketMap2 m_Commands;
+        SocketMap m_Commands;
+        std::vector<NetworkCommands::INetworkCommand*> m_CommandTypes;
+        char m_Header[HEADER_SIZE];
+        char* m_Buffer;
 
     public:
         Server();
@@ -57,6 +54,9 @@ namespace SteelEngine {
 
         SE_METHOD()
         int Receive(SOCKET sock, char* buffer, Type::uint32 size) override;
+
+        SE_METHOD()
+        std::queue<NetworkCommands::MessageData>* GetCommands(SOCKET sock);
 
         void operator()(NetworkCommands::INetworkCommand* event);
     };

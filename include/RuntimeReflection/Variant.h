@@ -107,7 +107,7 @@ namespace SteelEngine {
 
 		~Variant()
 		{
-
+			
 		}
 
 		void Change(const Variant& value)
@@ -173,6 +173,12 @@ namespace SteelEngine {
 			m_TypeID = value->m_TypeID;
 
 			return old;
+		}
+
+		inline void Clear()
+		{
+			delete m_ValuePointer;
+			m_ValuePointer = 0;
 		}
 
 		inline size_t GetType()

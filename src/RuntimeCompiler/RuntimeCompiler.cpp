@@ -288,7 +288,7 @@ namespace SteelEngine {
 						);
 
 #ifdef SE_WINDOWS
-						NetworkCommands::INetworkCommand* ev = new NetworkCommands::SwapModuleEvent("bin/Runtime/Swap/" + m_ModuleName + ".dll\0");
+						NetworkCommands::INetworkCommand* ev = new NetworkCommands::SwapModuleNetCommandEvent("bin/Runtime/Swap/" + m_ModuleName + ".dll\0");
 
 						Event::GlobalEvent::Broadcast_(ev);
 

@@ -12,6 +12,8 @@
 
 #include "RuntimeReflection/Variant.h"
 
+#include "RuntimeDatabase/RuntimeDatabase.h"
+
 namespace SteelEngine {
 
 	struct IReflectionData : public MetaDataImplementation
@@ -69,7 +71,17 @@ namespace SteelEngine {
 			{
 				if (cons->m_ConstructorID == typeid(Interface::IRuntimeObject*(Args...)).hash_code())
 				{
-					return cons->Invoke(args...);
+					Tuple2 tuple(args...);
+
+					Interface::IRuntimeObject* obj = cons->Invoke(tuple.m_Tuple);
+
+					if (tuple.m_Tuple)
+					{
+						delete tuple.m_Tuple;
+						tuple.m_Tuple = 0;
+					}
+
+					return obj;
 				}
 			}
 
@@ -113,15 +125,16 @@ namespace SteelEngine {
 		}
 
 		template <typename... Args>
-		Variant* Invoke(const std::string& name, void* object, Args... args)
+		Variant Invoke(const std::string& name, void* object, Args... args)
 		{
 			IProxyMethod<Args...>* res = (IProxyMethod<Args...>*)m_Methods.find(name.c_str())->second;
 
 			if (!res)
 			{
-				static Variant* wrongVariant = new Variant();
+				static Result noneRes(SE_FALSE, "NONE");
+				static Variant none(noneRes, typeid(noneRes).hash_code());
 
-				return wrongVariant;
+				return none;
 			}
 
 			return res->Invoke(object, args...);

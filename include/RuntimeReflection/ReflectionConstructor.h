@@ -6,6 +6,8 @@
 
 #include "RuntimeCompiler/IRuntimeObject.h"
 
+#include "ModuleManager/ModuleManager.h"
+
 namespace SteelEngine {
 
 	template <typename... Args>
@@ -23,22 +25,7 @@ namespace SteelEngine {
 
 		Interface::IRuntimeObject* Invoke(ITuple* args) override
 		{
-			static void* module;
-
-			if (!module)
-			{
-				Module::Load("RuntimeDatabase.dll", &module);
-			}
-
-			RuntimeDatabase::GetStateCallback get;
-			Module::Get("getState", module, (void**)&get);
-
-			static RuntimeDatabase* db;
-
-			if (!db)
-			{
-				db = (RuntimeDatabase*)get();
-			}
+			static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
 
 			Tuple<Args...>* tuple = 0;
 
@@ -52,12 +39,6 @@ namespace SteelEngine {
 			}
 
 			Interface::IRuntimeObject* object = apply(m_Function, tuple->m_Args);
-
-			if (args->m_Tuple)
-			{
-				delete args->m_Tuple;
-				args->m_Tuple = 0;
-			}
 
 			object->m_Object = object;
 			object->m_ConstructorID = m_ConstructorID;

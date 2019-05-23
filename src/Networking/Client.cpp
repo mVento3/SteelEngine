@@ -58,6 +58,8 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
+        m_Command = (NetworkCommands::INetworkCommand*)Reflection::CreateInstance("GetNetCommandEvent");
+
         Event::GlobalEvent::Add_<NetworkCommands::INetworkCommand>(this);
 
         return SE_TRUE;
@@ -71,63 +73,7 @@ namespace SteelEngine {
 
             while(1)
             {
-                std::string buf;
-
-                buf.resize(bufferSize);
-
-                if(!m_Commands.empty())
-                {
-                    while(!m_Commands.empty())
-                    {
-                        MessageData data = m_Commands.front();
-
-                        Send(m_Socket, data.m_Data, 1024);
-
-                        char header[HEADER_SIZE];
-
-                        for(int i = 0; i < HEADER_SIZE; i++)
-                        {
-                            header[i] = data.m_Data[i];
-                        }
-
-                        if(strcmp(header, "SwapModuleEvent") == 0)
-                        {
-                            NetworkCommands::SwapModuleEvent s;
-
-                            s.Deserialize(data.m_Data);
-
-                            s.ClientSide(this, m_Socket);
-                        }
-
-                        m_Commands.pop();
-                    }
-                }
-                else
-                {
-                    Send(m_Socket, "GetEvent", bufferSize);
-                }
-
-                Receive(m_Socket, (char*)&buf[0], bufferSize);
-
-                char header[HEADER_SIZE];
-
-                for(int i = 0; i < HEADER_SIZE; i++)
-                {
-                    header[i] = buf[i];
-                }
-
-                if(strcmp(header, "NoneEvent") == 0)
-                {
-
-                }
-                else if(strcmp(header, "SwapModuleEvent") == 0)
-                {
-                    NetworkCommands::SwapModuleEvent s;
-
-                    s.Deserialize(&buf[0]);
-
-                    s.ClientSide(this, m_Socket);
-                }
+                m_Command->ClientSide(this, m_Socket);
 
                 Sleep(1);
             }
@@ -144,6 +90,11 @@ namespace SteelEngine {
         return recv(sock, buffer, size, 0);
     }
 
+    std::queue<NetworkCommands::MessageData>* Client::GetCommands()
+    {
+        return &m_Commands;
+    }
+
     void Client::operator()(const RecompiledEvent& event)
     {
         
@@ -151,13 +102,13 @@ namespace SteelEngine {
 
     void Client::operator()(NetworkCommands::INetworkCommand* event)
     {
-        MessageData data;
+        NetworkCommands::MessageData data;
 
-        data.m_Size = event->m_Size;
+        data.m_Size = Reflection::GetType(event->m_Header)->GetMetaData("sizeof")->Convert<size_t>();
         data.m_Data = new char[data.m_Size];
 
         event->m_Flow = NetworkCommands::CommunicationFlow::CLIENT_TO_SERVER;
-
+        
         event->Serialize(data.m_Data);
 
         m_Commands.push(data);

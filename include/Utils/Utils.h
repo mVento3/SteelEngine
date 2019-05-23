@@ -4,6 +4,8 @@
 #include <sstream>
 #include <vector>
 
+#define SE_GET_TYPE_NAME(type) #type
+
 void split(const std::string &s, char delim, std::back_insert_iterator<std::vector<std::string>> result);
 
 std::vector<std::string> split(const std::string &s, char delim);

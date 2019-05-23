@@ -48,6 +48,22 @@ namespace SteelEngine {
         FD_ZERO(&m_Master);
         FD_SET(m_ListeningSocket, &m_Master);
 
+        std::vector<IReflectionData*> types = Reflection::GetTypes();
+
+        for(Type::uint32 i = 0; i < types.size(); i++)
+        {
+            IReflectionData* type = types[i];
+
+            if(type->GetMetaData(ReflectionAttribute::SE_NETWORK_COMMAND)->Convert<bool>())
+            {
+                m_CommandTypes.push_back((NetworkCommands::INetworkCommand*)type->Create());
+            }
+        }
+
+        Type::uint32 bufferSize = m_ServerInfo.m_BufferSize;
+
+        m_Buffer = new char[bufferSize];
+
         Event::GlobalEvent::Add_<NetworkCommands::INetworkCommand>(this);
     }
 
@@ -82,12 +98,7 @@ namespace SteelEngine {
             else
             {
                 Type::uint32 bufferSize = m_ServerInfo.m_BufferSize;
-
-                char* buf = new char[bufferSize];
-
-                ZeroMemory(buf, bufferSize);
-
-                int bytesIn = Receive(sock, buf, bufferSize);
+                int bytesIn = Receive(sock, m_Buffer, bufferSize);
 
                 if(bytesIn < 0)
                 {
@@ -111,52 +122,20 @@ namespace SteelEngine {
                 }
                 else
                 {
-                    char header[HEADER_SIZE];
-
                     for(int i = 0; i < HEADER_SIZE; i++)
                     {
-                        header[i] = buf[i];
+                        m_Header[i] = m_Buffer[i];
                     }
 
-                    if(strcmp(header, "GetEvent") == 0)
+                    for(Type::uint32 i = 0; i < m_CommandTypes.size(); i++)
                     {
-                        if(!m_Commands[sock].empty())
+                        NetworkCommands::INetworkCommand* command = m_CommandTypes[i];
+
+                        if(strcmp(command->m_Header, m_Header) == 0)
                         {
-                            MessageData data = m_Commands[sock].front();
-
-                            Send(sock, data.m_Data, data.m_Size);
-
-                            char header[HEADER_SIZE];
-
-                            for(int i = 0; i < HEADER_SIZE; i++)
-                            {
-                                header[i] = data.m_Data[i];
-                            }
-
-                            if(strcmp(header, "SwapModuleEvent") == 0)
-                            {
-                                NetworkCommands::SwapModuleEvent s;
-
-                                // Nah
-                                s.Deserialize(data.m_Data);
-
-                                s.ServerSide(this, sock);
-                            }
-
-                            m_Commands[sock].pop();
+                            command->Deserialize(m_Buffer);
+                            command->ServerSide(this, sock);
                         }
-                        else
-                        {
-                            Send(sock, "NoneEvent\0", bufferSize);
-                        }
-                    }
-                    else if(strcmp(header, "SwapModuleEvent") == 0)
-                    {
-                        NetworkCommands::SwapModuleEvent s;
-
-                        s.Deserialize(buf);
-
-                        s.ServerSide(this, sock);
                     }
                 }
             }
@@ -173,6 +152,11 @@ namespace SteelEngine {
         return recv(sock, buffer, size, 0);
     }
 
+    std::queue<NetworkCommands::MessageData>* Server::GetCommands(SOCKET sock)
+    {
+        return &m_Commands[sock];
+    }
+
     void Server::operator()(const RecompiledEvent& event)
     {
         m_ServerInfo = Reflection::GetType("Server")->GetMetaData(SE_SERVER_INFO)->Convert<ServerInfo>();
@@ -180,16 +164,16 @@ namespace SteelEngine {
 
     void Server::operator()(NetworkCommands::INetworkCommand* event)
     {  
-        MessageData data;
+        NetworkCommands::MessageData data;
 
-        data.m_Size = event->m_Size;
+        data.m_Size = Reflection::GetType(event->m_Header)->GetMetaData("sizeof")->Convert<size_t>();
         data.m_Data = new char[data.m_Size];
 
         event->m_Flow = NetworkCommands::CommunicationFlow::SERVER_TO_CLIENT;
 
         event->Serialize(data.m_Data);
 
-        for(SocketMap2::iterator it = m_Commands.begin(); it != m_Commands.end(); ++it)
+        for(SocketMap::iterator it = m_Commands.begin(); it != m_Commands.end(); ++it)
         {
             it->second.push(data);
         }

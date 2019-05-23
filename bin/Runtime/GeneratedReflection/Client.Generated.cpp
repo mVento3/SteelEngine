@@ -24,6 +24,9 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Client))
 .Method("Receive", &SteelEngine::Client::Receive)
 (
 )
+.Method("GetCommands", &SteelEngine::Client::GetCommands)
+(
+)
 ;
 }
 

@@ -12,7 +12,7 @@
 #include "RuntimeReflection/ReflectionGenerator.h"
 #include "RuntimeReflection/Macro.h"
 
-#include "Networking/NetworkCommands.h"
+#include "Networking/SwapModuleNetCommandEvent.h"
 #include "Networking/Config.h"
 
 #include "RuntimeCompiler.Generated.h"
