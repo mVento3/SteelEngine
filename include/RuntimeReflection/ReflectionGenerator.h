@@ -3,6 +3,8 @@
 #include "RuntimeReflection/IReflectionGenerator.h"
 
 #include "vector"
+#include "fstream"
+#include "sstream"
 
 namespace SteelEngine {
 
@@ -66,6 +68,50 @@ namespace SteelEngine {
 			std::string					m_EnumName;
 			std::vector<MetaDataInfo>	m_MetaData;
 			std::vector<EnumElement>	m_Elements;
+		};
+
+	// Header Parsing Events:
+		struct PreHeaderProcessEvent
+		{
+			const std::vector<std::string>* m_HeaderLines;
+		};
+
+		struct CheckCurrentTextEvent
+		{
+			const std::string m_Text;
+			const Type::uint32 m_Line;
+			const std::string m_FullLine;
+		};
+
+		struct SE_ClassMacroEvent
+		{
+			const std::vector<ReflectionGenerator::MetaDataInfo>* m_MetaData;
+			const std::string m_ClassName;
+			const std::vector<std::string>* m_Inheritance;
+		};
+
+		struct SE_ValueMacroEvent
+		{
+			const ReflectionGenerator::ClassProperty* m_Info;
+		};
+
+		struct SE_MethodMacroEvent
+		{
+			const ReflectionGenerator::ClassMethod* m_Info;
+		};
+
+	// Source Parsing Events
+
+	// Header Generate Events
+		struct GenerateHeaderEvent
+		{
+			std::ofstream* m_Out;
+		};
+	
+	// Source Generate Events
+		struct GenerateSourceEvent
+		{
+			std::ofstream* m_Out;
 		};
 
 	private:

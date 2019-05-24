@@ -17,6 +17,10 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::NetworkCommands:
 .Constructor<const std::string&>()
 (
 )
+.Property("m_ModuleName", &SteelEngine::NetworkCommands::SwapModuleNetCommandEvent::m_ModuleName)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_NET_VALUE, true)
+)
 .Method("Serialize", &SteelEngine::NetworkCommands::SwapModuleNetCommandEvent::Serialize)
 (
 )

@@ -20,6 +20,12 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::NetworkCommands:
 .Method("Deserialize", &SteelEngine::NetworkCommands::GetNetCommandEvent::Deserialize)
 (
 )
+.Method("Serialize", &SteelEngine::NetworkCommands::GetNetCommandEvent::Serialize)
+(
+)
+.Method("Deserialize", &SteelEngine::NetworkCommands::GetNetCommandEvent::Deserialize)
+(
+)
 .Method("ServerSide", &SteelEngine::NetworkCommands::GetNetCommandEvent::ServerSide)
 (
 )

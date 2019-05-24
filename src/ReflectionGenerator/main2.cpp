@@ -1,9 +1,13 @@
 #include "RuntimeReflection/ReflectionGenerator.h"
+#include "RuntimeReflection/Reflection.h"
+#include "RuntimeReflection/ReflectionAttributes.h"
 
 #include "Module/Module.h"
 #include "Module/ModuleDetails.h"
 
 #include "ModuleManager/ModuleManager.h"
+
+#include "RuntimeCompiler/IRuntimeObject.h"
 
 // Only used in building .exe and .dll part to create required reflection
 
@@ -26,6 +30,20 @@ int main(int argc, char* argv[])
     SteelEngine::Module::Get("exports", dll, (void**)&info);
 
     SteelEngine::Interface::IReflectionGenerator* rg = (SteelEngine::Interface::IReflectionGenerator*)info->m_AllocateCallback(0, 0);
+
+    std::vector<SteelEngine::Interface::IRuntimeObject*> modules;
+    std::vector<SteelEngine::IReflectionData*> types =
+        SteelEngine::Reflection::GetTypes();
+
+    for(SteelEngine::Type::uint32 i = 0; i < types.size(); i++)
+    {
+        SteelEngine::IReflectionData* type = types[i];
+
+        if(type->GetMetaData(SteelEngine::ReflectionAttribute::SE_REFLECTION_MODULE)->Convert<bool>())
+        {
+            modules.push_back(type->Create());
+        }
+    }
 
     try
     {

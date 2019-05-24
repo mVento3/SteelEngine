@@ -69,6 +69,8 @@ namespace SteelEngine { namespace NetworkCommands {
                     {
                         command->Deserialize(data.m_Data);
                         command->ServerSide(network, sock);
+
+                        break;
                     }
                 }
 
@@ -109,6 +111,8 @@ namespace SteelEngine { namespace NetworkCommands {
                         {
                             command->Deserialize(data.m_Data);
                             command->ClientSide(network, sock);
+
+                            break;
                         }
                     }
 
@@ -136,6 +140,8 @@ namespace SteelEngine { namespace NetworkCommands {
                 {
                     command->Deserialize(m_Buffer);
                     command->ClientSide(network, sock);
+
+                    break;
                 }
             }
         }

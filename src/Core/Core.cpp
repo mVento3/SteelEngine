@@ -27,6 +27,20 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
+        std::vector<SteelEngine::Interface::IRuntimeObject*> modules;
+        std::vector<SteelEngine::IReflectionData*> types =
+            SteelEngine::Reflection::GetTypes();
+
+        for(SteelEngine::Type::uint32 i = 0; i < types.size(); i++)
+        {
+            SteelEngine::IReflectionData* type = types[i];
+
+            if(type->GetMetaData(SteelEngine::ReflectionAttribute::SE_REFLECTION_MODULE)->Convert<bool>())
+            {
+                modules.push_back(type->Create());
+            }
+        }
+
         ((RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase"))->m_GlobalLogger = m_Logger;
 
         meta2 = Reflection::GetType("Core")->GetProperty("ta")->GetMetaData(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE);

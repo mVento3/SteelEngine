@@ -7,11 +7,18 @@
 #include "fstream"
 #include "queue"
 
+#include "RuntimeReflection/ReflectionAttributes.h"
+
+#include "SwapModuleNetCommandEvent.Generated.h"
+
 namespace SteelEngine { namespace NetworkCommands {
 
     SE_CLASS(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE, SteelEngine::ReflectionAttribute::SE_NETWORK_COMMAND)
     struct SwapModuleNetCommandEvent : public INetworkCommand
     {
+        GENERATED_BODY
+
+        SE_VALUE(SteelEngine::ReflectionAttribute::SE_NET_VALUE)
         std::string m_ModuleName;
 
         SwapModuleNetCommandEvent()
@@ -23,42 +30,6 @@ namespace SteelEngine { namespace NetworkCommands {
             m_ModuleName(moduleName)
         {
             strcpy(m_Header, SE_GET_TYPE_NAME(SwapModuleNetCommandEvent));
-        }
-
-        SE_METHOD()
-        char* Serialize(char* data) override
-        {
-            char* p = INetworkCommand::Serialize(data);
-
-            for(int i = 0; i < strlen(m_ModuleName.c_str()) + 1; i++)
-            {
-                *p = m_ModuleName[i];
-                p++;
-            }
-
-            return p;
-        }
-
-        SE_METHOD()
-        char* Deserialize(char* data) override
-        {
-            m_ModuleName.clear();
-
-            char* p = INetworkCommand::Deserialize(data);
-
-            while(1)
-            {
-                m_ModuleName.push_back(*p);
-                p++;
-
-                if(*p == '\0')
-                {
-                    p++;
-                    break;
-                }
-            }
-
-            return p;
         }
 
         SE_METHOD()

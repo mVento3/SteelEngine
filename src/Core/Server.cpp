@@ -139,6 +139,8 @@ namespace SteelEngine {
                         {
                             command->Deserialize(m_Buffer);
                             command->ServerSide(this, sock);
+
+                            break;
                         }
                     }
                 }
