@@ -233,9 +233,12 @@ namespace SteelEngine {
 				}
 				else if (currentChar == ';')
 				{
-					if (text != "" && m_SerializeAll && !isFunction)
+					if (text != "" && !isFunction)
 					{
-						m_PropertiesToSerialize.push_back(split(text, ' ')[1]);
+						//m_PropertiesToSerialize.push_back();
+						std::vector<std::string> splitted = split(text, ' ');
+
+						Event::GlobalEvent::Broadcast(CheckCurrentValueEvent{ splitted[0], splitted[1] });
 					}
 				}
 				else
@@ -279,36 +282,6 @@ namespace SteelEngine {
 						current.erase(current.begin(), current.begin() + strlen("SE_CLASS("));
 						current.erase(current.end() - 1, current.end());
 
-						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
-						{
-							m_SerializeAll = true;
-						}
-
-						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_NO_SERIALIZE)) != std::string::npos)
-						{
-							m_GenerateSerializeFunction = false;
-
-							MethodInfo methInfo;
-
-							methInfo.m_Name = "Serialize";
-							methInfo.m_ReturnType = "char*";
-
-							ClassMethod clsMeth;
-
-							clsMeth.m_MethodInfo = methInfo;
-							clsMeth.m_ProtectionFlag = ProtectionFlag::PUBLIC;
-
-							m_Methods.push_back(clsMeth);
-
-							methInfo.m_Name = "Deserialize";
-							methInfo.m_ReturnType = "char*";
-
-							clsMeth.m_MethodInfo = methInfo;
-							clsMeth.m_ProtectionFlag = ProtectionFlag::PUBLIC;
-
-							m_Methods.push_back(clsMeth);
-						}
-
 						m_ClassMetaDataInfo = ParseMeta(current);
 
 						std::string p = m_HeaderLines[lineIndex + 1];
@@ -334,10 +307,6 @@ namespace SteelEngine {
 								}
 							}
 						}
-						else
-						{
-							m_GenerateSerializeFunction = false;
-						}
 
 						Event::GlobalEvent::Broadcast(SE_ClassMacroEvent
 						{
@@ -357,16 +326,6 @@ namespace SteelEngine {
 
 						current.erase(current.begin(), current.begin() + strlen("SE_STRUCT("));
 						current.erase(current.end() - 1, current.end());
-
-						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
-						{
-							m_SerializeAll = true;
-						}
-
-						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_NO_SERIALIZE)) != std::string::npos)
-						{
-							m_GenerateSerializeFunction = false;
-						}
 
 						m_ClassMetaDataInfo = ParseMeta(current);
 
@@ -389,26 +348,16 @@ namespace SteelEngine {
 								}
 							}
 						}
-						else
-						{
-							m_GenerateSerializeFunction = false;
-						}
 					}
 					else if (text == "SE_VALUE")
 					{
 						std::string current = line;
-						bool serialize = false;
 
 						replaceAll(current, "    ", "");
 						replaceAll(current, "\t", "");
 
 						current.erase(current.begin(), current.begin() + strlen("SE_VALUE("));
 						current.erase(current.end() - 1, current.end());
-
-						if (current.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
-						{
-							serialize = true;
-						}
 
 						ClassProperty prop = {};
 
@@ -436,12 +385,7 @@ namespace SteelEngine {
 
 						m_Properties.push_back(prop);
 
-						Event::GlobalEvent::Broadcast(SE_ValueMacroEvent{ &prop });
-
-						if (serialize)
-						{
-							m_PropertiesToSerialize.push_back(splitted[1]);
-						}
+						Event::GlobalEvent::Broadcast(SE_ValueMacroEvent{ &prop, &m_Properties });
 					}
 					else if (text == "SE_METHOD")
 					{
@@ -473,7 +417,7 @@ namespace SteelEngine {
 
 						m_Methods.push_back(meth);
 
-						Event::GlobalEvent::Broadcast(SE_MethodMacroEvent{ &meth });
+						Event::GlobalEvent::Broadcast(SE_MethodMacroEvent{ &meth, &m_Methods });
 					}
 					else if(text == "SE_ENUM")
 					{
@@ -717,7 +661,6 @@ namespace SteelEngine {
 	ReflectionGenerator::ReflectionGenerator()
 	{
 		m_Reflect = false;
-		m_SerializeAll = false;
 	}
 
 	ReflectionGenerator::~ReflectionGenerator()
@@ -771,27 +714,37 @@ namespace SteelEngine {
 
 		std::ofstream headerFile(generatePath.string() + "/" + rawFilename + ".Generated.h");
 
-		Event::GlobalEvent::Broadcast(GenerateHeaderEvent{ &headerFile });
+		headerFile << "#include \"RuntimeReflection/ReflectionGeneratorMacros.h\"\n";
+		headerFile << "\n";
+		headerFile << "#define GENERATED_BODY";
+
+		Event::GlobalEvent::Broadcast(GenerateHeaderEvent{ &headerFile, &m_GeneratedBodyMacro });
 
 		if (m_Reflect)
 		{
-			if (m_GenerateSerializeFunction)
+			if(m_GeneratedBodyMacro.size() > 0)
 			{
-				headerFile << "#include \"RuntimeReflection/ReflectionGeneratorMacros.h\"\n";
-				headerFile << "\n";
+				headerFile << " \\\n";
+			}
 
-				headerFile << "#define GENERATED_BODY \\\n";
-				headerFile << "public:\\\n";
-				headerFile << "void Serialize(SteelEngine::Interface::ISerializer* serializer) override;\\\n";
-				headerFile << "void operator()(const SteelEngine::RecompiledEvent& event_) override;\n";
+			for(Type::uint32 i = 0; i < m_GeneratedBodyMacro.size(); i++)
+			{
+				headerFile << m_GeneratedBodyMacro[i];
+
+				if(i < m_GeneratedBodyMacro.size() - 1)
+				{
+					headerFile << "\\";
+				}
+
+				headerFile << "\n";
 			}
 		}
+
+		m_GeneratedBodyMacro.clear();
 
 		headerFile.close();
 
 		std::ofstream sourceFile(generatePath.string() + "/" + rawFilename + ".Generated.cpp");
-
-		Event::GlobalEvent::Broadcast(GenerateSourceEvent{ &sourceFile });
 
 		if (m_Reflect)
 		{
@@ -915,34 +868,7 @@ namespace SteelEngine {
 			}
 			sourceFile << "}\n\n";
 
-			if (m_GenerateSerializeFunction)
-			{
-				sourceFile << "void " + namespacedClassName + "::Serialize(SteelEngine::Interface::ISerializer* serializer)\n";
-				sourceFile << "{\n";
-				{
-					for (Type::uint32 i = 0; i < m_PropertiesToSerialize.size(); i++)
-					{					
-						sourceFile << "SERIALIZE(" << namespacedClassName << "::" << m_PropertiesToSerialize[i] << ")\n";
-					}
-
-					for (std::string inh : m_Inheritance)
-					{
-						std::string curr = inh;
-
-						replaceAll(curr, "::", " ");
-
-						std::vector<std::string> splitted = split(curr, ' ');
-
-						IReflectionData* data = Reflection::GetType(splitted[splitted.size() - 1]);
-
-						if (data)
-						{
-							sourceFile << inh << "::Serialize(serializer);\n";
-						}
-					}
-				}
-				sourceFile << "}\n\n";
-			}
+			Event::GlobalEvent::Broadcast(GenerateSourceEvent{ &sourceFile, namespacedClassName });
 
 			// Here we are generating info for the runtime compilator
 
@@ -1007,11 +933,13 @@ namespace SteelEngine {
 		m_Constructors.clear();
 		m_Properties.clear();
 		m_Methods.clear();
-		m_PropertiesToSerialize.clear();
 		m_Enums.clear();
 		m_NamespaceHierarchy.clear();
 		m_AdditionalIncludeDependencies.clear();
 		m_Inheritance.clear();
+
+		Event::GlobalEvent::Broadcast(ClearValuesEvent{});
+
 		m_ClassName = "";
 		m_Reflect = false;
 	}

@@ -83,6 +83,12 @@ namespace SteelEngine {
 			const std::string m_FullLine;
 		};
 
+		struct CheckCurrentValueEvent
+		{
+			std::string m_Type;
+			std::string m_Name;
+		};
+
 		struct SE_ClassMacroEvent
 		{
 			const std::vector<ReflectionGenerator::MetaDataInfo>* m_MetaData;
@@ -93,11 +99,18 @@ namespace SteelEngine {
 		struct SE_ValueMacroEvent
 		{
 			const ReflectionGenerator::ClassProperty* m_Info;
+			std::vector<ClassProperty>* m_Properties;
 		};
 
 		struct SE_MethodMacroEvent
 		{
 			const ReflectionGenerator::ClassMethod* m_Info;
+			std::vector<ClassMethod>* m_Methods;
+		};
+
+		struct ClearValuesEvent
+		{
+
 		};
 
 	// Source Parsing Events
@@ -106,12 +119,14 @@ namespace SteelEngine {
 		struct GenerateHeaderEvent
 		{
 			std::ofstream* m_Out;
+			std::vector<std::string>* m_GeneratedBodyMacro;
 		};
-	
+
 	// Source Generate Events
 		struct GenerateSourceEvent
 		{
 			std::ofstream* m_Out;
+			const std::string m_NamespacedClassName;
 		};
 
 	private:
@@ -123,17 +138,15 @@ namespace SteelEngine {
 
 		bool m_Reflect;
 		ProtectionFlag m_LastProtectionFlag;
-		bool m_SerializeAll;
-		bool m_GenerateSerializeFunction = true;
 
 		std::vector<MetaDataInfo>		m_ClassMetaDataInfo;
 		std::vector<ConstructorInfo>	m_Constructors;
 		std::vector<ClassProperty>		m_Properties;
 		std::vector<ClassMethod>		m_Methods;
-		std::vector<std::string>		m_PropertiesToSerialize;
 		std::vector<EnumInfo>			m_Enums;
 		std::vector<std::string>		m_NamespaceHierarchy;
 		std::vector<std::string>		m_Inheritance;
+		std::vector<std::string>		m_GeneratedBodyMacro;
 
 		std::string m_ClassName;
 

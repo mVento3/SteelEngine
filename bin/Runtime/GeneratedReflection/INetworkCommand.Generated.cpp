@@ -10,12 +10,6 @@ SteelEngine::Reflection::Register<SteelEngine::NetworkCommands::INetworkCommand>
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::NetworkCommands::INetworkCommand))
 )
-.Method("Serialize", &SteelEngine::NetworkCommands::INetworkCommand::Serialize)
-(
-)
-.Method("Deserialize", &SteelEngine::NetworkCommands::INetworkCommand::Deserialize)
-(
-)
 ;
 }
 

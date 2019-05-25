@@ -20,9 +20,6 @@
 
 namespace SteelEngine {
 
-    // BUG: If in the compiler occure error like "permission denied" the thread doesn't close
-    // Add queueing for compilation or prevent to compiling if engine is compiling already
-
     SE_CLASS(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE)
     class Core : public Interface::ICore
     {
