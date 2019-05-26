@@ -95,7 +95,7 @@ namespace SteelEngine {
                 {
                     ReflectionGenerator::ClassProperty prop = m_Properties[i];
 
-                    if(prop.m_ArgumentInfo.m_Key.find("string") != std::string::npos)
+                    if(prop.m_ArgumentInfo.m_Type.find("string") != std::string::npos)
                     {
                         event.m_GeneratedBodyMacro->push_back("char* p = INetworkCommand::Serialize(data);");
 
@@ -120,7 +120,7 @@ namespace SteelEngine {
                 {
                     ReflectionGenerator::ClassProperty prop = m_Properties[i];
 
-                    if(prop.m_ArgumentInfo.m_Key.find("string") != std::string::npos)
+                    if(prop.m_ArgumentInfo.m_Type.find("string") != std::string::npos)
                     {
                         event.m_GeneratedBodyMacro->push_back("char* p = INetworkCommand::Deserialize(data);");
                         event.m_GeneratedBodyMacro->push_back(prop.m_ArgumentInfo.m_Name + ".clear();");

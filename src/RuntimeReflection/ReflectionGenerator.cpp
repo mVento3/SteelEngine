@@ -785,7 +785,7 @@ namespace SteelEngine {
 
 					for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
 					{
-						sourceFile << consInfo.m_Arguments[i].m_Key;
+						sourceFile << consInfo.m_Arguments[i].m_Type;
 
 						if (i < consInfo.m_Arguments.size() - 1)
 						{
@@ -892,7 +892,7 @@ namespace SteelEngine {
 
 								for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
 								{
-									sourceFile << consInfo.m_Arguments[i].m_Key;
+									sourceFile << consInfo.m_Arguments[i].m_Type;
 
 									if (i < consInfo.m_Arguments.size() - 1)
 									{

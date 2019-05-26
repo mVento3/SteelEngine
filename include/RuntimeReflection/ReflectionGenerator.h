@@ -26,7 +26,7 @@ namespace SteelEngine {
 
 		struct ArgumentInfo
 		{
-			std::string m_Key;
+			std::string m_Type;
 			std::string m_Name;
 		};
 
