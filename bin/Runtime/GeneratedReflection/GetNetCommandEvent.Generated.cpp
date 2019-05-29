@@ -14,10 +14,13 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::NetworkCommands:
 .Constructor<>()
 (
 )
-.Method("Serialize", &SteelEngine::NetworkCommands::GetNetCommandEvent::Serialize)
+.Property("m_HeaderComp", &SteelEngine::NetworkCommands::GetNetCommandEvent::m_HeaderComp)
 (
 )
-.Method("Deserialize", &SteelEngine::NetworkCommands::GetNetCommandEvent::Deserialize)
+.Property("m_Buffer", &SteelEngine::NetworkCommands::GetNetCommandEvent::m_Buffer)
+(
+)
+.Property("m_BufferSize", &SteelEngine::NetworkCommands::GetNetCommandEvent::m_BufferSize)
 (
 )
 .Method("Serialize", &SteelEngine::NetworkCommands::GetNetCommandEvent::Serialize)

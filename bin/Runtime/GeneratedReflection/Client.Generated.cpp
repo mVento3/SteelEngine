@@ -12,6 +12,9 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Client))
 .Constructor<>()
 (
 )
+.Property("m_SendingHugeBlock", &SteelEngine::Client::m_SendingHugeBlock)
+(
+)
 .Method("Connect", &SteelEngine::Client::Connect)
 (
 )

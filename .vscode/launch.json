@@ -87,7 +87,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/ReflectionGenerator.exe",
-            "args": ["src/Networking/SwapModuleNetCommandEvent.cpp", "src/Networking/SwapModuleNetCommandEvent.h"],
+            "args": ["bin", "src/Core/Core.cpp", "include/Core/Core.h"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

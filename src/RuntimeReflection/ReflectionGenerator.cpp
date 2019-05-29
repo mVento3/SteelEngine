@@ -15,513 +15,720 @@ namespace SteelEngine {
 	{
 		Event::GlobalEvent::Broadcast(PreHeaderProcessEvent{ &m_HeaderLines });
 
-		Type::uint32 lineIndex = 0;
+		ClassData* currentData = 0;
+		ConstructorInfo cons;
+		ClassProperty prop;
+		ClassMethod meth;
 
-		for (Type::uint32 i = 0; i < m_HeaderLines.size(); i++)
+		std::stack<ClassData*> classStack;
+
+		Type::uint32 bracesSize = 0;
+		std::vector<Type::uint32> okBraces;
+		std::vector<Type::uint32> notOkBraces;
+
+		std::vector<std::string> namespaces;
+
+		bool wasOkBrace = false;
+		bool wasNotOkBrace = false;
+
+		bool seClass = false;
+		bool seValue = false;
+		bool seMethod = false;
+
+		m_LastProtectionFlag = ProtectionFlag::NOT_SPECIFIED;
+
+		Lexer lexer(m_HeaderLines);
+
+		while(1)
 		{
-			const std::string line = m_HeaderLines[i];
-			std::string current = line;
-			Type::uint32 index = 0;
-			char currentChar = current[index++];
-			std::string text = "";
+			lexer++;
 
-			while (currentChar != '\0')
+			if(lexer.End())
 			{
-				if (currentChar == '#')
+				break;
+			}
+
+			if(lexer.GetToken() == "namespace")
+			{
+				wasOkBrace = true;
+
+				lexer++;
+
+				namespaces.push_back(lexer.GetToken());
+			}
+			else if(lexer.GetToken() == "struct" ||
+				lexer.GetToken() == "class")
+			{
+				wasOkBrace = true;
+
+				if(currentData == 0)
 				{
-					isHash = true;
+					currentData = new ClassData();
+
+					classStack.push(currentData);
 				}
-				else if (currentChar == '{')
+				else if(!seClass)
 				{
-					isA_Open = true;
+					ClassData* data = new ClassData();
+					currentData->m_Others.push_back(data);
+					currentData = data;
+					classStack.push(data);
 				}
-				else if (currentChar == '}')
+
+				if(lexer.GetToken() == "class")
 				{
-					isA_Open = false;
+					currentData->m_Type = ClassType::CLASS_TYPE;
 				}
-				else if (currentChar == '(')
+				else if(lexer.GetToken() == "struct")
 				{
-					if(isFunction)
+					currentData->m_Type = ClassType::STRUCT_TYPE;
+				}
+
+				lexer++;
+
+				currentData->m_ClassName = lexer.GetToken();
+				currentData->m_Hierarchy = namespaces;
+				namespaces.push_back(lexer.GetToken());
+
+				lexer++;
+
+				// Have some inheritance
+				if(lexer.GetToken() == ":")
+				{
+					lexer++; // or public or name
+
+					ProtectionFlag protection;
+
+					while(1)
 					{
-						isIn = true;
-					}
-
-					isFunction = true;
-
-					if (m_ClassName != "" && text == m_ClassName)
-					{
-						std::string current = line;
-
-						replaceAll(current, "    ", "");
-						replaceAll(current, "\t", "");
-						replaceAll(current, ";", "");
-
-						current.erase(current.begin(), current.begin() + strlen(m_ClassName.c_str()) + 1);
-						current.erase(current.end() - 1, current.end());
-
-						ConstructorInfo cons;
-
-						std::vector<std::string> splitted = split(current, ',');
-
-						current = m_HeaderLines[lineIndex - 1];
-
-						if (current.find("SE_CONSTRUCTOR") != std::string::npos)
+						if(lexer.GetToken() == "{")
 						{
-							replaceAll(current, "    ", "");
-							replaceAll(current, "\t", "");
+							lexer.SaveToken(lexer.GetToken());
 
-							current.erase(current.begin(), current.begin() + strlen("SE_CONSTRUCTOR("));
-							current.erase(current.end() - 1, current.end());
-
-							cons.m_MetaData = ParseMeta(current);
+							break;
+						}
+						else if(lexer.GetToken() == ",")
+						{
+							lexer++;
+							continue;
 						}
 
-						for (std::string c : splitted)
+						if(lexer.GetToken() == "public")
 						{
-							if (c[0] == ' ')
+							protection = ProtectionFlag::PUBLIC;
+
+							std::string word = "";
+
+							while(1)
 							{
-								c[0] = '\t';
-							}
+								lexer++;
 
-							std::vector<std::string> s2 = split(c, ' ');
-
-							if (s2.size() > 2)
-							{
-								std::string res = "";
-
-								for (Type::uint32 i = 0; i < s2.size() - 1; i++)
+								if(lexer.GetToken() == "{" ||
+									lexer.GetToken() == ",")
 								{
-									res += s2[i];
+									lexer.SaveToken(lexer.GetToken());
 
-									if (i < s2.size() - 2)
-									{
-										res += " ";
-									}
+									break;
 								}
 
-								cons.m_Arguments.push_back(ArgumentInfo{ res, s2[s2.size() - 1] });
+								word += lexer.GetToken();
 							}
-							else if (s2.size() == 2)
-							{
-								replaceAll(s2[0], "    ", "");
 
-								cons.m_Arguments.push_back(ArgumentInfo{ s2[0], s2[1] });
-							}
+							currentData->m_Inheritance.push_back(word);
 						}
-
-						m_Constructors.push_back(cons);
-					}
-				}
-				else if (currentChar == ')')
-				{
-					if (isFunction && !isIn)
-					{
-						break;
-					}
-				}
-				else if(currentChar == '\t')
-				{
-					
-				}
-				else if (currentChar == '/')
-				{
-					if (isComment)
-					{
-						break;
-					}
-
-					isComment = true;
-				}
-				else if (currentChar == ' ')
-				{
-					// Here we should check the current syntax/text
-
-					Event::GlobalEvent::Broadcast(CheckCurrentTextEvent{ text, lineIndex, line });
-
-					if (text == "")
-					{
-
-					}
-					else if (text == "namespace")
-					{
-						std::string current = line;
-
-						replaceAll(current, "\t", "");
-
-						std::vector<std::string> splitted = split(current, ' ');
-
-						for (std::string nam : splitted)
+						else if(lexer.GetToken() == "private")
 						{
-							if (nam != "{" && nam != "namespace")
-							{
-								m_NamespaceHierarchy.push_back(nam);
-							}
+							protection = ProtectionFlag::PRIVATE;
+
+							lexer++;
+
+							currentData->m_Inheritance.push_back(lexer.GetToken());
 						}
-
-						break;
-					}
-					else if (text == "using")
-					{
-						break;
-					}
-					else if (text == "struct")
-					{
-						isStruct = true;
-
-						break;
-					}
-					else if (text == "class")
-					{
-						isClass = true;
-
-						break;
-					}
-					else if (text == "friend")
-					{
-						break;
-					}
-					else if (text == "static")
-					{
-						break;
-					}
-					else if (text == "template")
-					{
-						break;
-					}
-					else if (text == "return")
-					{
-						break;
-					}
-					else if (text == "const")
-					{
-						break;
-					}
-					else if (text == "void")
-					{
-						break;
-					}
-					else if (text == "inline")
-					{
-						break;
-					}
-					else if (text == "include")
-					{
-						if (line.find("/") == std::string::npos)
+						else if(lexer.GetToken() == "protected")
 						{
-							std::string current = line;
+							protection = ProtectionFlag::PROTECTED;
 
-							current.erase(current.begin(), current.begin() + strlen("#include \""));
-							current.erase(current.end() - 1, current.end());
+							lexer++;
 
-							filesystem::path linePath = current;
-							filesystem::path path = m_PathHeader;
-
-							linePath.replace_extension("cpp");
-
-							path.replace_filename(linePath);
-
-							if (filesystem::exists(path))
-							{
-								m_AdditionalIncludeDependencies.push_back(path.string());
-							}
+							currentData->m_Inheritance.push_back(lexer.GetToken());
 						}
-					}
-					else
-					{
-						text += ' ';
-					}
-				}
-				else if (currentChar == ';')
-				{
-					if (text != "" && !isFunction)
-					{
-						//m_PropertiesToSerialize.push_back();
-						std::vector<std::string> splitted = split(text, ' ');
+						else
+						{
+							// Pure inheritance name
+						}
 
-						Event::GlobalEvent::Broadcast(CheckCurrentValueEvent{ splitted[0], splitted[1] });
+						lexer++;
 					}
 				}
 				else
 				{
-					if (isA_Open && (isClass || isStruct))
+					// Need to get back, or save the token
+					lexer.SaveToken(lexer.GetToken());
+				}
+
+				Event::GlobalEvent::Broadcast(SE_ClassMacroEvent
 					{
-						break;
-					}
+						&currentData->m_ClassMetaDataInfo,
+						currentData->m_ClassName,
+						&currentData->m_Inheritance
+					});
+			}
+			else if(lexer.GetToken() == "public")
+			{
+				m_LastProtectionFlag = ProtectionFlag::PUBLIC;
+			}
+			else if(lexer.GetToken() == "protected")
+			{
+				m_LastProtectionFlag = ProtectionFlag::PROTECTED;
+			}
+			else if(lexer.GetToken() == "private")
+			{
+				m_LastProtectionFlag = ProtectionFlag::PRIVATE;
+			}
+			else if(lexer.GetToken() == "{")
+			{
+				if(wasOkBrace)
+				{
+					wasOkBrace = false;
 
-					text += currentChar;
+					okBraces.push_back(bracesSize);
+				}
+				else
+				{
+					wasNotOkBrace = false;
 
-					if (text == "public")
+					notOkBraces.push_back(bracesSize);
+				}
+
+				bracesSize++;
+			}
+			else if(lexer.GetToken() == "}")
+			{
+				bracesSize--;
+
+				bool found = false;
+
+				for(Type::uint32 i = 0; i < okBraces.size(); i++)
+				{
+					if(okBraces[i] == bracesSize)
 					{
-						m_LastProtectionFlag = ProtectionFlag::PUBLIC;
+						okBraces.erase(okBraces.begin() + i);
+						found = true;
 
-						break;
-					}
-					else if (text == "private")
-					{
-						m_LastProtectionFlag = ProtectionFlag::PRIVATE;
+						namespaces.pop_back();
 
-						break;
-					}
-					else if (text == "protected")
-					{
-						m_LastProtectionFlag = ProtectionFlag::PROTECTED;
-
-						break;
-					}
-
-					if (text == "SE_CLASS")
-					{
-						m_Reflect = true;
-
-						std::string current = line;
-
-						replaceAll(current, "    ", "");
-						replaceAll(current, "\t", "");
-						replaceAll(current, " ", "");
-
-						current.erase(current.begin(), current.begin() + strlen("SE_CLASS("));
-						current.erase(current.end() - 1, current.end());
-
-						m_ClassMetaDataInfo = ParseMeta(current);
-
-						std::string p = m_HeaderLines[lineIndex + 1];
-
-						replaceAll(p, "    ", "");
-
-						std::vector<std::string> splitted = split(p, ' ');
-
-						m_ClassName = splitted[1];
-
-						splitted.erase(splitted.begin(), splitted.begin() + 2);
-
-						// Has some inheritance
-						if (splitted.size() > 0 && splitted[0] == ":")
+						if(!classStack.empty())
 						{
-							for (Type::uint32 i = 1; i < splitted.size(); i++)
-							{
-								if (splitted[i] != "public" &&
-									splitted[i] != "protected" &&
-									splitted[i] != "private")
-								{
-									m_Inheritance.push_back(splitted[i]);
-								}
-							}
+							classStack.pop();
 						}
 
-						Event::GlobalEvent::Broadcast(SE_ClassMacroEvent
+						if(!classStack.empty())
 						{
-							&m_ClassMetaDataInfo,
-							m_ClassName,
-							&m_Inheritance
-						});
-					}
-					else if (text == "SE_STRUCT")
-					{
-						m_Reflect = true;
-
-						std::string current = line;
-
-						replaceAll(current, "    ", "");
-						replaceAll(current, "\t", "");
-
-						current.erase(current.begin(), current.begin() + strlen("SE_STRUCT("));
-						current.erase(current.end() - 1, current.end());
-
-						m_ClassMetaDataInfo = ParseMeta(current);
-
-						std::vector<std::string> splitted = split(m_HeaderLines[lineIndex + 1], ' ');
-
-						m_ClassName = splitted[1];
-
-						splitted.erase(splitted.begin(), splitted.begin() + 2);
-
-						// Has some inheritance
-						if (splitted.size() > 0 && splitted[0] == ":")
-						{
-							for (Type::uint32 i = 1; i < splitted.size(); i++)
-							{
-								if (splitted[i] != "public" &&
-									splitted[i] != "protected" &&
-									splitted[i] != "private")
-								{
-									m_Inheritance.push_back(splitted[i]);
-								}
-							}
+							currentData = classStack.top();
 						}
-					}
-					else if (text == "SE_VALUE")
-					{
-						std::string current = line;
-
-						replaceAll(current, "    ", "");
-						replaceAll(current, "\t", "");
-
-						current.erase(current.begin(), current.begin() + strlen("SE_VALUE("));
-						current.erase(current.end() - 1, current.end());
-
-						ClassProperty prop = {};
-
-						prop.m_MetaData = ParseMeta(current);
-
-						current = m_HeaderLines[lineIndex + 1];
-
-						replaceAll(current, "    ", "");
-						replaceAll(current, "\t", "");
-						replaceAll(current, ";", "");
-
-						size_t open = RuntimeDatabase::s_InvalidID;
-						size_t closed = RuntimeDatabase::s_InvalidID;
-
-						if((open = current.find("[")) != std::string::npos &&
-							(closed = current.find("]")) != std::string::npos)
+						else if(currentData)
 						{
-							current.erase(current.begin() + open, current.end());
+							m_Classes.push_back(currentData);
+							currentData = 0;
 						}
 
-						std::vector<std::string> splitted = split(current, ' ');
-
-						prop.m_ArgumentInfo = ArgumentInfo{ splitted[0], splitted[1] };
-						prop.m_ProtectionFlag = m_LastProtectionFlag;
-
-						m_Properties.push_back(prop);
-
-						Event::GlobalEvent::Broadcast(SE_ValueMacroEvent{ &prop, &m_Properties });
-					}
-					else if (text == "SE_METHOD")
-					{
-						std::string current = line;
-
-						replaceAll(current, "    ", "");
-						replaceAll(current, "\t", "");
-
-						current.erase(current.begin(), current.begin() + strlen("SE_METHOD("));
-						current.erase(current.end() - 1, current.end());
-
-						ClassMethod meth = {};
-
-						meth.m_MetaData = ParseMeta(current);
-
-						current = m_HeaderLines[lineIndex + 1];
-
-						replaceAll(current, "    ", "");
-						replaceAll(current, "\t", "");
-
-						size_t pos1 = current.find("(");
-
-						current.erase(current.begin() + pos1, current.end());
-
-						std::vector<std::string> splitted = split(current, ' ');
-
-						meth.m_MethodInfo = MethodInfo{ splitted[0], splitted[1] };
-						meth.m_ProtectionFlag = m_LastProtectionFlag;
-
-						m_Methods.push_back(meth);
-
-						Event::GlobalEvent::Broadcast(SE_MethodMacroEvent{ &meth, &m_Methods });
-					}
-					else if(text == "SE_ENUM")
-					{
-						std::string current = line;
-
-						replaceAll(current, "    ", "");
-						replaceAll(current, "\t", "");
-
-						current.erase(current.begin(), current.begin() + strlen("SE_ENUM("));
-						current.erase(current.end() - 1, current.end());
-
-						current = m_HeaderLines[lineIndex + 1];
-
-						replaceAll(current, "    ", "");
-						replaceAll(current, "\t", "");
-
-						std::vector<std::string> splitted = split(current, ' ');
-
-						EnumInfo enum_;
-
-						enum_.m_EnumName = splitted[1];
-
-						for(Type::uint32 i = 1; current != "}"; i++)
-						{
-							current = m_HeaderLines[lineIndex + 1 + i];
-							
-							replaceAll(current, "    ", "");
-							replaceAll(current, "\t", "");
-							replaceAll(current, ";", "");
-
-							if(current.find("SE_ELEMENT") != std::string::npos)
-							{
-								current = m_HeaderLines[lineIndex + 2 + i];
-
-								replaceAll(current, "    ", "");
-								replaceAll(current, "\t", "");
-
-								if(current[current.size() - 1] == ',')
-								{
-									current.erase(current.size() - 1);
-								}
-
-								EnumElement ele;
-
-								ele.m_ElementName = current;
-
-								enum_.m_Elements.push_back(ele);
-							}
-						}
-
-						m_Enums.push_back(enum_);
+						break;
 					}
 				}
 
-				currentChar = current[index++];
-			}
-
-			isFunction = false;
-			isHash = false;
-			isIn = false;
-
-			if (isA_Open && isClass)
-			{
-				isClass = false;
-			}
-
-			if (isA_Open && isStruct)
-			{
-				isStruct = false;
-			}
-
-			lineIndex++;
-		}
-
-		std::vector<std::string> toFind;
-
-		for (Type::uint32 i = 0; i < m_Inheritance.size(); i++)
-		{
-			std::string current = m_Inheritance[i];
-
-			replaceAll(current, "::", " ");
-
-			std::vector<std::string> splitted = split(current, ' ');
-
-			toFind.push_back(splitted[splitted.size() - 1]);
-		}
-
-		// Seek for interface source
-		for (const auto& entry : filesystem::directory_iterator("build/GeneratedReflection"))
-		{
-			filesystem::path path = entry.path();
-
-			if (path.extension() == ".h")
-			{
-				continue;
-			}
-
-			for (Type::uint32 i = 0; i < toFind.size(); i++)
-			{
-				if (path.filename().string().find(toFind[i]) != std::string::npos)
+				if(!found)
 				{
-					m_AdditionalIncludeDependencies.push_back(path.string());
+					for(Type::uint32 i = 0; i < notOkBraces.size(); i++)
+					{
+						if(notOkBraces[i] == bracesSize)
+						{
+							notOkBraces.erase(notOkBraces.begin() + i);
+							found = true;
 
-					break;
+							break;
+						}
+					}
+				}
+			}
+			else if(currentData && lexer.GetToken() == currentData->m_ClassName)
+			{
+				// Constructor
+
+				wasNotOkBrace = true;
+
+				lexer++;
+
+				if(lexer.GetToken() == "*" ||
+					lexer.GetToken() == "&" ||
+					lexer.GetToken() != "(" ||
+					lexer.GetToken() == ">")
+				{
+					continue;
+				}
+
+				if(!notOkBraces.empty())
+				{
+					continue;
+				}
+
+				std::string word = "";
+				ArgumentInfo arg;
+				std::string name = "";
+				std::vector<std::string> splitted;
+
+				while(1)
+				{
+					if(lexer.GetToken() == "(")
+					{
+						lexer++;
+
+						continue;
+					}
+					else if(lexer.GetToken() == ")")
+					{
+						if(splitted.size() == 0)
+						{
+							splitted = split(word, ' ');
+
+							if(splitted.size() == 2)
+							{
+								arg.m_Type = splitted[0];
+								arg.m_Name = splitted[1];
+
+								cons.m_Arguments.push_back(arg);
+							}
+							else if(splitted.size() == 3)
+							{
+								arg.m_Type = splitted[0] + " " + splitted[1];
+								arg.m_Name = splitted[2];
+
+								cons.m_Arguments.push_back(arg);
+							}
+						}
+						else
+						{
+							if(splitted.size() == 2)
+							{
+								arg.m_Type = splitted[0];
+								arg.m_Name = splitted[1];
+
+								cons.m_Arguments.push_back(arg);
+							}
+							else if(splitted.size() == 3)
+							{
+								arg.m_Type = splitted[0] + " " + splitted[1];
+								arg.m_Name = splitted[2];
+
+								cons.m_Arguments.push_back(arg);
+							}
+						}
+
+						word.clear();
+
+						break;
+					}
+					else if(lexer.GetToken() == ",")
+					{
+						lexer++;
+
+						if(splitted.size() == 0)
+						{
+							splitted = split(word, ' ');
+
+							if(splitted.size() == 2)
+							{
+								arg.m_Type = splitted[0];
+								arg.m_Name = splitted[1];
+
+								cons.m_Arguments.push_back(arg);
+							}
+							else if(splitted.size() == 3)
+							{
+								arg.m_Type = splitted[0] + " " + splitted[1];
+								arg.m_Name = splitted[2];
+
+								cons.m_Arguments.push_back(arg);
+							}
+						}
+						else
+						{
+							if(splitted.size() == 2)
+							{
+								arg.m_Type = splitted[0];
+								arg.m_Name = splitted[1];
+
+								cons.m_Arguments.push_back(arg);
+							}
+							else if(splitted.size() == 3)
+							{
+								arg.m_Type = splitted[0] + " " + splitted[1];
+								arg.m_Name = splitted[2];
+
+								cons.m_Arguments.push_back(arg);
+							}
+						}
+
+						word.clear();
+					}
+					else if(lexer.GetToken() == "=")
+					{
+						lexer++;
+
+						word.erase(word.end() - 1);
+
+						splitted = split(word, ' ');
+
+						word.clear();
+					}
+					else
+					{
+						word += lexer.GetToken();
+
+						if(lexer.Space())
+						{
+							word += " ";
+						}
+
+						lexer++;
+					}
+				}
+
+				currentData->m_Constructors.push_back(cons);
+			}
+			else if(lexer.GetToken() == "SE_CLASS" ||
+				lexer.GetToken() == "SE_STRUCT")
+			{
+				seClass = true;
+
+				if(currentData == 0)
+				{
+					currentData = new ClassData();
+				}
+
+				currentData->m_Reflect = true;
+
+				if(lexer.GetToken() == "SE_CLASS")
+				{
+					currentData->m_Type = ClassType::CLASS_TYPE;
+				}
+				else if(lexer.GetToken() == "SE_STRUCT")
+				{
+					currentData->m_Type = ClassType::STRUCT_TYPE;
+				}
+
+				lexer++; // (
+				
+				std::string word = "";
+				bool wasEqual = false;
+				MetaDataInfo meta;
+				std::stack<bool> roundBraces;
+
+				roundBraces.push(true);
+
+				while(1)
+				{
+					lexer++;
+
+					if(lexer.GetToken() == ")" && roundBraces.size() == 1)
+					{
+						if(wasEqual && word != "")
+						{
+							meta.m_Value = word;
+						}
+						else if(word != "")
+						{
+							meta.m_Key = word;
+							meta.m_Value = "true";
+						}
+						else
+						{
+							break;
+						}
+						
+						word.clear();
+						currentData->m_ClassMetaDataInfo.push_back(meta);
+
+						break;
+					}
+					else if(lexer.GetToken() == ")")
+					{
+						word += lexer.GetToken();
+						roundBraces.pop();
+					}
+					else if(lexer.GetToken() == "(")
+					{
+						word += lexer.GetToken();
+						roundBraces.push(true);
+					}
+					else if(lexer.GetToken() == "," && roundBraces.size() == 1)
+					{
+						if(wasEqual)
+						{
+							meta.m_Value = word;
+						}
+						else
+						{
+							meta.m_Key = word;
+							meta.m_Value = "true";
+						}
+
+						wasEqual = false;
+						word.clear();
+						currentData->m_ClassMetaDataInfo.push_back(meta);
+					}
+					else if(lexer.GetToken() == "=")
+					{
+						wasEqual = true;
+						meta.m_Key = word;
+						word.clear();
+					}
+					else
+					{
+						word += lexer.GetToken();
+					}
+				}
+			}
+			else if(lexer.GetToken() == "SE_VALUE")
+			{
+				seValue = true;
+
+				lexer++;
+
+				std::string word = "";
+				bool wasEqual = false;
+				MetaDataInfo meta;
+
+				while(1)
+				{
+					lexer++;
+
+					if(lexer.GetToken() == ")")
+					{
+						if(wasEqual && word != "")
+						{
+							meta.m_Value = word;
+						}
+						else if(word != "")
+						{
+							meta.m_Key = word;
+							meta.m_Value = "true";
+						}
+						else
+						{
+							break;
+						}
+						
+						word.clear();
+						prop.m_MetaData.push_back(meta);
+
+						break;
+					}
+					else if(lexer.GetToken() == ",")
+					{
+						if(wasEqual)
+						{
+							meta.m_Value = word;
+						}
+						else
+						{
+							meta.m_Key = word;
+							meta.m_Value = "true";
+						}
+
+						wasEqual = false;
+						word.clear();
+						prop.m_MetaData.push_back(meta);
+					}
+					else if(lexer.GetToken() == "=")
+					{
+						wasEqual = true;
+						meta.m_Key = word;
+						word.clear();
+					}
+					else
+					{
+						word += lexer.GetToken();
+					}
+				}
+			}
+			else if(lexer.GetToken() == "SE_METHOD")
+			{
+				seMethod = true;
+
+				lexer++;
+
+				std::string word = "";
+				bool wasEqual = false;
+				MetaDataInfo meta;
+
+				while(1)
+				{
+					lexer++;
+
+					if(lexer.GetToken() == ")")
+					{
+						if(wasEqual && word != "")
+						{
+							meta.m_Value = word;
+						}
+						else if(word != "")
+						{
+							meta.m_Key = word;
+							meta.m_Value = "true";
+						}
+						else
+						{
+							break;
+						}
+						
+						word.clear();
+						meth.m_MetaData.push_back(meta);
+						meth.m_ProtectionFlag = m_LastProtectionFlag;
+
+						break;
+					}
+					else if(lexer.GetToken() == ",")
+					{
+						if(wasEqual && word != "")
+						{
+							meta.m_Value = word;
+						}
+						else if(word != "")
+						{
+							meta.m_Key = word;
+							meta.m_Value = "true";
+						}
+
+						wasEqual = false;
+						word.clear();
+						meth.m_MetaData.push_back(meta);
+						meth.m_ProtectionFlag = m_LastProtectionFlag;
+					}
+					else if(lexer.GetToken() == "=")
+					{
+						wasEqual = true;
+						meta.m_Key = word;
+						word.clear();
+					}
+					else
+					{
+						word += lexer.GetToken();
+					}
+				}
+
+				lexer++;
+
+				while(1)
+				{
+					if(lexer.GetToken() == "const")
+					{
+						word += lexer.GetToken();
+
+						if(lexer.Space())
+						{
+							word += " ";
+						}
+
+						lexer++;
+					}
+
+					word += lexer.GetToken();
+
+					if(lexer.Space())
+					{
+						lexer++;
+
+						break;
+					}
+
+					lexer++;
+				}
+
+				meth.m_MethodInfo.m_ReturnType = word;
+				meth.m_MethodInfo.m_Name = lexer.GetToken();
+
+				currentData->m_Methods.push_back(meth);
+
+				Event::GlobalEvent::Broadcast(SE_MethodMacroEvent{ &meth, &currentData->m_Methods });
+
+				meth.m_MetaData.clear();
+			}
+			else if(lexer.GetToken() == "GENERATED_BODY")
+			{
+				
+			}
+			else if(lexer.GetToken() == "#pragma")
+			{
+				lexer++;
+			}
+			else if(lexer.GetToken() == "#include")
+			{
+				lexer++;
+			}
+			else if(lexer.GetToken() == ";")
+			{
+				if(!notOkBraces.empty())
+				{
+					continue;
+				}
+
+				std::string curr = lexer.GetCurrentLine();
+
+				replaceAll(curr, "    ", "");
+				replaceAll(curr, "\t", "");
+				replaceAll(curr, ";", "");
+
+				std::vector<std::string> splittedEqual =
+					split(curr, '=');
+				
+				std::vector<std::string> splitted =
+					split(splittedEqual[0], ' ');
+				
+				if(splitted.size() == 2 &&
+					splitted[1].find("(") == std::string::npos &&
+					splitted[1].find(")") == std::string::npos)
+				{
+					std::string& sec = splitted[1];
+
+					size_t pos1 = sec.find("[");
+					size_t pos2 = sec.find("]");
+
+					if(pos1 != std::string::npos &&
+						pos2 != std::string::npos)
+					{
+						sec.erase(sec.begin() + pos1, sec.end());
+					}
+
+					if(splitted[0] == "const")
+					{
+						prop.m_ArgumentInfo.m_Type =
+							splitted[0] + " " + splitted[1];
+
+						prop.m_ArgumentInfo.m_Name =
+							splitted[2];
+					}
+					else
+					{
+						prop.m_ArgumentInfo.m_Type =
+							splitted[0];
+
+						prop.m_ArgumentInfo.m_Name =
+							splitted[1];
+					}
+
+					if(m_LastProtectionFlag == ProtectionFlag::NOT_SPECIFIED &&
+						currentData->m_Type == ClassType::CLASS_TYPE)
+					{
+						m_LastProtectionFlag = ProtectionFlag::PROTECTED;
+					}
+
+					prop.m_ProtectionFlag = m_LastProtectionFlag;
+
+					currentData->m_Properties.push_back(prop);
+
+					Event::GlobalEvent::Broadcast(SE_ValueMacroEvent{ &prop, &currentData->m_Properties });
+
+					prop.m_MetaData.clear();
 				}
 			}
 		}
@@ -529,12 +736,12 @@ namespace SteelEngine {
 
 	void ReflectionGenerator::ParseSource()
 	{
-		Type::uint32 lineIndex = 0;
+		// Type::uint32 lineIndex = 0;
 
-		for (std::string line : m_SourceLines)
-		{
+		// for (std::string line : m_SourceLines)
+		// {
 
-		}
+		// }
 	}
 
 	std::vector<ReflectionGenerator::MetaDataInfo> ReflectionGenerator::ParseMeta(const std::string& line)
@@ -660,7 +867,7 @@ namespace SteelEngine {
 
 	ReflectionGenerator::ReflectionGenerator()
 	{
-		m_Reflect = false;
+		
 	}
 
 	ReflectionGenerator::~ReflectionGenerator()
@@ -706,6 +913,19 @@ namespace SteelEngine {
 
 	Result ReflectionGenerator::Generate(const filesystem::path& generatePath)
 	{
+		ClassData* data;
+
+		for(Type::uint32 i = 0; i < m_Classes.size(); i++)
+		{
+			data = m_Classes[i];
+
+			if(data->m_Reflect)
+			{
+				//return Result(SE_TRUE, "Nothing to reflect!");
+				break;
+			}
+		}
+
 		filesystem::path path(m_PathHeader);
 
 		std::string rawFilename = path.filename().string();
@@ -720,24 +940,21 @@ namespace SteelEngine {
 
 		Event::GlobalEvent::Broadcast(GenerateHeaderEvent{ &headerFile, &m_GeneratedBodyMacro });
 
-		if (m_Reflect)
+		if(m_GeneratedBodyMacro.size() > 0)
 		{
-			if(m_GeneratedBodyMacro.size() > 0)
+			headerFile << " \\\n";
+		}
+
+		for(Type::uint32 i = 0; i < m_GeneratedBodyMacro.size(); i++)
+		{
+			headerFile << m_GeneratedBodyMacro[i];
+
+			if(i < m_GeneratedBodyMacro.size() - 1)
 			{
-				headerFile << " \\\n";
+				headerFile << "\\";
 			}
 
-			for(Type::uint32 i = 0; i < m_GeneratedBodyMacro.size(); i++)
-			{
-				headerFile << m_GeneratedBodyMacro[i];
-
-				if(i < m_GeneratedBodyMacro.size() - 1)
-				{
-					headerFile << "\\";
-				}
-
-				headerFile << "\n";
-			}
+			headerFile << "\n";
 		}
 
 		m_GeneratedBodyMacro.clear();
@@ -746,179 +963,172 @@ namespace SteelEngine {
 
 		std::ofstream sourceFile(generatePath.string() + "/" + rawFilename + ".Generated.cpp");
 
-		if (m_Reflect)
-		{
-			std::string namespacedClassName = "";
+		std::string namespacedClassName = "";
 
-			for (Type::uint32 i = 0; i < m_NamespaceHierarchy.size(); i++)
+		for (Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
+		{
+			namespacedClassName += data->m_Hierarchy[i] += "::";
+		}
+
+		namespacedClassName += data->m_ClassName;
+
+		data->m_ClassMetaDataInfo.push_back(MetaDataInfo{ "\"sizeof\"", "sizeof(" + namespacedClassName + ")" });
+
+		path.replace_extension(".h");
+
+		sourceFile << "#include \"" << rawFilename + ".Generated.h" << "\"\n";
+
+		sourceFile << "#include \"../" << m_PathHeader.string() << "\"\n";
+		sourceFile << "#include \"RuntimeCompiler/IRuntimeObject.h\"\n";
+		sourceFile << "#include \"RuntimeReflection/Reflection.h\"\n";
+		sourceFile << "\n";
+
+		// Here we are generating the reflection info
+
+		sourceFile << "REGISTER_REFLECTION\n";
+		sourceFile << "{\n";
+		{
+			sourceFile << "SteelEngine::Reflection::Register<";
+			sourceFile << namespacedClassName;
+			sourceFile << ">(\"" << data->m_ClassName << "\")\n";
+
+			GenerateMetaDataInfo(sourceFile, data->m_ClassMetaDataInfo);
+
+			for (ConstructorInfo consInfo : data->m_Constructors)
 			{
-				namespacedClassName += m_NamespaceHierarchy[i] += "::";
+				sourceFile << ".Constructor<";
+
+				for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
+				{
+					sourceFile << consInfo.m_Arguments[i].m_Type;
+
+					if (i < consInfo.m_Arguments.size() - 1)
+					{
+						sourceFile << ", ";
+					}
+				}
+
+				sourceFile << ">()\n";
+
+				GenerateMetaDataInfo(sourceFile, consInfo.m_MetaData);
 			}
 
-			namespacedClassName += m_ClassName;
-
-			m_ClassMetaDataInfo.push_back(MetaDataInfo{ "\"sizeof\"", "sizeof(" + namespacedClassName + ")" });
-
-			path.replace_extension(".h");
-
-			sourceFile << "#include \"" << rawFilename + ".Generated.h" << "\"\n";
-
-			sourceFile << "#include \"../" << m_PathHeader.string() << "\"\n";
-			sourceFile << "#include \"RuntimeCompiler/IRuntimeObject.h\"\n";
-			sourceFile << "#include \"RuntimeReflection/Reflection.h\"\n";
-			sourceFile << "\n";
-
-			// Here we are generating the reflection info
-
-			sourceFile << "REGISTER_REFLECTION\n";
-			sourceFile << "{\n";
+			for (ClassProperty clsProp : data->m_Properties)
 			{
-				sourceFile << "SteelEngine::Reflection::Register<";
-				sourceFile << namespacedClassName;
-				sourceFile << ">(\"" << m_ClassName << "\")\n";
-
-				GenerateMetaDataInfo(sourceFile, m_ClassMetaDataInfo);
-
-				for (ConstructorInfo consInfo : m_Constructors)
+				if (clsProp.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
+					clsProp.m_ProtectionFlag == ProtectionFlag::PROTECTED)
 				{
-					sourceFile << ".Constructor<";
+					continue;
+				}
 
-					for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
+				sourceFile << ".Property(";
+				sourceFile << "\"" << clsProp.m_ArgumentInfo.m_Name << "\", ";
+				sourceFile << "&" << namespacedClassName << "::" << clsProp.m_ArgumentInfo.m_Name;
+				sourceFile << ")\n";
+
+				GenerateMetaDataInfo(sourceFile, clsProp.m_MetaData);
+			}
+
+			for (ClassMethod clsMeth : data->m_Methods)
+			{
+				if (clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
+					clsMeth.m_ProtectionFlag == ProtectionFlag::PROTECTED)
+				{
+					continue;
+				}
+
+				sourceFile << ".Method(";
+				sourceFile << "\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
+				sourceFile << "&" << namespacedClassName << "::" << clsMeth.m_MethodInfo.m_Name;
+				sourceFile << ")\n";
+
+				GenerateMetaDataInfo(sourceFile, clsMeth.m_MetaData);
+			}
+
+			for (EnumInfo enum_ : data->m_Enums)
+			{
+				sourceFile << ".Enum<" + namespacedClassName + "::" + enum_.m_EnumName + ">(\"" + enum_.m_EnumName + "\")\n";
+
+				GenerateMetaDataInfo(sourceFile, enum_.m_MetaData);
+
+				if (enum_.m_Elements.size() > 0)
+				{
+					sourceFile << ".Values\n";
+					sourceFile << "(\n";
+
+					for (Type::uint32 i = 0; i < enum_.m_Elements.size(); i++)
 					{
-						sourceFile << consInfo.m_Arguments[i].m_Type;
+						EnumElement ele = enum_.m_Elements[i];
 
-						if (i < consInfo.m_Arguments.size() - 1)
+						sourceFile << "SteelEngine::ReflectionValue(\"" + ele.m_ElementName;
+						sourceFile << "\", " + namespacedClassName + "::" + enum_.m_EnumName + "::" + ele.m_ElementName + ")\n";
+
+						GenerateMetaDataInfo(sourceFile, ele.m_MetaData);
+
+						if (i < enum_.m_Elements.size() - 1)
 						{
-							sourceFile << ", ";
+							sourceFile << ",\n";
+						}
+						else
+						{
+							sourceFile << "\n";
 						}
 					}
 
-					sourceFile << ">()\n";
-
-					GenerateMetaDataInfo(sourceFile, consInfo.m_MetaData);
-				}
-
-				for (ClassProperty clsProp : m_Properties)
-				{
-					if (clsProp.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
-						clsProp.m_ProtectionFlag == ProtectionFlag::PROTECTED)
-					{
-						continue;
-					}
-
-					sourceFile << ".Property(";
-					sourceFile << "\"" << clsProp.m_ArgumentInfo.m_Name << "\", ";
-					sourceFile << "&" << namespacedClassName << "::" << clsProp.m_ArgumentInfo.m_Name;
 					sourceFile << ")\n";
-
-					GenerateMetaDataInfo(sourceFile, clsProp.m_MetaData);
 				}
+			}
 
-				for (ClassMethod clsMeth : m_Methods)
+			sourceFile << ";\n";
+		}
+		sourceFile << "}\n\n";
+
+		Event::GlobalEvent::Broadcast(GenerateSourceEvent{ &sourceFile, namespacedClassName });
+
+		// Here we are generating info for the runtime compilator
+
+		if (data->m_Constructors.size() > 0)
+		{
+			sourceFile << "#ifdef RUNTIME_COMPILE\n";
+			sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* GetPerModuleInterface(void* typeInfo)\n";
+			sourceFile << "{\n";
+			{
+				sourceFile << "DECLARE_TYPE_INFO(" << namespacedClassName << ")\n";
+				sourceFile << "{\n";
 				{
-					if (clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
-						clsMeth.m_ProtectionFlag == ProtectionFlag::PROTECTED)
+					sourceFile << "FIND_THE_RIGHT_OBJECT\n";
+					sourceFile << "\n";
+
+					for (ConstructorInfo consInfo : data->m_Constructors)
 					{
-						continue;
-					}
-
-					sourceFile << ".Method(";
-					sourceFile << "\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
-					sourceFile << "&" << namespacedClassName << "::" << clsMeth.m_MethodInfo.m_Name;
-					sourceFile << ")\n";
-
-					GenerateMetaDataInfo(sourceFile, clsMeth.m_MetaData);
-				}
-
-				for (EnumInfo enum_ : m_Enums)
-				{
-					sourceFile << ".Enum<" + namespacedClassName + "::" + enum_.m_EnumName + ">(\"" + enum_.m_EnumName + "\")\n";
-
-					GenerateMetaDataInfo(sourceFile, enum_.m_MetaData);
-
-					if (enum_.m_Elements.size() > 0)
-					{
-						sourceFile << ".Values\n";
-						sourceFile << "(\n";
-
-						for (Type::uint32 i = 0; i < enum_.m_Elements.size(); i++)
+						if(consInfo.m_Arguments.size() > 0)
 						{
-							EnumElement ele = enum_.m_Elements[i];
+							sourceFile << "COMPARE_CONSTRUCTOR(";
 
-							sourceFile << "SteelEngine::ReflectionValue(\"" + ele.m_ElementName;
-							sourceFile << "\", " + namespacedClassName + "::" + enum_.m_EnumName + "::" + ele.m_ElementName + ")\n";
-
-							GenerateMetaDataInfo(sourceFile, ele.m_MetaData);
-
-							if (i < enum_.m_Elements.size() - 1)
+							for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
 							{
-								sourceFile << ",\n";
+								sourceFile << consInfo.m_Arguments[i].m_Type;
+
+								if (i < consInfo.m_Arguments.size() - 1)
+								{
+									sourceFile << ", ";
+								}
 							}
-							else
-							{
-								sourceFile << "\n";
-							}
+						}
+						else
+						{
+							sourceFile << "COMPARE_CONSTRUCTOR_(";
 						}
 
 						sourceFile << ")\n";
 					}
 				}
-
-				sourceFile << ";\n";
+				sourceFile << "};\n";
+				sourceFile << "\n";
+				sourceFile << "return result;\n";
 			}
-			sourceFile << "}\n\n";
-
-			Event::GlobalEvent::Broadcast(GenerateSourceEvent{ &sourceFile, namespacedClassName });
-
-			// Here we are generating info for the runtime compilator
-
-			if (m_Constructors.size() > 0)
-			{
-				sourceFile << "#ifdef RUNTIME_COMPILE\n";
-				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* GetPerModuleInterface(void* typeInfo)\n";
-				sourceFile << "{\n";
-				{
-					sourceFile << "DECLARE_TYPE_INFO(" << namespacedClassName << ")\n";
-					sourceFile << "{\n";
-					{
-						sourceFile << "FIND_THE_RIGHT_OBJECT\n";
-						sourceFile << "\n";
-
-						for (ConstructorInfo consInfo : m_Constructors)
-						{
-							if(consInfo.m_Arguments.size() > 0)
-							{
-								sourceFile << "COMPARE_CONSTRUCTOR(";
-
-								for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
-								{
-									sourceFile << consInfo.m_Arguments[i].m_Type;
-
-									if (i < consInfo.m_Arguments.size() - 1)
-									{
-										sourceFile << ", ";
-									}
-								}
-							}
-							else
-							{
-								sourceFile << "COMPARE_CONSTRUCTOR_(";
-							}
-
-							sourceFile << ")\n";
-						}
-					}
-					sourceFile << "};\n";
-					sourceFile << "\n";
-					sourceFile << "return result;\n";
-				}
-				sourceFile << "}\n";
-				sourceFile << "#endif\n";
-			}
-		}
-		else
-		{
-			sourceFile << "";
+			sourceFile << "}\n";
+			sourceFile << "#endif\n";
 		}
 
 		sourceFile.close();
@@ -930,18 +1140,16 @@ namespace SteelEngine {
 	{
 		m_HeaderLines.clear();
 		m_SourceLines.clear();
-		m_Constructors.clear();
-		m_Properties.clear();
-		m_Methods.clear();
-		m_Enums.clear();
-		m_NamespaceHierarchy.clear();
-		m_AdditionalIncludeDependencies.clear();
-		m_Inheritance.clear();
+
+		for(Type::uint32 i = 0; i < m_Classes.size(); i++)
+		{
+			delete m_Classes[i];
+			m_Classes[i] = 0;
+		}
+
+		m_Classes.clear();
 
 		Event::GlobalEvent::Broadcast(ClearValuesEvent{});
-
-		m_ClassName = "";
-		m_Reflect = false;
 	}
 
 }

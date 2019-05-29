@@ -1,8 +1,8 @@
 #pragma once
 
 #include "RuntimeReflection/IReflectionGenerator.h"
+#include "RuntimeReflection/Lexer.h"
 
-#include "vector"
 #include "fstream"
 #include "sstream"
 
@@ -15,7 +15,14 @@ namespace SteelEngine {
 		{
 			PUBLIC,
 			PROTECTED,
-			PRIVATE
+			PRIVATE,
+			NOT_SPECIFIED
+		};
+
+		enum ClassType
+		{
+			CLASS_TYPE,
+			STRUCT_TYPE
 		};
 
 		struct MetaDataInfo
@@ -70,23 +77,27 @@ namespace SteelEngine {
 			std::vector<EnumElement>	m_Elements;
 		};
 
+		struct ClassData
+		{
+			std::string m_ClassName;
+			ClassType m_Type;
+
+			std::vector<std::string> 		m_Inheritance;
+			std::vector<MetaDataInfo>		m_ClassMetaDataInfo;
+			std::vector<ConstructorInfo>	m_Constructors;
+			std::vector<ClassProperty>		m_Properties;
+			std::vector<ClassMethod>		m_Methods;
+			std::vector<EnumInfo>			m_Enums;
+			std::vector<std::string> 		m_Hierarchy;
+			bool m_Reflect;
+
+			std::vector<ClassData*> m_Others;
+		};
+
 	// Header Parsing Events:
 		struct PreHeaderProcessEvent
 		{
 			const std::vector<std::string>* m_HeaderLines;
-		};
-
-		struct CheckCurrentTextEvent
-		{
-			const std::string m_Text;
-			const Type::uint32 m_Line;
-			const std::string m_FullLine;
-		};
-
-		struct CheckCurrentValueEvent
-		{
-			std::string m_Type;
-			std::string m_Name;
 		};
 
 		struct SE_ClassMacroEvent
@@ -136,19 +147,10 @@ namespace SteelEngine {
 		filesystem::path m_PathSource;
 		filesystem::path m_PathHeader;
 
-		bool m_Reflect;
 		ProtectionFlag m_LastProtectionFlag;
 
-		std::vector<MetaDataInfo>		m_ClassMetaDataInfo;
-		std::vector<ConstructorInfo>	m_Constructors;
-		std::vector<ClassProperty>		m_Properties;
-		std::vector<ClassMethod>		m_Methods;
-		std::vector<EnumInfo>			m_Enums;
-		std::vector<std::string>		m_NamespaceHierarchy;
-		std::vector<std::string>		m_Inheritance;
-		std::vector<std::string>		m_GeneratedBodyMacro;
-
-		std::string m_ClassName;
+		std::vector<std::string>	m_GeneratedBodyMacro;
+		std::vector<ClassData*> 	m_Classes;
 
 		bool isComment = false;
 		bool isA_Open = false;
@@ -166,8 +168,6 @@ namespace SteelEngine {
 	public:
 		ReflectionGenerator();
 		~ReflectionGenerator();
-
-		std::vector<std::string> m_AdditionalIncludeDependencies;
 
 		Result Load(const filesystem::path& fileCpp, const filesystem::path& fileH) override;
 		Result Parse() override;

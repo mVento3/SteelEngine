@@ -10,11 +10,12 @@ working_directory = 'build/Windows'
 flags = '/ZI /Od /DEBUG:FASTLINK'
 definitions = '/DSE_WINDOWS /D_WINSOCKAPI_'
 includes = '/I../../include /I../../bin/Runtime/GeneratedReflection'
+libs = 'Ws2_32.lib'
 
 # dll's
 dll_type = '/MT /LD'
 
-subprocess.call(['bin/WindowsCompiler', working_directory, 'cl', '/DSE_WINDOWS', '/Fe../../bin/ReflectionGenerator.exe', 'main2.obj', '/link', '/LIBPATH:../../bin', 'Module.lib'])
+subprocess.call(['bin/WindowsCompiler', working_directory, 'cl', '/ZI /Od /DEBUG:FASTLINK /DSE_WINDOWS', '/Fe../../bin/ReflectionGenerator.exe', 'main2.obj', '/link', '/LIBPATH:../../bin', 'Module.lib'])
 
 project_types = [
     ['FileWatcher', 'lib'],
@@ -69,11 +70,12 @@ for type in project_types:
         for srcFile in source_files:
             if type[0] == project_name and os.path.splitext(os.path.basename(file))[0] == os.path.splitext(os.path.basename(srcFile))[0]:
                 if srcFile != '' and file != '':
+                    # print("AAAAA")
                     try:
                         subprocess.call(['bin/ReflectionGenerator.exe', 'bin', srcFile, file])
                     except:
                         print(os.sys.exc_info())
-    
+
     type.append(arr)
 
 ff = []
@@ -104,11 +106,11 @@ for type in project_types:
     if type[1] == 'dll':
         print('Building', type[0] + '.dll')
 
-        subprocess.call(['bin/WindowsCompiler', working_directory, 'cl', [flags], [definitions], [includes], [dll_type], ['/Fe', '../../bin/' + type[0] + '.dll']] + [generatedCppFiles] + objects + ['/link', 'Ws2_32.lib'] + processed_libs)
+        subprocess.call(['bin/WindowsCompiler', working_directory, 'cl', [flags], [definitions], [includes], [dll_type], ['/Fe', '../../bin/' + type[0] + '.dll']] + [generatedCppFiles] + objects + ['/link', [libs]] + processed_libs)
     elif type[1] == 'lib':
         processed_libs.append('../../bin/' + type[0] + '.lib')
         print('Building', type[0] + '.lib')
         subprocess.call(['bin/WindowsCompiler', working_directory, 'lib'] + objects + [['/OUT:', '../../bin/' + type[0] + '.lib']])
 
 print('Building Engine.exe')
-subprocess.call(['bin/WindowsCompiler', working_directory, 'cl', [flags], [definitions], [includes], ['/Fe', '../../bin/Engine.exe'], 'main.obj', '/link', '/LINKPATH:../../bin', 'Ws2_32.lib'] + processed_libs)
+subprocess.call(['bin/WindowsCompiler', working_directory, 'cl', [flags], [definitions], [includes], ['/Fe', '../../bin/Engine.exe'], 'main.obj', '/link', [libs]] + processed_libs)

@@ -42,7 +42,6 @@ SERIALIZE(SteelEngine::Core::meta)
 SERIALIZE(SteelEngine::Core::meta2)
 SERIALIZE(SteelEngine::Core::meta3)
 SERIALIZE(SteelEngine::Core::ta)
-SERIALIZE(SteelEngine::Core::ta)
 }
 
 #ifdef RUNTIME_COMPILE

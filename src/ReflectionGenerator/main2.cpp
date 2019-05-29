@@ -13,10 +13,14 @@
 
 int main(int argc, char* argv[])
 {
-    SteelEngine::ModuleManager::SetGlobalBinaryLocation(argv[1]);
+    std::string arg1 = argv[1];
+    std::string arg2 = argv[2];
+    std::string arg3 = argv[3];
+
+    SteelEngine::ModuleManager::SetGlobalBinaryLocation(arg1);
     SteelEngine::ModuleManager::LoadAll();
 
-    printf("Generating reflection for: %s %s\n", argv[2], argv[3]);
+    printf("Generating reflection for: %s %s\n", arg2.c_str(), arg3.c_str());
 
     void* dll;
 
@@ -47,33 +51,54 @@ int main(int argc, char* argv[])
 
     try
     {
-        if(rg->Load(argv[2], argv[3]) == SteelEngine::SE_FALSE)
+        if(rg->Load(arg2, arg3) == SteelEngine::SE_FALSE)
         {
             printf("Failed to load!\n");
 
             return 0;
         }
+    }
+    catch(const std::exception& e)
+    {
+        printf("Exception while loading in ReflectionGenerator.exe: %s!\n", e.what());
+    }
 
+    try
+    {
         if(rg->Parse() == SteelEngine::SE_FALSE)
         {
             printf("Failed to parse!\n");
 
             return 0;
         }
+    }
+    catch(const std::exception& e)
+    {
+        printf("Exception while parsing in ReflectionGenerator.exe: %s!\n", e.what());
+    };
 
+    try
+    {
         if(rg->Generate("bin/Runtime/GeneratedReflection") == SteelEngine::SE_FALSE)
         {
             printf("Failed to generate!\n");
 
             return 0;
         }
+    }
+    catch(const std::exception& e)
+    {
+        printf("Exception while generating in ReflectionGenerator.exe: %s!\n", e.what());
+    };
 
+    try
+    {
         rg->Clear();
     }
     catch(const std::exception& e)
     {
-        printf("Exception: %s\n", e.what());
-    }
+        printf("Exception while clearing in ReflectionGenerator.exe: %s!\n", e.what());
+    };
 
     delete rg;
     rg = 0;

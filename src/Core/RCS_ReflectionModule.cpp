@@ -9,7 +9,6 @@ namespace SteelEngine {
     {
         Event::GlobalEvent::Add<ReflectionGenerator::SE_ClassMacroEvent>(this);
         Event::GlobalEvent::Add<ReflectionGenerator::GenerateHeaderEvent>(this);
-        Event::GlobalEvent::Add<ReflectionGenerator::CheckCurrentValueEvent>(this);
         Event::GlobalEvent::Add<ReflectionGenerator::SE_ValueMacroEvent>(this);
         Event::GlobalEvent::Add<ReflectionGenerator::GenerateSourceEvent>(this);
         Event::GlobalEvent::Add<ReflectionGenerator::ClearValuesEvent>(this);
@@ -60,23 +59,22 @@ namespace SteelEngine {
         }
     }
 
-    void RCS_ReflectionModule::operator()(const ReflectionGenerator::CheckCurrentValueEvent& event)
+    void RCS_ReflectionModule::operator()(const ReflectionGenerator::SE_ValueMacroEvent& event)
     {
         if(m_SerializeAll)
         {
-            m_PropertiesToSerialize.push_back(event.m_Name);
+            m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
         }
-    }
-
-    void RCS_ReflectionModule::operator()(const ReflectionGenerator::SE_ValueMacroEvent& event)
-    {
-        for(Type::uint32 i = 0; i < event.m_Info->m_MetaData.size(); i++)
+        else
         {
-            ReflectionGenerator::MetaDataInfo meta = event.m_Info->m_MetaData[i];
-
-            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
+            for(Type::uint32 i = 0; i < event.m_Info->m_MetaData.size(); i++)
             {
-                m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
+                ReflectionGenerator::MetaDataInfo meta = event.m_Info->m_MetaData[i];
+
+                if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
+                {
+                    m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
+                }
             }
         }
     }

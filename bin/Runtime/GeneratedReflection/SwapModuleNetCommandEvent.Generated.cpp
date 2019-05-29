@@ -21,12 +21,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::NetworkCommands:
 (
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_NET_VALUE, true)
 )
-.Method("Serialize", &SteelEngine::NetworkCommands::SwapModuleNetCommandEvent::Serialize)
-(
-)
-.Method("Deserialize", &SteelEngine::NetworkCommands::SwapModuleNetCommandEvent::Deserialize)
-(
-)
 .Method("ServerSide", &SteelEngine::NetworkCommands::SwapModuleNetCommandEvent::ServerSide)
 (
 )

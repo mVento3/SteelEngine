@@ -20,6 +20,13 @@
 
 namespace SteelEngine {
 
+    // struct CheckCurrentTextEvent
+		// {
+		// 	const std::string m_Text;
+		// 	const Type::uint32 m_Line;
+		// 	const std::string m_FullLine;
+		// };
+
     SE_CLASS(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE)
     class Core : public Interface::ICore
     {

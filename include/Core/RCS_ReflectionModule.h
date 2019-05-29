@@ -31,7 +31,6 @@ namespace SteelEngine {
 
         void operator()(const ReflectionGenerator::SE_ClassMacroEvent& event);
         void operator()(const ReflectionGenerator::GenerateHeaderEvent& event);
-        void operator()(const ReflectionGenerator::CheckCurrentValueEvent& event);
         void operator()(const ReflectionGenerator::SE_ValueMacroEvent& event);
         void operator()(const ReflectionGenerator::GenerateSourceEvent& event);
         void operator()(const ReflectionGenerator::ClearValuesEvent& event);

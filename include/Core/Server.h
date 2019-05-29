@@ -6,7 +6,7 @@
 #include "fstream"
 #include "map"
 
-#ifndef SE_WINDOWS
+#ifdef SE_LINUX
 #include "unistd.h"
 #endif
 

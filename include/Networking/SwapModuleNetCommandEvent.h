@@ -13,13 +13,13 @@
 
 namespace SteelEngine { namespace NetworkCommands {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE, SteelEngine::ReflectionAttribute::SE_NETWORK_COMMAND)
+    SE_CLASS(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE = true, SteelEngine::ReflectionAttribute::SE_NETWORK_COMMAND)
     struct SwapModuleNetCommandEvent : public INetworkCommand
     {
         GENERATED_BODY
 
         SE_VALUE(SteelEngine::ReflectionAttribute::SE_NET_VALUE)
-        std::string m_ModuleName;
+        std::string m_ModuleName = "";
 
         SwapModuleNetCommandEvent()
         {
