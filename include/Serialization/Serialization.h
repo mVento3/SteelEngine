@@ -10,49 +10,17 @@ namespace SteelEngine {
     private:
         char*   m_DataStream;
         char*   m_Temp;
-        size_t  m_Size;
 
         template <typename A>
-        void CalculateTotalSize(const A& none)
-        {
-            m_Size += sizeof(none);
-        }
-
-        template <typename A, size_t N>
-        void CalculateTotalSize(const A(&arrayIn)[N])
-        {
-            m_Size += N;
-            m_Size += sizeof(size_t);
-        }
-
-        void CalculateTotalSize(const std::vector<const char*>& none)
-        {
-            for(Type::uint32 i = 0; i < none.size(); i++)
-            {
-                m_Size += sizeof(size_t);
-                m_Size += strlen(none[i]);
-            }
-
-            m_Size += sizeof(size_t);
-        }
-
-        template <typename A>
-        void CalculateTotalSize(const std::vector<A>& none)
-        {
-            m_Size += sizeof(none.size() * sizeof(A));
-            m_Size += sizeof(size_t);
-        }
-
-        template <typename A>
-        void SerializeType(const A& value, char* in)
+        void SerializeType(size_t& totalSize, const A& value, char* in)
         {
             A* t = (A*)in;
 
             *t = value;
             size_t s = sizeof(A);
-            m_Size -= s;
+            totalSize -= s;
 
-            if(m_Size > 0)
+            if(totalSize > 0)
             {
                 t++;
             }
@@ -61,14 +29,14 @@ namespace SteelEngine {
         }
 
         template <typename A, size_t N>
-        void SerializeType(const A(&arrayIn)[N], char* in)
+        void SerializeType(size_t& totalSize, const A(&arrayIn)[N], char* in)
         {
             size_t* sizePtr = (size_t*)in;
             size_t s = sizeof(size_t);
 
             *sizePtr = N;
             sizePtr++;
-            m_Size -= s;
+            totalSize -= s;
 
             A* t = (A*)sizePtr;
 
@@ -77,9 +45,9 @@ namespace SteelEngine {
                 *t = arrayIn[i];
                 
                 size_t s = sizeof(A);
-                m_Size -= s;
+                totalSize -= s;
 
-                if(m_Size > 0)
+                if(totalSize > 0)
                 {
                     t++;
                 }
@@ -88,7 +56,7 @@ namespace SteelEngine {
             m_Temp = (char*)t;
         }
 
-        void SerializeType(const std::vector<const char*>& value, char* in)
+        void SerializeType(size_t& totalSize, const std::vector<const char*>& value, char* in)
         {
             size_t s = sizeof(size_t);
             size_t* size = (size_t*)in;
@@ -96,7 +64,7 @@ namespace SteelEngine {
 
             *size = value.size();
             size++;
-            m_Size -= s;
+            totalSize -= s;
 
             for(Type::uint32 i = 0; i < value.size(); i++)
             {
@@ -109,7 +77,7 @@ namespace SteelEngine {
 
                 *size = s2;
                 size++;
-                m_Size -= s;
+                totalSize -= s;
 
                 t = (char*)size;
 
@@ -117,9 +85,9 @@ namespace SteelEngine {
                 {
                     *t = value[i][j];
                 
-                    m_Size -= sizeof(value[i][j]);
+                    totalSize -= sizeof(value[i][j]);
 
-                    if(m_Size > 0)
+                    if(totalSize > 0)
                     {
                         t++;
                     }
@@ -130,7 +98,7 @@ namespace SteelEngine {
         }
 
         template <typename A>
-        void SerializeType(const std::vector<A>& value, char* in)
+        void SerializeType(size_t& totalSize, const std::vector<A>& value, char* in)
         {
             size_t s = sizeof(size_t);
             size_t* size = (size_t*)in;
@@ -139,7 +107,7 @@ namespace SteelEngine {
 
             size++;
 
-            m_Size -= s;
+            totalSize -= s;
 
             A* t = (A*)size;
 
@@ -148,9 +116,9 @@ namespace SteelEngine {
                 *t = value[i];
                 
                 s = sizeof(value[i]);
-                m_Size -= s;
+                totalSize -= s;
 
-                if(m_Size > 0)
+                if(totalSize > 0)
                 {
                     t++;
                 }
@@ -160,15 +128,15 @@ namespace SteelEngine {
         }
 
         template <typename A>
-        void DeserializeType(A& value, char* in)
+        void DeserializeType(size_t& totalSize, A& value, char* in)
         {
             A* t = (A*)in;
 
             value = *t;
             size_t s = sizeof(A);
-            m_Size -= s;
+            totalSize -= s;
 
-            if(m_Size > 0)
+            if(totalSize > 0)
             {
                 t++;
             }
@@ -177,7 +145,7 @@ namespace SteelEngine {
         }
 
         template <typename A>
-        void DeserializeType(A** value, char* in)
+        void DeserializeType(size_t& totalSize, A** value, char* in)
         {
             size_t* sizePtr = (size_t*)in;
             size_t size = *sizePtr;
@@ -186,7 +154,7 @@ namespace SteelEngine {
 
             sizePtr++;
 
-            m_Size -= s;
+            totalSize -= s;
 
             A* t = (A*)sizePtr;
 
@@ -194,9 +162,9 @@ namespace SteelEngine {
             {
                 str[i] = *t;
                 s = sizeof(A);
-                m_Size -= s;
+                totalSize -= s;
 
-                if(m_Size > 0)
+                if(totalSize > 0)
                 {
                     t++;
                 }
@@ -207,25 +175,23 @@ namespace SteelEngine {
         }
 
         template <typename A>
-        void DeserializeType(A* value, char* in)
+        void DeserializeType(size_t& totalSize, A* value, char* in)
         {
             size_t* sizePtr = (size_t*)in;
             size_t size = *sizePtr;
             size_t s = sizeof(size_t);
 
             sizePtr++;
-
-            m_Size -= s;
-
+            totalSize -= s;
             A* t = (A*)sizePtr;
 
             for(Type::uint32 i = 0; i < size; i++)
             {
                 value[i] = *t;
                 s = sizeof(A);
-                m_Size -= s;
+                totalSize -= s;
 
-                if(m_Size > 0)
+                if(totalSize > 0)
                 {
                     t++;
                 }
@@ -235,7 +201,7 @@ namespace SteelEngine {
         }
 
         template <typename A, size_t N>
-        void DeserializeType(A(&arrayIn)[N], char* in)
+        void DeserializeType(size_t& totalSize, A(&arrayIn)[N], char* in)
         {
             A* ptr = arrayIn;
             A* t = (A*)in;
@@ -245,9 +211,9 @@ namespace SteelEngine {
                 ptr[i] = *t;
 
                 size_t s = sizeof(A);
-                m_Size -= s;
+                totalSize -= s;
 
-                if(m_Size > 0)
+                if(totalSize > 0)
                 {
                     t++;
                 }
@@ -257,7 +223,7 @@ namespace SteelEngine {
         }
 
         template <typename A>
-        void DeserializeType(std::vector<A>& value, char* in)
+        void DeserializeType(size_t& totalSize, std::vector<A>& value, char* in)
         {
             size_t* sizePtr = (size_t*)in;
             size_t size = *sizePtr;
@@ -267,16 +233,16 @@ namespace SteelEngine {
 
             A* t = (A*)sizePtr;
 
-            m_Size -= s;
+            totalSize -= s;
 
             for(Type::uint32 i = 0; i < size; i++)
             {
                 value.push_back(*t);
                 
                 s = sizeof(*t);
-                m_Size -= s;
+                totalSize -= s;
 
-                if(m_Size > 0)
+                if(totalSize > 0)
                 {
                     t++;
                 }
@@ -285,7 +251,7 @@ namespace SteelEngine {
             m_Temp = (char*)t;
         }
 
-        void DeserializeType(std::vector<char*>& value, char* in)
+        void DeserializeType(size_t& totalSize, std::vector<char*>& value, char* in)
         {
             size_t* sizePtr = (size_t*)in;
             size_t size = *sizePtr;
@@ -295,7 +261,7 @@ namespace SteelEngine {
 
             size2 = *sizePtr;
             sizePtr++;
-            m_Size -= s;
+            totalSize -= s;
 
             for(Type::uint32 i = 0; i < size2; i++)
             {
@@ -306,7 +272,7 @@ namespace SteelEngine {
 
                 size = *sizePtr;
                 sizePtr++;
-                m_Size -= s;
+                totalSize -= s;
 
                 t = (char*)sizePtr;
 
@@ -315,9 +281,9 @@ namespace SteelEngine {
                 for(Type::uint32 j = 0; j < size; j++)
                 {
                     arr[j] = *t;
-                    m_Size -= sizeof(*t);
+                    totalSize -= sizeof(*t);
 
-                    if(m_Size > 0)
+                    if(totalSize > 0)
                     {
                         t++;
                     }
@@ -332,12 +298,43 @@ namespace SteelEngine {
     public:
         Serialization()
         {
-            m_Size = 0;
+            m_DataStream = 0;
         }
 
         ~Serialization()
         {
             
+        }
+
+        template <typename A>
+        void CalculateTotalSize(size_t& totalSize, const A& none)
+        {
+            totalSize += sizeof(none);
+        }
+
+        template <typename A, size_t N>
+        void CalculateTotalSize(size_t& totalSize, const A(&arrayIn)[N])
+        {
+            totalSize += N;
+            totalSize += sizeof(size_t);
+        }
+
+        void CalculateTotalSize(size_t& totalSize, const std::vector<const char*>& none)
+        {
+            for(Type::uint32 i = 0; i < none.size(); i++)
+            {
+                totalSize += sizeof(size_t);
+                totalSize += strlen(none[i]);
+            }
+
+            totalSize += sizeof(size_t);
+        }
+
+        template <typename A>
+        void CalculateTotalSize(size_t& totalSize, const std::vector<A>& none)
+        {
+            totalSize += sizeof(none.size() * sizeof(A));
+            totalSize += sizeof(size_t);
         }
 
         void AllocateCustomSize(size_t size)
@@ -362,31 +359,40 @@ namespace SteelEngine {
         template <typename... Types>
         void Serialize(const Types& ...value)
         {
-            if(!m_DataStream)
-            {
-                int _[] = {0, (CalculateTotalSize(value), 0)...};
+            size_t totalSize = 0;
 
-                m_DataStream = new char[m_Size];
-            }
+            int _[] = {0, (CalculateTotalSize(totalSize, value), 0)...};
+
+            totalSize += sizeof(size_t);
+            m_DataStream = new char[totalSize];
 
             m_Temp = m_DataStream;
 
-            size_t size = m_Size;
+            size_t* stringSizePtr = (size_t*)m_Temp;
 
-            int _2[] = {0, (SerializeType(value, m_Temp), 0)...};
+            *stringSizePtr = totalSize;
+            stringSizePtr++;
+            totalSize -= sizeof(size_t);
 
-            m_Size = size;
+            m_Temp = (char*)stringSizePtr;
+
+            int _2[] = {0, (SerializeType(totalSize, value, m_Temp), 0)...};
         }
 
         template <typename... Types>
         void Deserialize(Types& ...value)
         {
-            size_t size = m_Size;
             m_Temp = m_DataStream;
 
-            int _[] = {0, (DeserializeType(value, m_Temp), 0)...};
+            size_t* stringSizePtr = (size_t*)m_Temp;
 
-            m_Size = size;
+            size_t totalSize = *stringSizePtr;
+            stringSizePtr++;
+            totalSize -= sizeof(size_t);
+
+            m_Temp = (char*)stringSizePtr;
+
+            int _[] = {0, (DeserializeType(totalSize, value, m_Temp), 0)...};
         }
 
         inline char* GetDataStream()

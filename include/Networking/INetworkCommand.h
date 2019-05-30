@@ -11,6 +11,8 @@
 
 #include "Utils/Utils.h"
 
+#include "Serialization/Serialization.h"
+
 #include "vector"
 
 #define HEADER_SIZE 50

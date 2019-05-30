@@ -2,8 +2,6 @@
 
 #include "Utils/Utils.h"
 
-#include "RuntimeCompiler/SwapModuleEvent.h"
-
 namespace SteelEngine {
 
     Server::Server()
@@ -169,7 +167,7 @@ namespace SteelEngine {
     }
 
     void Server::operator()(NetworkCommands::INetworkCommand* event)
-    {  
+    {
         NetworkCommands::MessageData data;
 
         data.m_Size = Reflection::GetType(event->m_Header)->GetMetaData("sizeof")->Convert<size_t>();

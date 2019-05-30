@@ -179,7 +179,7 @@ namespace SteelEngine {
 
         _strArray = &_strArray2;
 
-        ser.Deserialize(_int, _float, _intVector, _strArray2, _strVector);
+        ser.Deserialize(_int, _float, _intVector, _strArray, _strVector);
 
         // Serialization ser2;
 
