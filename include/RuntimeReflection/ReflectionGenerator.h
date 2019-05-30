@@ -152,14 +152,6 @@ namespace SteelEngine {
 		std::vector<std::string>	m_GeneratedBodyMacro;
 		std::vector<ClassData*> 	m_Classes;
 
-		bool isComment = false;
-		bool isA_Open = false;
-		bool isFunction = false;
-		bool isHash = false;
-		bool isClass = false;
-		bool isStruct = false;
-		bool isIn = false;
-
 		void ParseHeader();
 		void ParseSource();
 		std::vector<MetaDataInfo> ParseMeta(const std::string& line);

@@ -19,11 +19,6 @@ namespace SteelEngine { namespace NetworkCommands {
 
     struct MessageData
     {
-        struct YYYYYY
-        {
-            
-        };
-
         char* m_Data;
         size_t m_Size;
     };

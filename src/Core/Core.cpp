@@ -6,6 +6,8 @@
 
 #include "FileSystem/FileSystem.h"
 
+#include "Serialization/Serialization.h"
+
 namespace SteelEngine {
 
     void Core::Loop()
@@ -135,6 +137,12 @@ namespace SteelEngine {
         Sleep(100);
     }
 
+    struct Test2
+    {
+        const char* a = "aaaa";
+        int aa = 10;
+    };
+
     void Core::Start()
     {
         if(m_Running)
@@ -148,6 +156,38 @@ namespace SteelEngine {
         {
             return;
         }
+
+        Serialization ser;
+
+        //int a[] = { 2, 2 };
+        std::vector<int> a = { 2, 2 };
+
+        std::vector<const char*> aa =
+        {
+            "fff\0",
+            "aaa\0"
+        };
+
+        ser.Serialize(10, 2.3231f, a, "aa", aa);
+
+        int _int;
+        float _float;
+        std::vector<int> _intVector;
+        std::vector<char*> _strVector;
+        char** _strArray;
+        char* _strArray2;
+
+        _strArray = &_strArray2;
+
+        ser.Deserialize(_int, _float, _intVector, _strArray2, _strVector);
+
+        // Serialization ser2;
+
+        // ser2.SerializeData(Test2{ "aeerer", 222 });
+
+        // Test2 t;
+
+        // ser2.DeserializeData(t);
 
         Loop();
     }

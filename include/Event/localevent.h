@@ -1,6 +1,6 @@
 #pragma once
 
-#include "internaleventchannel.h"
+#include "Event/InternalEventChannel.h"
 
 // Define the local event handler
 #define H_LEVENT(type) void operator()(const type& event);

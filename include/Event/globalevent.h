@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Event/internaleventchannel.h"
+#include "Event/InternalEventChannel.h"
 
 namespace SteelEngine
 {
