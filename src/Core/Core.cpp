@@ -176,12 +176,13 @@ namespace SteelEngine {
         std::vector<char*> _strVector;
         char** _strArray;
         char* _strArray2;
+        std::string str;
 
         _strArray = &_strArray2;
 
         char* res = Serialization::SerializeStream(10, 2.3231f, a, "aa", aa);
 
-        Serialization::DeserializeStream(res, _int, _float, _intVector, _strArray, _strVector);
+        Serialization::DeserializeStream(res, _int, _float, _intVector, str, _strVector);
 
         //ser.Deserialize(_int, _float, _intVector, _strArray, _strVector);
 

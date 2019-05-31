@@ -10,6 +10,17 @@ namespace SteelEngine {
     private:
         char* m_DataStream;
 
+    public:
+        Serialization()
+        {
+            m_DataStream = 0;
+        }
+
+        ~Serialization()
+        {
+            
+        }
+
         template <typename A>
         static void SerializeType(size_t& totalSize, const A& value, char* in, char** out)
         {
@@ -221,6 +232,34 @@ namespace SteelEngine {
             *out = (char*)t;
         }
 
+        static void DeserializeType(size_t& totalSize, std::string& value, char* in, char** out)
+        {
+            size_t* sizePtr = (size_t*)in;
+            size_t size = *sizePtr;
+            size_t s = sizeof(size_t);
+
+            sizePtr++;
+
+            char* t = (char*)sizePtr;
+
+            totalSize -= s;
+
+            for(Type::uint32 i = 0; i < size; i++)
+            {
+                value.push_back(*t);
+                
+                s = sizeof(*t);
+                totalSize -= s;
+
+                if(totalSize > 0)
+                {
+                    t++;
+                }
+            }
+
+            *out = (char*)t;
+        }
+
         template <typename A>
         static void DeserializeType(size_t& totalSize, std::vector<A>& value, char* in, char** out)
         {
@@ -292,17 +331,6 @@ namespace SteelEngine {
             }
 
             *out = (char*)t;
-        }
-
-    public:
-        Serialization()
-        {
-            m_DataStream = 0;
-        }
-
-        ~Serialization()
-        {
-            
         }
 
         template <typename A>
