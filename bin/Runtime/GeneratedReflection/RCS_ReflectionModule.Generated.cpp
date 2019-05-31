@@ -10,6 +10,7 @@ SteelEngine::Reflection::Register<SteelEngine::RCS_ReflectionModule>("RCS_Reflec
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_REFLECTION_MODULE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::RCS_ReflectionModule))
 )
+.Inheritance("Interface::IRuntimeObject")
 .Constructor<>()
 (
 )

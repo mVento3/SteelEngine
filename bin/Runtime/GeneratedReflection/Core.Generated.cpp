@@ -10,6 +10,7 @@ SteelEngine::Reflection::Register<SteelEngine::Core>("Core")
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Core))
 )
+.Inheritance("Interface::ICore")
 .Constructor<>()
 (
 )

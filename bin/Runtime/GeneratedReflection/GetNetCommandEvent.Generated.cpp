@@ -11,6 +11,7 @@ SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_NO_SERIAL
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_NETWORK_COMMAND, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::NetworkCommands::GetNetCommandEvent))
 )
+.Inheritance("INetworkCommand")
 .Constructor<>()
 (
 )

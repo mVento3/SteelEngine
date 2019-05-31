@@ -10,6 +10,7 @@ SteelEngine::Reflection::Register<SteelEngine::Server>("Server")
 SteelEngine::Reflection::MetaData(SteelEngine::SE_SERVER_INFO, SteelEngine::ServerInfo(1024,54000)),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Server))
 )
+.Inheritance("Interface::INetwork")
 .Constructor<>()
 (
 )

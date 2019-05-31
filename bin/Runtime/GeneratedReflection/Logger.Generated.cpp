@@ -9,6 +9,7 @@ SteelEngine::Reflection::Register<SteelEngine::Logger>("Logger")
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Logger))
 )
+.Inheritance("Interface::ILogger")
 .Constructor<const char*>()
 (
 )

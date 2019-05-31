@@ -9,6 +9,7 @@ SteelEngine::Reflection::Register<SteelEngine::FileSystem>("FileSystem")
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::FileSystem))
 )
+.Inheritance("Interface::IFileSystem")
 .Constructor<>()
 (
 )

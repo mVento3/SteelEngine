@@ -212,6 +212,11 @@ namespace SteelEngine {
 			return *enum_;
 		}
 
+		ReflectionData& Inheritance(const std::string& name)
+		{
+			return *this;
+		}
+
 		template <typename... Args>
 		ReflectionData& operator()(Args... args)
 		{

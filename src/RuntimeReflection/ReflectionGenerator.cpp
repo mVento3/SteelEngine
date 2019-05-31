@@ -97,8 +97,6 @@ namespace SteelEngine {
 				{
 					lexer++; // or public or name
 
-					ProtectionFlag protection;
-
 					while(1)
 					{
 						if(lexer.GetToken() == "{")
@@ -115,8 +113,6 @@ namespace SteelEngine {
 
 						if(lexer.GetToken() == "public")
 						{
-							protection = ProtectionFlag::PUBLIC;
-
 							std::string word = "";
 
 							while(1)
@@ -134,23 +130,49 @@ namespace SteelEngine {
 								word += lexer.GetToken();
 							}
 
-							currentData->m_Inheritance.push_back(word);
+							currentData->m_Inheritance.push_back(InheritanceInfo{ word, ProtectionFlag::PUBLIC });
 						}
 						else if(lexer.GetToken() == "private")
 						{
-							protection = ProtectionFlag::PRIVATE;
+							std::string word = "";
 
-							lexer++;
+							while(1)
+							{
+								lexer++;
 
-							currentData->m_Inheritance.push_back(lexer.GetToken());
+								if(lexer.GetToken() == "{" ||
+									lexer.GetToken() == ",")
+								{
+									lexer.SaveToken(lexer.GetToken());
+
+									break;
+								}
+
+								word += lexer.GetToken();
+							}
+
+							currentData->m_Inheritance.push_back(InheritanceInfo{ word, ProtectionFlag::PRIVATE });
 						}
 						else if(lexer.GetToken() == "protected")
 						{
-							protection = ProtectionFlag::PROTECTED;
+							std::string word = "";
 
-							lexer++;
+							while(1)
+							{
+								lexer++;
 
-							currentData->m_Inheritance.push_back(lexer.GetToken());
+								if(lexer.GetToken() == "{" ||
+									lexer.GetToken() == ",")
+								{
+									lexer.SaveToken(lexer.GetToken());
+
+									break;
+								}
+
+								word += lexer.GetToken();
+							}
+
+							currentData->m_Inheritance.push_back(InheritanceInfo{ word, ProtectionFlag::PROTECTED });
 						}
 						else
 						{
@@ -963,14 +985,20 @@ namespace SteelEngine {
 
 		std::ofstream sourceFile(generatePath.string() + "/" + rawFilename + ".Generated.cpp");
 
+		std::string namespace_ = "";
 		std::string namespacedClassName = "";
 
 		for (Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
 		{
-			namespacedClassName += data->m_Hierarchy[i] += "::";
+			namespace_ += data->m_Hierarchy[i];
+
+			if(i < data->m_Hierarchy.size() - 1)
+			{
+				namespace_ += "::";
+			}
 		}
 
-		namespacedClassName += data->m_ClassName;
+		namespacedClassName = namespace_ + "::" + data->m_ClassName;
 
 		data->m_ClassMetaDataInfo.push_back(MetaDataInfo{ "\"sizeof\"", "sizeof(" + namespacedClassName + ")" });
 
@@ -993,6 +1021,12 @@ namespace SteelEngine {
 			sourceFile << ">(\"" << data->m_ClassName << "\")\n";
 
 			GenerateMetaDataInfo(sourceFile, data->m_ClassMetaDataInfo);
+
+			for(InheritanceInfo inh : data->m_Inheritance)
+			{
+				sourceFile << ".Inheritance";
+				sourceFile << "(\"" << inh.m_Name << "\")\n";
+			}
 
 			for (ConstructorInfo consInfo : data->m_Constructors)
 			{

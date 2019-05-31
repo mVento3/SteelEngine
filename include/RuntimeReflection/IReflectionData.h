@@ -9,6 +9,7 @@
 #include "RuntimeReflection/IReflectionProperty.h"
 #include "RuntimeReflection/IReflectionMethod.h"
 #include "RuntimeReflection/IReflectionEnumeration.h"
+#include "RuntimeReflection/IReflectionInheritance.h"
 
 #include "RuntimeReflection/Variant.h"
 
@@ -25,6 +26,7 @@ namespace SteelEngine {
 		typedef std::unordered_map<std::string, IReflectionMethod*> MethodsMap;
 		typedef std::unordered_map<std::string, IReflectionEnumeration*> EnumsMap;
 		typedef std::vector<IReflectionConstructor*> ConstructorsVector;
+		typedef std::vector<IReflectionInheritance*> InheritancesVector;
 
 		struct PropertyInfo
 		{
@@ -50,6 +52,7 @@ namespace SteelEngine {
 		PropertiesMap		m_Properties;
 		MethodsMap			m_Methods;
 		EnumsMap			m_Enums;
+		InheritancesVector	m_Inheritances;
 
 		ConstructorsVector m_ConstructorsToClear;
 
@@ -63,6 +66,15 @@ namespace SteelEngine {
 		virtual IReflectionProperty* GetProperty(const std::string& name) = 0;
 		virtual IReflectionMethod* GetMethod(const std::string& name) = 0;
 		virtual IReflectionEnumeration* GetEnum(const std::string& name) = 0;
+
+		const std::vector<IReflectionInheritance*> GetInheritances()
+		{
+			std::vector<IReflectionInheritance*> res;
+
+			res.insert(res.begin(), m_Inheritances.begin(), m_Inheritances.end());
+
+			return res;
+		}
 
 		template <typename... Args>
 		Interface::IRuntimeObject* Create(Args... args)

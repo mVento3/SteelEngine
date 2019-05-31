@@ -10,6 +10,7 @@ SteelEngine::Reflection::Register<SteelEngine::NCE_ReflectionModule>("NCE_Reflec
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_REFLECTION_MODULE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::NCE_ReflectionModule))
 )
+.Inheritance("Interface::IRuntimeObject")
 .Constructor<>()
 (
 )

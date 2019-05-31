@@ -9,6 +9,7 @@ SteelEngine::Reflection::Register<SteelEngine::Client>("Client")
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Client))
 )
+.Inheritance("Interface::INetwork")
 .Constructor<>()
 (
 )

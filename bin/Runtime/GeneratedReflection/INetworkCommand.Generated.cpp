@@ -10,6 +10,7 @@ SteelEngine::Reflection::Register<SteelEngine::NetworkCommands::INetworkCommand>
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::NetworkCommands::INetworkCommand))
 )
+.Inheritance("Interface::IRuntimeObject")
 .Property("m_Flow", &SteelEngine::NetworkCommands::INetworkCommand::m_Flow)
 (
 )

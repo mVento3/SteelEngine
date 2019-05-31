@@ -68,7 +68,16 @@ for type in project_types:
         project_name = file.split(os.sep)[1]
 
         for srcFile in source_files:
-            if type[0] == project_name and os.path.splitext(os.path.basename(file))[0] == os.path.splitext(os.path.basename(srcFile))[0]:
+            hDirs = file.split(os.sep)
+            cppDirs = srcFile.split(os.sep)
+            found = False
+
+            if len(hDirs) == len(cppDirs):
+                for x in range(1, len(hDirs) - 1):
+                    if hDirs[x] == cppDirs[x]:
+                        found = True
+
+            if found and type[0] == project_name and os.path.splitext(os.path.basename(file))[0] == os.path.splitext(os.path.basename(srcFile))[0]:
                 if srcFile != '' and file != '':
                     # print("AAAAA")
                     try:

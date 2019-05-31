@@ -77,12 +77,18 @@ namespace SteelEngine {
 			std::vector<EnumElement>	m_Elements;
 		};
 
+		struct InheritanceInfo
+		{
+			std::string m_Name;
+			ProtectionFlag m_Protection;
+		};
+
 		struct ClassData
 		{
 			std::string m_ClassName;
 			ClassType m_Type;
 
-			std::vector<std::string> 		m_Inheritance;
+			std::vector<InheritanceInfo> 	m_Inheritance;
 			std::vector<MetaDataInfo>		m_ClassMetaDataInfo;
 			std::vector<ConstructorInfo>	m_Constructors;
 			std::vector<ClassProperty>		m_Properties;
@@ -104,7 +110,7 @@ namespace SteelEngine {
 		{
 			const std::vector<ReflectionGenerator::MetaDataInfo>* m_MetaData;
 			const std::string m_ClassName;
-			const std::vector<std::string>* m_Inheritance;
+			const std::vector<InheritanceInfo>* m_Inheritance;
 		};
 
 		struct SE_ValueMacroEvent

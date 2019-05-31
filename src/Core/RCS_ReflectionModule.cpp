@@ -45,7 +45,7 @@ namespace SteelEngine {
 
         for(Type::uint32 i = 0; i < event.m_Inheritance->size(); i++)
         {
-            m_Inheritance.push_back(event.m_Inheritance->at(i));
+            m_Inheritance.push_back(event.m_Inheritance->at(i).m_Name);
         }
     }
 
