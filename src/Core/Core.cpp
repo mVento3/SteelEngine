@@ -157,7 +157,7 @@ namespace SteelEngine {
             return;
         }
 
-        Serialization ser;
+        //Serialization ser;
 
         //int a[] = { 2, 2 };
         std::vector<int> a = { 2, 2 };
@@ -168,7 +168,7 @@ namespace SteelEngine {
             "aaa\0"
         };
 
-        ser.Serialize(10, 2.3231f, a, "aa", aa);
+        //ser.Serialize(10, 2.3231f, a, "aa", aa);
 
         int _int;
         float _float;
@@ -179,7 +179,11 @@ namespace SteelEngine {
 
         _strArray = &_strArray2;
 
-        ser.Deserialize(_int, _float, _intVector, _strArray, _strVector);
+        char* res = Serialization::SerializeStream(10, 2.3231f, a, "aa", aa);
+
+        Serialization::DeserializeStream(res, _int, _float, _intVector, _strArray, _strVector);
+
+        //ser.Deserialize(_int, _float, _intVector, _strArray, _strVector);
 
         // Serialization ser2;
 

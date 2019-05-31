@@ -8,11 +8,10 @@ namespace SteelEngine {
     class Serialization
     {
     private:
-        char*   m_DataStream;
-        char*   m_Temp;
+        char* m_DataStream;
 
         template <typename A>
-        void SerializeType(size_t& totalSize, const A& value, char* in)
+        static void SerializeType(size_t& totalSize, const A& value, char* in, char** out)
         {
             A* t = (A*)in;
 
@@ -25,11 +24,11 @@ namespace SteelEngine {
                 t++;
             }
 
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
         template <typename A, size_t N>
-        void SerializeType(size_t& totalSize, const A(&arrayIn)[N], char* in)
+        static void SerializeType(size_t& totalSize, const A(&arrayIn)[N], char* in, char** out)
         {
             size_t* sizePtr = (size_t*)in;
             size_t s = sizeof(size_t);
@@ -53,10 +52,10 @@ namespace SteelEngine {
                 }
             }
 
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
-        void SerializeType(size_t& totalSize, const std::vector<const char*>& value, char* in)
+        static void SerializeType(size_t& totalSize, const std::vector<const char*>& value, char* in, char** out)
         {
             size_t s = sizeof(size_t);
             size_t* size = (size_t*)in;
@@ -94,11 +93,11 @@ namespace SteelEngine {
                 }
             }
 
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
         template <typename A>
-        void SerializeType(size_t& totalSize, const std::vector<A>& value, char* in)
+        static void SerializeType(size_t& totalSize, const std::vector<A>& value, char* in, char** out)
         {
             size_t s = sizeof(size_t);
             size_t* size = (size_t*)in;
@@ -124,11 +123,11 @@ namespace SteelEngine {
                 }
             }
 
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
         template <typename A>
-        void DeserializeType(size_t& totalSize, A& value, char* in)
+        static void DeserializeType(size_t& totalSize, A& value, char* in, char** out)
         {
             A* t = (A*)in;
 
@@ -141,11 +140,11 @@ namespace SteelEngine {
                 t++;
             }
 
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
         template <typename A>
-        void DeserializeType(size_t& totalSize, A** value, char* in)
+        static void DeserializeType(size_t& totalSize, A** value, char* in, char** out)
         {
             size_t* sizePtr = (size_t*)in;
             size_t size = *sizePtr;
@@ -171,11 +170,11 @@ namespace SteelEngine {
             }
 
             *value = str;
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
         template <typename A>
-        void DeserializeType(size_t& totalSize, A* value, char* in)
+        static void DeserializeType(size_t& totalSize, A* value, char* in, char** out)
         {
             size_t* sizePtr = (size_t*)in;
             size_t size = *sizePtr;
@@ -197,11 +196,11 @@ namespace SteelEngine {
                 }
             }
 
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
         template <typename A, size_t N>
-        void DeserializeType(size_t& totalSize, A(&arrayIn)[N], char* in)
+        static void DeserializeType(size_t& totalSize, A(&arrayIn)[N], char* in, char** out)
         {
             A* ptr = arrayIn;
             A* t = (A*)in;
@@ -219,11 +218,11 @@ namespace SteelEngine {
                 }
             }
 
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
         template <typename A>
-        void DeserializeType(size_t& totalSize, std::vector<A>& value, char* in)
+        static void DeserializeType(size_t& totalSize, std::vector<A>& value, char* in, char** out)
         {
             size_t* sizePtr = (size_t*)in;
             size_t size = *sizePtr;
@@ -248,10 +247,10 @@ namespace SteelEngine {
                 }
             }
 
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
-        void DeserializeType(size_t& totalSize, std::vector<char*>& value, char* in)
+        static void DeserializeType(size_t& totalSize, std::vector<char*>& value, char* in, char** out)
         {
             size_t* sizePtr = (size_t*)in;
             size_t size = *sizePtr;
@@ -292,7 +291,7 @@ namespace SteelEngine {
                 value.push_back(arr);
             }
 
-            m_Temp = (char*)t;
+            *out = (char*)t;
         }
 
     public:
@@ -307,19 +306,19 @@ namespace SteelEngine {
         }
 
         template <typename A>
-        void CalculateTotalSize(size_t& totalSize, const A& none)
+        static void CalculateTotalSize(size_t& totalSize, const A& none)
         {
             totalSize += sizeof(none);
         }
 
         template <typename A, size_t N>
-        void CalculateTotalSize(size_t& totalSize, const A(&arrayIn)[N])
+        static void CalculateTotalSize(size_t& totalSize, const A(&arrayIn)[N])
         {
             totalSize += N;
             totalSize += sizeof(size_t);
         }
 
-        void CalculateTotalSize(size_t& totalSize, const std::vector<const char*>& none)
+        static void CalculateTotalSize(size_t& totalSize, const std::vector<const char*>& none)
         {
             for(Type::uint32 i = 0; i < none.size(); i++)
             {
@@ -331,7 +330,7 @@ namespace SteelEngine {
         }
 
         template <typename A>
-        void CalculateTotalSize(size_t& totalSize, const std::vector<A>& none)
+        static void CalculateTotalSize(size_t& totalSize, const std::vector<A>& none)
         {
             totalSize += sizeof(none.size() * sizeof(A));
             totalSize += sizeof(size_t);
@@ -366,33 +365,74 @@ namespace SteelEngine {
             totalSize += sizeof(size_t);
             m_DataStream = new char[totalSize];
 
-            m_Temp = m_DataStream;
+            char* temp = m_DataStream;
 
-            size_t* stringSizePtr = (size_t*)m_Temp;
+            size_t* stringSizePtr = (size_t*)temp;
 
             *stringSizePtr = totalSize;
             stringSizePtr++;
             totalSize -= sizeof(size_t);
 
-            m_Temp = (char*)stringSizePtr;
+            temp = (char*)stringSizePtr;
 
-            int _2[] = {0, (SerializeType(totalSize, value, m_Temp), 0)...};
+            int _2[] = {0, (SerializeType(totalSize, value, temp, &temp), 0)...};
         }
 
         template <typename... Types>
         void Deserialize(Types& ...value)
         {
-            m_Temp = m_DataStream;
+            char* temp = m_DataStream;
 
-            size_t* stringSizePtr = (size_t*)m_Temp;
+            size_t* stringSizePtr = (size_t*)temp;
 
             size_t totalSize = *stringSizePtr;
             stringSizePtr++;
             totalSize -= sizeof(size_t);
 
-            m_Temp = (char*)stringSizePtr;
+            temp = (char*)stringSizePtr;
 
-            int _[] = {0, (DeserializeType(totalSize, value, m_Temp), 0)...};
+            int _[] = {0, (DeserializeType(totalSize, value, temp, &temp), 0)...};
+        }
+
+        template <typename... Types>
+        static char* SerializeStream(const Types& ...value)
+        {
+            size_t totalSize = 0;
+
+            int _[] = {0, (CalculateTotalSize(totalSize, value), 0)...};
+
+            totalSize += sizeof(size_t);
+            char* dataStream = new char[totalSize];
+
+            char* temp = dataStream;
+
+            size_t* stringSizePtr = (size_t*)temp;
+
+            *stringSizePtr = totalSize;
+            stringSizePtr++;
+            totalSize -= sizeof(size_t);
+
+            temp = (char*)stringSizePtr;
+
+            int _2[] = {0, (SerializeType(totalSize, value, temp, &temp), 0)...};
+
+            return dataStream;
+        }
+
+        template <typename... Types>
+        static void DeserializeStream(char* dataStream, Types& ...value)
+        {
+            char* temp = dataStream;
+
+            size_t* stringSizePtr = (size_t*)temp;
+
+            size_t totalSize = *stringSizePtr;
+            stringSizePtr++;
+            totalSize -= sizeof(size_t);
+
+            temp = (char*)stringSizePtr;
+
+            int _[] = {0, (DeserializeType(totalSize, value, temp, &temp), 0)...};
         }
 
         inline char* GetDataStream()
