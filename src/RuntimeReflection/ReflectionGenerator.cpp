@@ -935,7 +935,7 @@ namespace SteelEngine {
 
 	Result ReflectionGenerator::Generate(const filesystem::path& generatePath)
 	{
-		ClassData* data;
+		ClassData* data = 0;
 
 		for(Type::uint32 i = 0; i < m_Classes.size(); i++)
 		{
