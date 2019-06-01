@@ -124,18 +124,17 @@ namespace SteelEngine {
                 }
                 else
                 {
-                    for(int i = 0; i < HEADER_SIZE; i++)
-                    {
-                        m_Header[i] = m_Buffer[i];
-                    }
+                    Serialization::DeserializeStream(m_Buffer, m_Header);
 
                     for(Type::uint32 i = 0; i < m_CommandTypes.size(); i++)
                     {
                         NetworkCommands::INetworkCommand* command = m_CommandTypes[i];
 
-                        if(strcmp(command->m_Header, m_Header) == 0)
+                        if(strcmp(command->m_Header.c_str(), m_Header.c_str()) == 0)
                         {
-                            command->Deserialize(m_Buffer);
+                            size_t totalSize = 0;
+
+                            command->Deserialize(m_Buffer, totalSize);
                             command->ServerSide(this, sock);
 
                             break;
@@ -170,12 +169,23 @@ namespace SteelEngine {
     {
         NetworkCommands::MessageData data;
 
-        data.m_Size = Reflection::GetType(event->m_Header)->GetMetaData("sizeof")->Convert<size_t>();
-        data.m_Data = new char[data.m_Size];
-
         event->m_Flow = NetworkCommands::CommunicationFlow::SERVER_TO_CLIENT;
 
-        event->Serialize(data.m_Data);
+        event->CalculateSize(data.m_Size);
+
+        data.m_Data = new char[data.m_Size];
+
+        char* temp = data.m_Data;
+
+        size_t* stringSizePtr = (size_t*)temp;
+
+        *stringSizePtr = data.m_Size;
+        stringSizePtr++;
+        data.m_Size -= sizeof(size_t);
+
+        temp = (char*)stringSizePtr;
+
+        event->Serialize(temp, data.m_Size);
 
         for(SocketMap::iterator it = m_Commands.begin(); it != m_Commands.end(); ++it)
         {

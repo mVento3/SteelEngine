@@ -21,8 +21,8 @@ namespace SteelEngine { namespace NetworkCommands {
 
     struct MessageData
     {
-        char* m_Data;
-        size_t m_Size;
+        char* m_Data = 0;
+        size_t m_Size = 0;
     };
 
     enum CommunicationFlow
@@ -34,45 +34,46 @@ namespace SteelEngine { namespace NetworkCommands {
     SE_CLASS(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE)
     struct INetworkCommand : public Interface::IRuntimeObject
     {
+        SE_VALUE(SteelEngine::ReflectionAttribute::SE_NET_VALUE)
         CommunicationFlow m_Flow;
-        char m_Header[HEADER_SIZE];
+
+        SE_VALUE(SteelEngine::ReflectionAttribute::SE_NET_VALUE)
+        std::string m_Header;
+
         std::vector<INetworkCommand*>* m_Commands;
 
-        virtual char* Serialize(char *data)
+        virtual char* Serialize(char* data, size_t& totalSize)
         {
-            char* h = (char*)data;
+            char* out = data;
 
-            for(int i = 0; i < HEADER_SIZE; i++)
-            {
-                *h = m_Header[i];
-                h++;
-            }
+            Serialization::SerializeType(totalSize, m_Header, out, &out);
+            Serialization::SerializeType(totalSize, m_Flow, out, &out);
 
-            CommunicationFlow* cm = (CommunicationFlow*)h;
-
-            *cm = m_Flow;
-
-            cm++;
-
-            return (char*)cm;
+            return out;
         }
 
-        virtual char* Deserialize(char *data)
+        virtual char* Deserialize(char* data, size_t& totalSize)
         {
-            char* h = (char*)data;
+            char* out = data;
 
-            for(int i = 0; i < HEADER_SIZE; i++)
-            {
-                h++;
-            }
+            size_t* stringSizePtr = (size_t*)out;
 
-            CommunicationFlow* cm = (CommunicationFlow*)h;
+            totalSize = *stringSizePtr;
+            stringSizePtr++;
+            totalSize -= sizeof(size_t);
 
-            m_Flow = *cm;
+            out = (char*)stringSizePtr;
 
-            cm++;
+            Serialization::DeserializeType(totalSize, m_Header, out, &out);
+            Serialization::DeserializeType(totalSize, m_Flow, out, &out);
 
-            return (char*)cm;
+            return out;
+        }
+
+        virtual void CalculateSize(size_t& totalSize)
+        {
+            Serialization::CalculateTotalSize(totalSize, m_Header);
+            Serialization::CalculateTotalSize(totalSize, m_Flow);
         }
 
         virtual void ServerSide(Interface::INetwork* network, SOCKET sock) { }

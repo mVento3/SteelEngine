@@ -1,29 +1,20 @@
 #include "RuntimeReflection/ReflectionGeneratorMacros.h"
 
 #define GENERATED_BODY \
-char* Serialize(char* data) override\
+char* Serialize(char* data, size_t& totalSize) override\
 {\
-char* p = INetworkCommand::Serialize(data);\
-for(int i = 0; i < strlen(m_ModuleName.c_str()) + 1; i++)\
-{\
-*p = m_ModuleName[i];\
-p++;\
+char* out = INetworkCommand::Serialize(data, totalSize);\
+Serialization::SerializeType(totalSize, m_ModuleName, out, &out);\
+return out;\
 }\
-return p;\
-}\
-char* Deserialize(char* data) override\
+char* Deserialize(char* data, size_t& totalSize) override\
 {\
-char* p = INetworkCommand::Deserialize(data);\
-m_ModuleName.clear();\
-while(1)\
-{\
-m_ModuleName.push_back(*p);\
-p++;\
-if(*p == '\0')\
-{\
-p++;\
-break;\
+char* out = INetworkCommand::Deserialize(data, totalSize);\
+Serialization::DeserializeType(totalSize, m_ModuleName, out, &out);\
+return out;\
 }\
-}\
-return p;\
+void CalculateSize(size_t& totalSize) override\
+{\
+INetworkCommand::CalculateSize(totalSize);\
+Serialization::CalculateTotalSize(totalSize, m_ModuleName);\
 }

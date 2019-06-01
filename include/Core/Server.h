@@ -37,7 +37,7 @@ namespace SteelEngine {
         ServerInfo m_ServerInfo;
         SocketMap m_Commands;
         std::vector<NetworkCommands::INetworkCommand*> m_CommandTypes;
-        char m_Header[HEADER_SIZE];
+        std::string m_Header;
         char* m_Buffer;
 
     public:

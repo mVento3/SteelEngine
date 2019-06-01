@@ -66,6 +66,33 @@ namespace SteelEngine {
             *out = (char*)t;
         }
 
+        static void SerializeType(size_t& totalSize, const std::string& value, char* in, char** out)
+        {
+            size_t* sizePtr = (size_t*)in;
+            size_t s = sizeof(size_t);
+
+            *sizePtr = value.size();
+            sizePtr++;
+            totalSize -= s;
+
+            char* t = (char*)sizePtr;
+
+            for(Type::uint32 i = 0; i < value.size(); i++)
+            {
+                *t = value[i];
+                
+                size_t s = sizeof(char);
+                totalSize -= s;
+
+                if(totalSize > 0)
+                {
+                    t++;
+                }
+            }
+
+            *out = (char*)t;
+        }
+
         static void SerializeType(size_t& totalSize, const std::vector<const char*>& value, char* in, char** out)
         {
             size_t s = sizeof(size_t);
@@ -244,6 +271,8 @@ namespace SteelEngine {
 
             totalSize -= s;
 
+            value.clear();
+
             for(Type::uint32 i = 0; i < size; i++)
             {
                 value.push_back(*t);
@@ -343,6 +372,12 @@ namespace SteelEngine {
         static void CalculateTotalSize(size_t& totalSize, const A(&arrayIn)[N])
         {
             totalSize += N;
+            totalSize += sizeof(size_t);
+        }
+
+        static void CalculateTotalSize(size_t& totalSize, const std::string& none)
+        {
+            totalSize += none.size();
             totalSize += sizeof(size_t);
         }
 

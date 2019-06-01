@@ -2,26 +2,18 @@
 
 #include "Networking/INetworkCommand.h"
 
+#include "NoneNetCommandEvent.Generated.h"
+
 namespace SteelEngine { namespace NetworkCommands {
 
     SE_CLASS(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE, SteelEngine::ReflectionAttribute::SE_NETWORK_COMMAND)
     struct NoneNetCommandEvent : public INetworkCommand
     {
+        GENERATED_BODY
+
         NoneNetCommandEvent()
         {
-            strcpy(m_Header, SE_GET_TYPE_NAME(NoneNetCommandEvent));
-        }
-
-        SE_METHOD()
-        char* Serialize(char* data) override
-        {
-            return INetworkCommand::Serialize(data);
-        }
-
-        SE_METHOD()
-        char* Deserialize(char* data) override
-        {
-            return INetworkCommand::Deserialize(data);
+            m_Header = SE_GET_TYPE_NAME(NoneNetCommandEvent);
         }
 
         SE_METHOD()

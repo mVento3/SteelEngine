@@ -23,13 +23,13 @@ namespace SteelEngine { namespace NetworkCommands {
 
         SwapModuleNetCommandEvent()
         {
-            strcpy(m_Header, SE_GET_TYPE_NAME(SwapModuleNetCommandEvent));
+            m_Header = SE_GET_TYPE_NAME(SwapModuleNetCommandEvent);
         }
 
         SwapModuleNetCommandEvent(const std::string& moduleName) :
             m_ModuleName(moduleName)
         {
-            strcpy(m_Header, SE_GET_TYPE_NAME(SwapModuleNetCommandEvent));
+            m_Header = SE_GET_TYPE_NAME(SwapModuleNetCommandEvent);
         }
 
         SE_METHOD()
@@ -138,7 +138,12 @@ namespace SteelEngine { namespace NetworkCommands {
 
                 input.close();
                 network->Send(sock, "DONE", bufSize);
-                network->Send(sock, "GetNetCommandEvent", bufSize);
+                
+                char* cmd = Serialization::SerializeStream("GetNetCommandEvent");
+
+                network->Send(sock, cmd, bufSize);
+
+                delete[] cmd;
                 fileBuf.clear();
             }
         }

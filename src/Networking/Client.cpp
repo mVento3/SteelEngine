@@ -120,12 +120,25 @@ namespace SteelEngine {
     {
         NetworkCommands::MessageData data;
 
-        data.m_Size = Reflection::GetType(event->m_Header)->GetMetaData("sizeof")->Convert<size_t>();
+        event->m_Flow = NetworkCommands::CommunicationFlow::CLIENT_TO_SERVER;
+
+        event->CalculateSize(data.m_Size);
+
+        data.m_Size += sizeof(size_t);
+
         data.m_Data = new char[data.m_Size];
 
-        event->m_Flow = NetworkCommands::CommunicationFlow::CLIENT_TO_SERVER;
-        
-        event->Serialize(data.m_Data);
+        char* temp = data.m_Data;
+
+        size_t* stringSizePtr = (size_t*)temp;
+
+        *stringSizePtr = data.m_Size;
+        stringSizePtr++;
+        data.m_Size -= sizeof(size_t);
+
+        temp = (char*)stringSizePtr;
+
+        event->Serialize(temp, data.m_Size);
 
         m_Commands.push(data);
     }

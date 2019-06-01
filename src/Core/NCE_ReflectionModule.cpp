@@ -88,60 +88,43 @@ namespace SteelEngine {
 
         if(m_NetCommand)
         {
-            event.m_GeneratedBodyMacro->push_back("char* Serialize(char* data) override");
+            event.m_GeneratedBodyMacro->push_back("char* Serialize(char* data, size_t& totalSize) override");
             event.m_GeneratedBodyMacro->push_back("{");
-            {
+            {          
+                event.m_GeneratedBodyMacro->push_back("char* out = INetworkCommand::Serialize(data, totalSize);");
+                    
                 for(Type::uint32 i = 0; i < m_Properties.size(); i++)
                 {
-                    ReflectionGenerator::ClassProperty prop = m_Properties[i];
-
-                    if(prop.m_ArgumentInfo.m_Type.find("string") != std::string::npos)
-                    {
-                        event.m_GeneratedBodyMacro->push_back("char* p = INetworkCommand::Serialize(data);");
-
-                        event.m_GeneratedBodyMacro->push_back("for(int i = 0; i < strlen(" + prop.m_ArgumentInfo.m_Name + ".c_str()) + 1; i++)");
-                        event.m_GeneratedBodyMacro->push_back("{");
-                        {
-                            event.m_GeneratedBodyMacro->push_back("*p = " + prop.m_ArgumentInfo.m_Name + "[i];");
-                            event.m_GeneratedBodyMacro->push_back("p++;");
-                        }
-                        event.m_GeneratedBodyMacro->push_back("}");
-                    }
+                    event.m_GeneratedBodyMacro->push_back("Serialization::SerializeType(totalSize, " + m_Properties[i].m_ArgumentInfo.m_Name + ", out, &out);");
                 }
 
-                event.m_GeneratedBodyMacro->push_back("return p;");
+                event.m_GeneratedBodyMacro->push_back("return out;");
             }
             event.m_GeneratedBodyMacro->push_back("}");
 
-            event.m_GeneratedBodyMacro->push_back("char* Deserialize(char* data) override");
+            event.m_GeneratedBodyMacro->push_back("char* Deserialize(char* data, size_t& totalSize) override");
             event.m_GeneratedBodyMacro->push_back("{");
             {
+                event.m_GeneratedBodyMacro->push_back("char* out = INetworkCommand::Deserialize(data, totalSize);");
+                
                 for(Type::uint32 i = 0; i < m_Properties.size(); i++)
                 {
-                    ReflectionGenerator::ClassProperty prop = m_Properties[i];
-
-                    if(prop.m_ArgumentInfo.m_Type.find("string") != std::string::npos)
-                    {
-                        event.m_GeneratedBodyMacro->push_back("char* p = INetworkCommand::Deserialize(data);");
-                        event.m_GeneratedBodyMacro->push_back(prop.m_ArgumentInfo.m_Name + ".clear();");
-                        event.m_GeneratedBodyMacro->push_back("while(1)");
-                        event.m_GeneratedBodyMacro->push_back("{");
-                        {
-                            event.m_GeneratedBodyMacro->push_back(prop.m_ArgumentInfo.m_Name + ".push_back(*p);");
-                            event.m_GeneratedBodyMacro->push_back("p++;");
-                            event.m_GeneratedBodyMacro->push_back("if(*p == '\\0')");
-                            event.m_GeneratedBodyMacro->push_back("{");
-                            {
-                                event.m_GeneratedBodyMacro->push_back("p++;");
-                                event.m_GeneratedBodyMacro->push_back("break;");
-                            }
-                            event.m_GeneratedBodyMacro->push_back("}");
-                        }
-                        event.m_GeneratedBodyMacro->push_back("}");
-                    }
+                    event.m_GeneratedBodyMacro->push_back("Serialization::DeserializeType(totalSize, " + m_Properties[i].m_ArgumentInfo.m_Name + ", out, &out);");
                 }
 
-                event.m_GeneratedBodyMacro->push_back("return p;");
+                event.m_GeneratedBodyMacro->push_back("return out;");
+            }
+            event.m_GeneratedBodyMacro->push_back("}");
+
+            event.m_GeneratedBodyMacro->push_back("void CalculateSize(size_t& totalSize) override");
+            event.m_GeneratedBodyMacro->push_back("{");
+            {
+                event.m_GeneratedBodyMacro->push_back("INetworkCommand::CalculateSize(totalSize);");
+
+                for(Type::uint32 i = 0; i < m_Properties.size(); i++)
+                {
+                    event.m_GeneratedBodyMacro->push_back("Serialization::CalculateTotalSize(totalSize, " + m_Properties[i].m_ArgumentInfo.m_Name + ");");
+                }
             }
             event.m_GeneratedBodyMacro->push_back("}");
         }

@@ -13,9 +13,11 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::NetworkCommands:
 .Inheritance("Interface::IRuntimeObject")
 .Property("m_Flow", &SteelEngine::NetworkCommands::INetworkCommand::m_Flow)
 (
+SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_NET_VALUE, true)
 )
 .Property("m_Header", &SteelEngine::NetworkCommands::INetworkCommand::m_Header)
 (
+SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_NET_VALUE, true)
 )
 .Property("m_Commands", &SteelEngine::NetworkCommands::INetworkCommand::m_Commands)
 (

@@ -10,7 +10,7 @@
 #include "Networking/INetworkCommand.h"
 #include "Networking/SwapModuleNetCommandEvent.h"
 
-#include "NetworkCommands.Generated.h"
+#include "GetNetCommandEvent.Generated.h"
 
 #define BUFSIZE 1024
 
@@ -19,29 +19,19 @@ namespace SteelEngine { namespace NetworkCommands {
     SE_CLASS(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE, SteelEngine::ReflectionAttribute::SE_NETWORK_COMMAND)
     struct GetNetCommandEvent : public INetworkCommand
     {
-        char m_HeaderComp[HEADER_SIZE];
+        GENERATED_BODY
+
+        std::string m_HeaderComp;
         char* m_Buffer;
         Type::uint32 m_BufferSize;
 
         GetNetCommandEvent()
         {
-            strcpy(m_Header, SE_GET_TYPE_NAME(GetNetCommandEvent));
+            m_Header = SE_GET_TYPE_NAME(GetNetCommandEvent);
 
             m_BufferSize = Reflection::GetType("Server")->GetMetaData(SE_SERVER_INFO)->Convert<Type::uint32>();
 
             m_Buffer = new char[m_BufferSize];
-        }
-
-        SE_METHOD()
-        char* Serialize(char* data) override
-        {
-            return INetworkCommand::Serialize(data);
-        }
-
-        SE_METHOD()
-        char* Deserialize(char* data) override
-        {
-            return INetworkCommand::Deserialize(data);
         }
 
         SE_METHOD()
@@ -56,18 +46,17 @@ namespace SteelEngine { namespace NetworkCommands {
 
                 network->Send(sock, data.m_Data, data.m_Size);
 
-                for(int i = 0; i < HEADER_SIZE; i++)
-                {
-                    m_HeaderComp[i] = data.m_Data[i];
-                }
+                Serialization::DeserializeStream(data.m_Data, m_HeaderComp);
 
                 for(Type::uint32 i = 0; i < m_Commands->size(); i++)
                 {
                     NetworkCommands::INetworkCommand* command = m_Commands->at(i);
 
-                    if(strcmp(command->m_Header, m_HeaderComp) == 0)
+                    if(command->m_Header == m_HeaderComp)
                     {
-                        command->Deserialize(data.m_Data);
+                        size_t totalSize = 0;
+
+                        command->Deserialize(data.m_Data, totalSize);
                         command->ServerSide(network, sock);
 
                         break;
@@ -78,7 +67,11 @@ namespace SteelEngine { namespace NetworkCommands {
             }
             else
             {
-                network->Send(sock, "NoneNetCommandEvent", m_BufferSize);
+                char* cmd = Serialization::SerializeStream("NoneNetCommandEvent", m_Flow);
+
+                network->Send(sock, cmd, m_BufferSize);
+
+                delete[] cmd;
             }
 
             commands.Clear();
@@ -98,18 +91,17 @@ namespace SteelEngine { namespace NetworkCommands {
 
                     network->Send(sock, data.m_Data, m_BufferSize);
 
-                    for(int i = 0; i < HEADER_SIZE; i++)
-                    {
-                        m_HeaderComp[i] = data.m_Data[i];
-                    }
+                    Serialization::DeserializeStream(data.m_Data, m_HeaderComp);
 
                     for(Type::uint32 i = 0; i < m_Commands->size(); i++)
                     {
                         NetworkCommands::INetworkCommand* command = m_Commands->at(i);
 
-                        if(strcmp(command->m_Header, m_HeaderComp) == 0)
+                        if(strcmp(command->m_Header.c_str(), m_HeaderComp.c_str()) == 0)
                         {
-                            command->Deserialize(data.m_Data);
+                            size_t totalSize = 0;
+
+                            command->Deserialize(data.m_Data, totalSize);
                             command->ClientSide(network, sock);
 
                             break;
@@ -121,24 +113,27 @@ namespace SteelEngine { namespace NetworkCommands {
             }
             else
             {
-                network->Send(sock, "GetNetCommandEvent", m_BufferSize);
+                char* cmd = Serialization::SerializeStream("GetNetCommandEvent", m_Flow);
+
+                network->Send(sock, cmd, m_BufferSize);
+
+                delete[] cmd;
             }
 
             commands.Clear();
             network->Receive(sock, m_Buffer, m_BufferSize);
 
-            for(int i = 0; i < HEADER_SIZE; i++)
-            {
-                m_HeaderComp[i] = m_Buffer[i];
-            }    
+            Serialization::DeserializeStream(m_Buffer, m_HeaderComp);
 
             for(Type::uint32 i = 0; i < m_Commands->size(); i++)
             {
                 NetworkCommands::INetworkCommand* command = m_Commands->at(i);
 
-                if(strcmp(command->m_Header, m_HeaderComp) == 0)
+                if(strcmp(command->m_Header.c_str(), m_HeaderComp.c_str()) == 0)
                 {
-                    command->Deserialize(m_Buffer);
+                    size_t totalSize = 0;
+
+                    command->Deserialize(m_Buffer, totalSize);
                     command->ClientSide(network, sock);
 
                     break;
