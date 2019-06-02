@@ -29,7 +29,7 @@ namespace SteelEngine {
     {
         GENERATED_BODY
     public:
-        typedef std::map<SOCKET, std::queue<NetworkCommands::MessageData>> SocketMap;
+        typedef std::map<SOCKET, std::queue<char*>> SocketMap;
 
     private:
         fd_set m_Master;
@@ -56,7 +56,7 @@ namespace SteelEngine {
         int Receive(SOCKET sock, char* buffer, Type::uint32 size) override;
 
         SE_METHOD()
-        std::queue<NetworkCommands::MessageData>* GetCommands(SOCKET sock);
+        std::queue<char*>* GetCommands(SOCKET sock);
 
         void operator()(NetworkCommands::INetworkCommand* event);
     };

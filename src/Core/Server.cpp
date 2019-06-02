@@ -155,7 +155,7 @@ namespace SteelEngine {
         return recv(sock, buffer, size, 0);
     }
 
-    std::queue<NetworkCommands::MessageData>* Server::GetCommands(SOCKET sock)
+    std::queue<char*>* Server::GetCommands(SOCKET sock)
     {
         return &m_Commands[sock];
     }
@@ -167,25 +167,27 @@ namespace SteelEngine {
 
     void Server::operator()(NetworkCommands::INetworkCommand* event)
     {
-        NetworkCommands::MessageData data;
+        size_t size = 0;
 
         event->m_Flow = NetworkCommands::CommunicationFlow::SERVER_TO_CLIENT;
 
-        event->CalculateSize(data.m_Size);
+        event->CalculateSize(size);
 
-        data.m_Data = new char[data.m_Size];
+        size += sizeof(size_t);
 
-        char* temp = data.m_Data;
+        char* data = new char[size];
+
+        char* temp = data;
 
         size_t* stringSizePtr = (size_t*)temp;
 
-        *stringSizePtr = data.m_Size;
+        *stringSizePtr = size;
         stringSizePtr++;
-        data.m_Size -= sizeof(size_t);
+        size -= sizeof(size_t);
 
         temp = (char*)stringSizePtr;
 
-        event->Serialize(temp, data.m_Size);
+        event->Serialize(temp, size);
 
         for(SocketMap::iterator it = m_Commands.begin(); it != m_Commands.end(); ++it)
         {

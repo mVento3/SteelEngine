@@ -31,7 +31,7 @@ namespace SteelEngine {
     private:
         SOCKET m_Socket;
         std::thread* m_Thread;
-        std::queue<NetworkCommands::MessageData> m_Commands;
+        std::queue<char*> m_Commands;
         NetworkCommands::INetworkCommand* m_Command;
         Variant* m_ServerInfo;
         std::vector<NetworkCommands::INetworkCommand*> m_CommandTypes;
@@ -55,7 +55,7 @@ namespace SteelEngine {
         int Receive(SOCKET sock, char* buffer, Type::uint32 size) override;
 
         SE_METHOD()
-        std::queue<NetworkCommands::MessageData>* GetCommands();
+        std::queue<char*>* GetCommands();
 
         void operator()(NetworkCommands::INetworkCommand* event);
     };

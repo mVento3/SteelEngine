@@ -38,15 +38,15 @@ namespace SteelEngine { namespace NetworkCommands {
         void ServerSide(Interface::INetwork* network, SOCKET sock) override
         {
             Variant commands = Reflection::GetType("Server")->Invoke("GetCommands", network, sock);
-            std::queue<MessageData>* queue = commands.Convert<std::queue<NetworkCommands::MessageData>*>();
+            std::queue<char*>* queue = commands.Convert<std::queue<char*>*>();
 
             if(!queue->empty())
             {
-                MessageData data = queue->front();
+                char* data = queue->front();
 
-                network->Send(sock, data.m_Data, data.m_Size);
+                network->Send(sock, data, m_BufferSize);
 
-                Serialization::DeserializeStream(data.m_Data, m_HeaderComp);
+                Serialization::DeserializeStream(data, m_HeaderComp);
 
                 for(Type::uint32 i = 0; i < m_Commands->size(); i++)
                 {
@@ -56,7 +56,7 @@ namespace SteelEngine { namespace NetworkCommands {
                     {
                         size_t totalSize = 0;
 
-                        command->Deserialize(data.m_Data, totalSize);
+                        command->Deserialize(data, totalSize);
                         command->ServerSide(network, sock);
 
                         break;
@@ -81,17 +81,17 @@ namespace SteelEngine { namespace NetworkCommands {
         void ClientSide(Interface::INetwork* network, SOCKET sock) override
         {
             Variant commands = Reflection::GetType("Client")->Invoke("GetCommands", network);
-            std::queue<MessageData>* queue = commands.Convert<std::queue<NetworkCommands::MessageData>*>();
+            std::queue<char*>* queue = commands.Convert<std::queue<char*>*>();
 
             if(!queue->empty())
             {
                 while(!queue->empty())
                 {
-                    MessageData data = queue->front();
+                    char* data = queue->front();
 
-                    network->Send(sock, data.m_Data, m_BufferSize);
+                    network->Send(sock, data, m_BufferSize);
 
-                    Serialization::DeserializeStream(data.m_Data, m_HeaderComp);
+                    Serialization::DeserializeStream(data, m_HeaderComp);
 
                     for(Type::uint32 i = 0; i < m_Commands->size(); i++)
                     {
@@ -101,7 +101,7 @@ namespace SteelEngine { namespace NetworkCommands {
                         {
                             size_t totalSize = 0;
 
-                            command->Deserialize(data.m_Data, totalSize);
+                            command->Deserialize(data, totalSize);
                             command->ClientSide(network, sock);
 
                             break;

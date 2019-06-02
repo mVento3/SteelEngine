@@ -122,7 +122,7 @@ namespace SteelEngine {
         //     printf("c %i\n", meta3->Convert<int>());
         // }
 
-        SE_INFO("CZESC %i", 33);
+        SE_INFO("CZESC2 %i", 33);
         //SE_FATAL("LOL");
 
         // if(Reflection::GetType("Core")->GetMetaData(EngineInfo::IS_SERVER)->Convert<bool>())
