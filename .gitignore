@@ -41,3 +41,7 @@ ReflectionGenerator.exe
 *.idb
 .vscode/.ropeproject/objectdb
 *.log
+external/Vulkan/**
+!external/Vulkan/.gitkeep
+external/SDL2-2.0.9/**
+!external/SDL2-2.0.9/.gitkeep

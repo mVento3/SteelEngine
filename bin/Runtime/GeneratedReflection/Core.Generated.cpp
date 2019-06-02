@@ -17,8 +17,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::Core))
 .Property("ta", &SteelEngine::Core::ta)
 (
 SteelEngine::Reflection::MetaData("lol", 1212),
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE, 11),
-SteelEngine::Reflection::MetaData(SteelEngine::Core::Lol::TES, 22)
+SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE, 11)
 )
 .Method("Start", &SteelEngine::Core::Start)
 (
@@ -37,6 +36,8 @@ void SteelEngine::Core::Serialize(SteelEngine::Interface::ISerializer* serialize
 SERIALIZE(SteelEngine::Core::m_RuntimeCompiler)
 SERIALIZE(SteelEngine::Core::m_Network)
 SERIALIZE(SteelEngine::Core::m_Logger)
+SERIALIZE(SteelEngine::Core::m_Renderer)
+SERIALIZE(SteelEngine::Core::m_Window)
 SERIALIZE(SteelEngine::Core::m_Running)
 SERIALIZE(SteelEngine::Core::m_EnginePathVariant)
 SERIALIZE(SteelEngine::Core::meta)

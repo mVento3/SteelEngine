@@ -9,8 +9,8 @@ working_directory = 'build/Windows'
 # general
 flags = '/ZI /Od /DEBUG:FASTLINK'
 definitions = '/DSE_WINDOWS /D_WINSOCKAPI_'
-includes = '/I../../include /I../../bin/Runtime/GeneratedReflection'
-libs = 'Ws2_32.lib'
+includes = '/I../../include /I../../bin/Runtime/GeneratedReflection /I../../external/Vulkan/Include /I../../external/SDL2-2.0.9/include'
+libs = 'Ws2_32.lib ../../external/Vulkan/Lib/vulkan-1.lib ../../external/SDL2-2.0.9/lib/x64/SDL2.lib'
 
 # dll's
 dll_type = '/MT /LD'
@@ -21,6 +21,8 @@ project_types = [
     ['FileWatcher', 'lib'],
     ['Module', 'lib'],
     ['Utils', 'lib'],
+    ['Rendering', 'dll'],
+    ['Window', 'dll'],
     ['ModuleManager', 'dll'],
     ['RuntimeReflection', 'dll'],
     ['Core', 'dll'],

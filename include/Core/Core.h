@@ -18,25 +18,17 @@
 
 #include "Logger/Logger.h"
 
-namespace SteelEngine {
+#include "Rendering/IRenderer.h"
 
-    // struct CheckCurrentTextEvent
-		// {
-		// 	const std::string m_Text;
-		// 	const Type::uint32 m_Line;
-		// 	const std::string m_FullLine;
-		// };
+#include "Window/IWindow.h"
+
+namespace SteelEngine {
 
     SE_CLASS(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE)
     class Core : public Interface::ICore
     {
         GENERATED_BODY
     public:
-        enum Lol
-        {
-            TES
-        };
-
         enum EnginePathVariant
         {
             ENGINE_DEV,
@@ -50,9 +42,11 @@ namespace SteelEngine {
         };
 
     private:
-        SteelEngine::RuntimeCompiler* m_RuntimeCompiler;
+        RuntimeCompiler* m_RuntimeCompiler;
         Interface::INetwork* m_Network;
         Interface::ILogger* m_Logger;
+        Interface::IRenderer* m_Renderer;
+        Interface::IWindow* m_Window;
 
         bool m_Running;
 
@@ -69,7 +63,7 @@ namespace SteelEngine {
         Core();
         ~Core();
 
-        SE_VALUE("lol" = 1212, SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE = 11, SteelEngine::Core::Lol::TES = 22)
+        SE_VALUE("lol" = 1212, SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE = 11)
         bool ta;
 
         void Update() override;

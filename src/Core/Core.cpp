@@ -46,7 +46,7 @@ namespace SteelEngine {
         ((RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase"))->m_GlobalLogger = m_Logger;
 
         meta2 = Reflection::GetType("Core")->GetProperty("ta")->GetMetaData(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE);
-        meta = Reflection::GetType("Core")->GetProperty("ta")->GetMetaData(SteelEngine::Core::Lol::TES);
+        //meta = Reflection::GetType("Core")->GetProperty("ta")->GetMetaData(SteelEngine::Core::Lol::TES);
         meta3 = Reflection::GetType("Core")->GetProperty("ta")->GetMetaData("lol");
 
         m_RuntimeCompiler =
@@ -87,6 +87,18 @@ namespace SteelEngine {
 
                 Reflection::GetType("Client")->Invoke("Process", m_Network);
             }
+        }
+
+        m_Window = (Interface::IWindow*)Reflection::CreateInstance("VulkanWindow");
+        m_Renderer = (Interface::IRenderer*)Reflection::CreateInstance("VulkanRenderer");
+
+        m_Window->SetTitle("Test Window!");
+        m_Window->SetWidth(800);
+        m_Window->SetHeight(600);
+
+        if(m_Window->Create() == SE_FALSE)
+        {
+            return SE_FALSE;
         }
 
         return SE_TRUE;
