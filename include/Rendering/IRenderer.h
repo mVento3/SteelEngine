@@ -9,6 +9,7 @@ namespace SteelEngine { namespace Interface {
     struct IRenderer : public IRuntimeObject
     {
         virtual Result Init() { return SE_NOT_IMPLEMENTED; }
+        virtual void Update() override { }
     };
 
 }}

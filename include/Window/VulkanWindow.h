@@ -18,10 +18,16 @@ namespace SteelEngine {
         std::string m_Title;
         Type::uint32 m_Width;
         Type::uint32 m_Height;
+
+        SDL_Window* m_Window;
         
     public:
         VulkanWindow();
         ~VulkanWindow();
+
+        Result Create() override;
+        void Update() override;
+        void Close() override;
 
         void SetTitle(const std::string& title) override;
         void SetWidth(const Type::uint32& width) override;

@@ -372,7 +372,7 @@ namespace SteelEngine {
 		std::string sourceFilesToCompile = file.string() + " " + generatedFile;
 		std::string objFiles = "";
 		std::string libs = "/LIBPATH:../../bin Module.lib Utils.lib Ws2_32.lib";
-		std::string include = "/I../../include /I../../bin/Runtime/GeneratedReflection";
+		std::string include = "/I../../include /I../../bin/Runtime/GeneratedReflection /I../../external/SDL2-2.0.9/include /I../../external/Vulkan/Include";
 
 #ifdef _DEBUG
 		std::string flags = "/nologo /Zi /FC /MTd /LDd /Od /std:c++17";
@@ -426,6 +426,7 @@ namespace SteelEngine {
 
 		TypeInfo* info = getPerModule(db->m_Objects);
 		size_t size = db->m_Objects->size();
+		Interface::IRuntimeObject* old = 0;
 
 		for(Type::uint32 i = 0; i < size; i++)
 		{
@@ -438,7 +439,8 @@ namespace SteelEngine {
 
 			Interface::IRuntimeObject* currentObject = db->m_Objects->at(i)->m_Object;
 			Interface::IRuntimeObject* obj = info->m_CreateObjectCallback(currentObject->m_ObjectID, currentObject->m_ConstructorID);
-			Interface::IRuntimeObject* old = currentObject->m_Object;
+			
+			old = currentObject->m_Object;
 
 			Event::GlobalEvent::Remove<RecompiledEvent>(old);
 			Event::GlobalEvent::Add<RecompiledEvent>(obj);
@@ -458,7 +460,7 @@ namespace SteelEngine {
 
 		m_IsSwapComplete = true;
 		
-		Event::GlobalEvent::Broadcast(RecompiledEvent{ info->m_TypeID });
+		Event::GlobalEvent::Broadcast(RecompiledEvent{ info->m_TypeID, old });
 
 		if(info)
 		{

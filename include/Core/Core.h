@@ -76,6 +76,8 @@ namespace SteelEngine {
 
         SE_METHOD()
         void SetPathVariant(EnginePathVariant variant);
+
+        void operator()(const Interface::IWindow::WindowCloseEvent& event);
     };
 
 }

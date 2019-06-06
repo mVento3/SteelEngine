@@ -8,7 +8,13 @@ namespace SteelEngine { namespace Interface {
 
     struct IWindow : public IRuntimeObject
     {
-        Result Create() { return SE_NOT_IMPLEMENTED; }
+        struct WindowCloseEvent
+        {
+
+        };
+
+        virtual Result Create() { return SE_NOT_IMPLEMENTED; }
+        virtual void Close() { }
 
         virtual void SetTitle(const std::string& title) { }
         virtual void SetWidth(const Type::uint32& width) { }

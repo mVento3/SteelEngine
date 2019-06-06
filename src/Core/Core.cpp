@@ -12,10 +12,14 @@ namespace SteelEngine {
 
     void Core::Loop()
     {
+        Core* core = (Core*)m_Object;
+
         while(m_Running)
         {
             m_Object->Update();
         }
+
+        ((Core*)m_Object)->m_Window->Close();
     }
 
     Result Core::Init()
@@ -101,6 +105,8 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
+        Event::GlobalEvent::Add<Interface::IWindow::WindowCloseEvent>((Core*)m_Object);
+
         return SE_TRUE;
     }
 
@@ -116,8 +122,10 @@ namespace SteelEngine {
 
     void Core::Update()
     {
-        m_RuntimeCompiler->Update();
-        m_Logger->Update();
+        m_RuntimeCompiler->m_Object->Update();
+        m_Logger->m_Object->Update();
+        m_Renderer->m_Object->Update();
+        m_Window->m_Object->Update();
 
         // if(meta2->IsValid())
         // {
@@ -134,7 +142,7 @@ namespace SteelEngine {
         //     printf("c %i\n", meta3->Convert<int>());
         // }
 
-        SE_INFO("CZESC2 %i", 33);
+        SE_INFO("CZESC %i", 33);
         //SE_FATAL("LOL");
 
         // if(Reflection::GetType("Core")->GetMetaData(EngineInfo::IS_SERVER)->Convert<bool>())
@@ -224,7 +232,13 @@ namespace SteelEngine {
 
     void Core::operator()(const RecompiledEvent& event)
     {
-        // meta = Reflection::GetType("Core")->GetProperty("ta")->GetMetaData(SteelEngine::Core::Lol::TES);
+        Event::GlobalEvent::Remove<Interface::IWindow::WindowCloseEvent>(event.m_Object);
+        Event::GlobalEvent::Add<Interface::IWindow::WindowCloseEvent>((Core*)m_Object);
+    }
+
+    void Core::operator()(const Interface::IWindow::WindowCloseEvent& event)
+    {
+        printf("Window close!\n");
     }
 
 }

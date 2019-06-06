@@ -31,6 +31,11 @@ namespace SteelEngine {
         return SE_TRUE;
     }
 
+    void VulkanRenderer::Update()
+    {
+        printf("AAA\n");
+    }
+
     void VulkanRenderer::operator()(const RecompiledEvent& event)
     {
         

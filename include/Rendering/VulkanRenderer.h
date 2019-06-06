@@ -22,6 +22,7 @@ namespace SteelEngine {
         ~VulkanRenderer();
 
         Result Init() override;
+        void Update() override;
     };
 
 }
