@@ -10,6 +10,7 @@ namespace SteelEngine { namespace Interface {
     {
         virtual Result Init() { return SE_NOT_IMPLEMENTED; }
         virtual void Update() override { }
+        virtual void Cleanup() { }
     };
 
 }}
