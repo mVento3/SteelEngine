@@ -371,7 +371,7 @@ namespace SteelEngine {
 
 		std::string sourceFilesToCompile = file.string() + " " + generatedFile;
 		std::string objFiles = "";
-		std::string libs = "/LIBPATH:../../bin Module.lib Utils.lib Ws2_32.lib";
+		std::string libs = "/LIBPATH:../../bin /LIBPATH:../../external/Vulkan/Lib /LIBPATH:../../external/SDL2-2.0.9/lib/x64 SDL2.lib vulkan-1.lib Module.lib Utils.lib Ws2_32.lib";
 		std::string include = "/I../../include /I../../bin/Runtime/GeneratedReflection /I../../external/SDL2-2.0.9/include /I../../external/Vulkan/Include";
 
 #ifdef _DEBUG
