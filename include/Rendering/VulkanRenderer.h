@@ -8,6 +8,8 @@
 
 #include "VulkanRenderer.Generated.h"
 
+#include "Window/IWindow.h"
+
 namespace SteelEngine {
 
     SE_CLASS()
@@ -17,8 +19,12 @@ namespace SteelEngine {
     private:
         VkInstance m_Instance;
 
+        Interface::IWindow* m_Window;
+
+        std::vector<const char*> GetSDL_Extensions();
+
     public:
-        VulkanRenderer();
+        VulkanRenderer(SteelEngine::Interface::IWindow* window);
         ~VulkanRenderer();
 
         Result Init() override;

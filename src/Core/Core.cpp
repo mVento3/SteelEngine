@@ -22,6 +22,13 @@ namespace SteelEngine {
         }
 
         ((Core*)m_Object)->m_Window->Close();
+
+        Cleanup();
+    }
+
+    void Core::Cleanup()
+    {
+
     }
 
     Result Core::Init()
@@ -33,20 +40,6 @@ namespace SteelEngine {
         if(m_Logger->Init() == SE_FALSE)
         {
             return SE_FALSE;
-        }
-
-        std::vector<SteelEngine::Interface::IRuntimeObject*> modules;
-        std::vector<SteelEngine::IReflectionData*> types =
-            SteelEngine::Reflection::GetTypes();
-
-        for(SteelEngine::Type::uint32 i = 0; i < types.size(); i++)
-        {
-            SteelEngine::IReflectionData* type = types[i];
-
-            if(type->GetMetaData(SteelEngine::ReflectionAttribute::SE_REFLECTION_MODULE)->Convert<bool>())
-            {
-                modules.push_back(type->Create());
-            }
         }
 
         ((RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase"))->m_GlobalLogger = m_Logger;
@@ -95,8 +88,9 @@ namespace SteelEngine {
             }
         }
 
+    // Graphics stuff
         m_Window = (Interface::IWindow*)Reflection::CreateInstance("VulkanWindow");
-        m_Renderer = (Interface::IRenderer*)Reflection::CreateInstance("VulkanRenderer");
+        m_Renderer = (Interface::IRenderer*)Reflection::CreateInstance("VulkanRenderer", m_Window);
 
         m_Window->SetTitle("Test Window!");
         m_Window->SetWidth(800);
@@ -108,7 +102,7 @@ namespace SteelEngine {
 
             if(event->type == SDL_QUIT)
             {
-                printf("AAAAAAA\n");
+                
             }
         };
 
@@ -120,6 +114,12 @@ namespace SteelEngine {
         }
 
         Event::GlobalEvent::Add<Interface::IWindow::WindowCloseEvent>((Core*)m_Object);
+
+        if(m_Renderer->Init() == SE_FALSE)
+        {
+            return SE_FALSE;
+        }
+    // ---------------------------------------------------------------------
 
         return SE_TRUE;
     }
@@ -237,6 +237,8 @@ namespace SteelEngine {
         {
             return;
         }
+
+        m_Running = false;
     }
 
     void Core::SetPathVariant(EnginePathVariant variant)
@@ -252,7 +254,7 @@ namespace SteelEngine {
 
     void Core::operator()(const Interface::IWindow::WindowCloseEvent& event)
     {
-        printf("Window close!\n");
+        Stop();
     }
 
 }

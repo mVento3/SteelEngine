@@ -10,7 +10,7 @@ SteelEngine::Reflection::Register<SteelEngine::VulkanRenderer>("VulkanRenderer")
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::VulkanRenderer))
 )
 .Inheritance("Interface::IRenderer")
-.Constructor<>()
+.Constructor<SteelEngine::Interface::IWindow*>()
 (
 )
 ;
@@ -27,7 +27,7 @@ DECLARE_TYPE_INFO(SteelEngine::VulkanRenderer)
 {
 FIND_THE_RIGHT_OBJECT
 
-COMPARE_CONSTRUCTOR_()
+COMPARE_CONSTRUCTOR(SteelEngine::Interface::IWindow*)
 };
 
 return result;

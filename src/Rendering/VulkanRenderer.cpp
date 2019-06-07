@@ -2,7 +2,28 @@
 
 namespace SteelEngine {
 
-    VulkanRenderer::VulkanRenderer()
+    std::vector<const char*> VulkanRenderer::GetSDL_Extensions()
+    {
+        Type::uint32 count = 0;
+        std::vector<const char*> res;
+
+        m_Window->GetVulkanInstanceExtensions(
+            &count,
+            0
+        );
+
+        res.resize(count);
+
+        m_Window->GetVulkanInstanceExtensions(
+            &count,
+            res.data()
+        );
+
+        return res;
+    }
+
+    VulkanRenderer::VulkanRenderer(Interface::IWindow* window) :
+        m_Window(window)
     {
 
     }
@@ -27,6 +48,11 @@ namespace SteelEngine {
 
         createInfo.sType =              VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo =   &appInfo;
+
+        std::vector<const char*> extensions = GetSDL_Extensions();
+
+        createInfo.enabledExtensionCount =      extensions.size();
+        createInfo.ppEnabledExtensionNames =    extensions.data();
 
         return SE_TRUE;
     }

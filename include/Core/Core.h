@@ -58,12 +58,16 @@ namespace SteelEngine {
 
         void Loop();
         Result Init();
+        void Cleanup();
 
     public:
         Core();
         ~Core();
 
-        SE_VALUE("lol" = 1212, SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE = 11)
+        SE_VALUE(
+            "lol" = 1212,
+            SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE = 11
+        )
         bool ta;
 
         void Update() override;
