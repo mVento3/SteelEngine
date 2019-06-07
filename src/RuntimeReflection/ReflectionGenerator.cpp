@@ -56,6 +56,11 @@ namespace SteelEngine {
 
 				namespaces.push_back(lexer.GetToken());
 			}
+			else if(lexer.GetToken() == "friend")
+			{
+				lexer++;
+				lexer++;
+			}
 			else if(lexer.GetToken() == "struct" ||
 				lexer.GetToken() == "class")
 			{
@@ -181,6 +186,18 @@ namespace SteelEngine {
 
 						lexer++;
 					}
+				}
+				else if(lexer.GetToken() == ";")
+				{
+					classStack.pop();
+					namespaces.pop_back();
+
+					delete currentData;
+					currentData = 0;
+
+					wasOkBrace = false;
+
+					continue;
 				}
 				else
 				{
@@ -936,6 +953,7 @@ namespace SteelEngine {
 	Result ReflectionGenerator::Generate(const filesystem::path& generatePath)
 	{
 		ClassData* data = 0;
+		bool found = false;
 
 		for(Type::uint32 i = 0; i < m_Classes.size(); i++)
 		{
@@ -944,6 +962,8 @@ namespace SteelEngine {
 			if(data->m_Reflect)
 			{
 				//return Result(SE_TRUE, "Nothing to reflect!");
+				found = true;
+
 				break;
 			}
 		}
@@ -960,7 +980,10 @@ namespace SteelEngine {
 		headerFile << "\n";
 		headerFile << "#define GENERATED_BODY";
 
-		Event::GlobalEvent::Broadcast(GenerateHeaderEvent{ &headerFile, &m_GeneratedBodyMacro });
+		if(found)
+		{
+			Event::GlobalEvent::Broadcast(GenerateHeaderEvent{ &headerFile, &m_GeneratedBodyMacro });
+		}
 
 		if(m_GeneratedBodyMacro.size() > 0)
 		{
@@ -1013,156 +1036,159 @@ namespace SteelEngine {
 
 		// Here we are generating the reflection info
 
-		sourceFile << "REGISTER_REFLECTION\n";
-		sourceFile << "{\n";
+		if(found)
 		{
-			sourceFile << "SteelEngine::Reflection::Register<";
-			sourceFile << namespacedClassName;
-			sourceFile << ">(\"" << data->m_ClassName << "\")\n";
-
-			GenerateMetaDataInfo(sourceFile, data->m_ClassMetaDataInfo);
-
-			for(InheritanceInfo inh : data->m_Inheritance)
-			{
-				sourceFile << ".Inheritance";
-				sourceFile << "(\"" << inh.m_Name << "\")\n";
-			}
-
-			for (ConstructorInfo consInfo : data->m_Constructors)
-			{
-				sourceFile << ".Constructor<";
-
-				for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
-				{
-					sourceFile << consInfo.m_Arguments[i].m_Type;
-
-					if (i < consInfo.m_Arguments.size() - 1)
-					{
-						sourceFile << ", ";
-					}
-				}
-
-				sourceFile << ">()\n";
-
-				GenerateMetaDataInfo(sourceFile, consInfo.m_MetaData);
-			}
-
-			for (ClassProperty clsProp : data->m_Properties)
-			{
-				if (clsProp.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
-					clsProp.m_ProtectionFlag == ProtectionFlag::PROTECTED)
-				{
-					continue;
-				}
-
-				sourceFile << ".Property(";
-				sourceFile << "\"" << clsProp.m_ArgumentInfo.m_Name << "\", ";
-				sourceFile << "&" << namespacedClassName << "::" << clsProp.m_ArgumentInfo.m_Name;
-				sourceFile << ")\n";
-
-				GenerateMetaDataInfo(sourceFile, clsProp.m_MetaData);
-			}
-
-			for (ClassMethod clsMeth : data->m_Methods)
-			{
-				if (clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
-					clsMeth.m_ProtectionFlag == ProtectionFlag::PROTECTED)
-				{
-					continue;
-				}
-
-				sourceFile << ".Method(";
-				sourceFile << "\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
-				sourceFile << "&" << namespacedClassName << "::" << clsMeth.m_MethodInfo.m_Name;
-				sourceFile << ")\n";
-
-				GenerateMetaDataInfo(sourceFile, clsMeth.m_MetaData);
-			}
-
-			for (EnumInfo enum_ : data->m_Enums)
-			{
-				sourceFile << ".Enum<" + namespacedClassName + "::" + enum_.m_EnumName + ">(\"" + enum_.m_EnumName + "\")\n";
-
-				GenerateMetaDataInfo(sourceFile, enum_.m_MetaData);
-
-				if (enum_.m_Elements.size() > 0)
-				{
-					sourceFile << ".Values\n";
-					sourceFile << "(\n";
-
-					for (Type::uint32 i = 0; i < enum_.m_Elements.size(); i++)
-					{
-						EnumElement ele = enum_.m_Elements[i];
-
-						sourceFile << "SteelEngine::ReflectionValue(\"" + ele.m_ElementName;
-						sourceFile << "\", " + namespacedClassName + "::" + enum_.m_EnumName + "::" + ele.m_ElementName + ")\n";
-
-						GenerateMetaDataInfo(sourceFile, ele.m_MetaData);
-
-						if (i < enum_.m_Elements.size() - 1)
-						{
-							sourceFile << ",\n";
-						}
-						else
-						{
-							sourceFile << "\n";
-						}
-					}
-
-					sourceFile << ")\n";
-				}
-			}
-
-			sourceFile << ";\n";
-		}
-		sourceFile << "}\n\n";
-
-		Event::GlobalEvent::Broadcast(GenerateSourceEvent{ &sourceFile, namespacedClassName });
-
-		// Here we are generating info for the runtime compilator
-
-		if (data->m_Constructors.size() > 0)
-		{
-			sourceFile << "#ifdef RUNTIME_COMPILE\n";
-			sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* GetPerModuleInterface(void* typeInfo)\n";
+			sourceFile << "REGISTER_REFLECTION\n";
 			sourceFile << "{\n";
 			{
-				sourceFile << "DECLARE_TYPE_INFO(" << namespacedClassName << ")\n";
-				sourceFile << "{\n";
+				sourceFile << "SteelEngine::Reflection::Register<";
+				sourceFile << namespacedClassName;
+				sourceFile << ">(\"" << data->m_ClassName << "\")\n";
+
+				GenerateMetaDataInfo(sourceFile, data->m_ClassMetaDataInfo);
+
+				for(InheritanceInfo inh : data->m_Inheritance)
 				{
-					sourceFile << "FIND_THE_RIGHT_OBJECT\n";
-					sourceFile << "\n";
+					sourceFile << ".Inheritance";
+					sourceFile << "(\"" << inh.m_Name << "\")\n";
+				}
 
-					for (ConstructorInfo consInfo : data->m_Constructors)
+				for (ConstructorInfo consInfo : data->m_Constructors)
+				{
+					sourceFile << ".Constructor<";
+
+					for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
 					{
-						if(consInfo.m_Arguments.size() > 0)
+						sourceFile << consInfo.m_Arguments[i].m_Type;
+
+						if (i < consInfo.m_Arguments.size() - 1)
 						{
-							sourceFile << "COMPARE_CONSTRUCTOR(";
-
-							for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
-							{
-								sourceFile << consInfo.m_Arguments[i].m_Type;
-
-								if (i < consInfo.m_Arguments.size() - 1)
-								{
-									sourceFile << ", ";
-								}
-							}
+							sourceFile << ", ";
 						}
-						else
+					}
+
+					sourceFile << ">()\n";
+
+					GenerateMetaDataInfo(sourceFile, consInfo.m_MetaData);
+				}
+
+				for (ClassProperty clsProp : data->m_Properties)
+				{
+					if (clsProp.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
+						clsProp.m_ProtectionFlag == ProtectionFlag::PROTECTED)
+					{
+						continue;
+					}
+
+					sourceFile << ".Property(";
+					sourceFile << "\"" << clsProp.m_ArgumentInfo.m_Name << "\", ";
+					sourceFile << "&" << namespacedClassName << "::" << clsProp.m_ArgumentInfo.m_Name;
+					sourceFile << ")\n";
+
+					GenerateMetaDataInfo(sourceFile, clsProp.m_MetaData);
+				}
+
+				for (ClassMethod clsMeth : data->m_Methods)
+				{
+					if (clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
+						clsMeth.m_ProtectionFlag == ProtectionFlag::PROTECTED)
+					{
+						continue;
+					}
+
+					sourceFile << ".Method(";
+					sourceFile << "\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
+					sourceFile << "&" << namespacedClassName << "::" << clsMeth.m_MethodInfo.m_Name;
+					sourceFile << ")\n";
+
+					GenerateMetaDataInfo(sourceFile, clsMeth.m_MetaData);
+				}
+
+				for (EnumInfo enum_ : data->m_Enums)
+				{
+					sourceFile << ".Enum<" + namespacedClassName + "::" + enum_.m_EnumName + ">(\"" + enum_.m_EnumName + "\")\n";
+
+					GenerateMetaDataInfo(sourceFile, enum_.m_MetaData);
+
+					if (enum_.m_Elements.size() > 0)
+					{
+						sourceFile << ".Values\n";
+						sourceFile << "(\n";
+
+						for (Type::uint32 i = 0; i < enum_.m_Elements.size(); i++)
 						{
-							sourceFile << "COMPARE_CONSTRUCTOR_(";
+							EnumElement ele = enum_.m_Elements[i];
+
+							sourceFile << "SteelEngine::ReflectionValue(\"" + ele.m_ElementName;
+							sourceFile << "\", " + namespacedClassName + "::" + enum_.m_EnumName + "::" + ele.m_ElementName + ")\n";
+
+							GenerateMetaDataInfo(sourceFile, ele.m_MetaData);
+
+							if (i < enum_.m_Elements.size() - 1)
+							{
+								sourceFile << ",\n";
+							}
+							else
+							{
+								sourceFile << "\n";
+							}
 						}
 
 						sourceFile << ")\n";
 					}
 				}
-				sourceFile << "};\n";
-				sourceFile << "\n";
-				sourceFile << "return result;\n";
+
+				sourceFile << ";\n";
 			}
-			sourceFile << "}\n";
-			sourceFile << "#endif\n";
+			sourceFile << "}\n\n";
+
+			Event::GlobalEvent::Broadcast(GenerateSourceEvent{ &sourceFile, namespacedClassName });
+
+			// Here we are generating info for the runtime compilator
+
+			if (data->m_Constructors.size() > 0)
+			{
+				sourceFile << "#ifdef RUNTIME_COMPILE\n";
+				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* GetPerModuleInterface(void* typeInfo)\n";
+				sourceFile << "{\n";
+				{
+					sourceFile << "DECLARE_TYPE_INFO(" << namespacedClassName << ")\n";
+					sourceFile << "{\n";
+					{
+						sourceFile << "FIND_THE_RIGHT_OBJECT\n";
+						sourceFile << "\n";
+
+						for (ConstructorInfo consInfo : data->m_Constructors)
+						{
+							if(consInfo.m_Arguments.size() > 0)
+							{
+								sourceFile << "COMPARE_CONSTRUCTOR(";
+
+								for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
+								{
+									sourceFile << consInfo.m_Arguments[i].m_Type;
+
+									if (i < consInfo.m_Arguments.size() - 1)
+									{
+										sourceFile << ", ";
+									}
+								}
+							}
+							else
+							{
+								sourceFile << "COMPARE_CONSTRUCTOR_(";
+							}
+
+							sourceFile << ")\n";
+						}
+					}
+					sourceFile << "};\n";
+					sourceFile << "\n";
+					sourceFile << "return result;\n";
+				}
+				sourceFile << "}\n";
+				sourceFile << "#endif\n";
+			}
 		}
 
 		sourceFile.close();

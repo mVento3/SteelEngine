@@ -87,7 +87,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/ReflectionGenerator.exe",
-            "args": ["bin", "src/Module/Module.cpp", "include/Module/Module.h"],
+            "args": ["bin", "src/Rendering/Vulkan/PhysicalDevice.cpp", "include/Rendering/Vulkan/PhysicalDevice.h"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
