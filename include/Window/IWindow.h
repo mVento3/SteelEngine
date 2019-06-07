@@ -19,6 +19,10 @@ namespace SteelEngine { namespace Interface {
         virtual void SetTitle(const std::string& title) { }
         virtual void SetWidth(const Type::uint32& width) { }
         virtual void SetHeight(const Type::uint32& height) { }
+
+        // Vulkan
+        virtual Result GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames) { return SE_NOT_IMPLEMENTED; }
+        virtual Result CreateVulkanSurface(void* instance, void** surface) { return SE_NOT_IMPLEMENTED; }
     };
 
 }}

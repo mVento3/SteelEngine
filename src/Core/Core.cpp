@@ -8,6 +8,8 @@
 
 #include "Serialization/Serialization.h"
 
+#include "SDL_events.h"
+
 namespace SteelEngine {
 
     void Core::Loop()
@@ -100,6 +102,18 @@ namespace SteelEngine {
         m_Window->SetWidth(800);
         m_Window->SetHeight(600);
 
+        std::function<void(void*)> func = [](void* event_)
+        {
+            SDL_Event* event = (SDL_Event*)event_;
+
+            if(event->type == SDL_QUIT)
+            {
+                printf("AAAAAAA\n");
+            }
+        };
+
+        Reflection::GetType("VulkanWindow")->Invoke("SetProcessEventsCallback", m_Window, func);
+
         if(m_Window->Create() == SE_FALSE)
         {
             return SE_FALSE;
@@ -142,8 +156,8 @@ namespace SteelEngine {
         //     printf("c %i\n", meta3->Convert<int>());
         // }
 
-        SE_INFO("CZESC %i", 33);
-        //SE_FATAL("LOL");
+        // SE_INFO("CZESC %i", 33);
+        // SE_FATAL("LOL");
 
         // if(Reflection::GetType("Core")->GetMetaData(EngineInfo::IS_SERVER)->Convert<bool>())
         // {

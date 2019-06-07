@@ -35,8 +35,6 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
-        
-
         return SE_TRUE;
     }
 
@@ -46,12 +44,12 @@ namespace SteelEngine {
 
         while(SDL_PollEvent(&event))
         {
-            if(event.type == SDL_QUIT ||
-                event.key.keysym.scancode == SDL_SCANCODE_ESCAPE ||
-                (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(m_Window)))
+            if(event.type == SDL_QUIT)
             {
                 Event::GlobalEvent::Broadcast(WindowCloseEvent{});
             }
+
+            m_ProcessEventsCallback(&event);
         }
     }
 
@@ -75,6 +73,40 @@ namespace SteelEngine {
     void VulkanWindow::SetHeight(const Type::uint32& height)
     {
         m_Height = height;
+    }
+
+    Result VulkanWindow::GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames)
+    {
+        if(!m_Window)
+        {
+            return SE_FALSE;
+        }
+
+        SDL_Vulkan_GetInstanceExtensions(m_Window, enabledExtensionCount, extensionNames);
+
+        return SE_TRUE;
+    }
+
+    Result VulkanWindow::CreateVulkanSurface(void* instance, void** surface)
+    {
+        if(!m_Window)
+        {
+            return SE_FALSE;
+        }
+
+        SDL_Vulkan_CreateSurface(m_Window, (VkInstance)instance, (VkSurfaceKHR*)surface);
+
+        if(!*surface)
+        {
+            return SE_FALSE;
+        }
+
+        return SE_TRUE;
+    }
+
+    void VulkanWindow::SetProcessEventsCallback(std::function<void(void*)> callback)
+    {
+        m_ProcessEventsCallback = callback;
     }
 
 }
