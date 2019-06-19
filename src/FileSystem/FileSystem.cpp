@@ -26,8 +26,8 @@ namespace SteelEngine {
     }
 
     void FileSystem::operator()(const RecompiledEvent& event)
-    {
-        
-    }
+	{
+		
+	}
 
 }

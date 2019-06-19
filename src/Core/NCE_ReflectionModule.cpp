@@ -21,7 +21,7 @@ namespace SteelEngine {
 
     void NCE_ReflectionModule::operator()(const RecompiledEvent& event)
     {
-
+        
     }
 
     void NCE_ReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)

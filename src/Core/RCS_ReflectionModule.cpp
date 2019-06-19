@@ -22,11 +22,6 @@ namespace SteelEngine {
 
     }
 
-    void RCS_ReflectionModule::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
     void RCS_ReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)
     {
         for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
@@ -120,6 +115,11 @@ namespace SteelEngine {
 
         m_GenerateSerializeFunction = true;
         m_SerializeAll = false;
+    }
+
+    void RCS_ReflectionModule::operator()(const RecompiledEvent& event)
+    {
+        
     }
 
 }

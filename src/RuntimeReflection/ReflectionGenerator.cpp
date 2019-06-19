@@ -226,6 +226,8 @@ namespace SteelEngine {
 			}
 			else if(lexer.GetToken() == "{")
 			{
+				seClass = false;
+
 				if(wasOkBrace)
 				{
 					wasOkBrace = false;
@@ -244,6 +246,8 @@ namespace SteelEngine {
 			else if(lexer.GetToken() == "}")
 			{
 				bracesSize--;
+
+				seClass = false;
 
 				bool found = false;
 
@@ -442,6 +446,8 @@ namespace SteelEngine {
 				if(currentData == 0)
 				{
 					currentData = new ClassData();
+
+					classStack.push(currentData);
 				}
 
 				currentData->m_Reflect = true;
@@ -755,19 +761,22 @@ namespace SteelEngine {
 							splitted[1];
 					}
 
-					if(m_LastProtectionFlag == ProtectionFlag::NOT_SPECIFIED &&
-						currentData->m_Type == ClassType::CLASS_TYPE)
+					if(currentData)
 					{
-						m_LastProtectionFlag = ProtectionFlag::PROTECTED;
+						if(m_LastProtectionFlag == ProtectionFlag::NOT_SPECIFIED &&
+							currentData->m_Type == ClassType::CLASS_TYPE)
+						{
+							m_LastProtectionFlag = ProtectionFlag::PROTECTED;
+						}
+
+						prop.m_ProtectionFlag = m_LastProtectionFlag;
+
+						currentData->m_Properties.push_back(prop);
+
+						Event::GlobalEvent::Broadcast(SE_ValueMacroEvent{ &prop, &currentData->m_Properties });
+
+						prop.m_MetaData.clear();
 					}
-
-					prop.m_ProtectionFlag = m_LastProtectionFlag;
-
-					currentData->m_Properties.push_back(prop);
-
-					Event::GlobalEvent::Broadcast(SE_ValueMacroEvent{ &prop, &currentData->m_Properties });
-
-					prop.m_MetaData.clear();
 				}
 			}
 		}

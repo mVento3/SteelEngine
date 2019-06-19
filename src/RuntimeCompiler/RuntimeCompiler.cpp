@@ -482,14 +482,14 @@ namespace SteelEngine {
         );
     }
 
-	void RuntimeCompiler::operator()(const RecompiledEvent& event)
-	{
-
-	}
-
 	void RuntimeCompiler::operator()(const SwapModuleEvent& event)
 	{
 		SwapModule(event.m_ModuleName);
+	}
+
+	void RuntimeCompiler::operator()(const RecompiledEvent& event)
+	{
+		
 	}
 
     void readAndHandleOutputThread(LPVOID arg)
