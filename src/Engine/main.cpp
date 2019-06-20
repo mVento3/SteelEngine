@@ -162,5 +162,7 @@ int main(int argc, char* argv[])
 
     SteelEngine::Reflection::GetType("Core")->Invoke("Start", core);
 
+    while(1) { }
+
     return EXIT_SUCCESS;
 }

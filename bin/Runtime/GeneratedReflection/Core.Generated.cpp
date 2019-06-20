@@ -43,6 +43,8 @@ SERIALIZE(SteelEngine::Core::m_EnginePathVariant)
 SERIALIZE(SteelEngine::Core::meta)
 SERIALIZE(SteelEngine::Core::meta2)
 SERIALIZE(SteelEngine::Core::meta3)
+SERIALIZE(SteelEngine::Core::m_Delta)
+SERIALIZE(SteelEngine::Core::m_Frames)
 SERIALIZE(SteelEngine::Core::ta)
 }
 

@@ -21,6 +21,7 @@ namespace SteelEngine {
             m_Object->Update();
         }
 
+        ((Core*)m_Object)->m_Renderer->Cleanup();
         ((Core*)m_Object)->m_Window->Close();
 
         Cleanup();
@@ -104,7 +105,7 @@ namespace SteelEngine {
 
     // Graphics stuff
         m_Window = (Interface::IWindow*)Reflection::CreateInstance("VulkanWindow");
-        m_Renderer = (Interface::IRenderer*)Reflection::CreateInstance("VulkanRenderer", m_Window);
+        m_Renderer = (Interface::IRenderer*)Reflection::CreateInstance("Renderer", m_Window);
 
         m_Window->SetTitle("Test Window!");
         m_Window->SetWidth(800);
@@ -141,6 +142,8 @@ namespace SteelEngine {
     Core::Core()
     {
         m_Running = false;
+        m_Delta = 0;
+        m_Frames = 0;
     }
 
     Core::~Core()
@@ -150,10 +153,29 @@ namespace SteelEngine {
 
     void Core::Update()
     {
+        static auto startTime = std::chrono::high_resolution_clock::now();
+
+        // The runtime compiler file watcher is not too perform
         m_RuntimeCompiler->m_Object->Update();
         m_Logger->m_Object->Update();
         m_Renderer->m_Object->Update();
         m_Window->m_Object->Update();
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float delta = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+        startTime = currentTime;
+        m_Delta += delta;
+        m_Frames++;
+
+        if(m_Delta >= 1)
+        {
+            printf("Delta: %f ms\n", delta * 1000);
+            printf("FPS: %u\n", m_Frames);
+
+            m_Delta = 0;
+            m_Frames = 0;
+        }
 
         // if(meta2->IsValid())
         // {
@@ -181,8 +203,6 @@ namespace SteelEngine {
 
         //     delete ev;
         // }
-
-        Sleep(100);
     }
 
     struct Test2

@@ -1,0 +1,103 @@
+#pragma once
+
+#include "Rendering/IRenderer.h"
+
+#include "RuntimeReflection/Macro.h"
+
+#include "Vulkan/vulkan.h"
+
+#include "Renderer.Generated.h"
+
+#include "Window/IWindow.h"
+
+#include "Rendering/Vulkan/PhysicalDevice.h"
+#include "Rendering/Vulkan/LogicalDevice.h"
+#include "Rendering/Vulkan/Surface.h"
+#include "Rendering/Vulkan/SwapChain.h"
+#include "Rendering/Vulkan/GraphicsPipeline.h"
+#include "Rendering/Vulkan/RenderPass.h"
+#include "Rendering/Vulkan/Framebuffer.h"
+#include "Rendering/Vulkan/CommandPool.h"
+
+#define WIDTH 800
+#define HEIGHT 600
+
+namespace SteelEngine { namespace Graphics { namespace Vulkan {
+
+    SE_CLASS()
+    class Renderer : public Interface::IRenderer
+    {
+        GENERATED_BODY
+
+        friend class PhysicalDevice;
+        friend class LogicalDevice;
+        friend class Surface;
+        friend class SwapChain;
+        friend class GraphicsPipeline;
+        friend class RenderPass;
+        friend class Framebuffer;
+        friend class CommandPool;
+    public:
+        const static std::vector<const char*> mc_ValidationLayers;
+        const static bool mc_EnableValidationLayers;
+        const static std::vector<const char*> mc_DeviceExtensions;
+        const static int MAX_FRAMES_IN_FLIGHT;
+
+        static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+            VkDebugUtilsMessageTypeFlagsEXT messageType,
+            const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+            void* pUserData
+        );
+
+    private:
+        VkInstance m_Instance;
+        VkDebugUtilsMessengerEXT m_DebugMessenger;
+
+        Interface::IWindow* m_Window;
+
+        PhysicalDevice*     m_PhysicalDevice;
+        LogicalDevice*      m_LogicalDevice;
+        Surface*            m_Surface;
+        SwapChain*          m_SwapChain;
+        GraphicsPipeline*   m_GraphicsPipeline;
+        RenderPass*         m_RenderPass;
+        Framebuffer*        m_Framebuffer;
+        CommandPool*        m_CommandPool;
+
+        std::vector<VkSemaphore>    m_ImageAvailableSemaphores;
+        std::vector<VkSemaphore>    m_RenderFinishedSemaphores;
+        std::vector<VkFence>        m_InFlightFences;
+
+        size_t m_CurrentFrame;
+
+        std::vector<const char*> GetSDL_Extensions();
+        void PrintAvailableExtensions();
+        bool CheckValidationLayerSupport();
+
+        VkResult CreateDebugUtilsMessengerEXT(
+            VkInstance instance,
+            const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+            const VkAllocationCallbacks* pAllocator,
+            VkDebugUtilsMessengerEXT* pDebugMessenger
+        );
+        void DestroyDebugUtilsMessengerEXT(
+            VkInstance instance,
+            VkDebugUtilsMessengerEXT debugMessenger,
+            const VkAllocationCallbacks* pAllocator
+        );
+
+        Result CreateInstance();
+        Result SetupDebugMessenger();
+        Result CreateSyncObjects();
+
+    public:
+        Renderer(SteelEngine::Interface::IWindow* window);
+        ~Renderer();
+
+        Result Init() override;
+        void Update() override;
+        void Cleanup() override;
+    };
+
+}}}

@@ -13,6 +13,7 @@
 #include "RuntimeCompiler/RuntimeCompiler.h"
 
 #include "Utils/Utils.h"
+#include "Utils/Time.h"
 
 #include "Core/Server.h"
 
@@ -55,6 +56,9 @@ namespace SteelEngine {
         Variant* meta;
         Variant* meta2;
         Variant* meta3;
+
+        float m_Delta;
+        Type::uint32 m_Frames;
 
         void Loop();
         Result Init();
