@@ -24,6 +24,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         ~Surface();
 
         Result Create(Renderer* renderer, Interface::IWindow* window);
+        void Cleanup(Renderer* renderer);
 
         static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
         static VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);

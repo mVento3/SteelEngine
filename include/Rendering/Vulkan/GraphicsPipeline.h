@@ -24,6 +24,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         ~GraphicsPipeline();
 
         Result Create(Renderer* renderer);
+        void Cleanup(Renderer* renderer);
 
         inline VkPipeline GetPipeline() { return m_GraphicsPipeline; }
     };

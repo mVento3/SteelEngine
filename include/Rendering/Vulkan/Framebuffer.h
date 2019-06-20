@@ -21,6 +21,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         ~Framebuffer();
 
         Result Create(Renderer* renderer);
+        void Cleanup(Renderer* renderer);
     };
 
 }}}

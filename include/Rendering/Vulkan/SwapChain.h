@@ -34,6 +34,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         ~SwapChain();
 
         Result Create(Renderer* renderer);
+        void Cleanup(Renderer* renderer);
     };
 
 }}}

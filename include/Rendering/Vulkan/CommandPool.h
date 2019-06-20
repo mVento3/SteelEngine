@@ -27,6 +27,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         ~CommandPool();
 
         Result Create();
+        void Cleanup();
     };
 
 }}}

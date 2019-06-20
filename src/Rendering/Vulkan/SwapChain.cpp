@@ -121,4 +121,14 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
+    void SwapChain::Cleanup(Renderer* renderer)
+    {
+        for(auto imageView : m_SwapChainImageViews)
+        {
+            vkDestroyImageView(renderer->m_LogicalDevice->GetLogicalDevice(), imageView, nullptr);
+        }
+
+        vkDestroySwapchainKHR(renderer->m_LogicalDevice->GetLogicalDevice(), m_SwapChain, nullptr);
+    }
+
 }}}

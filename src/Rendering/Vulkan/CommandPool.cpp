@@ -97,4 +97,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
+    void CommandPool::Cleanup()
+    {
+        vkFreeCommandBuffers(m_Renderer->m_LogicalDevice->GetLogicalDevice(), m_CommandPool, m_CommandBuffers.size(), m_CommandBuffers.data());
+        vkDestroyCommandPool(m_Renderer->m_LogicalDevice->GetLogicalDevice(), m_CommandPool, nullptr);
+    }
+
 }}}

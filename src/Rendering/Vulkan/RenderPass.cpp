@@ -66,4 +66,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
+    void RenderPass::Cleanup(Renderer* renderer)
+    {
+        vkDestroyRenderPass(renderer->m_LogicalDevice->GetLogicalDevice(), m_RenderPass, nullptr);
+    }
+
 }}}

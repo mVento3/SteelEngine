@@ -377,11 +377,29 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     void Renderer::Cleanup()
     {
+        vkDeviceWaitIdle(m_LogicalDevice->GetLogicalDevice());
+
+        m_Framebuffer->Cleanup(this);
+        m_CommandPool->Cleanup();
+        m_GraphicsPipeline->Cleanup(this);
+        m_RenderPass->Cleanup(this);
+        m_SwapChain->Cleanup(this);
+
+        for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            vkDestroySemaphore(m_LogicalDevice->GetLogicalDevice(), m_RenderFinishedSemaphores[i], nullptr);
+            vkDestroySemaphore(m_LogicalDevice->GetLogicalDevice(), m_ImageAvailableSemaphores[i], nullptr);
+            vkDestroyFence(m_LogicalDevice->GetLogicalDevice(), m_InFlightFences[i], nullptr);
+        }
+
+        vkDestroyDevice(m_LogicalDevice->GetLogicalDevice(), nullptr);
+
         if(mc_EnableValidationLayers)
         {
             DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
         }
 
+        m_Surface->Cleanup(this);
         vkDestroyInstance(m_Instance, 0);
     }
 

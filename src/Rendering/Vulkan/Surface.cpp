@@ -26,6 +26,11 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
+    void Surface::Cleanup(Renderer* renderer)
+    {
+        vkDestroySurfaceKHR(renderer->m_Instance, m_Surface, nullptr);
+    }
+
     VkSurfaceFormatKHR Surface::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
     {
         for(const auto& availableFormat : availableFormats)

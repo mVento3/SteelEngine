@@ -133,4 +133,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
+    void GraphicsPipeline::Cleanup(Renderer* renderer)
+    {
+        vkDestroyPipeline(renderer->m_LogicalDevice->GetLogicalDevice(), m_GraphicsPipeline, nullptr);
+        vkDestroyPipelineLayout(renderer->m_LogicalDevice->GetLogicalDevice(), m_PipelineLayout, nullptr);
+    }
+
 }}}

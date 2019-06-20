@@ -44,4 +44,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
+    void Framebuffer::Cleanup(Renderer* renderer)
+    {
+        for(auto framebuffer : m_SwapChainFramebuffers)
+        {
+            vkDestroyFramebuffer(renderer->m_LogicalDevice->GetLogicalDevice(), framebuffer, nullptr);
+        }
+    }
+
 }}}

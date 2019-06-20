@@ -18,6 +18,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         ~RenderPass();
 
         Result Create(Renderer* renderer);
+        void Cleanup(Renderer* renderer);
 
         inline VkRenderPass GetRenderPass() { return m_RenderPass; }
     };
