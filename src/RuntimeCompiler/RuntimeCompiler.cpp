@@ -202,7 +202,7 @@ namespace SteelEngine {
 					return;
 				}
 
-				switch (status)
+				switch(status)
 				{
 				case FileWatcher::FileStatus::CREATED:
 					break;
@@ -210,7 +210,7 @@ namespace SteelEngine {
 					break;
 				case FileWatcher::FileStatus::MODIFIED:
 				{
-					for (Type::uint32 i = 0; i < m_Threads.size(); i++)
+					for(Type::uint32 i = 0; i < m_Threads.size(); i++)
 					{
 						Thread* thread = m_Threads[i];
 
@@ -237,13 +237,41 @@ namespace SteelEngine {
 								std::string dirPath = file.parent_path().string();
 								replaceAll(dirPath, "/", "\\");
 								std::vector<std::string> splitted = split(dirPath, '\\');
-								filesystem::path p = splitted[splitted.size() - 1];
+								filesystem::path p;
+								
+								for(Type::uint32 i = 1; i < splitted.size(); i++)
+								{
+									p.append(splitted[i]);
+
+									if(i < splitted.size() - 1)
+									{
+										p.append("\\");
+									}
+								}
+
 								m_ReflectionGenerator->Load(file, "include\\" + p.string() + "\\" + file.filename().replace_extension(".h").string());
 							}
 
 							m_ReflectionGenerator->Parse();
 							m_ReflectionGenerator->Generate(m_BinaryLocation.string() + "/Runtime/GeneratedReflection");
 							m_ReflectionGenerator->Clear();
+
+							for(auto& p: filesystem::directory_iterator("build/Windows"))
+							{
+								std::string filename = p.path().filename().string();
+								std::vector<std::string> splitted = split(filename, '.');
+
+								if(splitted.size() == 2)
+								{
+									for(Type::uint32 i = 0; i < m_ReflectionGenerator->m_Dependencies.size(); i++)
+									{
+										if(m_ReflectionGenerator->m_Dependencies[i] == splitted[0])
+										{
+											m_AdditionalDependencies.push_back(p.path().string());
+										}
+									}
+								}
+							}
 						},
 						{
 							printf("Reflection time: %f ms\n", delta * 1000.f);
@@ -374,13 +402,23 @@ namespace SteelEngine {
 		std::string libs = "/LIBPATH:../../bin /LIBPATH:../../external/Vulkan/Lib /LIBPATH:../../external/SDL2-2.0.9/lib/x64 SDL2.lib vulkan-1.lib Module.lib Utils.lib Ws2_32.lib";
 		std::string include = "/I../../include /I../../bin/Runtime/GeneratedReflection /I../../external/SDL2-2.0.9/include /I../../external/Vulkan/Include";
 
+		for(Type::uint32 i = 0; i < m_AdditionalDependencies.size(); i++)
+		{
+			objFiles.append("../../" + m_AdditionalDependencies[i]);
+
+			if(i < m_AdditionalDependencies.size() - 1)
+			{
+				objFiles.append(" ");
+			}
+		}
+
 #ifdef _DEBUG
 		std::string flags = "/nologo /Zi /FC /MTd /LDd /Od /std:c++17";
 #else
 		std::string flags = "/nologo /Zi /FC /MT /LD /O2 /std:c++17";	//also need debug information in release
 #endif
 		std::string buildDir = m_BinaryLocation.string() + "/Runtime/Swap/";
-		std::string totalCommand = "cl " + flags + " /D UNICODE /D _UNICODE /D RUNTIME_COMPILE /D SE_WINDOWS " + include + " /Fe" + buildDir + m_ModuleName + ".dll /Fd" + buildDir + m_ModuleName + ".pdb " + sourceFilesToCompile + " /link" + libs;
+		std::string totalCommand = "cl " + flags + " /D UNICODE /D _UNICODE /D RUNTIME_COMPILE /D SE_WINDOWS " + include + " /Fe" + buildDir + m_ModuleName + ".dll /Fd" + buildDir + m_ModuleName + ".pdb " + objFiles + " " + sourceFilesToCompile + " /link" + libs;
 
 		totalCommand += "\n" + cs_CompletionToken + "\n";
 #endif

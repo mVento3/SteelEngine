@@ -9,7 +9,7 @@ namespace SteelEngine {
 		assert(m_CurrentObject);
 		assert(pValue);
 
-		if (m_CurrentSerialization == m_SerializationMap.end())
+		if(m_CurrentSerialization == m_SerializationMap.end())
 		{
 			size_t ownerId = m_CurrentObject->m_ObjectID;
 
@@ -29,11 +29,11 @@ namespace SteelEngine {
 		const Interface::ISerializedValue* pRet = NULL;
 
 		//TSerializationMap::const_iterator found = m_map.find(ownerId);
-		if (m_CurrentSerialization != m_SerializationMap.end())
+		if(m_CurrentSerialization != m_SerializationMap.end())
 		{
 			TValueGroup::const_iterator propertyFound = m_CurrentSerialization->second.find(propertyName);
 
-			if (propertyFound != m_CurrentSerialization->second.end())
+			if(propertyFound != m_CurrentSerialization->second.end())
 			{
 				pRet = propertyFound->second;
 			}
@@ -70,11 +70,11 @@ namespace SteelEngine {
 	{
 		TSerializationMap::iterator it = m_SerializationMap.begin();
 
-		while (it != m_SerializationMap.end())
+		while(it != m_SerializationMap.end())
 		{
 			TValueGroup::iterator it2 = it->second.begin();
 
-			while (it2 != it->second.end())
+			while(it2 != it->second.end())
 			{
 				delete it2->second;
 
@@ -89,11 +89,11 @@ namespace SteelEngine {
 	{
 		TSerializationMap::iterator found = m_SerializationMap.find(id);
 
-		if (found != m_SerializationMap.end())
+		if(found != m_SerializationMap.end())
 		{
 			TValueGroup::iterator it = found->second.begin();
 
-			while (it != found->second.end())
+			while(it != found->second.end())
 			{
 				delete it->second;
 				++it;
@@ -105,11 +105,11 @@ namespace SteelEngine {
 	{
 		TSerializationMap::iterator found = m_SerializationMap.find(id);
 
-		if (found != m_SerializationMap.end())
+		if(found != m_SerializationMap.end())
 		{
 			TValueGroup::iterator propertyFound = found->second.find(propertyName);
 
-			if (propertyFound != found->second.end())
+			if(propertyFound != found->second.end())
 			{
 				delete propertyFound->second;
 				found->second.erase(propertyFound);

@@ -64,7 +64,7 @@ namespace SteelEngine {
 	template<typename A>
 	inline bool ISerializer::SerializeProperty(const char* name, A& value)
 	{
-		if (IsLoading())
+		if(IsLoading())
 		{
 			const SerializedValue<A>* pSV = static_cast<const SerializedValue<A>*>(GetISerializedValue(name));
 
@@ -88,7 +88,7 @@ namespace SteelEngine {
 	template <typename A, size_t N>
 	inline bool ISerializer::SerializeProperty(const char* name, A(&value)[N])
 	{
-		if (IsLoading())
+		if(IsLoading())
 		{
 			const SerializedValueArray<A, N>* pSV = static_cast<const SerializedValueArray<A, N>*>(GetISerializedValue(name));
 

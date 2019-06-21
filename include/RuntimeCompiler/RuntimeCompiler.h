@@ -55,6 +55,8 @@ namespace SteelEngine {
         std::string m_ModuleName;
         std::string m_SourceFile;
 
+        std::vector<std::string> m_AdditionalDependencies;
+
         Result SetupProcess();
 
         void GenerateModuleName();

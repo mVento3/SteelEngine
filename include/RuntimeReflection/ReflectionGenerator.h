@@ -167,6 +167,8 @@ namespace SteelEngine {
 		ReflectionGenerator();
 		~ReflectionGenerator();
 
+		std::vector<std::string> m_Dependencies;
+
 		Result Load(const filesystem::path& fileCpp, const filesystem::path& fileH) override;
 		Result Parse() override;
 		Result Generate(const filesystem::path& generatePath) override;

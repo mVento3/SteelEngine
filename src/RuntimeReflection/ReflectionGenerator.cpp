@@ -709,6 +709,19 @@ namespace SteelEngine {
 			else if(lexer.GetToken() == "#include")
 			{
 				lexer++;
+
+				std::string token = lexer.GetToken();
+
+				token.erase(token.begin());
+				token.erase(token.end() - 1);
+
+				std::vector<std::string> splitted = split(token, '/');
+				std::vector<std::string> splitted2 = split(splitted[splitted.size() - 1], '.');
+
+				if(splitted2.size() == 2)
+				{
+					m_Dependencies.push_back(splitted2[0]);
+				}
 			}
 			else if(lexer.GetToken() == ";")
 			{
@@ -719,13 +732,11 @@ namespace SteelEngine {
 
 				std::string curr = lexer.GetCurrentLine();
 
-				replaceAll(curr, "    ", "");
-				replaceAll(curr, "\t", "");
-				replaceAll(curr, ";", "");
+				removeSpaces(curr);
 
 				std::vector<std::string> splittedEqual =
 					split(curr, '=');
-				
+
 				std::vector<std::string> splitted =
 					split(splittedEqual[0], ' ');
 				
