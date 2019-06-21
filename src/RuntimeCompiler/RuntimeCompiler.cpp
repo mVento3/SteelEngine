@@ -175,6 +175,8 @@ namespace SteelEngine {
     RuntimeCompiler::RuntimeCompiler()
     {
         m_Error = false;
+		m_IsCompileComplete = true;
+		m_IsSwapComplete = true;
     }
 
     RuntimeCompiler::~RuntimeCompiler()
@@ -197,7 +199,8 @@ namespace SteelEngine {
 			"src",
 			[this](const filesystem::path& file, FileWatcher::FileStatus status)
 			{
-				if(!filesystem::is_regular_file(filesystem::path(file)) && status != FileWatcher::FileStatus::DELETED)
+				if((!filesystem::is_regular_file(filesystem::path(file)) && status != FileWatcher::FileStatus::DELETED) ||
+					!m_IsCompileComplete || !m_IsSwapComplete)
 				{
 					return;
 				}
@@ -261,14 +264,11 @@ namespace SteelEngine {
 								std::string filename = p.path().filename().string();
 								std::vector<std::string> splitted = split(filename, '.');
 
-								if(splitted.size() == 2)
+								for(Type::uint32 i = 0; i < m_ReflectionGenerator->m_Dependencies.size(); i++)
 								{
-									for(Type::uint32 i = 0; i < m_ReflectionGenerator->m_Dependencies.size(); i++)
+									if(m_ReflectionGenerator->m_Dependencies[i] == splitted[0])
 									{
-										if(m_ReflectionGenerator->m_Dependencies[i] == splitted[0])
-										{
-											m_AdditionalDependencies.push_back(p.path().string());
-										}
+										m_AdditionalDependencies.push_back(p.path().string());
 									}
 								}
 							}
@@ -418,7 +418,7 @@ namespace SteelEngine {
 		std::string flags = "/nologo /Zi /FC /MT /LD /O2 /std:c++17";	//also need debug information in release
 #endif
 		std::string buildDir = m_BinaryLocation.string() + "/Runtime/Swap/";
-		std::string totalCommand = "cl " + flags + " /D UNICODE /D _UNICODE /D RUNTIME_COMPILE /D SE_WINDOWS " + include + " /Fe" + buildDir + m_ModuleName + ".dll /Fd" + buildDir + m_ModuleName + ".pdb " + objFiles + " " + sourceFilesToCompile + " /link" + libs;
+		std::string totalCommand = "cl " + flags + " /D UNICODE /D _UNICODE /D RUNTIME_COMPILE /D SE_WINDOWS " + include + " /Fe" + buildDir + m_ModuleName + ".dll /Fd" + buildDir + m_ModuleName + ".pdb " + sourceFilesToCompile + " " + objFiles + " /link" + libs;
 
 		totalCommand += "\n" + cs_CompletionToken + "\n";
 #endif

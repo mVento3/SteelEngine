@@ -23,6 +23,12 @@
 
 #include "Window/IWindow.h"
 
+// 1. Fix the problem with spaces and tabs in reflection parser - DONE
+// 2. Create a system that will gather inforamtion about additional dependencies
+//    which will be attached to compilation - STARTED
+// 3. Fix the problem with reflection generation if the frame time
+//    less than 100 ms (the reflection is generating twice) - DONE
+
 namespace SteelEngine {
 
     SE_CLASS(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE)
