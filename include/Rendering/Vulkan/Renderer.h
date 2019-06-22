@@ -3,12 +3,14 @@
 #include "Rendering/IRenderer.h"
 
 #include "RuntimeReflection/Macro.h"
+#include "RuntimeReflection/ReflectionAttributes.h"
 
 #include "Vulkan/vulkan.h"
 
 #include "Renderer.Generated.h"
 
 #include "Window/IWindow.h"
+#include "Window/ResizeEvent.h"
 
 #include "Rendering/Vulkan/PhysicalDevice.h"
 #include "Rendering/Vulkan/LogicalDevice.h"
@@ -18,13 +20,14 @@
 #include "Rendering/Vulkan/RenderPass.h"
 #include "Rendering/Vulkan/Framebuffer.h"
 #include "Rendering/Vulkan/CommandPool.h"
+#include "Rendering/Vulkan/Shader.h"
 
 #define WIDTH 800
 #define HEIGHT 600
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    SE_CLASS()
+    SE_CLASS(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE)
     class Renderer : public Interface::IRenderer
     {
         GENERATED_BODY
@@ -65,11 +68,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         Framebuffer*        m_Framebuffer;
         CommandPool*        m_CommandPool;
 
-        std::vector<VkSemaphore>    m_ImageAvailableSemaphores;
-        std::vector<VkSemaphore>    m_RenderFinishedSemaphores;
-        std::vector<VkFence>        m_InFlightFences;
+        std::vector<VkSemaphore> m_ImageAvailableSemaphores;
+        std::vector<VkSemaphore> m_RenderFinishedSemaphores;
+        std::vector<VkFence> m_InFlightFences;
 
         size_t m_CurrentFrame;
+        bool m_FramebufferResized;
 
         std::vector<const char*> GetSDL_Extensions();
         void PrintAvailableExtensions();
@@ -98,6 +102,11 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         Result Init() override;
         void Update() override;
         void Cleanup() override;
+
+        SE_METHOD()
+        void RecreateSwapChain();
+
+        void operator()(const ResizeEvent& event);
     };
 
 }}}

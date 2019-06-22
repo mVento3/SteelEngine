@@ -20,14 +20,15 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         std::vector<VkCommandBuffer> m_CommandBuffers;
 
-        Result CreateCommandBuffers();
-
     public:
         CommandPool(Renderer* renderer);
         ~CommandPool();
 
+        Result CreateCommandBuffers();
+
         Result Create();
         void Cleanup();
+        void CleanupCommandBuffers();
     };
 
 }}}

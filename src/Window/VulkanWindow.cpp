@@ -27,7 +27,8 @@ namespace SteelEngine {
             SDL_WINDOWPOS_CENTERED,
             m_Width,
             m_Height,
-            SDL_WINDOW_VULKAN
+            SDL_WINDOW_VULKAN |
+            SDL_WINDOW_RESIZABLE
         );
 
         if(!m_Window)

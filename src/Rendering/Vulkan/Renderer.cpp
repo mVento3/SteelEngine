@@ -1,5 +1,12 @@
 #include "Rendering/Vulkan/Renderer.h"
 
+#include "algorithm"
+
+#include "Event/GlobalEvent.h"
+
+#undef max
+#undef min
+
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     const bool Renderer::mc_EnableValidationLayers = true;
@@ -251,6 +258,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         m_CommandPool = new CommandPool(this);
 
         m_CurrentFrame = 0;
+        m_FramebufferResized = false;
     }
 
     Renderer::~Renderer()
@@ -322,18 +330,30 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             return SE_FALSE;
         }
 
+        Event::GlobalEvent::Add<ResizeEvent>(this);
+
         return SE_TRUE;
     }
 
     void Renderer::Update()
     {
         vkWaitForFences(m_LogicalDevice->GetLogicalDevice(), 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
-        vkResetFences(m_LogicalDevice->GetLogicalDevice(), 1, &m_InFlightFences[m_CurrentFrame]);
 
         uint32_t imageIndex;
         
-        vkAcquireNextImageKHR(m_LogicalDevice->GetLogicalDevice(), m_SwapChain->m_SwapChain, std::numeric_limits<uint64_t>::max(), m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex);
+        VkResult result = vkAcquireNextImageKHR(m_LogicalDevice->GetLogicalDevice(), m_SwapChain->m_SwapChain, std::numeric_limits<uint64_t>::max(), m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex);
     
+        if(result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            RecreateSwapChain();
+
+            return;
+        }
+        else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            throw std::runtime_error("Failed to acquire swap chain image!");
+        }
+
         VkSubmitInfo submitInfo = {};
 
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -351,6 +371,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         submitInfo.signalSemaphoreCount =   1;
         submitInfo.pSignalSemaphores =      signalSemaphores;
+
+        vkResetFences(m_LogicalDevice->GetLogicalDevice(), 1, &m_InFlightFences[m_CurrentFrame]);
 
         if(vkQueueSubmit(m_LogicalDevice->m_GraphicsQueue, 1, &submitInfo, m_InFlightFences[m_CurrentFrame]) != VK_SUCCESS)
         {
@@ -370,7 +392,18 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         presentInfo.pImageIndices =     &imageIndex;
         presentInfo.pResults =          nullptr; // Optional
 
-        vkQueuePresentKHR(m_LogicalDevice->m_PresentQueue, &presentInfo);
+        result = vkQueuePresentKHR(m_LogicalDevice->m_PresentQueue, &presentInfo);
+
+        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_FramebufferResized)
+        {
+            m_FramebufferResized = false;
+
+            RecreateSwapChain();
+        }
+        else if(result != VK_SUCCESS)
+        {
+            throw std::runtime_error("Failed to present swap chain image!");
+        }
 
         m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
@@ -403,9 +436,31 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         vkDestroyInstance(m_Instance, 0);
     }
 
+    void Renderer::RecreateSwapChain()
+    {
+        vkDeviceWaitIdle(m_LogicalDevice->GetLogicalDevice());
+
+        m_Framebuffer->Cleanup(this);
+        m_CommandPool->CleanupCommandBuffers();
+        m_GraphicsPipeline->Cleanup(this);
+        m_RenderPass->Cleanup(this);
+        m_SwapChain->Cleanup(this);
+
+        m_SwapChain->Create(this);
+        m_RenderPass->Create(this);
+        m_GraphicsPipeline->Create(this);
+        m_Framebuffer->Create(this);
+        m_CommandPool->CreateCommandBuffers();
+    }
+
     void Renderer::operator()(const RecompiledEvent& event)
     {
         
+    }
+
+    void Renderer::operator()(const ResizeEvent& event)
+    {
+        printf("Resized window to: %u:%u", event.m_Width, event.m_Height);
     }
 
 }}}

@@ -5,6 +5,17 @@
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
+    CommandPool::CommandPool(Renderer* renderer) :
+        m_Renderer(renderer)
+    {
+
+    }
+
+    CommandPool::~CommandPool()
+    {
+
+    }
+
     Result CommandPool::CreateCommandBuffers()
     {
         m_CommandBuffers.resize(m_Renderer->m_Framebuffer->m_SwapChainFramebuffers.size());
@@ -63,15 +74,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
-    CommandPool::CommandPool(Renderer* renderer) :
-        m_Renderer(renderer)
+    void CommandPool::CleanupCommandBuffers()
     {
-
-    }
-
-    CommandPool::~CommandPool()
-    {
-
+        vkFreeCommandBuffers(m_Renderer->m_LogicalDevice->GetLogicalDevice(), m_CommandPool, m_CommandBuffers.size(), m_CommandBuffers.data());
     }
 
     Result CommandPool::Create()
@@ -99,7 +104,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     void CommandPool::Cleanup()
     {
-        vkFreeCommandBuffers(m_Renderer->m_LogicalDevice->GetLogicalDevice(), m_CommandPool, m_CommandBuffers.size(), m_CommandBuffers.data());
+        CleanupCommandBuffers();
         vkDestroyCommandPool(m_Renderer->m_LogicalDevice->GetLogicalDevice(), m_CommandPool, nullptr);
     }
 
