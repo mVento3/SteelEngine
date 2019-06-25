@@ -4,9 +4,11 @@
 #include "iostream"
 #include "string"
 
-#include "FileSystem/FileSystem.h"
-
 #include "Serialization/Serialization.h"
+
+#include "FileWatcher/FileWatcher.h"
+
+#include "Rendering/Vulkan/Renderer.h"
 
 #include "SDL_events.h"
 
@@ -111,13 +113,38 @@ namespace SteelEngine {
         m_Window->SetWidth(800);
         m_Window->SetHeight(600);
 
-        std::function<void(void*)> func = [](void* event_)
+        std::function<void(void*, Interface::IWindow*)> func = [](void* event_, Interface::IWindow* window)
         {
             SDL_Event* event = (SDL_Event*)event_;
 
             if(event->type == SDL_QUIT)
             {
                 
+            }
+            else if(event->type == SDL_WINDOWEVENT)
+            {
+                switch (event->window.event)
+                {
+                case SDL_WINDOWEVENT_RESIZED:
+                    Event::GlobalEvent::Broadcast(ResizeEvent
+                        {
+                            (Type::uint32)event->window.data1,
+                            (Type::uint32)event->window.data2
+                        }
+                    );
+                    break;
+                case SDL_WINDOWEVENT_MINIMIZED:
+                    Event::GlobalEvent::Broadcast(MinimizedEvent{});
+                    break;
+                case SDL_WINDOWEVENT_MAXIMIZED:
+                    Event::GlobalEvent::Broadcast(MaximizedEvent{});
+                    break;
+                case SDL_WINDOWEVENT_RESTORED:
+                    Event::GlobalEvent::Broadcast(MaximizedEvent{});
+                    break;
+                default:
+                    break;
+                }
             }
         };
 

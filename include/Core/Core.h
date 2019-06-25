@@ -11,6 +11,7 @@
 #include "Core.Generated.h"
 
 #include "RuntimeCompiler/RuntimeCompiler.h"
+#include "RuntimeCompiler/Serializer.h"
 
 #include "Utils/Utils.h"
 #include "Utils/Time.h"
@@ -21,13 +22,11 @@
 
 #include "Rendering/IRenderer.h"
 
+#include "FileSystem/FileSystem.h"
+
 #include "Window/IWindow.h"
 
-// 1. Fix the problem with spaces and tabs in reflection parser - DONE
-// 2. Create a system that will gather inforamtion about additional dependencies
-//    which will be attached to compilation - STARTED
-// 3. Fix the problem with reflection generation if the frame time
-//    less than 100 ms (the reflection is generating twice) - DONE
+// 1. Fix problem with properties in proper class, especially while nesting
 
 namespace SteelEngine {
 
@@ -49,11 +48,11 @@ namespace SteelEngine {
         };
 
     private:
-        RuntimeCompiler* m_RuntimeCompiler;
-        Interface::INetwork* m_Network;
-        Interface::ILogger* m_Logger;
-        Interface::IRenderer* m_Renderer;
-        Interface::IWindow* m_Window;
+        RuntimeCompiler*        m_RuntimeCompiler;
+        Interface::INetwork*    m_Network;
+        Interface::ILogger*     m_Logger;
+        Interface::IRenderer*   m_Renderer;
+        Interface::IWindow*     m_Window;
 
         bool m_Running;
 

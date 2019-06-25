@@ -14,9 +14,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::VulkanWindow))
 .Constructor<>()
 (
 )
-.Property("m_ProcessEventsCallback", &SteelEngine::VulkanWindow::m_ProcessEventsCallback)
-(
-)
 .Method("SetProcessEventsCallback", &SteelEngine::VulkanWindow::SetProcessEventsCallback)
 (
 )

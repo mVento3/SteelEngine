@@ -26,26 +26,30 @@ namespace SteelEngine {
         Type::uint32 m_Height;
 
         SDL_Window* m_Window;
+        SDL_Event m_Event;
         
     public:
         VulkanWindow();
         ~VulkanWindow();
 
-        std::function<void(void*)> m_ProcessEventsCallback;
+        std::function<void(void*, Interface::IWindow*)> m_ProcessEventsCallback;
 
         Result Create() override;
         void Update() override;
         void Close() override;
+        void WaitEvents() override;
 
         void SetTitle(const std::string& title) override;
         void SetWidth(const Type::uint32& width) override;
         void SetHeight(const Type::uint32& height) override;
 
+        void GetWindowSize(Type::uint32* width, Type::uint32* height) override;
+
         Result GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames) override;
         Result CreateVulkanSurface(void* instance, void** surface) override;
 
         SE_METHOD()
-        void SetProcessEventsCallback(std::function<void(void*)> callback);
+        void SetProcessEventsCallback(std::function<void(void*, Interface::IWindow*)> callback);
     };
 
 }

@@ -11,6 +11,8 @@
 
 #include "Window/IWindow.h"
 #include "Window/ResizeEvent.h"
+#include "Window/MinimizedEvent.h"
+#include "Window/MaximizedEvent.h"
 
 #include "Rendering/Vulkan/PhysicalDevice.h"
 #include "Rendering/Vulkan/LogicalDevice.h"
@@ -74,6 +76,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         size_t m_CurrentFrame;
         bool m_FramebufferResized;
+        bool m_WindowMinimized;
+
+        Type::uint32 m_Width;
+        Type::uint32 m_Height;
 
         std::vector<const char*> GetSDL_Extensions();
         void PrintAvailableExtensions();
@@ -107,6 +113,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         void RecreateSwapChain();
 
         void operator()(const ResizeEvent& event);
+        void operator()(const MinimizedEvent& event);
+        void operator()(const MaximizedEvent& event);
     };
 
 }}}

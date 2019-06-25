@@ -259,6 +259,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         m_CurrentFrame = 0;
         m_FramebufferResized = false;
+        m_WindowMinimized = false;
+
+        window->GetWindowSize(&m_Width, &m_Height);
     }
 
     Renderer::~Renderer()
@@ -331,6 +334,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         }
 
         Event::GlobalEvent::Add<ResizeEvent>(this);
+        Event::GlobalEvent::Add<MinimizedEvent>(this);
+        Event::GlobalEvent::Add<MaximizedEvent>(this);
 
         return SE_TRUE;
     }
@@ -438,6 +443,16 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     void Renderer::RecreateSwapChain()
     {
+        // while(m_WindowMinimized || m_Width == 0 || m_Height == 0)
+        // {
+        //     //m_Window->WaitEvents();
+        // }
+
+        if(m_WindowMinimized)
+        {
+            return;
+        }
+
         vkDeviceWaitIdle(m_LogicalDevice->GetLogicalDevice());
 
         m_Framebuffer->Cleanup(this);
@@ -460,7 +475,20 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     void Renderer::operator()(const ResizeEvent& event)
     {
-        printf("Resized window to: %u:%u", event.m_Width, event.m_Height);
+        m_FramebufferResized = true;
+
+        m_Width = event.m_Width;
+        m_Height = event.m_Height;
+    }
+
+    void Renderer::operator()(const MinimizedEvent& event)
+    {
+        m_WindowMinimized = true;
+    }
+
+    void Renderer::operator()(const MaximizedEvent& event)
+    {
+        m_WindowMinimized = false;
     }
 
 }}}

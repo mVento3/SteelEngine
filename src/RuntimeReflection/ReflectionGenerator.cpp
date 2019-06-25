@@ -75,6 +75,7 @@ namespace SteelEngine {
 				else if(!seClass)
 				{
 					ClassData* data = new ClassData();
+
 					currentData->m_Others.push_back(data);
 					currentData = data;
 					classStack.push(data);
@@ -795,12 +796,35 @@ namespace SteelEngine {
 
 	void ReflectionGenerator::ParseSource()
 	{
-		// Type::uint32 lineIndex = 0;
+		Lexer lexer(m_SourceLines);
 
-		// for (std::string line : m_SourceLines)
-		// {
+		while(1)
+		{
+			lexer++;
 
-		// }
+			if(lexer.End())
+			{
+				break;
+			}
+
+			if(lexer.GetToken() == "#include")
+			{
+				lexer++;
+
+				std::string token = lexer.GetToken();
+
+				token.erase(token.begin());
+				token.erase(token.end() - 1);
+
+				std::vector<std::string> splitted = split(token, '/');
+				std::vector<std::string> splitted2 = split(splitted[splitted.size() - 1], '.');
+
+				if(splitted2.size() == 2)
+				{
+					m_Dependencies.push_back(splitted2[0]);
+				}
+			}
+		}
 	}
 
 	std::vector<ReflectionGenerator::MetaDataInfo> ReflectionGenerator::ParseMeta(const std::string& line)
@@ -1228,6 +1252,7 @@ namespace SteelEngine {
 		}
 
 		m_Classes.clear();
+		m_Dependencies.clear();
 
 		Event::GlobalEvent::Broadcast(ClearValuesEvent{});
 	}

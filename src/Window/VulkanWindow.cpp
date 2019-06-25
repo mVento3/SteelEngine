@@ -41,16 +41,14 @@ namespace SteelEngine {
 
     void VulkanWindow::Update()
     {
-        SDL_Event event;
-
-        while(SDL_PollEvent(&event))
+        while(SDL_PollEvent(&m_Event))
         {
-            if(event.type == SDL_QUIT)
+            if(m_Event.type == SDL_QUIT)
             {
                 Event::GlobalEvent::Broadcast(WindowCloseEvent{});
             }
 
-            m_ProcessEventsCallback(&event);
+            m_ProcessEventsCallback(&m_Event, this);
         }
     }
 
@@ -59,6 +57,11 @@ namespace SteelEngine {
         SDL_DestroyWindow(m_Window);
 
         m_Window = 0;
+    }
+
+    void VulkanWindow::WaitEvents()
+    {
+        SDL_WaitEvent(&m_Event);
     }
 
     void VulkanWindow::SetTitle(const std::string& title)
@@ -74,6 +77,11 @@ namespace SteelEngine {
     void VulkanWindow::SetHeight(const Type::uint32& height)
     {
         m_Height = height;
+    }
+
+    void VulkanWindow::GetWindowSize(Type::uint32* width, Type::uint32* height)
+    {
+        SDL_GetWindowSize(m_Window, (int*)width, (int*)height);
     }
 
     Result VulkanWindow::GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames)
@@ -105,7 +113,7 @@ namespace SteelEngine {
         return SE_TRUE;
     }
 
-    void VulkanWindow::SetProcessEventsCallback(std::function<void(void*)> callback)
+    void VulkanWindow::SetProcessEventsCallback(std::function<void(void*, Interface::IWindow*)> callback)
     {
         m_ProcessEventsCallback = callback;
     }

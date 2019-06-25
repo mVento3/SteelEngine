@@ -257,7 +257,6 @@ namespace SteelEngine {
 
 							m_ReflectionGenerator->Parse();
 							m_ReflectionGenerator->Generate(m_BinaryLocation.string() + "/Runtime/GeneratedReflection");
-							m_ReflectionGenerator->Clear();
 
 							for(auto& p: filesystem::directory_iterator("build/Windows"))
 							{
@@ -272,6 +271,8 @@ namespace SteelEngine {
 									}
 								}
 							}
+
+							m_ReflectionGenerator->Clear();
 						},
 						{
 							printf("Reflection time: %f ms\n", delta * 1000.f);
@@ -411,6 +412,8 @@ namespace SteelEngine {
 				objFiles.append(" ");
 			}
 		}
+
+		m_AdditionalDependencies.clear();
 
 #ifdef _DEBUG
 		std::string flags = "/nologo /Zi /FC /MTd /LDd /Od /std:c++17";
