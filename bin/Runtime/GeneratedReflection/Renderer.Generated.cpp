@@ -36,11 +36,14 @@ SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_CommandPool)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_ImageAvailableSemaphores)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_RenderFinishedSemaphores)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_InFlightFences)
+SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_ShaderStages)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_CurrentFrame)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_FramebufferResized)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_WindowMinimized)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_Width)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_Height)
+SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_SomeShader)
+SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_Buffer)
 }
 
 #ifdef RUNTIME_COMPILE

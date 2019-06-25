@@ -15,9 +15,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         std::vector<VkSurfaceFormatKHR> m_Formats;
         std::vector<VkPresentModeKHR>   m_PresentModes;
 
-        static SwapChainSupportDetails QuerySwapChainSupport(PhysicalDevice* device, Surface* surface)
+        static SwapChainSupportDetails QuerySwapChainSupport(const PhysicalDevice& device, const Surface& surface)
         {
-            return QuerySwapChainSupport(device->m_PhysicalDevice, surface->m_Surface);
+            return QuerySwapChainSupport(device.m_PhysicalDevice, surface.m_Surface);
         }
 
         static SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)

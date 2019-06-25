@@ -255,7 +255,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         m_GraphicsPipeline = new GraphicsPipeline();
         m_RenderPass = new RenderPass();
         m_Framebuffer = new Framebuffer();
-        m_CommandPool = new CommandPool(this);
+        m_CommandPool = new CommandPool();
+
+        m_SomeShader = new Shader(m_LogicalDevice);
+        m_Buffer = new VertexBuffer();
 
         m_CurrentFrame = 0;
         m_FramebufferResized = false;
@@ -298,32 +301,51 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             return SE_FALSE;
         }
 
-        if(m_LogicalDevice->Create(this) == SE_FALSE)
+        if(m_LogicalDevice->Create(*m_PhysicalDevice, *m_Surface) == SE_FALSE)
         {
             return SE_FALSE;
         }
 
-        if(m_SwapChain->Create(this) == SE_FALSE)
+        if(m_SwapChain->Create(*m_PhysicalDevice, *m_LogicalDevice, *m_Surface) == SE_FALSE)
         {
             return SE_FALSE;
         }
 
-        if(m_RenderPass->Create(this) == SE_FALSE)
+        if(m_RenderPass->Create(*m_LogicalDevice, *m_SwapChain) == SE_FALSE)
         {
             return SE_FALSE;
         }
 
-        if(m_GraphicsPipeline->Create(this) == SE_FALSE)
+        m_SomeShader->LoadShader("", m_ShaderStages);
+        m_Buffer->CreateVertexBuffer(this, sizeof(m_Vertices[0]) * m_Vertices.size(), m_Vertices.data());
+
+        if(m_GraphicsPipeline->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass, m_ShaderStages) == SE_FALSE)
         {
             return SE_FALSE;
         }
 
-        if(m_Framebuffer->Create(this) == SE_FALSE)
+        m_SomeShader->Destroy();
+
+        if(m_Framebuffer->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass) == SE_FALSE)
         {
             return SE_FALSE;
         }
 
-        if(m_CommandPool->Create() == SE_FALSE)
+        if(m_CommandPool->Create(
+            *m_PhysicalDevice,
+            *m_LogicalDevice,
+            *m_Surface) == SE_FALSE)
+        {
+            return SE_FALSE;
+        }
+
+        if(m_CommandPool->CreateCommandBuffers(
+            *m_LogicalDevice,
+            *m_Framebuffer,
+            *m_RenderPass,
+            *m_SwapChain,
+            m_Buffer,
+            m_GraphicsPipeline->GetPipeline()) == SE_FALSE)
         {
             return SE_FALSE;
         }
@@ -417,11 +439,11 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     {
         vkDeviceWaitIdle(m_LogicalDevice->GetLogicalDevice());
 
-        m_Framebuffer->Cleanup(this);
-        m_CommandPool->Cleanup();
-        m_GraphicsPipeline->Cleanup(this);
-        m_RenderPass->Cleanup(this);
-        m_SwapChain->Cleanup(this);
+        m_Framebuffer->Cleanup(*m_LogicalDevice);
+        m_CommandPool->Cleanup(*m_LogicalDevice);
+        m_GraphicsPipeline->Cleanup(*m_LogicalDevice);
+        m_RenderPass->Cleanup(*m_LogicalDevice);
+        m_SwapChain->Cleanup(*m_LogicalDevice);
 
         for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
@@ -443,11 +465,6 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     void Renderer::RecreateSwapChain()
     {
-        // while(m_WindowMinimized || m_Width == 0 || m_Height == 0)
-        // {
-        //     //m_Window->WaitEvents();
-        // }
-
         if(m_WindowMinimized)
         {
             return;
@@ -455,17 +472,28 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         vkDeviceWaitIdle(m_LogicalDevice->GetLogicalDevice());
 
-        m_Framebuffer->Cleanup(this);
-        m_CommandPool->CleanupCommandBuffers();
-        m_GraphicsPipeline->Cleanup(this);
-        m_RenderPass->Cleanup(this);
-        m_SwapChain->Cleanup(this);
+        m_Framebuffer->Cleanup(*m_LogicalDevice);
+        m_CommandPool->CleanupCommandBuffers(*m_LogicalDevice);
+        m_GraphicsPipeline->Cleanup(*m_LogicalDevice);
+        m_RenderPass->Cleanup(*m_LogicalDevice);
+        m_SwapChain->Cleanup(*m_LogicalDevice);
 
-        m_SwapChain->Create(this);
-        m_RenderPass->Create(this);
-        m_GraphicsPipeline->Create(this);
-        m_Framebuffer->Create(this);
-        m_CommandPool->CreateCommandBuffers();
+        m_SwapChain->Create(*m_PhysicalDevice, *m_LogicalDevice, *m_Surface);
+        m_RenderPass->Create(*m_LogicalDevice, *m_SwapChain);
+
+        m_ShaderStages.clear();
+        m_SomeShader->LoadShader("", m_ShaderStages);
+        m_GraphicsPipeline->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass, m_ShaderStages);
+        m_SomeShader->Destroy();
+        m_Framebuffer->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass);
+        m_CommandPool->CreateCommandBuffers(
+            *m_LogicalDevice,
+            *m_Framebuffer,
+            *m_RenderPass,
+            *m_SwapChain,
+            m_Buffer,
+            m_GraphicsPipeline->GetPipeline()
+        );
     }
 
     void Renderer::operator()(const RecompiledEvent& event)

@@ -10,8 +10,9 @@
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    class Renderer;
+    class PhysicalDevice;
     class SwapChain;
+    class Surface;
 
     class LogicalDevice
     {
@@ -27,10 +28,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         LogicalDevice();
         ~LogicalDevice();
 
-        Result Create(Renderer* renderer);
-        Result CreateSwapChain(const VkSwapchainCreateInfoKHR& createInfo, SwapChain* swapChain);
+        Result Create(const PhysicalDevice& physicalDevice, const Surface& surface);
+        Result CreateSwapChain(const VkSwapchainCreateInfoKHR& createInfo, SwapChain* swapChain) const;
 
-        inline VkDevice GetLogicalDevice() { return m_LogicalDevice; }
+        inline VkDevice GetLogicalDevice() const { return m_LogicalDevice; }
     };
 
 }}}

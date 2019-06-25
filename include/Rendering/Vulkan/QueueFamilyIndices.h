@@ -22,9 +22,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             return m_GraphicsFamily.has_value() && m_PresentFamily.has_value();
         }
 
-        static QueueFamilyIndices FindQueueFamilies(PhysicalDevice* device, Surface* surface)
+        static QueueFamilyIndices FindQueueFamilies(const PhysicalDevice& device, const Surface& surface)
         {
-            return FindQueueFamilies(device->m_PhysicalDevice, surface->m_Surface);
+            return FindQueueFamilies(device.m_PhysicalDevice, surface.m_Surface);
         }
 
         static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)

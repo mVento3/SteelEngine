@@ -8,7 +8,9 @@
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    class Renderer;
+    class SwapChain;
+    class LogicalDevice;
+    class RenderPass;
 
     class Framebuffer
     {
@@ -20,8 +22,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         Framebuffer();
         ~Framebuffer();
 
-        Result Create(Renderer* renderer);
-        void Cleanup(Renderer* renderer);
+        Result Create(
+            const LogicalDevice& logicalDevice,
+            const SwapChain& swapChain,
+            const RenderPass& renderPass
+        );
+        void Cleanup(const LogicalDevice& logicalDevice);
     };
 
 }}}

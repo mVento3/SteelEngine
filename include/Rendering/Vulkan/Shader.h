@@ -15,11 +15,13 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     class Shader
     {
     private:
+        LogicalDevice* m_LogicalDevice;
+
+        std::vector<VkShaderModule> m_Modules;
+
         static std::vector<char> ReadFile(const std::string& filename);
 
         VkShaderModule CreateShaderModule(const std::vector<char>& code);
-
-        LogicalDevice* m_LogicalDevice;
 
     public:
         Shader(LogicalDevice* logicalDevice);
@@ -27,9 +29,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         Result LoadShader(
             const std::string& name,
-            std::vector<VkPipelineShaderStageCreateInfo>& stages,
-            std::vector<VkShaderModule>& modules
+            std::vector<VkPipelineShaderStageCreateInfo>& stages
         );
+        void Destroy();
     };
 
 }}}

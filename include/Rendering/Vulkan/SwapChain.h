@@ -10,7 +10,9 @@
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    class Renderer;
+    class PhysicalDevice;
+    class Surface;
+    class LogicalDevice;
 
     class SwapChain
     {
@@ -27,14 +29,18 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         VkExtent2D                  m_SwapChainExtent;
         std::vector<VkImageView>    m_SwapChainImageViews;
 
-        Result CreateImageViews(Renderer* renderer);
+        Result CreateImageViews(const LogicalDevice& logicalDevice);
 
     public:
         SwapChain();
         ~SwapChain();
 
-        Result Create(Renderer* renderer);
-        void Cleanup(Renderer* renderer);
+        Result Create(
+            const PhysicalDevice& physicalDevice,
+            const LogicalDevice& logicalDevice,
+            const Surface& surface
+        );
+        void Cleanup(const LogicalDevice& logicalDevice);
     };
 
 }}}

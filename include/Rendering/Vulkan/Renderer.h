@@ -42,6 +42,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         friend class RenderPass;
         friend class Framebuffer;
         friend class CommandPool;
+        friend class VertexBuffer;
     public:
         const static std::vector<const char*> mc_ValidationLayers;
         const static bool mc_EnableValidationLayers;
@@ -54,6 +55,13 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
             void* pUserData
         );
+
+        const std::vector<Vertex> m_Vertices =
+        {
+            Vertex{{ 0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
+            Vertex{{ 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }},
+            Vertex{{ -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }}
+        };
 
     private:
         VkInstance m_Instance;
@@ -73,6 +81,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         std::vector<VkSemaphore> m_ImageAvailableSemaphores;
         std::vector<VkSemaphore> m_RenderFinishedSemaphores;
         std::vector<VkFence> m_InFlightFences;
+        std::vector<VkPipelineShaderStageCreateInfo> m_ShaderStages;
 
         size_t m_CurrentFrame;
         bool m_FramebufferResized;
@@ -80,6 +89,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         Type::uint32 m_Width;
         Type::uint32 m_Height;
+
+        Shader*         m_SomeShader;
+        VertexBuffer*   m_Buffer;
 
         std::vector<const char*> GetSDL_Extensions();
         void PrintAvailableExtensions();

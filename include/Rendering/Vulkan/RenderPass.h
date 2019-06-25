@@ -6,7 +6,8 @@
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    class Renderer;
+    class SwapChain;
+    class LogicalDevice;
 
     class RenderPass
     {
@@ -17,10 +18,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         RenderPass();
         ~RenderPass();
 
-        Result Create(Renderer* renderer);
-        void Cleanup(Renderer* renderer);
+        Result Create(const LogicalDevice& logicalDevice, const SwapChain& swapChain);
+        void Cleanup(const LogicalDevice& logicalDevice);
 
-        inline VkRenderPass GetRenderPass() { return m_RenderPass; }
+        inline VkRenderPass GetRenderPass() const { return m_RenderPass; }
     };
 
 }}}

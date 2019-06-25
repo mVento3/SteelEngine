@@ -87,7 +87,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
-    Result PhysicalDevice::CreateLogicalDevice(LogicalDevice* logicalDevice, const VkDeviceCreateInfo& createInfo)
+    Result PhysicalDevice::CreateLogicalDevice(LogicalDevice* logicalDevice, const VkDeviceCreateInfo& createInfo) const
     {
         if(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &logicalDevice->m_LogicalDevice) != VK_SUCCESS)
         {

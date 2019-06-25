@@ -13,6 +13,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     {
         friend struct QueueFamilyIndices;
         friend struct SwapChainSupportDetails;
+        friend struct VertexBuffer;
     private:
         VkPhysicalDevice m_PhysicalDevice;
 
@@ -24,7 +25,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         ~PhysicalDevice();
 
         Result PickPhysicalDevice(Renderer* renderer);
-        Result CreateLogicalDevice(LogicalDevice* logicalDevice, const VkDeviceCreateInfo& createInfo);
+        Result CreateLogicalDevice(LogicalDevice* logicalDevice, const VkDeviceCreateInfo& createInfo) const;
     };
 
 }}}

@@ -1,10 +1,14 @@
 #include "Rendering/Vulkan/SwapChain.h"
 
-#include "Rendering/Vulkan/Renderer.h"
+#include "Rendering/Vulkan/Surface.h"
+#include "Rendering/Vulkan/PhysicalDevice.h"
+#include "Rendering/Vulkan/QueueFamilyIndices.h"
+#include "Rendering/Vulkan/SwapChainSupportDetails.h"
+#include "Rendering/Vulkan/LogicalDevice.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    Result SwapChain::CreateImageViews(Renderer* renderer)
+    Result SwapChain::CreateImageViews(const LogicalDevice& logicalDevice)
     {
         m_SwapChainImageViews.resize(m_SwapChainImages.size());
 
@@ -28,7 +32,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             createInfo.subresourceRange.baseArrayLayer =    0;
             createInfo.subresourceRange.layerCount =        1;
 
-            if (vkCreateImageView(renderer->m_LogicalDevice->GetLogicalDevice(), &createInfo, nullptr, &m_SwapChainImageViews[i]) != VK_SUCCESS)
+            if(vkCreateImageView(logicalDevice.GetLogicalDevice(), &createInfo, nullptr, &m_SwapChainImageViews[i]) != VK_SUCCESS)
             {
                 return SE_FALSE;
             }
@@ -47,9 +51,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     }
 
-    Result SwapChain::Create(Renderer* renderer)
+    Result SwapChain::Create(
+        const PhysicalDevice& physicalDevice,
+        const LogicalDevice& logicalDevice,
+        const Surface& surface)
     {
-        SwapChainSupportDetails swapChainSupport = SwapChainSupportDetails::QuerySwapChainSupport(renderer->m_PhysicalDevice, renderer->m_Surface);
+        SwapChainSupportDetails swapChainSupport = SwapChainSupportDetails::QuerySwapChainSupport(physicalDevice, surface);
 
         VkSurfaceFormatKHR surfaceFormat = Surface::ChooseSwapSurfaceFormat(swapChainSupport.m_Formats);
         VkPresentModeKHR presentMode = Surface::ChooseSwapPresentMode(swapChainSupport.m_PresentModes);
@@ -65,7 +72,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         VkSwapchainCreateInfoKHR createInfo = {};
 
         createInfo.sType =              VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        createInfo.surface =            renderer->m_Surface->m_Surface;
+        createInfo.surface =            surface.m_Surface;
         createInfo.minImageCount =      imageCount;
         createInfo.imageFormat =        surfaceFormat.format;
         createInfo.imageColorSpace =    surfaceFormat.colorSpace;
@@ -73,7 +80,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         createInfo.imageArrayLayers =   1;
         createInfo.imageUsage =         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        QueueFamilyIndices indices = QueueFamilyIndices::FindQueueFamilies(renderer->m_PhysicalDevice, renderer->m_Surface);
+        QueueFamilyIndices indices = QueueFamilyIndices::FindQueueFamilies(physicalDevice, surface);
         Type::uint32 queueFamilyIndices[] =
             {
                 indices.m_GraphicsFamily.value(),
@@ -99,21 +106,21 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         createInfo.clipped =        VK_TRUE;
         createInfo.oldSwapchain =   VK_NULL_HANDLE;
 
-        if(renderer->m_LogicalDevice->CreateSwapChain(createInfo, renderer->m_SwapChain) == SE_FALSE)
+        if(logicalDevice.CreateSwapChain(createInfo, this) == SE_FALSE)
         {
             return SE_FALSE;
         }
 
-        vkGetSwapchainImagesKHR(renderer->m_LogicalDevice->GetLogicalDevice(), m_SwapChain, &imageCount, nullptr);
+        vkGetSwapchainImagesKHR(logicalDevice.GetLogicalDevice(), m_SwapChain, &imageCount, nullptr);
 
         m_SwapChainImages.resize(imageCount);
 
-        vkGetSwapchainImagesKHR(renderer->m_LogicalDevice->GetLogicalDevice(), m_SwapChain, &imageCount, m_SwapChainImages.data());
+        vkGetSwapchainImagesKHR(logicalDevice.GetLogicalDevice(), m_SwapChain, &imageCount, m_SwapChainImages.data());
 
         m_SwapChainImageFormat = surfaceFormat.format;
         m_SwapChainExtent = extent;
 
-        if(CreateImageViews(renderer) == SE_FALSE)
+        if(CreateImageViews(logicalDevice) == SE_FALSE)
         {
             return SE_FALSE;
         }
@@ -121,14 +128,14 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
-    void SwapChain::Cleanup(Renderer* renderer)
+    void SwapChain::Cleanup(const LogicalDevice& logicalDevice)
     {
         for(auto imageView : m_SwapChainImageViews)
         {
-            vkDestroyImageView(renderer->m_LogicalDevice->GetLogicalDevice(), imageView, nullptr);
+            vkDestroyImageView(logicalDevice.GetLogicalDevice(), imageView, nullptr);
         }
 
-        vkDestroySwapchainKHR(renderer->m_LogicalDevice->GetLogicalDevice(), m_SwapChain, nullptr);
+        vkDestroySwapchainKHR(logicalDevice.GetLogicalDevice(), m_SwapChain, nullptr);
     }
 
 }}}

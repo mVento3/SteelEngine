@@ -8,27 +8,42 @@
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    class Renderer;
+    class Framebuffer;
+    class VertexBuffer;
+    class PhysicalDevice;
+    class LogicalDevice;
+    class Surface;
+    class RenderPass;
+    class SwapChain;
 
     class CommandPool
     {
         friend class Renderer;
     private:
-        Renderer* m_Renderer;
-
         VkCommandPool m_CommandPool;
 
         std::vector<VkCommandBuffer> m_CommandBuffers;
 
     public:
-        CommandPool(Renderer* renderer);
+        CommandPool();
         ~CommandPool();
 
-        Result CreateCommandBuffers();
+        Result CreateCommandBuffers(
+            const LogicalDevice& logicalDevice,
+            const Framebuffer& framebuffer,
+            const RenderPass& renderpass,
+            const SwapChain& swapChain,
+            VertexBuffer* vertexBuffer,
+            VkPipeline pipeline
+        );
 
-        Result Create();
-        void Cleanup();
-        void CleanupCommandBuffers();
+        Result Create(
+            const PhysicalDevice& physicalDevice,
+            const LogicalDevice& logicalDevice,
+            const Surface& surface
+        );
+        void Cleanup(const LogicalDevice& logicalDevice);
+        void CleanupCommandBuffers(const LogicalDevice& logicalDevice);
     };
 
 }}}

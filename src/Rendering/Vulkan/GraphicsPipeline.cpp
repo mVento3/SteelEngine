@@ -1,12 +1,13 @@
 #include "Rendering/Vulkan/GraphicsPipeline.h"
 
-#include "Rendering/Vulkan/Renderer.h"
+#include "Rendering/Vulkan/SwapChain.h"
+#include "Rendering/Vulkan/RenderPass.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     GraphicsPipeline::GraphicsPipeline()
     {
-
+        
     }
 
     GraphicsPipeline::~GraphicsPipeline()
@@ -14,13 +15,18 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     }
 
-    Result GraphicsPipeline::Create(Renderer* renderer)
+    Result GraphicsPipeline::Create(const LogicalDevice& logicalDevice, const SwapChain& swapChain, const RenderPass& renderPass, std::vector<VkPipelineShaderStageCreateInfo> stages)
     {
+        auto bindingDescription = Vertex::GetBindingDescription();
+        auto attributeDescription = Vertex::GetAttributeDescriptions();
+
         VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 
         vertexInputInfo.sType =                             VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount =     0;
-        vertexInputInfo.vertexAttributeDescriptionCount =   0;
+        vertexInputInfo.vertexBindingDescriptionCount =     1;
+        vertexInputInfo.pVertexBindingDescriptions =        &bindingDescription;
+        vertexInputInfo.vertexAttributeDescriptionCount =   attributeDescription.size();
+        vertexInputInfo.pVertexAttributeDescriptions =      attributeDescription.data();
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
 
@@ -32,15 +38,15 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         viewport.x =        0.0f;
         viewport.y =        0.0f;
-        viewport.width =    (float)renderer->m_SwapChain->m_SwapChainExtent.width;
-        viewport.height =   (float)renderer->m_SwapChain->m_SwapChainExtent.height;
+        viewport.width =    (float)swapChain.m_SwapChainExtent.width;
+        viewport.height =   (float)swapChain.m_SwapChainExtent.height;
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
         VkRect2D scissor = {};
 
         scissor.offset = { 0, 0 };
-        scissor.extent = renderer->m_SwapChain->m_SwapChainExtent;
+        scissor.extent = swapChain.m_SwapChainExtent;
 
         VkPipelineViewportStateCreateInfo viewportState = {};
 
@@ -91,17 +97,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         pipelineLayoutInfo.setLayoutCount =         0;
         pipelineLayoutInfo.pushConstantRangeCount = 0;
 
-        if(vkCreatePipelineLayout(renderer->m_LogicalDevice->GetLogicalDevice(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
+        if(vkCreatePipelineLayout(logicalDevice.GetLogicalDevice(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
         {
             return SE_FALSE;
         }
-
-        m_SomeShader = new Shader(renderer->m_LogicalDevice);
-
-        std::vector<VkPipelineShaderStageCreateInfo> stages;
-        std::vector<VkShaderModule> modules;
-
-        m_SomeShader->LoadShader("", stages, modules);
 
         VkGraphicsPipelineCreateInfo pipelineInfo = {};
 
@@ -117,26 +116,23 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         pipelineInfo.pColorBlendState =     &colorBlending;
         pipelineInfo.pDynamicState =        nullptr; // Optional
         pipelineInfo.layout =               m_PipelineLayout;
-        pipelineInfo.renderPass =           renderer->m_RenderPass->GetRenderPass();
+        pipelineInfo.renderPass =           renderPass.GetRenderPass();
         pipelineInfo.subpass =              0;
         pipelineInfo.basePipelineHandle =   VK_NULL_HANDLE; // Optional
         pipelineInfo.basePipelineIndex =    -1; // Optional
 
-        if(vkCreateGraphicsPipelines(renderer->m_LogicalDevice->GetLogicalDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
+        if(vkCreateGraphicsPipelines(logicalDevice.GetLogicalDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
         {
             return SE_FALSE;
         }
 
-        vkDestroyShaderModule(renderer->m_LogicalDevice->GetLogicalDevice(), modules[1], nullptr);
-        vkDestroyShaderModule(renderer->m_LogicalDevice->GetLogicalDevice(), modules[0], nullptr);
-
         return SE_TRUE;
     }
 
-    void GraphicsPipeline::Cleanup(Renderer* renderer)
+    void GraphicsPipeline::Cleanup(const LogicalDevice& logicalDevice)
     {
-        vkDestroyPipeline(renderer->m_LogicalDevice->GetLogicalDevice(), m_GraphicsPipeline, nullptr);
-        vkDestroyPipelineLayout(renderer->m_LogicalDevice->GetLogicalDevice(), m_PipelineLayout, nullptr);
+        vkDestroyPipeline(logicalDevice.GetLogicalDevice(), m_GraphicsPipeline, nullptr);
+        vkDestroyPipelineLayout(logicalDevice.GetLogicalDevice(), m_PipelineLayout, nullptr);
     }
 
 }}}

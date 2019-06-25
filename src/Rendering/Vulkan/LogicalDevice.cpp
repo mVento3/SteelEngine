@@ -1,7 +1,6 @@
 #include "Rendering/Vulkan/LogicalDevice.h"
 
 #include "Rendering/Vulkan/Renderer.h"
-#include "Rendering/Vulkan/SwapChain.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
@@ -15,9 +14,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     }
 
-    Result LogicalDevice::Create(Renderer* renderer)
+    Result LogicalDevice::Create(const PhysicalDevice& physicalDevice, const Surface& surface)
     {
-        QueueFamilyIndices indices = QueueFamilyIndices::FindQueueFamilies(renderer->m_PhysicalDevice, renderer->m_Surface);
+        QueueFamilyIndices indices = QueueFamilyIndices::FindQueueFamilies(physicalDevice, surface);
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         std::set<Type::uint32> uniqueQueueFamilies =
@@ -60,9 +59,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             createInfo.enabledLayerCount = 0;
         }
 
-        if(renderer->m_PhysicalDevice->CreateLogicalDevice(this, createInfo) == SE_FALSE)
+        if(physicalDevice.CreateLogicalDevice(this, createInfo) == SE_FALSE)
         {
-            //throw std::runtime_error("failed to create logical device!");
             return SE_FALSE;
         }
 
@@ -72,7 +70,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
-    Result LogicalDevice::CreateSwapChain(const VkSwapchainCreateInfoKHR& createInfo, SwapChain* swapChain)
+    Result LogicalDevice::CreateSwapChain(const VkSwapchainCreateInfoKHR& createInfo, SwapChain* swapChain) const
     {
         if(vkCreateSwapchainKHR(m_LogicalDevice, &createInfo, nullptr, &swapChain->m_SwapChain) != VK_SUCCESS)
         {

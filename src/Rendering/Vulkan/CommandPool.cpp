@@ -1,12 +1,15 @@
 #include "Rendering/Vulkan/CommandPool.h"
 
-#include "Rendering/Vulkan/Renderer.h"
+#include "Rendering/Vulkan/LogicalDevice.h"
+#include "Rendering/Vulkan/Framebuffer.h"
+#include "Rendering/Vulkan/RenderPass.h"
+#include "Rendering/Vulkan/SwapChain.h"
 #include "Rendering/Vulkan/QueueFamilyIndices.h"
+#include "Rendering/Vulkan/VertexBuffer.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    CommandPool::CommandPool(Renderer* renderer) :
-        m_Renderer(renderer)
+    CommandPool::CommandPool()
     {
 
     }
@@ -16,9 +19,15 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     }
 
-    Result CommandPool::CreateCommandBuffers()
+    Result CommandPool::CreateCommandBuffers(
+        const LogicalDevice& logicalDevice,
+        const Framebuffer& framebuffer,
+        const RenderPass& renderpass,
+        const SwapChain& swapChain,
+        VertexBuffer* vertexBuffer,
+        VkPipeline pipeline)
     {
-        m_CommandBuffers.resize(m_Renderer->m_Framebuffer->m_SwapChainFramebuffers.size());
+        m_CommandBuffers.resize(framebuffer.m_SwapChainFramebuffers.size());
 
         VkCommandBufferAllocateInfo allocInfo = {};
 
@@ -27,7 +36,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         allocInfo.level =               VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount =  m_CommandBuffers.size();
 
-        if(vkAllocateCommandBuffers(m_Renderer->m_LogicalDevice->GetLogicalDevice(), &allocInfo, m_CommandBuffers.data()) != VK_SUCCESS)
+        if(vkAllocateCommandBuffers(logicalDevice.GetLogicalDevice(), &allocInfo, m_CommandBuffers.data()) != VK_SUCCESS)
         {
             return SE_FALSE;
         }
@@ -47,21 +56,26 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             VkRenderPassBeginInfo renderPassInfo = {};
 
             renderPassInfo.sType =              VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            renderPassInfo.renderPass =         m_Renderer->m_RenderPass->GetRenderPass();
-            renderPassInfo.framebuffer =        m_Renderer->m_Framebuffer->m_SwapChainFramebuffers[i];
+            renderPassInfo.renderPass =         renderpass.GetRenderPass();
+            renderPassInfo.framebuffer =        framebuffer.m_SwapChainFramebuffers[i];
             renderPassInfo.renderArea.offset =  { 0, 0 };
-            renderPassInfo.renderArea.extent =  m_Renderer->m_SwapChain->m_SwapChainExtent;
+            renderPassInfo.renderArea.extent =  swapChain.m_SwapChainExtent;
 
-            VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+            VkClearValue clearColor = { 0.0f, 0.15f, 0.3f, 1.0f };
 
             renderPassInfo.clearValueCount =    1;
             renderPassInfo.pClearValues =       &clearColor;
 
             vkCmdBeginRenderPass(m_CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-                vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Renderer->m_GraphicsPipeline->GetPipeline());
+                vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-                vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
+                VkBuffer vertexBuffers[] = { vertexBuffer->GetBuffer() };
+                VkDeviceSize offsets[] = { 0 };
+
+                vkCmdBindVertexBuffers(m_CommandBuffers[i], 0, 1, vertexBuffers, offsets);
+
+                vkCmdDraw(m_CommandBuffers[i], vertexBuffer->GetSize(), 1, 0, 0);
 
             vkCmdEndRenderPass(m_CommandBuffers[i]);
 
@@ -74,14 +88,17 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
-    void CommandPool::CleanupCommandBuffers()
+    void CommandPool::CleanupCommandBuffers(const LogicalDevice& logicalDevice)
     {
-        vkFreeCommandBuffers(m_Renderer->m_LogicalDevice->GetLogicalDevice(), m_CommandPool, m_CommandBuffers.size(), m_CommandBuffers.data());
+        vkFreeCommandBuffers(logicalDevice.GetLogicalDevice(), m_CommandPool, m_CommandBuffers.size(), m_CommandBuffers.data());
     }
 
-    Result CommandPool::Create()
+    Result CommandPool::Create(
+        const PhysicalDevice& physicalDevice,
+        const LogicalDevice& logicalDevice,
+        const Surface& surface)
     {
-        QueueFamilyIndices queueFamilyIndices = QueueFamilyIndices::FindQueueFamilies(m_Renderer->m_PhysicalDevice, m_Renderer->m_Surface);
+        QueueFamilyIndices queueFamilyIndices = QueueFamilyIndices::FindQueueFamilies(physicalDevice, surface);
 
         VkCommandPoolCreateInfo poolInfo = {};
 
@@ -89,12 +106,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         poolInfo.queueFamilyIndex = queueFamilyIndices.m_GraphicsFamily.value();
         poolInfo.flags =            0; // Optional
 
-        if(vkCreateCommandPool(m_Renderer->m_LogicalDevice->GetLogicalDevice(), &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
-        {
-            return SE_FALSE;
-        }
-
-        if(CreateCommandBuffers() == SE_FALSE)
+        if(vkCreateCommandPool(logicalDevice.GetLogicalDevice(), &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
         {
             return SE_FALSE;
         }
@@ -102,10 +114,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
-    void CommandPool::Cleanup()
+    void CommandPool::Cleanup(const LogicalDevice& logicalDevice)
     {
-        CleanupCommandBuffers();
-        vkDestroyCommandPool(m_Renderer->m_LogicalDevice->GetLogicalDevice(), m_CommandPool, nullptr);
+        CleanupCommandBuffers(logicalDevice);
+        vkDestroyCommandPool(logicalDevice.GetLogicalDevice(), m_CommandPool, nullptr);
     }
 
 }}}
