@@ -1,9 +1,10 @@
 #pragma once
 
-#include <vector>
-#include <algorithm>
-#include <mutex>
-#include <iostream>
+#include "vector"
+#include "algorithm"
+#include "mutex"
+#include "iostream"
+#include "functional"
 
 #include "Module/Module.h"
 #include "Module/ModuleDetails.h"

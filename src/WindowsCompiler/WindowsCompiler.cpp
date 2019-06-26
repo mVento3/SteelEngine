@@ -141,7 +141,7 @@ struct Process
             &m_CmdProcessInfo	//__out        LPPROCESS_INFORMATION lpProcessInformation
         );
 
-        std::string cmdSetParams = "@PROMPT $ \n\"D:/Programs/VS17/VC/Auxiliary/Build/vcvarsall.bat\" x86_amd64\n";
+        std::string cmdSetParams = "vcvarsall x86_amd64\n";
 
         WriteInput(cmdSetParams);
 
