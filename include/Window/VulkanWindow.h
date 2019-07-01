@@ -43,7 +43,7 @@ namespace SteelEngine {
         void SetWidth(const Type::uint32& width) override;
         void SetHeight(const Type::uint32& height) override;
 
-        void GetWindowSize(Type::uint32* width, Type::uint32* height) override;
+        void GetWindowSize(Type::uint32& width, Type::uint32& height) override;
 
         Result GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames) override;
         Result CreateVulkanSurface(void* instance, void** surface) override;

@@ -21,7 +21,7 @@ namespace SteelEngine { namespace Interface {
         virtual void SetWidth(const Type::uint32& width) { }
         virtual void SetHeight(const Type::uint32& height) { }
 
-        virtual void GetWindowSize(Type::uint32* width, Type::uint32* height) { }
+        virtual void GetWindowSize(Type::uint32& width, Type::uint32& height) { }
 
         // Vulkan
         virtual Result GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames) { return SE_NOT_IMPLEMENTED; }

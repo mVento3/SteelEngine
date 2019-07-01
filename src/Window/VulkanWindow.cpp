@@ -79,9 +79,9 @@ namespace SteelEngine {
         m_Height = height;
     }
 
-    void VulkanWindow::GetWindowSize(Type::uint32* width, Type::uint32* height)
+    void VulkanWindow::GetWindowSize(Type::uint32& width, Type::uint32& height)
     {
-        SDL_GetWindowSize(m_Window, (int*)width, (int*)height);
+        SDL_GetWindowSize(m_Window, (int*)&width, (int*)&height);
     }
 
     Result VulkanWindow::GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames)
