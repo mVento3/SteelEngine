@@ -144,7 +144,7 @@ namespace SteelEngine {
 		);
 
 #ifdef SE_WINDOWS
-		std::string cmdSetParams = "@PROMPT $ \n\"D:/Programs/VS17/VC/Auxiliary/Build/vcvarsall.bat\" x86_amd64\n";
+		std::string cmdSetParams = "vcvarsall x86_amd64\n";
 
 		WriteInput(cmdSetParams);
 
@@ -401,7 +401,7 @@ namespace SteelEngine {
 		std::string sourceFilesToCompile = file.string() + " " + generatedFile;
 		std::string objFiles = "";
 		std::string libs = "/LIBPATH:../../bin /LIBPATH:../../external/Vulkan/Lib /LIBPATH:../../external/SDL2-2.0.9/lib/x64 SDL2.lib vulkan-1.lib Module.lib Utils.lib Ws2_32.lib";
-		std::string include = "/I../../include /I../../bin/Runtime/GeneratedReflection /I../../external/SDL2-2.0.9/include /I../../external/Vulkan/Include";
+		std::string include = "/I../../include /I../../bin/Runtime/GeneratedReflection /I../../external/SDL2-2.0.9/include /I../../external/Vulkan/Include /I../../external/glm";
 
 		for(Type::uint32 i = 0; i < m_AdditionalDependencies.size(); i++)
 		{
