@@ -2,6 +2,7 @@
 
 #include "Rendering/Vulkan/SwapChain.h"
 #include "Rendering/Vulkan/RenderPass.h"
+#include "Rendering/Vulkan/Buffer.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
@@ -15,7 +16,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     }
 
-    Result GraphicsPipeline::Create(const LogicalDevice& logicalDevice, const SwapChain& swapChain, const RenderPass& renderPass, std::vector<VkPipelineShaderStageCreateInfo> stages)
+    Result GraphicsPipeline::Create(
+        const LogicalDevice& logicalDevice,
+        const SwapChain& swapChain,
+        const RenderPass& renderPass,
+        const DescriptorSetLayout& desc,
+        std::vector<VkPipelineShaderStageCreateInfo> stages)
     {
         auto bindingDescription = Vertex::GetBindingDescription();
         auto attributeDescription = Vertex::GetAttributeDescriptions();
@@ -64,7 +70,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         rasterizer.polygonMode =                VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth =                  1.0f;
         rasterizer.cullMode =                   VK_CULL_MODE_BACK_BIT;
-        rasterizer.frontFace =                  VK_FRONT_FACE_CLOCKWISE;
+        rasterizer.frontFace =                  VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable =            VK_FALSE;
 
         VkPipelineMultisampleStateCreateInfo multisampling = {};
@@ -93,9 +99,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 
-        pipelineLayoutInfo.sType =                  VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount =         0;
-        pipelineLayoutInfo.pushConstantRangeCount = 0;
+        pipelineLayoutInfo.sType =          VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 1;
+        pipelineLayoutInfo.pSetLayouts =    &desc.m_DescriptorSetLayout;
 
         if(vkCreatePipelineLayout(logicalDevice.GetLogicalDevice(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
         {
@@ -129,10 +135,37 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
-    void GraphicsPipeline::Cleanup(const LogicalDevice& logicalDevice)
+    void GraphicsPipeline::Cleanup(const LogicalDevice& logicalDevice, const SwapChain& swapChain)
     {
         vkDestroyPipeline(logicalDevice.GetLogicalDevice(), m_GraphicsPipeline, nullptr);
         vkDestroyPipelineLayout(logicalDevice.GetLogicalDevice(), m_PipelineLayout, nullptr);
+
+        for(size_t i = 0; i < swapChain.m_SwapChainImages.size(); i++)
+        {
+            vkDestroyBuffer(logicalDevice.GetLogicalDevice(), m_UniformBuffers[i], nullptr);
+            vkFreeMemory(logicalDevice.GetLogicalDevice(), m_UniformBuffersMemory[i], nullptr);
+        }
+    }
+
+    Result GraphicsPipeline::CreateUniformBuffers(const PhysicalDevice& physicalDevice, const LogicalDevice& logicalDevice, const SwapChain& swapChain, Type::uint32 size)
+    {
+        m_UniformBuffers.resize(swapChain.m_SwapChainImages.size());
+        m_UniformBuffersMemory.resize(swapChain.m_SwapChainImages.size());
+
+        for(size_t i = 0; i < swapChain.m_SwapChainImages.size(); i++)
+        {
+            Buffer::CreateBuffer(
+                physicalDevice,
+                logicalDevice,
+                size,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                m_UniformBuffers[i],
+                m_UniformBuffersMemory[i]
+            );
+        }
+
+        return SE_TRUE;
     }
 
 }}}

@@ -4,6 +4,12 @@
 
 #include "Event/GlobalEvent.h"
 
+#include "Rendering/UniformBufferObject.h"
+
+#define GLM_FORCE_RADIANS
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 #undef max
 #undef min
 
@@ -245,6 +251,27 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
+    void Renderer::UpdateUniform(Type::uint32 imageIndex)
+    {
+        static auto startTime = std::chrono::high_resolution_clock::now();
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+        UniformBufferObject ubo;
+
+        ubo.m_Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.m_View = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.m_Projection = glm::perspective(glm::radians(70.0f), (float)m_Width / (float)m_Height, 0.01f, 1000.0f);
+        ubo.m_Projection[1][1] *= -1;
+
+        void* data;
+
+        vkMapMemory(m_LogicalDevice->GetLogicalDevice(), m_GraphicsPipeline->GetUniformMemory(imageIndex), 0, sizeof(ubo), 0, &data);
+        memcpy(data, &ubo, sizeof(ubo));
+        vkUnmapMemory(m_LogicalDevice->GetLogicalDevice(), m_GraphicsPipeline->GetUniformMemory(imageIndex));
+    }
+
     Renderer::Renderer(Interface::IWindow* window) :
         m_Window(window)
     {
@@ -256,15 +283,18 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         m_RenderPass = new RenderPass();
         m_Framebuffer = new Framebuffer();
         m_CommandPool = new CommandPool();
+        m_DescriptorPool = new DescriptorPool();
+
+        m_Descriptor = new DescriptorSetLayout();
 
         m_SomeShader = new Shader(m_LogicalDevice);
         m_Buffer = new VertexBuffer();
+        m_Buffer2 = new VertexBuffer();
+        m_IndexBuffer = new IndexBuffer();
 
         m_CurrentFrame = 0;
         m_FramebufferResized = false;
         m_WindowMinimized = false;
-
-        window->GetWindowSize(&m_Width, &m_Height);
     }
 
     Renderer::~Renderer()
@@ -274,6 +304,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     Result Renderer::Init()
     {
+        m_Window->GetWindowSize(m_Width, m_Height);
+
         if(mc_EnableValidationLayers && !CheckValidationLayerSupport())
         {
             return SE_FALSE;
@@ -316,10 +348,11 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             return SE_FALSE;
         }
 
-        m_SomeShader->LoadShader("", m_ShaderStages);
-        m_Buffer->CreateVertexBuffer(this, sizeof(m_Vertices[0]) * m_Vertices.size(), m_Vertices.data());
+        m_SomeShader->LoadShader("testShader", m_ShaderStages);
 
-        if(m_GraphicsPipeline->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass, m_ShaderStages) == SE_FALSE)
+        m_Descriptor->Create(*m_LogicalDevice);
+
+        if(m_GraphicsPipeline->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass, *m_Descriptor, m_ShaderStages) == SE_FALSE)
         {
             return SE_FALSE;
         }
@@ -339,13 +372,31 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             return SE_FALSE;
         }
 
+        m_Buffer->CreateVertexBuffer(*m_PhysicalDevice, *m_LogicalDevice, *m_CommandPool, m_Vertices.data(), m_Vertices.size());
+        m_Buffer2->CreateVertexBuffer(*m_PhysicalDevice, *m_LogicalDevice, *m_CommandPool, m_Vertices2.data(), m_Vertices2.size());
+        m_IndexBuffer->CreateIndexBuffer(*m_PhysicalDevice, *m_LogicalDevice, *m_CommandPool, m_Indices.data(), m_Indices.size());
+
+        m_VertexArray = { m_Buffer, m_Buffer2 };
+
+        if(m_GraphicsPipeline->CreateUniformBuffers(*m_PhysicalDevice, *m_LogicalDevice, *m_SwapChain, sizeof(UniformBufferObject)) == SE_FALSE)
+        {
+            return SE_FALSE;
+        }
+
+        if(m_DescriptorPool->Create(*m_LogicalDevice, *m_SwapChain, *m_Descriptor, *m_GraphicsPipeline) == SE_FALSE)
+        {
+            return SE_FALSE;
+        }
+
         if(m_CommandPool->CreateCommandBuffers(
             *m_LogicalDevice,
             *m_Framebuffer,
             *m_RenderPass,
             *m_SwapChain,
-            m_Buffer,
-            m_GraphicsPipeline->GetPipeline()) == SE_FALSE)
+            *m_GraphicsPipeline,
+            *m_DescriptorPool,
+            m_VertexArray,
+            m_IndexBuffer) == SE_FALSE)
         {
             return SE_FALSE;
         }
@@ -366,7 +417,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     {
         vkWaitForFences(m_LogicalDevice->GetLogicalDevice(), 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
-        uint32_t imageIndex;
+        Type::uint32 imageIndex;
         
         VkResult result = vkAcquireNextImageKHR(m_LogicalDevice->GetLogicalDevice(), m_SwapChain->m_SwapChain, std::numeric_limits<uint64_t>::max(), m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex);
     
@@ -380,6 +431,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         {
             throw std::runtime_error("Failed to acquire swap chain image!");
         }
+
+        UpdateUniform(imageIndex);
 
         VkSubmitInfo submitInfo = {};
 
@@ -441,9 +494,15 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         m_Framebuffer->Cleanup(*m_LogicalDevice);
         m_CommandPool->Cleanup(*m_LogicalDevice);
-        m_GraphicsPipeline->Cleanup(*m_LogicalDevice);
+        m_GraphicsPipeline->Cleanup(*m_LogicalDevice, *m_SwapChain);
         m_RenderPass->Cleanup(*m_LogicalDevice);
         m_SwapChain->Cleanup(*m_LogicalDevice);
+        m_DescriptorPool->Cleanup(*m_LogicalDevice);
+        m_Descriptor->Cleanup(*m_LogicalDevice);
+
+        m_Buffer->Cleanup(*m_LogicalDevice);
+        m_Buffer2->Cleanup(*m_LogicalDevice);
+        m_IndexBuffer->Cleanup(*m_LogicalDevice);
 
         for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
@@ -474,25 +533,30 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         m_Framebuffer->Cleanup(*m_LogicalDevice);
         m_CommandPool->CleanupCommandBuffers(*m_LogicalDevice);
-        m_GraphicsPipeline->Cleanup(*m_LogicalDevice);
+        m_GraphicsPipeline->Cleanup(*m_LogicalDevice, *m_SwapChain);
         m_RenderPass->Cleanup(*m_LogicalDevice);
         m_SwapChain->Cleanup(*m_LogicalDevice);
+        m_DescriptorPool->Cleanup(*m_LogicalDevice);
 
         m_SwapChain->Create(*m_PhysicalDevice, *m_LogicalDevice, *m_Surface);
         m_RenderPass->Create(*m_LogicalDevice, *m_SwapChain);
 
         m_ShaderStages.clear();
-        m_SomeShader->LoadShader("", m_ShaderStages);
-        m_GraphicsPipeline->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass, m_ShaderStages);
+        m_SomeShader->LoadShader(m_ShaderStages);
+        m_GraphicsPipeline->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass, *m_Descriptor, m_ShaderStages);
         m_SomeShader->Destroy();
         m_Framebuffer->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass);
+        m_GraphicsPipeline->CreateUniformBuffers(*m_PhysicalDevice, *m_LogicalDevice, *m_SwapChain, sizeof(UniformBufferObject));
+        m_DescriptorPool->Create(*m_LogicalDevice, *m_SwapChain, *m_Descriptor, *m_GraphicsPipeline);
         m_CommandPool->CreateCommandBuffers(
             *m_LogicalDevice,
             *m_Framebuffer,
             *m_RenderPass,
             *m_SwapChain,
-            m_Buffer,
-            m_GraphicsPipeline->GetPipeline()
+            *m_GraphicsPipeline,
+            *m_DescriptorPool,
+            m_VertexArray,
+            m_IndexBuffer
         );
     }
 

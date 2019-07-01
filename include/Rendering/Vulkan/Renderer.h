@@ -23,6 +23,10 @@
 #include "Rendering/Vulkan/Framebuffer.h"
 #include "Rendering/Vulkan/CommandPool.h"
 #include "Rendering/Vulkan/Shader.h"
+#include "Rendering/Vulkan/IndexBuffer.h"
+#include "Rendering/Vulkan/Buffer.h"
+#include "Rendering/Vulkan/VertexBuffer.h"
+#include "Rendering/Vulkan/DescriptorPool.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -58,9 +62,23 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         const std::vector<Vertex> m_Vertices =
         {
-            Vertex{{ 0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
-            Vertex{{ 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }},
-            Vertex{{ -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }}
+            {{ -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
+            {{ 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }},
+            {{ 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }},
+            {{ -0.5f, 0.5f }, { 1.0f, 1.0f, 1.0f }}
+        };
+
+        const std::vector<Vertex> m_Vertices2 =
+        {
+            {{ -0.2f, -0.2f }, { 1.0f, 0.0f, 0.0f }},
+            {{ 0.2f, -0.2f }, { 0.0f, 1.0f, 0.0f }},
+            {{ 0.2f, 0.2f }, { 0.0f, 0.0f, 1.0f }},
+            {{ -0.2f, 0.2f }, { 1.0f, 1.0f, 1.0f }}
+        };
+
+        const std::vector<Type::uint16> m_Indices =
+        {
+            0, 1, 2, 2, 3, 0
         };
 
     private:
@@ -77,6 +95,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         RenderPass*         m_RenderPass;
         Framebuffer*        m_Framebuffer;
         CommandPool*        m_CommandPool;
+        DescriptorPool*     m_DescriptorPool;
+        
+        DescriptorSetLayout* m_Descriptor;
 
         std::vector<VkSemaphore> m_ImageAvailableSemaphores;
         std::vector<VkSemaphore> m_RenderFinishedSemaphores;
@@ -92,6 +113,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         Shader*         m_SomeShader;
         VertexBuffer*   m_Buffer;
+        VertexBuffer*   m_Buffer2;
+        IndexBuffer*    m_IndexBuffer;
+
+        std::vector<Buffer*> m_VertexArray;
 
         std::vector<const char*> GetSDL_Extensions();
         void PrintAvailableExtensions();
@@ -112,6 +137,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         Result CreateInstance();
         Result SetupDebugMessenger();
         Result CreateSyncObjects();
+
+        void UpdateUniform(Type::uint32 imageIndex);
 
     public:
         Renderer(SteelEngine::Interface::IWindow* window);

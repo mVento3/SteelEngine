@@ -13,7 +13,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     {
         friend struct QueueFamilyIndices;
         friend struct SwapChainSupportDetails;
-        friend struct VertexBuffer;
+        friend struct Buffer;
     private:
         VkPhysicalDevice m_PhysicalDevice;
 

@@ -18,6 +18,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     {
         friend class PhysicalDevice;
         friend class Renderer;
+        friend class Buffer;
     private:
         VkDevice m_LogicalDevice;
 

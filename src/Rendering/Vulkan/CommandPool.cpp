@@ -6,6 +6,8 @@
 #include "Rendering/Vulkan/SwapChain.h"
 #include "Rendering/Vulkan/QueueFamilyIndices.h"
 #include "Rendering/Vulkan/VertexBuffer.h"
+#include "Rendering/Vulkan/GraphicsPipeline.h"
+#include "Rendering/Vulkan/DescriptorPool.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
@@ -24,8 +26,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         const Framebuffer& framebuffer,
         const RenderPass& renderpass,
         const SwapChain& swapChain,
-        VertexBuffer* vertexBuffer,
-        VkPipeline pipeline)
+        const GraphicsPipeline& graphicsPipeline,
+        const DescriptorPool& descriptorPool,
+        std::vector<Buffer*> vertexVector,
+        Buffer* indexBuffer)
     {
         m_CommandBuffers.resize(framebuffer.m_SwapChainFramebuffers.size());
 
@@ -68,14 +72,18 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
             vkCmdBeginRenderPass(m_CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-                vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+                vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline.m_GraphicsPipeline);
 
-                VkBuffer vertexBuffers[] = { vertexBuffer->GetBuffer() };
-                VkDeviceSize offsets[] = { 0 };
+                for(Buffer* data : vertexVector)
+                {
+                    VkBuffer buff = data->GetBuffer();
+                    VkDeviceSize offsets[] = { 0 };
 
-                vkCmdBindVertexBuffers(m_CommandBuffers[i], 0, 1, vertexBuffers, offsets);
-
-                vkCmdDraw(m_CommandBuffers[i], vertexBuffer->GetSize(), 1, 0, 0);
+                    vkCmdBindVertexBuffers(m_CommandBuffers[i], 0, 1, &buff, offsets);
+                    vkCmdBindIndexBuffer(m_CommandBuffers[i], indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+                    vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline.m_PipelineLayout, 0, 1, &descriptorPool.m_DescriptorSets[i], 0, nullptr);
+                    vkCmdDrawIndexed(m_CommandBuffers[i], indexBuffer->GetCount(), 1, 0, 0, 0);
+                }
 
             vkCmdEndRenderPass(m_CommandBuffers[i]);
 

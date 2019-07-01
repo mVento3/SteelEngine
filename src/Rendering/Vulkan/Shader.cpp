@@ -56,8 +56,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         const std::string& name,
         std::vector<VkPipelineShaderStageCreateInfo>& stages)
     {
-        auto vertShaderCode = ReadFile("bin/Resources/Shaders/vert.spv");
-        auto fragShaderCode = ReadFile("bin/Resources/Shaders/frag.spv");
+        m_Filename = name;
+
+        auto vertShaderCode = ReadFile(/*"bin/Resources/Shaders/vert.spv"*/ "bin/Resources/Shaders/" + name + ".vs");
+        auto fragShaderCode = ReadFile(/*"bin/Resources/Shaders/frag.spv"*/ "bin/Resources/Shaders/" + name + ".fs");
 
         VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
@@ -89,6 +91,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         stages.push_back(fragShaderStageInfo);
         
         return SE_TRUE;
+    }
+
+    Result Shader::LoadShader(
+        std::vector<VkPipelineShaderStageCreateInfo>& stages)
+    {
+        return LoadShader(m_Filename, stages);
     }
 
     void Shader::Destroy()

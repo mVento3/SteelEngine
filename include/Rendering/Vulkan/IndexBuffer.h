@@ -1,49 +1,38 @@
 #pragma once
 
-#include "Core/Result.h"
-#include "Core/Type.h"
-
 #include "Rendering/Vulkan/Buffer.h"
-
-#include "Vulkan/vulkan.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    class Renderer;
-    class PhysicalDevice;
-    class LogicalDevice;
-    class CommandPool;
-
-    class VertexBuffer : public Buffer
+    class IndexBuffer : public Buffer
     {
     private:
-        VkMemoryRequirements m_MemoryRequirements;
 
     public:
-        VertexBuffer();
-        ~VertexBuffer();
+        IndexBuffer();
+        ~IndexBuffer();
 
         template <typename A>
-        Result CreateVertexBuffer(
+        Result CreateIndexBuffer(
             const PhysicalDevice& physicalDevice,
             const LogicalDevice& logicalDevice,
             const CommandPool& commandPool,
             A* data_,
-            Type::uint32 verticesCount
+            Type::uint32 indicesCount
         );
     };
 
     template <typename A>
-    Result VertexBuffer::CreateVertexBuffer(
+    Result IndexBuffer::CreateIndexBuffer(
         const PhysicalDevice& physicalDevice,
         const LogicalDevice& logicalDevice,
         const CommandPool& commandPool,
         A* data_,
-        Type::uint32 verticesCount)
+        Type::uint32 indicesCount)
     {
-        m_Count = verticesCount;
+        m_Count = indicesCount;
 
-        VkDeviceSize size = sizeof(data_[0]) * verticesCount;
+        VkDeviceSize size = sizeof(data_[0]) * indicesCount;
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
 
@@ -67,7 +56,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             physicalDevice,
             logicalDevice,
             size,
-            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
         );
 

@@ -10,6 +10,18 @@ namespace SteelEngine {
 
     struct Vertex
     {
+        Vertex(const glm::vec2& position, const glm::vec3& color) :
+            m_Position(position),
+            m_Color(color)
+        {
+
+        }
+
+        ~Vertex()
+        {
+
+        }
+
         glm::vec2 m_Position;
         glm::vec3 m_Color;
 

@@ -33,6 +33,8 @@ SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_GraphicsPipeline)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_RenderPass)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_Framebuffer)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_CommandPool)
+SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_DescriptorPool)
+SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_Descriptor)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_ImageAvailableSemaphores)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_RenderFinishedSemaphores)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_InFlightFences)
@@ -44,6 +46,9 @@ SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_Width)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_Height)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_SomeShader)
 SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_Buffer)
+SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_Buffer2)
+SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_IndexBuffer)
+SERIALIZE(SteelEngine::Graphics::Vulkan::Renderer::m_VertexArray)
 }
 
 #ifdef RUNTIME_COMPILE

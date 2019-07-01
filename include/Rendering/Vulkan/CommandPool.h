@@ -15,10 +15,13 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     class Surface;
     class RenderPass;
     class SwapChain;
+    class GraphicsPipeline;
+    class DescriptorPool;
 
     class CommandPool
     {
         friend class Renderer;
+        friend class Buffer;
     private:
         VkCommandPool m_CommandPool;
 
@@ -33,8 +36,10 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             const Framebuffer& framebuffer,
             const RenderPass& renderpass,
             const SwapChain& swapChain,
-            VertexBuffer* vertexBuffer,
-            VkPipeline pipeline
+            const GraphicsPipeline& graphicsPipeline,
+            const DescriptorPool& descriptorPool,
+            std::vector<Buffer*> vertexVector,
+            Buffer* indexBuffer
         );
 
         Result Create(

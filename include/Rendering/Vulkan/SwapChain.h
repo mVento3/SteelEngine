@@ -22,6 +22,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         friend class Framebuffer;
         friend class CommandPool;
         friend class Renderer;
+        friend class DescriptorPool;
     private:
         VkSwapchainKHR              m_SwapChain;
         std::vector<VkImage>        m_SwapChainImages;
