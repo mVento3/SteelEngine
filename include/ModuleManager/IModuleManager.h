@@ -1,6 +1,7 @@
 #pragma once
 
-#include <string>
+#include "string"
+#include "filesystem"
 
 namespace SteelEngine { namespace Interface {
 
@@ -19,7 +20,6 @@ namespace SteelEngine { namespace Interface {
 	public:
 		virtual void Load() { }
 		virtual void Unload(const std::string& blackList, Mode mode) { }
-		virtual void SetBinaryLocation(const std::string& binaryLocation) { }
 	};
 
 }}

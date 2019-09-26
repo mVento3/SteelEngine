@@ -8,16 +8,16 @@ namespace SteelEngine {
     }
 
     FileWatcher::FileWatcher(
-        const std::string& path,
-        const std::function<void(const filesystem::path&, FileStatus)>& action) :
+        const std::filesystem::path& path,
+        const std::function<void(const std::filesystem::path&, FileStatus)>& action) :
         m_Path(path),
         m_Action(action)
     {
         m_Running = true;
 
-        for(auto &file : filesystem::recursive_directory_iterator(path))
+        for(auto &file : std::filesystem::recursive_directory_iterator(path))
         {
-            m_Paths[file.path().string()] = filesystem::last_write_time(file);
+            m_Paths[file.path().string()] = std::filesystem::last_write_time(file);
         }
     }
 
@@ -32,7 +32,7 @@ namespace SteelEngine {
 
         while(it != m_Paths.end())
         {
-            if(!filesystem::exists(it->first))
+            if(!std::filesystem::exists(it->first))
             {
                 m_Action(it->first, FileStatus::DELETED);
 
@@ -44,9 +44,9 @@ namespace SteelEngine {
             }
         }
 
-        for(auto& file : filesystem::recursive_directory_iterator(m_Path))
+        for(auto& file : std::filesystem::recursive_directory_iterator(m_Path))
         {
-            auto currentFileLastWriteTime = filesystem::last_write_time(file);
+            auto currentFileLastWriteTime = std::filesystem::last_write_time(file);
 
             std::string file_ = file.path().string();
 

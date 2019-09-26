@@ -1,5 +1,7 @@
 #include "Utils/Utils.h"
 
+#include "Windows.h"
+
 void split(const std::string & s, char delim, std::back_insert_iterator<std::vector<std::string>> result)
 {
 	std::stringstream ss(s);
@@ -78,4 +80,12 @@ void removeSpaces(std::string& str)
 	{
 		str.erase(str.begin() + i - 1, str.end());
 	}
+}
+
+std::filesystem::path getBinaryLocation()
+{
+	char binPath[64];
+	GetModuleFileNameA(GetModuleHandleA(0), binPath, 64);
+
+	return std::filesystem::path(binPath).parent_path();
 }

@@ -54,7 +54,7 @@ namespace SteelEngine {
             {
                 m_CurrentCharacter = m_CurrentLine[m_CharacterIndex++];
 
-                if(m_CurrentCharacter == ' ' && m_Token == "")
+                if((m_CurrentCharacter == ' ' && m_Token == "") || m_CurrentCharacter == '\t')
                 {
                     continue;
                 }
@@ -176,6 +176,14 @@ namespace SteelEngine {
         inline void SaveToken(const std::string& token)
         {
             m_SavedToken.push(token);
+        }
+
+        inline void SkipLine()
+        {
+            m_LineIndex++;
+            m_CurrentLine = m_Lines->at(m_LineIndex);
+            m_CharacterIndex = 0;
+            m_CurrentLineSize = m_CurrentLine.size();
         }
 
         Lexer operator++(int v)

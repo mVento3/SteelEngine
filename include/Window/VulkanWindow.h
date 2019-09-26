@@ -6,7 +6,8 @@
 #include "SDL_vulkan.h"
 
 #include "RuntimeReflection/Macro.h"
-#include "RuntimeReflection/ReflectionAttributes.h"
+
+#include "Core/ReflectionAttributes.h"
 
 #include "RuntimeCompiler/IRuntimeObject.h"
 
@@ -14,8 +15,10 @@
 
 namespace SteelEngine {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE)
-    class VulkanWindow : public Interface::IWindow
+    SE_CLASS(
+        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+    )
+    class VulkanWindow : public IWindow
     {
     public:
         typedef void(*ProcessEventsCallback)(void*);
@@ -32,7 +35,7 @@ namespace SteelEngine {
         VulkanWindow();
         ~VulkanWindow();
 
-        std::function<void(void*, Interface::IWindow*)> m_ProcessEventsCallback;
+        std::function<void(void*, IWindow*)> m_ProcessEventsCallback;
 
         Result Create() override;
         void Update() override;
@@ -44,12 +47,16 @@ namespace SteelEngine {
         void SetHeight(const Type::uint32& height) override;
 
         void GetWindowSize(Type::uint32& width, Type::uint32& height) override;
+        void* GetWindow() const override;
 
         Result GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames) override;
         Result CreateVulkanSurface(void* instance, void** surface) override;
 
         SE_METHOD()
-        void SetProcessEventsCallback(std::function<void(void*, Interface::IWindow*)> callback);
+        inline void SetProcessEventsCallback(std::function<void(void*, IWindow*)> callback)
+        {
+            m_ProcessEventsCallback = callback;
+        }
     };
 
 }

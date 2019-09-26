@@ -4,6 +4,7 @@
 #include "RuntimeReflection/ReflectionConstructor.h"
 #include "RuntimeReflection/MetaDataInfo.h"
 #include "RuntimeReflection/ReflectionEnumeration.h"
+#include "RuntimeReflection/ReflectionInheritance.h"
 
 #include "RuntimeDatabase/RuntimeDatabase.h"
 
@@ -14,16 +15,10 @@
 namespace SteelEngine {
 
 	template <typename Type, typename... Args>
-	Interface::IRuntimeObject* createType(Args... args)
+	void* createType(Args... args)
 	{
 		return new Type(args...);
 	}
-
-	struct Test
-	{
-		MetaDataInfo m_Info;
-		bool m_Done;
-	};
 
 	template <typename T>
 	struct ReflectionData : public IReflectionData
@@ -98,55 +93,13 @@ namespace SteelEngine {
 			m_CurrentBind = CurrentBindFlag::CONSTRUCTOR_BIND;
 
 			ReflectionConstructor<Args...>* cons = new ReflectionConstructor<Args...>(&createType<T, Args...>);
-			std::function<Interface::IRuntimeObject*(Args...)> func;
 
-			cons->m_ConstructorID = typeid(Interface::IRuntimeObject*(Args...)).hash_code();
+			cons->m_ConstructorID = typeid(HotReload::IRuntimeObject*(Args...)).hash_code();
 			cons->m_TypeID = m_TypeID;
 
 			m_Constructors.push_back(cons);
 
 			return *this;
-		}
-
-		Variant GetProperty(const std::string& name, void* object) override
-		{
-			ReflectionProperty<Variant, T>* te = (ReflectionProperty<Variant, T>*)m_Properties.find(name)->second;
-
-			if (!te)
-			{
-				static Variant wrong;
-
-				return wrong;
-			}
-
-			T* object_ = (T*)object;
-			Variant res((object_->*(te->m_Value)), te->m_TypeID);
-
-			return res;
-		}
-
-		IReflectionProperty* GetProperty(const std::string& name) override
-		{
-			return (ReflectionProperty<Variant, T>*)m_Properties.find(name)->second;
-		}
-
-		IReflectionMethod* GetMethod(const std::string& name) override
-		{
-			return m_Methods[name];
-		}
-
-		IReflectionEnumeration* GetEnum(const std::string& name) override
-		{
-			IReflectionEnumeration* res = (IReflectionEnumeration*)m_Enums.find(name)->second;
-
-			if (!res)
-			{
-				IReflectionEnumeration a;
-
-				res = &a;
-			}
-
-			return res;
 		}
 
 		template <typename A, typename B>
@@ -212,8 +165,11 @@ namespace SteelEngine {
 			return *enum_;
 		}
 
+		template <typename A>
 		ReflectionData& Inheritance(const std::string& name)
 		{
+			m_Inheritances.push_back(new ReflectionInheritance(name, typeid(A).hash_code()));
+
 			return *this;
 		}
 
@@ -223,7 +179,7 @@ namespace SteelEngine {
 			std::vector<MetaDataInfo> infos = { args... };
 			static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
 
-			switch (m_CurrentBind)
+			switch(m_CurrentBind)
 			{
 			case CurrentBindFlag::CONSTRUCTOR_BIND:
 			{
@@ -236,7 +192,7 @@ namespace SteelEngine {
 			{
 				MethodsMap::iterator it = m_Methods.begin();
 
-				for (Type::uint32 i = 0; i < m_Methods.size() - 1; i++, it++);
+				for(Type::uint32 i = 0; i < m_Methods.size() - 1; i++, it++);
 
 				ProcessMetaData(db, it->second, infos);
 			}
@@ -245,9 +201,9 @@ namespace SteelEngine {
 			{
 				PropertiesMap::iterator it = m_Properties.begin();
 
-				for (; it != m_Properties.end(); ++it)
+				for(; it != m_Properties.end(); ++it)
 				{
-					if (it->first == m_CurrentBindName)
+					if(it->first == m_CurrentBindName)
 					{
 						break;
 					}
@@ -264,6 +220,49 @@ namespace SteelEngine {
 			}
 
 			return *this;
+		}
+
+		Variant GetProperty(const std::string& name, void* object) override
+		{
+			ReflectionProperty<Variant, T>* te = (ReflectionProperty<Variant, T>*)m_Properties.find(name)->second;
+
+			if(!te)
+			{
+				static Variant wrong;
+
+				return wrong;
+			}
+
+			T* object_ = (T*)object;
+			Variant res = GetInfo(te);
+
+			res.Reassign((ValuePointer*)&(object_->*(te->m_Value)));
+
+			return res;
+		}
+
+		IReflectionProperty* GetProperty(const std::string& name) override
+		{
+			return (ReflectionProperty<Variant, T>*)m_Properties.find(name)->second;
+		}
+
+		IReflectionMethod* GetMethod(const std::string& name) override
+		{
+			return m_Methods[name];
+		}
+
+		IReflectionEnumeration* GetEnum(const std::string& name) override
+		{
+			IReflectionEnumeration* res = (IReflectionEnumeration*)m_Enums.find(name)->second;
+
+			if(!res)
+			{
+				IReflectionEnumeration a;
+
+				res = &a;
+			}
+
+			return res;
 		}
 	};
 

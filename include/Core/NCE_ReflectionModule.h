@@ -4,16 +4,16 @@
 
 #include "RuntimeReflection/Macro.h"
 #include "RuntimeReflection/ReflectionGenerator.h"
-#include "RuntimeReflection/ReflectionAttributes.h"
 
-#include "Event/globalevent.h"
+#include "Event/GlobalEvent.h"
 
-#include "NCE_ReflectionModule.Generated.h"
+#include "Core/NCE_ReflectionModule.Generated.h"
+#include "Core/ReflectionAttributes.h"
 
 namespace SteelEngine {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::SE_REFLECTION_MODULE)
-    class NCE_ReflectionModule : public Interface::IRuntimeObject
+    SE_CLASS(SteelEngine::ReflectionAttribute::REFLECTION_MODULE)
+    class NCE_ReflectionModule : public HotReload::IRuntimeObject
     {
         GENERATED_BODY
     private:

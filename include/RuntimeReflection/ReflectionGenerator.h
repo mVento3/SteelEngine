@@ -8,7 +8,9 @@
 
 namespace SteelEngine {
 
-	class ReflectionGenerator : public Interface::IReflectionGenerator
+	struct IReflectionData;
+
+	class ReflectionGenerator : public IReflectionGenerator
 	{
 	public:
 		enum ProtectionFlag
@@ -95,6 +97,7 @@ namespace SteelEngine {
 			std::vector<ClassMethod>		m_Methods;
 			std::vector<EnumInfo>			m_Enums;
 			std::vector<std::string> 		m_Hierarchy;
+			IReflectionData*				m_Data;
 			bool m_Reflect;
 
 			std::vector<ClassData*> m_Others;
@@ -111,6 +114,7 @@ namespace SteelEngine {
 			const std::vector<ReflectionGenerator::MetaDataInfo>* m_MetaData;
 			const std::string m_ClassName;
 			const std::vector<InheritanceInfo>* m_Inheritance;
+			const IReflectionData* m_Data;
 		};
 
 		struct SE_ValueMacroEvent
@@ -130,6 +134,11 @@ namespace SteelEngine {
 
 		};
 
+		struct GenerateMethodReflection
+		{
+			std::vector<ClassMethod> m_Methods;
+		};
+
 	// Source Parsing Events
 
 	// Header Generate Events
@@ -143,15 +152,13 @@ namespace SteelEngine {
 		struct GenerateSourceEvent
 		{
 			std::ofstream* m_Out;
-			const std::string m_NamespacedClassName;
+			const std::string m_ClassName;
 		};
 
 	private:
 		std::vector<std::string> m_HeaderLines;
-		std::vector<std::string> m_SourceLines;
 
-		filesystem::path m_PathSource;
-		filesystem::path m_PathHeader;
+		std::filesystem::path m_PathHeader;
 
 		ProtectionFlag m_LastProtectionFlag;
 
@@ -159,7 +166,6 @@ namespace SteelEngine {
 		std::vector<ClassData*> 	m_Classes;
 
 		void ParseHeader();
-		void ParseSource();
 		std::vector<MetaDataInfo> ParseMeta(const std::string& line);
 		void GenerateMetaDataInfo(std::ofstream& out, std::vector<MetaDataInfo> meta);
 
@@ -167,11 +173,9 @@ namespace SteelEngine {
 		ReflectionGenerator();
 		~ReflectionGenerator();
 
-		std::vector<std::string> m_Dependencies;
-
-		Result Load(const filesystem::path& fileCpp, const filesystem::path& fileH) override;
+		Result Load(const std::filesystem::path& fileH) override;
 		Result Parse() override;
-		Result Generate(const filesystem::path& generatePath) override;
+		Result Generate(const std::filesystem::path& cwd, const std::filesystem::path& generatePath) override;
 		void Clear() override;
 	};
 

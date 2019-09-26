@@ -6,10 +6,22 @@ namespace SteelEngine { namespace Module {
 
     Result Load(const std::string& filename, void** dll)
     {
-        *dll = LoadLibraryA(filename.c_str());
+        *dll = LoadLibraryA(filename.c_str()); 
 
         if(!*dll)
         {
+            DWORD errorMessageID = GetLastError();
+
+            LPSTR messageBuffer = nullptr;
+            size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                        NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+
+            std::string message(messageBuffer, size);
+
+            LocalFree(messageBuffer);
+
+            printf("Module %s error: %s\n", filename.c_str(), message.c_str());
+
             return Result(SE_FALSE, "Could not load library!");
         }
 

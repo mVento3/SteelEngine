@@ -45,3 +45,13 @@ external/Vulkan/**
 !external/Vulkan/.gitkeep
 external/SDL2-2.0.9/**
 !external/SDL2-2.0.9/.gitkeep
+external/glew-2.1.0/**
+!external/glew-2.1.0/.gitkeep
+external/glm/**
+!external/glm/.gitkeep
+external/imgui/**
+!external/imgui/.gitkeep
+external/json-develop/**
+!external/json-develop/.gitkeep
+external/Python/**
+!external/Python/.gitkeep

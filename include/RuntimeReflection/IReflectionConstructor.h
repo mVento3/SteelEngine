@@ -15,7 +15,7 @@ namespace SteelEngine {
 		size_t m_ConstructorID = RuntimeDatabase::s_InvalidID;
 		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
 
-		virtual Interface::IRuntimeObject* Invoke(ITuple* args) { return 0; }
+		virtual HotReload::IRuntimeObject* Invoke(ITuple* args) { return 0; }
 	};
 
 }

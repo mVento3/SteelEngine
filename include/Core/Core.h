@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Core/ICore.h"
+#include "FileSystem/FileSystem.h"
 
 #include "Networking/INetwork.h"
+#include "Networking/INetworkManager.h"
 
 #include "RuntimeReflection/Macro.h"
 #include "RuntimeReflection/Reflection.h"
-#include "RuntimeReflection/ReflectionAttributes.h"
-
-#include "Core.Generated.h"
 
 #include "RuntimeCompiler/RuntimeCompiler.h"
 #include "RuntimeCompiler/Serializer.h"
@@ -16,23 +14,45 @@
 #include "Utils/Utils.h"
 #include "Utils/Time.h"
 
-#include "Core/Server.h"
-
 #include "Logger/Logger.h"
 
-#include "Rendering/IRenderer.h"
-
-#include "FileSystem/FileSystem.h"
+#include "Graphics/IRenderer.h"
 
 #include "Window/IWindow.h"
+#include "Window/ResizeEvent.h"
+#include "Window/MinimizedEvent.h"
+#include "Window/MaximizedEvent.h"
+
+#include "Graphics/IEditor.h"
+#include "Graphics/Renderer.h"
+
+#include "VirtualProject/IVirtualProject.h"
+#include "VirtualProject/LoadedProjectEvent.h"
+
+#include "PythonCore/IPythonCore.h"
+
+#include "nlohmann/json.hpp"
+
+#include "ImGUI_Editor/IContext.h"
+
+#include "Core/ICore.h"
+#include "Core/ReflectionAttributes.h"
+#include "Core/Core.Generated.h"
+#include "Core/GetCompileConfigEvent.h"
 
 // 1. Fix problem with properties in proper class, especially while nesting
+// 2. Replace ImGUI_Program from vulkan to editor module, to do this i need create good render api
 
 namespace SteelEngine {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE)
-    class Core : public Interface::ICore
+    using json = nlohmann::json;
+
+    SE_CLASS(
+        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
+    )
+    class Core : public ICore
     {
+        friend class PythonCore;
         GENERATED_BODY
     public:
         enum EnginePathVariant
@@ -41,26 +61,34 @@ namespace SteelEngine {
             GAME_DEV
         };
 
-        enum EngineInfo
+        // enum EngineInfo
+        // {
+        //     IS_SERVER,
+        //     SERVER_IP
+        // };
+
+        enum GlobalSystems
         {
-            IS_SERVER,
-            SERVER_IP
+            PYTHON
         };
 
     private:
-        RuntimeCompiler*        m_RuntimeCompiler;
-        Interface::INetwork*    m_Network;
-        Interface::ILogger*     m_Logger;
-        Interface::IRenderer*   m_Renderer;
-        Interface::IWindow*     m_Window;
+        HotReload::RuntimeCompiler* m_RuntimeCompiler;
+        IReflectionGenerator*       m_ReflectionGenerator;
+        Interface::ILogger*         m_Logger;
+        Graphics::IRenderer**       m_Renderer;
+        IWindow*                    m_Window;
+        Editor::IEditor**           m_Editor;
+        IVirtualProject**           m_VirtualProject;
+        Network::INetworkManager*   m_NetworkManager;
+        Script::IPython*            m_Python;
+        IContext*                   m_ImGUI_ContextAPI;
+
+        json m_CompileConfig;
 
         bool m_Running;
 
         EnginePathVariant m_EnginePathVariant;
-
-        Variant* meta;
-        Variant* meta2;
-        Variant* meta3;
 
         float m_Delta;
         Type::uint32 m_Frames;
@@ -73,12 +101,6 @@ namespace SteelEngine {
         Core();
         ~Core();
 
-        SE_VALUE(
-            "lol" = 1212,
-            SteelEngine::ReflectionAttribute::SE_RUNTIME_SERIALIZE = 11
-        )
-        bool ta;
-
         void Update() override;
 
         SE_METHOD()
@@ -90,7 +112,9 @@ namespace SteelEngine {
         SE_METHOD()
         void SetPathVariant(EnginePathVariant variant);
 
-        void operator()(const Interface::IWindow::WindowCloseEvent& event);
+        void operator()(const IWindow::WindowCloseEvent& event);
+        void operator()(const LoadedProjectEvent& event);
+        void operator()(GetCompileConfigEvent* event);
     };
 
 }

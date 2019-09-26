@@ -2,16 +2,15 @@
 
 #include "Networking/INetwork.h"
 #include "Networking/Config.h"
-
-#include "Networking/GetNetCommandEvent.h"
+#include "Networking/INetworkCommand.h"
 
 #include "RuntimeReflection/Macro.h"
 #include "RuntimeReflection/Reflection.h"
-#include "RuntimeReflection/ReflectionAttributes.h"
 
-#include "Client.Generated.h"
+#include "Networking/Client.Generated.h"
 
 #include "Core/Result.h"
+#include "Core/ReflectionAttributes.h"
 
 #include "ws2tcpip.h"
 #include "thread"
@@ -25,22 +24,20 @@
 namespace SteelEngine {
 
     SE_CLASS()
-    class Client : public Interface::INetwork
+    class Client : public Network::INetwork
     {
         GENERATED_BODY
     private:
         SOCKET m_Socket;
         std::thread* m_Thread;
-        std::queue<char*> m_Commands;
-        NetworkCommands::INetworkCommand* m_Command;
-        Variant* m_ServerInfo;
-        std::vector<NetworkCommands::INetworkCommand*> m_CommandTypes;
+        std::queue<Network::INetworkCommand*> m_Commands;
+        char* m_Buffer;
+
+        Network::INetworkManager* m_NetworkManager;
 
     public:
         Client();
         ~Client();
-
-        bool m_SendingHugeBlock = false;
 
         SE_METHOD()
         Result Connect(const char* ip = "127.0.0.1");
@@ -54,10 +51,17 @@ namespace SteelEngine {
         SE_METHOD()
         int Receive(SOCKET sock, char* buffer, Type::uint32 size) override;
 
-        SE_METHOD()
-        std::queue<char*>* GetCommands();
+        int SendSerialized(const std::string& buffer, Type::uint32 size);
 
-        void operator()(NetworkCommands::INetworkCommand* event);
+        void SetNetworkManager(Network::INetworkManager* networkManager) override { m_NetworkManager = networkManager; }
+
+        SE_METHOD()
+        std::queue<Network::INetworkCommand*>* GetCommands()
+        {
+            return &m_Commands;
+        }
+
+        void operator()(Network::INetworkCommand* event);
     };
 
 }

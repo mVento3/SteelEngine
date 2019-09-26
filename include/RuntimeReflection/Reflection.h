@@ -14,16 +14,11 @@
 #include "RuntimeReflection/ReflectionData.h"
 #include "RuntimeReflection/MetaDataInfo.h"
 
-#include "Event/globalevent.h"
+#include "Event/GlobalEvent.h"
 
 #include "ModuleManager/ModuleManager.h"
 
 #include "Core/Type.h"
-
-#define CHECK_DATABASE \
-static RuntimeDatabase* db; \
-if (!db) \
-	db = LoadDatabase();
 
 namespace SteelEngine {
 
@@ -41,17 +36,34 @@ namespace SteelEngine {
 
 	public:
 		template <typename Type>
-		static ReflectionData<Type>& Register(const std::string& name)
+		static ReflectionData<Type>& Register(const std::string& name, const std::vector<std::string>& namespaces)
 		{
 			CHECK_DATABASE
 
 			ReflectionData<Type>* type = 0;
 
-			for (SteelEngine::Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(SteelEngine::Type::uint32 i = 0; i < db->m_Types->size(); i++)
 			{
 				IReflectionData* data = (IReflectionData*)db->m_Types->at(i);
+				std::string dataTypeName = "";
 
-				if (data->m_TypeName == name)
+				for(std::string name : data->m_Namespaces)
+				{
+					dataTypeName += name + "::";
+				}
+
+				dataTypeName += data->m_TypeName;
+
+				std::string typeName = "";
+
+				for(std::string name : namespaces)
+				{
+					typeName += name + "::";
+				}
+
+				typeName += typeName;
+
+				if(dataTypeName == typeName)
 				{
 					type = (ReflectionData<Type>*)data;
 
@@ -59,7 +71,67 @@ namespace SteelEngine {
 				}
 			}
 
-			if (!type)
+			if(!type)
+			{
+				type = new ReflectionData<Type>();
+
+				type->m_TypeName = name;
+				type->m_TypeID = typeid(Type).hash_code();
+
+				db->m_Types->push_back(type);
+
+				type->m_Namespaces.insert(type->m_Namespaces.begin(), namespaces.begin(), namespaces.end());
+			}
+			else if(type)
+			{
+				for(SteelEngine::Type::uint32 i = 0; i < type->m_ConstructorsToClear.size(); i++)
+				{
+					delete type->m_ConstructorsToClear[i];
+				}
+
+				type->m_ConstructorsToClear.clear();
+
+				type->m_ConstructorsToClear.insert(
+					type->m_ConstructorsToClear.begin(),
+					type->m_Constructors.begin(),
+					type->m_Constructors.end()
+				);
+
+				type->m_Constructors.clear();
+				type->m_MetaDatas.clear();
+				type->m_Namespaces.clear();
+
+				type->m_Namespaces.insert(type->m_Namespaces.begin(), namespaces.begin(), namespaces.end());
+			}
+
+			if(type)
+			{
+				type->m_CurrentBind = IReflectionData::CurrentBindFlag::TYPE_BIND;
+			}
+
+			return *type;
+		}
+
+		template <typename Type>
+		static ReflectionData<Type>& Register(const std::string& name)
+		{
+			CHECK_DATABASE
+
+			ReflectionData<Type>* type = 0;
+
+			for(SteelEngine::Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			{
+				IReflectionData* data = (IReflectionData*)db->m_Types->at(i);
+
+				if(data->m_TypeName == name)
+				{
+					type = (ReflectionData<Type>*)data;
+
+					break;
+				}
+			}
+
+			if(!type)
 			{
 				type = new ReflectionData<Type>();
 
@@ -85,6 +157,7 @@ namespace SteelEngine {
 
 				type->m_Constructors.clear();
 				type->m_MetaDatas.clear();
+				type->m_Namespaces.clear();
 			}
 
 			type->m_CurrentBind = IReflectionData::CurrentBindFlag::TYPE_BIND;
@@ -98,7 +171,7 @@ namespace SteelEngine {
 
 			CHECK_DATABASE
 
-			for (Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
 			{
 				res.push_back((IReflectionData*)db->m_Types->at(i));
 			}
@@ -110,11 +183,76 @@ namespace SteelEngine {
 		{
 			CHECK_DATABASE
 
-			for (Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			// for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			// {
+			// 	IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+
+			// 	if(type->GetTypeName() == name)
+			// 	{
+			// 		return type;
+			// 	}
+			// }
+
+			std::string name_ = name;
+
+			replaceAll(name_, "::", ":");
+
+			std::vector<std::string> splitted = split(name_, ':');
+
+			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
 			{
 				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
 
-				if (type->GetTypeName() == name)
+				if(type->m_Namespaces.size() == splitted.size() - 1)
+				{
+					bool isEqual = true;
+
+					for(Type::uint32 i = 0; i < splitted.size() - 1; i++)
+					{
+						if(type->m_Namespaces[i] != splitted[i])
+						{
+							isEqual = false;
+
+							break;
+						}
+					}
+
+					if(type->m_TypeName == splitted[splitted.size() - 1] && isEqual)
+					{
+						return type;
+					}
+				}
+			}
+
+			return 0;
+		}
+
+		static IReflectionData* GetType(size_t typeID)
+		{
+			CHECK_DATABASE
+
+			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			{
+				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+
+				if(type->m_TypeID == typeID)
+				{
+					return type;
+				}
+			}
+
+			return 0;
+		}
+
+		static IReflectionData* GetType(const HotReload::IRuntimeObject* object)
+		{
+			CHECK_DATABASE
+
+			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			{
+				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+
+				if(type->m_TypeID == object->m_TypeID)
 				{
 					return type;
 				}
@@ -130,7 +268,7 @@ namespace SteelEngine {
 
 			CHECK_DATABASE
 
-			for (Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
 			{
 				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
 
@@ -144,38 +282,37 @@ namespace SteelEngine {
 		}
 
 		template <typename... Args>
-		static Interface::IRuntimeObject* CreateInstance(const std::string& name, Args... args)
+		static HotReload::IRuntimeObject* CreateInstance(const std::string& name, Args... args)
 		{
 			CHECK_DATABASE
 
-			for (Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			std::string name_ = name;
+
+			replaceAll(name_, "::", ":");
+
+			std::vector<std::string> splitted = split(name_, ':');
+
+			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
 			{
 				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
 
-				if (type->m_TypeName == name)
+				if(type->m_Namespaces.size() == splitted.size() - 1)
 				{
-					std::vector<IReflectionConstructor*>& cons = type->m_Constructors;
+					bool isEqual = true;
 
-					for (Type::uint32 j = 0; j < cons.size(); j++)
+					for(Type::uint32 i = 0; i < splitted.size() - 1; i++)
 					{
-						IReflectionConstructor* con = cons[j];
-
-						if (con->m_ConstructorID == typeid(Interface::IRuntimeObject*(Args...)).hash_code())
+						if(type->m_Namespaces[i] != splitted[i])
 						{
-							ReflectionConstructor<Args...>* con_ = (ReflectionConstructor<Args...>*)con;
-							Interface::IRuntimeObject* createdObject = (Interface::IRuntimeObject*)con_->m_Function(args...);
+							isEqual = false;
 
-							createdObject->m_Object = createdObject;
-							createdObject->m_ConstructorID = con->m_ConstructorID;
-							createdObject->m_ObjectID = db->m_LastPerObjectID++;
-							createdObject->m_TypeID = type->m_TypeID;
-
-							Event::GlobalEvent::Add<RecompiledEvent>(createdObject->m_Object);
-
-							db->m_Objects->push_back(new ConstrucedObject(createdObject->m_ObjectID, con->m_ConstructorID, type->m_TypeID, new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
-
-							return createdObject;
+							break;
 						}
+					}
+
+					if(type->m_TypeName == splitted[splitted.size() - 1] && isEqual)
+					{
+						return type->Create(args...);
 					}
 				}
 			}
@@ -184,44 +321,46 @@ namespace SteelEngine {
 		}
 
 		template <typename T, typename... Args>
-		static Interface::IRuntimeObject* CreateInstance(Args... args)
+		static HotReload::IRuntimeObject* CreateInstance(Args... args)
 		{
 			size_t typeID = typeid(T).hash_code();
 
 			CHECK_DATABASE
 
-			for (Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
 			{
 				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
 
-				if (type->m_TypeID == typeID)
+				if(type->m_Namespaces.size() == splitted.size() - 1)
 				{
-					std::vector<IReflectionConstructor*>& cons = type->m_Constructors;
+					bool isEqual = true;
 
-					for (Type::uint32 j = 0; j < cons.size(); j++)
+					for(Type::uint32 i = 0; i < splitted.size() - 1; i++)
 					{
-						IReflectionConstructor* con = cons[j];
-
-						if (con->m_ConstructorID == typeid(Interface::IRuntimeObject*(Args...)).hash_code())
+						if(type->m_Namespaces[i] != splitted[i])
 						{
-							ReflectionConstructor<Args...>* con_ = (ReflectionConstructor<Args...>*)con;
-							Interface::IRuntimeObject* createdObject = (Interface::IRuntimeObject*)con_->m_Function(args...);
+							isEqual = false;
 
-							createdObject->m_Object = createdObject;
-							createdObject->m_ConstructorID = con->m_ConstructorID;
-							createdObject->m_ObjectID = db->m_LastPerObjectID++;
-							createdObject->m_TypeID = type->m_TypeID;
-
-							db->m_Objects->push_back(new ConstrucedObject(createdObject->m_ObjectID, con->m_ConstructorID, type->m_TypeID, new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
-
-							return createdObject;
+							break;
 						}
+					}
+
+					if(type->m_TypeID == typeID && isEqual)
+					{
+						return type->Create(args...);
 					}
 				}
 			}
 
 			return 0;
 		}
+
+		// static void DestroyInstance(HotReload::IRuntimeObject* object)
+		// {
+		// 	Event::GlobalEvent::Remove<RecompiledEvent>(object);
+		// 	delete object;
+		// 	object = 0;
+		// }
 
 		template <typename KeyType, typename ValueType>
 		static MetaDataInfo MetaData(KeyType key, ValueType value)

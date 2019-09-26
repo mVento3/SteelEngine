@@ -41,15 +41,15 @@ for (SteelEngine::Type::uint32 i = 0; i < vec->size(); i++) \
 }
 
 #define COMPARE_CONSTRUCTOR_() \
-if (constructorID == typeid(SteelEngine::Interface::IRuntimeObject*()).hash_code()) \
+if (constructorID == typeid(SteelEngine::HotReload::IRuntimeObject*()).hash_code()) \
 { \
-	return (SteelEngine::Interface::IRuntimeObject*)SteelEngine::createType<ClassType>(); \
+	return (SteelEngine::HotReload::IRuntimeObject*)SteelEngine::createType<ClassType>(); \
 }
 
 #define COMPARE_CONSTRUCTOR(...) \
-if (constructorID == typeid(SteelEngine::Interface::IRuntimeObject*(__VA_ARGS__)).hash_code()) \
+if (constructorID == typeid(SteelEngine::HotReload::IRuntimeObject*(__VA_ARGS__)).hash_code()) \
 { \
 	SteelEngine::Tuple<__VA_ARGS__>* tupleArguments = (SteelEngine::Tuple<__VA_ARGS__>*)obj->m_Args; \
  \
-	return (SteelEngine::Interface::IRuntimeObject*)apply(SteelEngine::createType<ClassType, __VA_ARGS__>, tupleArguments->m_Args); \
+	return (SteelEngine::HotReload::IRuntimeObject*)apply(SteelEngine::createType<ClassType, __VA_ARGS__>, tupleArguments->m_Args); \
 }

@@ -18,10 +18,10 @@ namespace SteelEngine {
 		friend struct MetaDataImplementation;
 		friend struct MetaDataInfo;
 		friend struct IReflectionData;
+		friend struct IReflectionProperty;
 	private:
 		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
 		ValuePointer* m_ValuePointer;
-		bool m_Pending;
 		size_t m_VariantID = RuntimeDatabase::s_InvalidID;
 
 		template <typename T>
@@ -39,6 +39,8 @@ namespace SteelEngine {
 			m_IsFloatingPoint	= std::is_floating_point<T>::value;
 			m_IsReference		= std::is_reference<T>::value;
 			m_IsEmpty			= std::is_empty<T>::value;
+
+			m_TypeID = typeid(T).hash_code();
 		}
 
 	public:
@@ -81,10 +83,34 @@ namespace SteelEngine {
 
 		template <typename T>
 		Variant(T& value, size_t typeID, bool pending = false) :
-			m_TypeID(typeID),
-			m_Pending(pending)
+			m_TypeID(typeID)
 		{
 			m_ValuePointer = (ValuePointer*)(new T(value));
+
+			m_IsPointer			= std::is_pointer<T>::value;
+			m_IsArray			= std::is_array<T>::value;
+			m_IsArithmetic		= std::is_arithmetic<T>::value;
+			m_IsAbstract		= std::is_abstract<T>::value;
+			m_IsClass			= std::is_class<T>::value;
+			m_IsCompound		= std::is_compound<T>::value;
+			m_IsConst			= std::is_const<T>::value;
+			m_IsEnum			= std::is_enum<T>::value;
+			m_IsIntegral		= std::is_integral<T>::value;
+			m_IsFloatingPoint	= std::is_floating_point<T>::value;
+			m_IsReference		= std::is_reference<T>::value;
+			m_IsEmpty			= std::is_empty<T>::value;
+
+			static RuntimeDatabase* db =
+				(RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+
+			m_VariantID = db->m_LastPerVariantID++;
+		}
+
+		template <typename T>
+		Variant(T* value)
+		{
+			m_TypeID = typeid(T).hash_code();
+			m_ValuePointer = (ValuePointer*)value;
 
 			m_IsPointer			= std::is_pointer<T>::value;
 			m_IsArray			= std::is_array<T>::value;
@@ -144,7 +170,7 @@ namespace SteelEngine {
 		template <typename Type>
 		Type Convert()
 		{
-			if (!IsValid())
+			if(!IsValid())
 			{
 				Result wrong(SE_FALSE, "");
 
@@ -161,6 +187,15 @@ namespace SteelEngine {
 
 			m_ValuePointer = (ValuePointer*)(new T(value));
 			m_TypeID = typeid(T).hash_code();
+
+			return old;
+		}
+
+		ValuePointer* Reassign(ValuePointer* value)
+		{
+			ValuePointer* old = m_ValuePointer;
+
+			m_ValuePointer = value;
 
 			return old;
 		}
@@ -184,6 +219,11 @@ namespace SteelEngine {
 		inline size_t GetType()
 		{
 			return m_TypeID;
+		}
+
+		inline ValuePointer* GetAddress()
+		{
+			return m_ValuePointer;
 		}
 
 		template <typename T>

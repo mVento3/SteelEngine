@@ -2,14 +2,17 @@
 
 #include "RuntimeCompiler/IRuntimeObject.h"
 
-#include "Core/Platform.h"
+#include "filesystem"
 
-namespace SteelEngine { namespace Interface {
+namespace SteelEngine {
 
-    struct IFileSystem : public IRuntimeObject
+    struct IFileSystem : public HotReload::IRuntimeObject
     {
-        virtual void MapImpl(const std::string& name, const filesystem::path& dir) { }
-        virtual const filesystem::path& GetImpl(const std::string& name) { return "NONE"; }
+    protected:
+
+    public:
+        virtual void MapImpl(const std::string& name, const std::filesystem::path& dir) { }
+        virtual const std::filesystem::path& GetImpl(const std::string& name) { return "NONE"; }
     };
 
-}}
+}

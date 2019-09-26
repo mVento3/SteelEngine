@@ -13,7 +13,7 @@ namespace SteelEngine {
 	template <typename... Args>
 	struct ReflectionConstructor : public NoTupleReflectionConstructor
 	{
-		typedef Interface::IRuntimeObject*(*Func)(Args...);
+		typedef void*(*Func)(Args...);
 
 		Func m_Function;
 
@@ -23,7 +23,7 @@ namespace SteelEngine {
 
 		}
 
-		Interface::IRuntimeObject* Invoke(ITuple* args) override
+		HotReload::IRuntimeObject* Invoke(ITuple* args) override
 		{
 			static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
 
@@ -38,7 +38,7 @@ namespace SteelEngine {
 				tuple = (Tuple<Args...>*)args;
 			}
 
-			Interface::IRuntimeObject* object = apply(m_Function, tuple->m_Args);
+			HotReload::IRuntimeObject* object = (HotReload::IRuntimeObject*)apply(m_Function, tuple->m_Args);
 
 			object->m_Object = object;
 			object->m_ConstructorID = m_ConstructorID;

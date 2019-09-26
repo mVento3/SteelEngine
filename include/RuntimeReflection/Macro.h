@@ -1,8 +1,5 @@
 #pragma once
 
-#include "RuntimeCompiler/RecompiledEvent.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-
 #define SE_CLASS(...)
 #define SE_STRUCT(...)
 #define SE_VALUE(...)

@@ -20,16 +20,16 @@ namespace SteelEngine {
 
 		}
 
-		void Call(T& obj, Args... args)
+		void Call(T* obj, Args... args)
 		{
-			return (obj.*m_FunctionCallback)(std::forward<Args>(args)...);
+			(obj->*m_FunctionCallback)(std::forward<Args>(args)...);
 		}
 
 		Variant Invoke(void* obj, Args... args) override
 		{
 			T* type = (T*)obj;
 
-			Call(*type, args...);
+			Call(type, args...);
 
 			static Result noneRes(SE_FALSE, "NONE");
 			static Variant none(noneRes, typeid(noneRes).hash_code());

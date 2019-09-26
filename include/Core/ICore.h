@@ -2,12 +2,12 @@
 
 #include "RuntimeCompiler/IRuntimeObject.h"
 
-namespace SteelEngine { namespace Interface {
+namespace SteelEngine {
 
-    struct ICore : public IRuntimeObject
+    struct ICore : public HotReload::IRuntimeObject
     {
         virtual void Start() { }
         virtual void Stop() { }
     };
 
-}}
+}

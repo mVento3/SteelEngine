@@ -25,7 +25,10 @@
         {
             "name": "Windows",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/external/json-develop/include",
+                "${workspaceFolder}/external/Python/include",
+                "${workspaceFolder}/external/glew-2.1.0/include"
             ],
             "defines": [
                 "_DEBUG",
@@ -33,7 +36,7 @@
                 "_UNICODE",
                 "SE_WINDOWS"
             ],
-            "compilerPath": "D:/Programs/VS17/VC/Tools/MSVC/14.14.26428/bin/Hostx64/x64/cl.exe",
+            "compilerPath": "D:/Programs/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.21.27702/bin/Hostx64/x64/cl.exe",
             "cppStandard": "c++17",
             "intelliSenseMode": "msvc-x64",
             "browse": {

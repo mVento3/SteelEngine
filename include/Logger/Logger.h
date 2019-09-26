@@ -4,13 +4,11 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Logger.Generated.h"
+#include "Logger/Logger.Generated.h"
 
 #include "vector"
 #include "fstream"
 #include "cstdarg"
-
-#include "Core/Platform.h"
 
 #undef FATAL
 #undef ERROR

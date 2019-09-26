@@ -10,7 +10,7 @@ namespace SteelEngine {
         argv += (argc > 0);
 
         m_Arguments = "";
-
+ 
         for(Type::uint32 i = 0; i < argc; i++)
         {
             m_Arguments.append(argv[i]);

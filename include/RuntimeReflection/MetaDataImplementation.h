@@ -21,8 +21,6 @@ namespace SteelEngine {
 
 			meta.m_Value->m_TypeID = RuntimeDatabase::s_InvalidID;
 
-			//m_MetaDatas.push_back(meta);
-
 			return meta.m_Value;
 		}
 

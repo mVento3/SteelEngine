@@ -1,21 +1,23 @@
 #pragma once
 
 #include "RuntimeReflection/Macro.h"
-#include "RuntimeReflection/ReflectionAttributes.h"
 #include "RuntimeReflection/ReflectionGenerator.h"
 
 #include "RuntimeCompiler/IRuntimeObject.h"
 
-#include "RCS_ReflectionModule.Generated.h"
+#include "Core/RCS_ReflectionModule.Generated.h"
+#include "Core/ReflectionAttributes.h"
 
-#include "Event/globalevent.h"
+#include "Event/GlobalEvent.h"
 
 #include "Utils/Utils.h"
 
 namespace SteelEngine {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::SE_REFLECTION_MODULE)
-    class RCS_ReflectionModule : public Interface::IRuntimeObject
+    SE_CLASS(
+        SteelEngine::ReflectionAttribute::REFLECTION_MODULE
+    )
+    class RCS_ReflectionModule : public HotReload::IRuntimeObject
     {
         GENERATED_BODY
     private:
@@ -23,7 +25,7 @@ namespace SteelEngine {
         bool m_GenerateSerializeFunction;
 
         std::vector<std::string> m_PropertiesToSerialize;
-        std::vector<std::string> m_Inheritance;
+        std::vector<size_t> m_Inheritance;
 
     public:
         RCS_ReflectionModule();

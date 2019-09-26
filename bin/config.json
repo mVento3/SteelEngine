@@ -1,0 +1,146 @@
+{
+	"compiler": {
+		"flags": [
+			"Od",
+			"ZI",
+			"DEBUG:FASTLINK",
+			"std:c++17"
+		],
+		"definitions": [
+			"SE_WINDOWS",
+			"_WINSOCKAPI_"
+		],
+		"dll": [
+			"MT",
+			"LD"
+		],
+		"includes": [
+			"include",
+			"build/GeneratedReflection",
+			"external/SDL2-2.0.9/include",
+			"external/Vulkan/Include",
+			"external/glm",
+			"external",
+			"external/imgui",
+			"external/json-develop/include",
+			"external/Python/include",
+			"external/glew-2.1.0/include"
+		],
+		"lib_paths": [
+			"bin",
+			"external/Vulkan/Lib",
+			"external/SDL2-2.0.9/lib/x64",
+			"external/Python/libs",
+			"external/glew-2.1.0/lib/Release/x64"
+		],
+		"libs": [
+			"SDL2.lib",
+			"vulkan-1.lib",
+			"Module.lib",
+			"Utils.lib",
+			"Event.lib",
+			"InformationTracker.lib",
+			"Ws2_32.lib",
+			"imgui.lib",
+			"python37.lib",
+			"glew32.lib",
+			"OpenGL32.lib"
+		],
+		"libs2": [
+			"SDL2.lib",
+			"vulkan-1.lib",
+			"Ws2_32.lib",
+			"imgui.lib",
+			"python37.lib",
+			"glew32.lib",
+			"OpenGL32.lib"
+		]
+	},
+	"projects_path": "D:/Projects/SteelEngine",
+	"modules": [
+		{
+			"name": "FileWatcher",
+			"type": "lib"
+		},
+		{
+			"name": "InformationTracker",
+			"type": "lib"
+		},
+		{
+			"name": "Module",
+			"type": "lib"
+		},
+		{
+			"name": "Utils",
+			"type": "lib"
+		},
+		{
+			"name": "Event",
+			"type": "lib"
+		},
+		{
+			"name": "Core",
+			"type": "dll"
+		},
+		{
+			"name": "Application",
+			"type": "lib"
+		},
+		{
+			"name": "ReflectionGenerator",
+			"type": "exe"
+		},
+		{
+			"name": "Graphics",
+			"type": "dll"
+		},
+		{
+			"name": "ImGUI_Editor",
+			"type": "dll"
+		},
+		{
+			"name": "VirtualProject",
+			"type": "dll"
+		},
+		{
+			"name": "Window",
+			"type": "dll"
+		},
+		{
+			"name": "ModuleManager",
+			"type": "dll"
+		},
+		{
+			"name": "RuntimeReflection",
+			"type": "dll"
+		},
+		{
+			"name": "RuntimeCompiler",
+			"type": "dll"
+		},
+		{
+			"name": "RuntimeDatabase",
+			"type": "dll"
+		},
+		{
+			"name": "Networking",
+			"type": "dll"
+		},
+		{
+			"name": "Logger",
+			"type": "dll"
+		},
+		{
+			"name": "FileSystem",
+			"type": "dll"
+		},
+		{
+			"name": "PythonCore",
+			"type": "dll"
+		},
+		{
+			"name": "Engine",
+			"type": "exe"
+		}
+	]
+}

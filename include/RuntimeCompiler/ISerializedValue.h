@@ -1,6 +1,6 @@
 #pragma once
 
-namespace SteelEngine { namespace Interface {
+namespace SteelEngine { namespace HotReload {
 
 	struct ISerializedValue
 	{

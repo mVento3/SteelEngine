@@ -2,6 +2,7 @@
 
 #include "vector"
 #include "cstring"
+#include "functional"
 
 namespace SteelEngine {
 
@@ -80,7 +81,7 @@ namespace SteelEngine {
             for(Type::uint32 i = 0; i < value.size(); i++)
             {
                 *t = value[i];
-                
+
                 size_t s = sizeof(char);
                 totalSize -= s;
 
@@ -162,6 +163,40 @@ namespace SteelEngine {
             }
 
             *out = (char*)t;
+        }
+
+        template <typename _Res, typename... _Args>
+        static void SerializeType(size_t& totalSize, _Res(*fn_ptr)(_Args...), char* in, char** out)
+        {
+            _Res(**func)(_Args...) = (_Res(**)(_Args...))in;
+
+            *func = fn_ptr;
+            size_t s = sizeof(fn_ptr);
+            totalSize -= s;
+
+            if(totalSize > 0)
+            {
+                func++;
+            }
+
+            *out = (char*)func;
+        }
+
+        template <typename _Res, typename... _Args>
+        static void DeserializeType(size_t& totalSize, _Res(*&fn_ptr)(_Args...), char* in, char** out)
+        {
+            _Res(**func)(_Args...) = (_Res(**)(_Args...))in;
+
+            fn_ptr = *func;
+            size_t s = sizeof(fn_ptr);
+            totalSize -= s;
+
+            if(totalSize > 0)
+            {
+                func++;
+            }
+
+            *out = (char*)func;
         }
 
         template <typename A>
@@ -270,6 +305,12 @@ namespace SteelEngine {
             char* t = (char*)sizePtr;
 
             totalSize -= s;
+
+            // Dont sure if this should be like that
+            if(totalSize == 0)
+            {
+                totalSize += size;
+            }
 
             value.clear();
 
@@ -468,7 +509,6 @@ namespace SteelEngine {
             char* dataStream = new char[totalSize];
 
             char* temp = dataStream;
-
             size_t* stringSizePtr = (size_t*)temp;
 
             *stringSizePtr = totalSize;
@@ -486,7 +526,6 @@ namespace SteelEngine {
         static void DeserializeStream(char* dataStream, Types& ...value)
         {
             char* temp = dataStream;
-
             size_t* stringSizePtr = (size_t*)temp;
 
             size_t totalSize = *stringSizePtr;
@@ -496,6 +535,23 @@ namespace SteelEngine {
             temp = (char*)stringSizePtr;
 
             int _[] = {0, (DeserializeType(totalSize, value, temp, &temp), 0)...};
+        }
+
+        template <typename... Types>
+        static size_t DeserializeStreamS(char* dataStream, Types& ...value)
+        {
+            char* temp = dataStream;
+            size_t* stringSizePtr = (size_t*)temp;
+
+            size_t totalSize = *stringSizePtr;
+            stringSizePtr++;
+            totalSize -= sizeof(size_t);
+
+            temp = (char*)stringSizePtr;
+
+            int _[] = {0, (DeserializeType(totalSize, value, temp, &temp), 0)...};
+
+            return totalSize;
         }
 
         inline char* GetDataStream()

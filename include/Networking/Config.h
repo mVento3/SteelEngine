@@ -6,7 +6,7 @@ namespace SteelEngine {
 
     enum
     {
-        SE_SERVER_INFO
+        SERVER_INFO
     };
 
     struct ServerInfo

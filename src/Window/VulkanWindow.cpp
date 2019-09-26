@@ -84,6 +84,11 @@ namespace SteelEngine {
         SDL_GetWindowSize(m_Window, (int*)&width, (int*)&height);
     }
 
+    void* VulkanWindow::GetWindow() const
+    {
+        return m_Window;
+    }
+
     Result VulkanWindow::GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames)
     {
         if(!m_Window)
@@ -111,11 +116,6 @@ namespace SteelEngine {
         }
 
         return SE_TRUE;
-    }
-
-    void VulkanWindow::SetProcessEventsCallback(std::function<void(void*, Interface::IWindow*)> callback)
-    {
-        m_ProcessEventsCallback = callback;
     }
 
 }

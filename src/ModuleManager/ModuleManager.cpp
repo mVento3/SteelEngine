@@ -4,8 +4,6 @@
 
 #include "Utils/Utils.h"
 
-#include "Core/Platform.h"
-
 extern "C"
 {
 	__declspec(dllexport) void* getState()
@@ -74,9 +72,9 @@ namespace SteelEngine {
 
 	void ModuleManager::Load()
 	{
-		for (const auto& entry : filesystem::directory_iterator(m_BinaryLocation))
+		for(const auto& entry : std::filesystem::directory_iterator(getBinaryLocation()))
 		{
-			filesystem::path path = entry.path();
+			std::filesystem::path path = entry.path();
 
 #ifdef SE_WINDOWS
 			if (path.extension().string() == ".dll")
@@ -86,9 +84,7 @@ namespace SteelEngine {
 			{
 				void* module;
 
-				std::string test = path.string();
-
-				Module::Load(test, (void**)&module);
+				Module::Load(path.string(), (void**)&module);
 
 				Module::Details* info;
 
@@ -186,18 +182,6 @@ namespace SteelEngine {
 			{
 				Module::Free(&info.m_Raw);
 			}
-		}
-	}
-
-	void ModuleManager::SetBinaryLocation(const std::string& binaryLocation)
-	{
-		if(binaryLocation != "")
-		{
-			m_BinaryLocation = filesystem::current_path().string() + "/" + binaryLocation;
-		}
-		else
-		{
-			m_BinaryLocation = filesystem::current_path();
 		}
 	}
 

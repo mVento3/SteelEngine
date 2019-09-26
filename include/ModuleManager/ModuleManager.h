@@ -5,9 +5,8 @@
 #include "Module/Module.h"
 #include "Module/ModuleExport.h"
 
-#include "Core/Platform.h"
-
 #include "vector"
+#include "filesystem"
 #include "string"
 
 namespace SteelEngine {
@@ -40,8 +39,6 @@ namespace SteelEngine {
 		std::vector<ModuleInfo> m_Modules;
 		std::vector<ReflectionModuleInfo> m_ReflectedModules;
 
-		filesystem::path m_BinaryLocation;
-
 		void* GetModuleLocal(const std::string& name) override;
 
 		bool FreeIf(const std::vector<std::string>& a, const std::string& b, Mode mode);
@@ -70,7 +67,6 @@ namespace SteelEngine {
 
 		void Load() override;
 		void Unload(const std::string& blackList, Mode mode) override;
-		void SetBinaryLocation(const std::string& binaryLocation) override;
 
 		static void LoadAll()
 		{
@@ -91,13 +87,6 @@ namespace SteelEngine {
 			static ModuleManager* mm = GetModuleManager();
 
 			return mm->GetModuleLocal(name);
-		}
-
-		static void SetGlobalBinaryLocation(const std::string& binaryLocation)
-		{
-			static ModuleManager* mm = GetModuleManager();
-
-			mm->SetBinaryLocation(binaryLocation);
 		}
 	};
 

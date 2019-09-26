@@ -3,6 +3,8 @@
 #include "Module/ModuleExport.h"
 #include "Module/ModuleDetails.h"
 
+#include "Windows.h"
+
 namespace SteelEngine {
 
     FileSystem::FileSystem()
@@ -15,19 +17,19 @@ namespace SteelEngine {
 
     }
     
-    void FileSystem::MapImpl(const std::string& name, const filesystem::path& dir)
+    void FileSystem::MapImpl(const std::string& name, const std::filesystem::path& dir)
     {
         m_MappedDirectories[name] = dir;
     }
 
-    const filesystem::path& FileSystem::GetImpl(const std::string& name)
+    const std::filesystem::path& FileSystem::GetImpl(const std::string& name)
     {
         return m_MappedDirectories[name];
     }
 
     void FileSystem::operator()(const RecompiledEvent& event)
 	{
-		
+
 	}
 
 }

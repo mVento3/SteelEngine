@@ -13,10 +13,15 @@
 
 namespace SteelEngine {
 
-	namespace Interface {
+	namespace HotReload {
 
 		struct IRuntimeObject;
 		struct IRuntimeCompiler;
+
+	}
+
+	namespace Interface {
+
 		struct ILogger;
 		struct IFileSystem;
 
@@ -45,7 +50,7 @@ namespace SteelEngine {
 
 		~Tuple()
 		{
-			
+
 		}
 	};
 
@@ -59,7 +64,7 @@ namespace SteelEngine {
 
 		~Tuple2()
 		{
-			
+
 		}
 	};
 
@@ -70,9 +75,9 @@ namespace SteelEngine {
 		size_t m_TypeID;
 
 		ITuple* m_Args;
-		Interface::IRuntimeObject* m_Object;
+		HotReload::IRuntimeObject* m_Object;
 
-		ConstrucedObject(size_t objectID, size_t constructorID, size_t typeID, ITuple* args, Interface::IRuntimeObject* obj) :
+		ConstrucedObject(size_t objectID, size_t constructorID, size_t typeID, ITuple* args, HotReload::IRuntimeObject* obj) :
 			m_ObjectID(objectID),
 			m_ConstructorID(constructorID),
 			m_TypeID(typeID),
@@ -83,7 +88,7 @@ namespace SteelEngine {
 		}
 	};
 
-	class RuntimeDatabase : public Interface::IRuntimeDatabase
+	class RuntimeDatabase : public IRuntimeDatabase
 	{
   	public:
 		typedef void*(*GetStateCallback)();
@@ -115,7 +120,7 @@ namespace SteelEngine {
 		TypesVector* m_Types; // Only for reflection
 		ConstructedObjectsVector* m_Objects; // Created and running objects
 
-		Interface::IRuntimeCompiler* m_Compiler;
+		HotReload::IRuntimeCompiler* m_Compiler;
 		size_t m_LastPerObjectID;
 		size_t m_LastPerVariantID;
 

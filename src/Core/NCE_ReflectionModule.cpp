@@ -21,7 +21,7 @@ namespace SteelEngine {
 
     void NCE_ReflectionModule::operator()(const RecompiledEvent& event)
     {
-        
+
     }
 
     void NCE_ReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)
@@ -30,7 +30,7 @@ namespace SteelEngine {
         {
             ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
 
-            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_NETWORK_COMMAND)) != std::string::npos)
+            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::NETWORK_COMMAND)) != std::string::npos)
             {
                 m_NetCommand = true;
 
@@ -65,7 +65,7 @@ namespace SteelEngine {
         {
             ReflectionGenerator::MetaDataInfo meta = prop.m_MetaData[i];
 
-            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_NET_VALUE)))
+            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::NET_VALUE)))
             {
                 m_Properties.push_back(prop);
             }
@@ -84,14 +84,13 @@ namespace SteelEngine {
 
     void NCE_ReflectionModule::operator()(const ReflectionGenerator::GenerateHeaderEvent& event)
     {
-        std::ofstream& out = *event.m_Out;
-
         if(m_NetCommand)
         {
+            event.m_GeneratedBodyMacro->push_back("private:");
             event.m_GeneratedBodyMacro->push_back("char* Serialize(char* data, size_t& totalSize) override");
             event.m_GeneratedBodyMacro->push_back("{");
             {          
-                event.m_GeneratedBodyMacro->push_back("char* out = INetworkCommand::Serialize(data, totalSize);");
+                event.m_GeneratedBodyMacro->push_back("char* out = SteelEngine::Network::INetworkCommand::Serialize(data, totalSize);");
                     
                 for(Type::uint32 i = 0; i < m_Properties.size(); i++)
                 {
@@ -105,7 +104,7 @@ namespace SteelEngine {
             event.m_GeneratedBodyMacro->push_back("char* Deserialize(char* data, size_t& totalSize) override");
             event.m_GeneratedBodyMacro->push_back("{");
             {
-                event.m_GeneratedBodyMacro->push_back("char* out = INetworkCommand::Deserialize(data, totalSize);");
+                event.m_GeneratedBodyMacro->push_back("char* out = SteelEngine::Network::INetworkCommand::Deserialize(data, totalSize);");
                 
                 for(Type::uint32 i = 0; i < m_Properties.size(); i++)
                 {
@@ -119,7 +118,7 @@ namespace SteelEngine {
             event.m_GeneratedBodyMacro->push_back("void CalculateSize(size_t& totalSize) override");
             event.m_GeneratedBodyMacro->push_back("{");
             {
-                event.m_GeneratedBodyMacro->push_back("INetworkCommand::CalculateSize(totalSize);");
+                event.m_GeneratedBodyMacro->push_back("SteelEngine::Network::INetworkCommand::CalculateSize(totalSize);");
 
                 for(Type::uint32 i = 0; i < m_Properties.size(); i++)
                 {

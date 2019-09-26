@@ -101,9 +101,10 @@
         "scoped_allocator": "cpp",
         "typeindex": "cpp",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "parentbad": "cpp"
     },
-    "python.pythonPath": "D:\\Programs\\Python37\\python.exe",
+    "python.pythonPath": "D:\\Programs\\Microsoft Visual Studio\\Shared\\Python37_64\\python.exe",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true
 }

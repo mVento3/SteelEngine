@@ -5,28 +5,28 @@
 
 namespace SteelEngine {
 
-	class Serializer : public Interface::ISerializer
+	class Serializer : public HotReload::ISerializer
 	{
 	public:
-		typedef std::map<std::string, const Interface::ISerializedValue*> TValueGroup;
+		typedef std::map<std::string, const HotReload::ISerializedValue*> TValueGroup;
 		typedef std::map<size_t, TValueGroup> TSerializationMap;
 
 	private:
-		Interface::IRuntimeObject* m_CurrentObject;
+		HotReload::IRuntimeObject* m_CurrentObject;
 
 		TSerializationMap			m_SerializationMap;
 		TSerializationMap::iterator m_CurrentSerialization;
 
 		bool m_IsLoading;
 
-		void SetISerializedValue(const char* propertyName, const Interface::ISerializedValue* pValue) override;
-		const Interface::ISerializedValue* GetISerializedValue(const char* propertyName) const override;
+		void SetISerializedValue(const char* propertyName, const HotReload::ISerializedValue* pValue) override;
+		const HotReload::ISerializedValue* GetISerializedValue(const char* propertyName) const override;
 
 	public:
 		Serializer();
 		~Serializer();
 
-		void Serialize(Interface::IRuntimeObject* object);
+		void Serialize(HotReload::IRuntimeObject* object);
 
 		void Clear() override;
 		void Clear(size_t id) override;

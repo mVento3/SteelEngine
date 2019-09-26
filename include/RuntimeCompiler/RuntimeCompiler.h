@@ -3,27 +3,34 @@
 #include "RuntimeCompiler/IRuntimeCompiler.h"
 #include "RuntimeCompiler/Serializer.h"
 #include "RuntimeCompiler/SwapModuleEvent.h"
+#include "RuntimeCompiler/RuntimeCompiler.Generated.h"
+
+#include "RuntimeCompiler/Events/StopRecompilingEvent.h"
+#include "RuntimeCompiler/Events/StartRecompilingEvent.h"
 
 #include "windows.h"
 #include "string"
 
 #include "FileWatcher/FileWatcher.h"
 
-#include "RuntimeReflection/ReflectionGenerator.h"
+#include "RuntimeReflection/IReflectionGenerator.h"
 #include "RuntimeReflection/Macro.h"
 
-#include "Networking/SwapModuleNetCommandEvent.h"
 #include "Networking/Config.h"
 
-#include "RuntimeCompiler.Generated.h"
+#include "PythonProcess/IPythonProcess.h"
 
-namespace SteelEngine {
+#include "Core/GetCompileConfigEvent.h"
+
+namespace SteelEngine { namespace HotReload {
 
     SE_CLASS()
-    class RuntimeCompiler : public Interface::IRuntimeCompiler
+    class RuntimeCompiler : public IRuntimeCompiler
     {
         GENERATED_BODY
     public:
+        typedef IPythonProcess*(*ProcessAllocator)();
+
         struct Thread
         {
             Thread()
@@ -44,20 +51,22 @@ namespace SteelEngine {
         const static std::string cs_CompletionToken;
 
     private:
-        FileWatcher*            m_SourceFileWatcher;
-        ReflectionGenerator*    m_ReflectionGenerator;
+        FileWatcher*                    m_SourceFileWatcher;
+        IReflectionGenerator*           m_ReflectionGenerator;
+        SteelEngine::IPythonProcess*    m_Process;
 
-        filesystem::path m_BinaryLocation;
+        std::filesystem::path m_BinaryLocation;
+        Utils::json m_CompileConfig;
+        bool m_Once;
+        bool m_IsSwapComplete;
+        bool m_Paused = false;
+        bool m_Initialized = false;
 
         std::vector<Thread*> m_Threads;
         std::vector<HotModule> m_LoadedHotModules;
+        std::vector<std::string> m_ObjFilesToDelete;
 
         std::string m_ModuleName;
-        std::string m_SourceFile;
-
-        std::vector<std::string> m_AdditionalDependencies;
-
-        Result SetupProcess();
 
         void GenerateModuleName();
 
@@ -65,28 +74,22 @@ namespace SteelEngine {
         RuntimeCompiler();
         ~RuntimeCompiler();
 
-        bool m_IsCompileComplete;
-        bool m_IsSwapComplete;
-        bool m_Error;
-
-        HANDLE m_CmdProcessOutputRead;
-		HANDLE m_CmdProcessInputWrite;
-
-        PROCESS_INFORMATION m_CmdProcessInfo;
-
         Result Initalize() override;
         void Cleanup() override;
 
         void Update() override;
-        void Compile(const filesystem::path& file) override;
+        void Compile(const std::filesystem::path& file) override;
         void SwapModule(const std::string& moduleName) override;
-
-        void WriteInput(const std::string& input);
 
         void operator()(const SwapModuleEvent& event);
 
-        inline Result IsCompileComplete() override { return m_IsCompileComplete; }
+        void operator()(const StopRecompilingEvent& event);
+        void operator()(const StartRecompilingEvent& event);
+
+        inline Result IsCompileComplete() override { return m_Process->IsCompileComplete(); }
         inline Result IsSwapComplete() override { return m_IsSwapComplete; }
+
+        void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) override { m_ReflectionGenerator = reflectionGenerator; }
     };
 
-}
+}}

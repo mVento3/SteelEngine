@@ -28,19 +28,21 @@ namespace SteelEngine {
         {
             ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
 
-            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
+            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::RUNTIME_SERIALIZE)) != std::string::npos)
             {
                 m_SerializeAll = true;
             }
-            else if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_NO_SERIALIZE)) != std::string::npos)
+            else if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::NO_SERIALIZE)) != std::string::npos)
             {
                 m_GenerateSerializeFunction = false;
             }
         }
 
-        for(Type::uint32 i = 0; i < event.m_Inheritance->size(); i++)
+        const std::vector<IReflectionInheritance*> inhs = event.m_Data->GetInheritances();
+
+        for(Type::uint32 i = 0; i < inhs.size(); i++)
         {
-            m_Inheritance.push_back(event.m_Inheritance->at(i).m_Name);
+            m_Inheritance.push_back(inhs[i]->GetTypeID());
         }
     }
 
@@ -49,8 +51,8 @@ namespace SteelEngine {
         if(m_GenerateSerializeFunction)
         {
             event.m_GeneratedBodyMacro->push_back("public:");
-            event.m_GeneratedBodyMacro->push_back("void Serialize(SteelEngine::Interface::ISerializer* serializer) override;");
-            event.m_GeneratedBodyMacro->push_back("void operator()(const SteelEngine::RecompiledEvent& event_) override;");
+            event.m_GeneratedBodyMacro->push_back("virtual void Serialize(SteelEngine::HotReload::ISerializer* serializer) override;");
+            event.m_GeneratedBodyMacro->push_back("virtual void operator()(const SteelEngine::RecompiledEvent& event_) override;");
         }
     }
 
@@ -66,7 +68,7 @@ namespace SteelEngine {
             {
                 ReflectionGenerator::MetaDataInfo meta = event.m_Info->m_MetaData[i];
 
-                if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::SE_RUNTIME_SERIALIZE)) != std::string::npos)
+                if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::RUNTIME_SERIALIZE)) != std::string::npos)
                 {
                     m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
                 }
@@ -78,29 +80,23 @@ namespace SteelEngine {
     {
         std::ofstream& out = *event.m_Out;
 
-        if (m_GenerateSerializeFunction)
+        if(m_GenerateSerializeFunction)
         {
-            out << "void " + event.m_NamespacedClassName + "::Serialize(SteelEngine::Interface::ISerializer* serializer)\n";
+            out << "void " + event.m_ClassName + "::Serialize(SteelEngine::HotReload::ISerializer* serializer)\n";
             out << "{\n";
             {
-                for (Type::uint32 i = 0; i < m_PropertiesToSerialize.size(); i++)
+                for(Type::uint32 i = 0; i < m_PropertiesToSerialize.size(); i++)
                 {					
-                    out << "SERIALIZE(" << event.m_NamespacedClassName << "::" << m_PropertiesToSerialize[i] << ")\n";
+                    out << "SERIALIZE(" << event.m_ClassName << "::" << m_PropertiesToSerialize[i] << ")\n";
                 }
 
-                for (std::string inh : m_Inheritance)
+                for(size_t inh : m_Inheritance)
                 {
-                    std::string curr = inh;
+                    IReflectionData* data = Reflection::GetType(inh);
 
-                    replaceAll(curr, "::", " ");
-
-                    std::vector<std::string> splitted = split(curr, ' ');
-
-                    IReflectionData* data = Reflection::GetType(splitted[splitted.size() - 1]);
-
-                    if (data)
+                    if(data)
                     {
-                        out << inh << "::Serialize(serializer);\n";
+                        out << data->GetTypeName() << "::Serialize(serializer);\n";
                     }
                 }
             }

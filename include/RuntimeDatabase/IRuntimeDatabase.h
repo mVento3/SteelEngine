@@ -1,10 +1,10 @@
 #pragma once
 
-namespace SteelEngine { namespace Interface {
+namespace SteelEngine {
 
     struct IRuntimeDatabase
     {
 
     };
 
-}}
+}

@@ -4,7 +4,7 @@
 
 namespace SteelEngine {
 
-	void Serializer::SetISerializedValue(const char* propertyName, const Interface::ISerializedValue* pValue)
+	void Serializer::SetISerializedValue(const char* propertyName, const HotReload::ISerializedValue* pValue)
 	{
 		assert(m_CurrentObject);
 		assert(pValue);
@@ -20,13 +20,13 @@ namespace SteelEngine {
 		m_CurrentSerialization->second[propertyName] = pValue;
 	}
 
-	const Interface::ISerializedValue* Serializer::GetISerializedValue(const char* propertyName) const
+	const HotReload::ISerializedValue* Serializer::GetISerializedValue(const char* propertyName) const
 	{
 		assert(m_CurrentObject);
 		assert(propertyName);
 		assert(m_IsLoading);
 
-		const Interface::ISerializedValue* pRet = NULL;
+		const HotReload::ISerializedValue* pRet = NULL;
 
 		//TSerializationMap::const_iterator found = m_map.find(ownerId);
 		if(m_CurrentSerialization != m_SerializationMap.end())
@@ -52,7 +52,7 @@ namespace SteelEngine {
 		Clear();
 	}
 
-	void Serializer::Serialize(Interface::IRuntimeObject* object)
+	void Serializer::Serialize(HotReload::IRuntimeObject* object)
 	{
 		assert(object);
 		assert(0 == m_CurrentObject);

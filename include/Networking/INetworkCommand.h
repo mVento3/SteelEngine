@@ -6,7 +6,6 @@
 #include "RuntimeCompiler/IRuntimeObject.h"
 
 #include "RuntimeReflection/Reflection.h"
-#include "RuntimeReflection/ReflectionAttributes.h"
 #include "RuntimeReflection/Macro.h"
 
 #include "Utils/Utils.h"
@@ -15,15 +14,11 @@
 
 #include "vector"
 
+#include "Core/ReflectionAttributes.h"
+
 #define HEADER_SIZE 50
 
-namespace SteelEngine { namespace NetworkCommands {
-
-    struct MessageData
-    {
-        char* m_Data = 0;
-        size_t m_Size = 0;
-    };
+namespace SteelEngine { namespace Network {
 
     enum CommunicationFlow
     {
@@ -31,16 +26,19 @@ namespace SteelEngine { namespace NetworkCommands {
         CLIENT_TO_SERVER
     };
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::SE_NO_SERIALIZE)
-    struct INetworkCommand : public Interface::IRuntimeObject
+    SE_CLASS(SteelEngine::ReflectionAttribute::NO_SERIALIZE)
+    struct INetworkCommand : public HotReload::IRuntimeObject
     {
-        SE_VALUE(SteelEngine::ReflectionAttribute::SE_NET_VALUE)
+        SE_VALUE(SteelEngine::ReflectionAttribute::NET_VALUE)
         CommunicationFlow m_Flow;
 
-        SE_VALUE(SteelEngine::ReflectionAttribute::SE_NET_VALUE)
+        SE_VALUE(SteelEngine::ReflectionAttribute::NET_VALUE)
         std::string m_Header;
 
-        std::vector<INetworkCommand*>* m_Commands;
+        bool m_Deserialized = false;
+        bool m_Busy = false;
+
+        const std::vector<INetworkCommand*>* m_Commands;
 
         virtual char* Serialize(char* data, size_t& totalSize)
         {
@@ -56,14 +54,6 @@ namespace SteelEngine { namespace NetworkCommands {
         {
             char* out = data;
 
-            size_t* stringSizePtr = (size_t*)out;
-
-            totalSize = *stringSizePtr;
-            stringSizePtr++;
-            totalSize -= sizeof(size_t);
-
-            out = (char*)stringSizePtr;
-
             Serialization::DeserializeType(totalSize, m_Header, out, &out);
             Serialization::DeserializeType(totalSize, m_Flow, out, &out);
 
@@ -76,8 +66,8 @@ namespace SteelEngine { namespace NetworkCommands {
             Serialization::CalculateTotalSize(totalSize, m_Flow);
         }
 
-        virtual void ServerSide(Interface::INetwork* network, SOCKET sock) { }
-        virtual void ClientSide(Interface::INetwork* network, SOCKET sock) { }
+        virtual void ServerSide(Network::INetwork* network, SOCKET sock) { }
+        virtual void ClientSide(Network::INetwork* network, SOCKET sock) { }
     };
 
 }}

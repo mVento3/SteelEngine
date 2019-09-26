@@ -3,9 +3,12 @@
 #include "Module/ModuleExport.h"
 
 #include "RuntimeReflection/Reflection.h"
-#include "RuntimeReflection/ReflectionAttributes.h"
+
+#include "Core/ReflectionAttributes.h"
 
 #include "Utils/Utils.h"
+
+#include "FileSystem/FileSystem.h"
 
 SE_PLUGIN(SteelEngine::ReflectionGenerator, "ReflectionGenerator", SteelEngine::Module::Details::PluginType::CORE_PLUGIN, SteelEngine::Module::Details::PluginFlag::NONE)
 
@@ -34,6 +37,7 @@ namespace SteelEngine {
 		bool seClass = false;
 		bool seValue = false;
 		bool seMethod = false;
+		bool seEnum = false;
 
 		m_LastProtectionFlag = ProtectionFlag::NOT_SPECIFIED;
 
@@ -58,8 +62,7 @@ namespace SteelEngine {
 			}
 			else if(lexer.GetToken() == "friend")
 			{
-				lexer++;
-				lexer++;
+				lexer.SkipLine();
 			}
 			else if(lexer.GetToken() == "struct" ||
 				lexer.GetToken() == "class")
@@ -95,6 +98,20 @@ namespace SteelEngine {
 				currentData->m_ClassName = lexer.GetToken();
 				currentData->m_Hierarchy = namespaces;
 				namespaces.push_back(lexer.GetToken());
+
+				std::string namespaced = "";
+
+				for(Type::uint32 i = 0; i < namespaces.size(); i++)
+				{
+					namespaced += namespaces[i];
+
+					if(i < namespaces.size() - 1)
+					{
+						namespaced += "::";
+					}
+				}
+
+				currentData->m_Data = Reflection::GetType(namespaced);
 
 				lexer++;
 
@@ -207,11 +224,12 @@ namespace SteelEngine {
 				}
 
 				Event::GlobalEvent::Broadcast(SE_ClassMacroEvent
-					{
-						&currentData->m_ClassMetaDataInfo,
-						currentData->m_ClassName,
-						&currentData->m_Inheritance
-					});
+				{
+					&currentData->m_ClassMetaDataInfo,
+					currentData->m_ClassName,
+					&currentData->m_Inheritance,
+					currentData->m_Data
+				});
 			}
 			else if(lexer.GetToken() == "public")
 			{
@@ -543,12 +561,15 @@ namespace SteelEngine {
 				std::string word = "";
 				bool wasEqual = false;
 				MetaDataInfo meta;
+				std::stack<bool> roundBraces;
+
+				roundBraces.push(true);
 
 				while(1)
 				{
 					lexer++;
 
-					if(lexer.GetToken() == ")")
+					if(lexer.GetToken() == ")" && roundBraces.size() == 1)
 					{
 						if(wasEqual && word != "")
 						{
@@ -569,7 +590,17 @@ namespace SteelEngine {
 
 						break;
 					}
-					else if(lexer.GetToken() == ",")
+					else if(lexer.GetToken() == ")")
+					{
+						word += lexer.GetToken();
+						roundBraces.pop();
+					}
+					else if(lexer.GetToken() == "(")
+					{
+						word += lexer.GetToken();
+						roundBraces.push(true);
+					}
+					else if(lexer.GetToken() == "," && roundBraces.size() == 1)
 					{
 						if(wasEqual)
 						{
@@ -677,6 +708,10 @@ namespace SteelEngine {
 
 						lexer++;
 					}
+					else if(lexer.GetToken() == "inline")
+					{
+						lexer++;
+					}
 
 					word += lexer.GetToken();
 
@@ -701,7 +736,7 @@ namespace SteelEngine {
 			}
 			else if(lexer.GetToken() == "GENERATED_BODY")
 			{
-				
+
 			}
 			else if(lexer.GetToken() == "#pragma")
 			{
@@ -710,19 +745,6 @@ namespace SteelEngine {
 			else if(lexer.GetToken() == "#include")
 			{
 				lexer++;
-
-				std::string token = lexer.GetToken();
-
-				token.erase(token.begin());
-				token.erase(token.end() - 1);
-
-				std::vector<std::string> splitted = split(token, '/');
-				std::vector<std::string> splitted2 = split(splitted[splitted.size() - 1], '.');
-
-				if(splitted2.size() == 2)
-				{
-					m_Dependencies.push_back(splitted2[0]);
-				}
 			}
 			else if(lexer.GetToken() == ";")
 			{
@@ -789,39 +811,6 @@ namespace SteelEngine {
 
 						prop.m_MetaData.clear();
 					}
-				}
-			}
-		}
-	}
-
-	void ReflectionGenerator::ParseSource()
-	{
-		Lexer lexer(m_SourceLines);
-
-		while(1)
-		{
-			lexer++;
-
-			if(lexer.End())
-			{
-				break;
-			}
-
-			if(lexer.GetToken() == "#include")
-			{
-				lexer++;
-
-				std::string token = lexer.GetToken();
-
-				token.erase(token.begin());
-				token.erase(token.end() - 1);
-
-				std::vector<std::string> splitted = split(token, '/');
-				std::vector<std::string> splitted2 = split(splitted[splitted.size() - 1], '.');
-
-				if(splitted2.size() == 2)
-				{
-					m_Dependencies.push_back(splitted2[0]);
 				}
 			}
 		}
@@ -958,9 +947,8 @@ namespace SteelEngine {
 
 	}
 
-	Result ReflectionGenerator::Load(const filesystem::path& fileCpp, const filesystem::path& fileH)
+	Result ReflectionGenerator::Load(const std::filesystem::path& fileH)
 	{
-		m_PathSource = fileCpp;
 		m_PathHeader = fileH;
 
 		std::string line;
@@ -974,27 +962,17 @@ namespace SteelEngine {
 
 		headerFile.close();
 
-		std::ifstream sourceFile(fileCpp);
-
-		while (std::getline(sourceFile, line))
-		{
-			m_SourceLines.push_back(line);
-		}
-
-		sourceFile.close();
-
 		return SE_TRUE;
 	}
 
 	Result ReflectionGenerator::Parse()
 	{
 		ParseHeader();
-		ParseSource();
 
 		return SE_TRUE;
 	}
 
-	Result ReflectionGenerator::Generate(const filesystem::path& generatePath)
+	Result ReflectionGenerator::Generate(const std::filesystem::path& cwd, const std::filesystem::path& generatePath)
 	{
 		ClassData* data = 0;
 		bool found = false;
@@ -1012,13 +990,42 @@ namespace SteelEngine {
 			}
 		}
 
-		filesystem::path path(m_PathHeader);
+		std::filesystem::path path(m_PathHeader);
+
+		std::string p_ = path.string();
+
+		replaceAll(p_, "\\", "/");
+
+		std::vector<std::string> splitted_ = split(p_, '/');
+		std::string finalPath = generatePath.string() + "/";
+		std::string includePath = "";
+
+		std::string p2 = cwd.string();
+
+		replaceAll(p2, "/", "\\");
+
+		for(Type::uint32 i = split(p2, '\\').size() + 1; i < splitted_.size() - 1; i++)
+		{
+			finalPath.append(splitted_[i]).append("/");
+			includePath.append(splitted_[i]).append("/");
+
+			try
+			{
+				std::filesystem::create_directory(finalPath);
+			}
+			catch(const std::exception& e)
+			{
+				printf("%s\n", e.what());
+			}
+		}
+
+		includePath.append(splitted_[splitted_.size() - 1]);
 
 		std::string rawFilename = path.filename().string();
 
 		rawFilename = split(rawFilename, '.')[0];
 
-		std::ofstream headerFile(generatePath.string() + "/" + rawFilename + ".Generated.h");
+		std::ofstream headerFile(finalPath + rawFilename + ".Generated.h");
 
 		headerFile << "#include \"RuntimeReflection/ReflectionGeneratorMacros.h\"\n";
 		headerFile << "\n";
@@ -1050,12 +1057,12 @@ namespace SteelEngine {
 
 		headerFile.close();
 
-		std::ofstream sourceFile(generatePath.string() + "/" + rawFilename + ".Generated.cpp");
+		std::ofstream sourceFile(finalPath + rawFilename + ".Generated.cpp");
 
 		std::string namespace_ = "";
 		std::string namespacedClassName = "";
 
-		for (Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
+		for(Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
 		{
 			namespace_ += data->m_Hierarchy[i];
 
@@ -1067,13 +1074,13 @@ namespace SteelEngine {
 
 		namespacedClassName = namespace_ + "::" + data->m_ClassName;
 
-		data->m_ClassMetaDataInfo.push_back(MetaDataInfo{ "\"sizeof\"", "sizeof(" + namespacedClassName + ")" });
+		data->m_ClassMetaDataInfo.push_back(MetaDataInfo{ "\"sizeof\"", "sizeof(" + data->m_ClassName + ")" });
 
 		path.replace_extension(".h");
 
-		sourceFile << "#include \"" << rawFilename + ".Generated.h" << "\"\n";
+		sourceFile << "#include \"" << finalPath << rawFilename << ".Generated.h" << "\"\n";
 
-		sourceFile << "#include \"../" << m_PathHeader.string() << "\"\n";
+		sourceFile << "#include \"" << includePath << "\"\n";
 		sourceFile << "#include \"RuntimeCompiler/IRuntimeObject.h\"\n";
 		sourceFile << "#include \"RuntimeReflection/Reflection.h\"\n";
 		sourceFile << "\n";
@@ -1082,26 +1089,54 @@ namespace SteelEngine {
 
 		if(found)
 		{
+			for(Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
+			{
+				sourceFile << "namespace " << data->m_Hierarchy[i] << " {\n";
+			}
+
 			sourceFile << "REGISTER_REFLECTION\n";
 			sourceFile << "{\n";
 			{
 				sourceFile << "SteelEngine::Reflection::Register<";
-				sourceFile << namespacedClassName;
-				sourceFile << ">(\"" << data->m_ClassName << "\")\n";
+				sourceFile << data->m_ClassName;
+				sourceFile << ">(\"" << data->m_ClassName << "\"";
+
+				if(data->m_Hierarchy.size() > 0)
+				{
+					sourceFile << ",{\n";
+					for(Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
+					{
+						sourceFile << "\"" << data->m_Hierarchy[i] << "\"";
+
+						if(i < data->m_Hierarchy.size() - 1)
+						{
+							sourceFile << ",\n";
+						}
+						else
+						{
+							sourceFile << "\n";
+						}
+					}
+
+					sourceFile << "}\n";
+				}
+
+				sourceFile << ")\n";
 
 				GenerateMetaDataInfo(sourceFile, data->m_ClassMetaDataInfo);
 
 				for(InheritanceInfo inh : data->m_Inheritance)
 				{
-					sourceFile << ".Inheritance";
+					sourceFile << ".Inheritance<";
+					sourceFile << inh.m_Name << ">";
 					sourceFile << "(\"" << inh.m_Name << "\")\n";
 				}
 
-				for (ConstructorInfo consInfo : data->m_Constructors)
+				for(ConstructorInfo consInfo : data->m_Constructors)
 				{
 					sourceFile << ".Constructor<";
 
-					for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
+					for(Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
 					{
 						sourceFile << consInfo.m_Arguments[i].m_Type;
 
@@ -1116,9 +1151,9 @@ namespace SteelEngine {
 					GenerateMetaDataInfo(sourceFile, consInfo.m_MetaData);
 				}
 
-				for (ClassProperty clsProp : data->m_Properties)
+				for(ClassProperty clsProp : data->m_Properties)
 				{
-					if (clsProp.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
+					if(clsProp.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
 						clsProp.m_ProtectionFlag == ProtectionFlag::PROTECTED)
 					{
 						continue;
@@ -1126,15 +1161,15 @@ namespace SteelEngine {
 
 					sourceFile << ".Property(";
 					sourceFile << "\"" << clsProp.m_ArgumentInfo.m_Name << "\", ";
-					sourceFile << "&" << namespacedClassName << "::" << clsProp.m_ArgumentInfo.m_Name;
+					sourceFile << "&" << data->m_ClassName << "::" << clsProp.m_ArgumentInfo.m_Name;
 					sourceFile << ")\n";
 
 					GenerateMetaDataInfo(sourceFile, clsProp.m_MetaData);
 				}
 
-				for (ClassMethod clsMeth : data->m_Methods)
+				for(ClassMethod clsMeth : data->m_Methods)
 				{
-					if (clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
+					if(clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
 						clsMeth.m_ProtectionFlag == ProtectionFlag::PROTECTED)
 					{
 						continue;
@@ -1142,15 +1177,35 @@ namespace SteelEngine {
 
 					sourceFile << ".Method(";
 					sourceFile << "\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
-					sourceFile << "&" << namespacedClassName << "::" << clsMeth.m_MethodInfo.m_Name;
+					sourceFile << "&" << data->m_ClassName << "::" << clsMeth.m_MethodInfo.m_Name;
 					sourceFile << ")\n";
 
 					GenerateMetaDataInfo(sourceFile, clsMeth.m_MetaData);
 				}
 
-				for (EnumInfo enum_ : data->m_Enums)
+				GenerateMethodReflection* ev = new GenerateMethodReflection();
+
+				Event::GlobalEvent::Broadcast_(ev);
+
+				for(ClassMethod clsMeth : ev->m_Methods)
 				{
-					sourceFile << ".Enum<" + namespacedClassName + "::" + enum_.m_EnumName + ">(\"" + enum_.m_EnumName + "\")\n";
+					if(clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
+						clsMeth.m_ProtectionFlag == ProtectionFlag::PROTECTED)
+					{
+						continue;
+					}
+
+					sourceFile << ".Method(";
+					sourceFile << "\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
+					sourceFile << "&" << data->m_ClassName << "::" << clsMeth.m_MethodInfo.m_Name;
+					sourceFile << ")\n";
+
+					GenerateMetaDataInfo(sourceFile, clsMeth.m_MetaData);
+				}
+
+				for(EnumInfo enum_ : data->m_Enums)
+				{
+					sourceFile << ".Enum<" << data->m_ClassName << "::" << enum_.m_EnumName << ">(\"" << enum_.m_EnumName << "\")\n";
 
 					GenerateMetaDataInfo(sourceFile, enum_.m_MetaData);
 
@@ -1163,8 +1218,8 @@ namespace SteelEngine {
 						{
 							EnumElement ele = enum_.m_Elements[i];
 
-							sourceFile << "SteelEngine::ReflectionValue(\"" + ele.m_ElementName;
-							sourceFile << "\", " + namespacedClassName + "::" + enum_.m_EnumName + "::" + ele.m_ElementName + ")\n";
+							sourceFile << "SteelEngine::ReflectionValue(\"" << ele.m_ElementName;
+							sourceFile << "\", " << data->m_ClassName << "::" << enum_.m_EnumName << "::" << ele.m_ElementName << ")\n";
 
 							GenerateMetaDataInfo(sourceFile, ele.m_MetaData);
 
@@ -1186,17 +1241,17 @@ namespace SteelEngine {
 			}
 			sourceFile << "}\n\n";
 
-			Event::GlobalEvent::Broadcast(GenerateSourceEvent{ &sourceFile, namespacedClassName });
+			Event::GlobalEvent::Broadcast(GenerateSourceEvent{ &sourceFile, data->m_ClassName });
 
 			// Here we are generating info for the runtime compilator
 
 			if (data->m_Constructors.size() > 0)
 			{
 				sourceFile << "#ifdef RUNTIME_COMPILE\n";
-				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* GetPerModuleInterface(void* typeInfo)\n";
+				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)\n";
 				sourceFile << "{\n";
 				{
-					sourceFile << "DECLARE_TYPE_INFO(" << namespacedClassName << ")\n";
+					sourceFile << "DECLARE_TYPE_INFO(" << data->m_ClassName << ")\n";
 					sourceFile << "{\n";
 					{
 						sourceFile << "FIND_THE_RIGHT_OBJECT\n";
@@ -1233,6 +1288,11 @@ namespace SteelEngine {
 				sourceFile << "}\n";
 				sourceFile << "#endif\n";
 			}
+
+			for(Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
+			{
+				sourceFile << "}\n";
+			}
 		}
 
 		sourceFile.close();
@@ -1243,7 +1303,6 @@ namespace SteelEngine {
 	void ReflectionGenerator::Clear()
 	{
 		m_HeaderLines.clear();
-		m_SourceLines.clear();
 
 		for(Type::uint32 i = 0; i < m_Classes.size(); i++)
 		{
@@ -1252,7 +1311,6 @@ namespace SteelEngine {
 		}
 
 		m_Classes.clear();
-		m_Dependencies.clear();
 
 		Event::GlobalEvent::Broadcast(ClearValuesEvent{});
 	}

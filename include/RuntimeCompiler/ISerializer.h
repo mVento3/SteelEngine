@@ -7,7 +7,7 @@
 namespace SteelEngine { 
 	
 	template <typename T>
-	struct SerializedValue : Interface::ISerializedValue
+	struct SerializedValue : HotReload::ISerializedValue
 	{
 		// NOTE: this requires value being serialized to have a correct copy constructor that
 		// will copy all values that would otherwise be deleted when object being serialized
@@ -22,7 +22,7 @@ namespace SteelEngine {
 	};
 
 	template <typename A, size_t N>
-	struct SerializedValueArray : Interface::ISerializedValue
+	struct SerializedValueArray : HotReload::ISerializedValue
 	{
 		// NOTE: this requires value being serialized to have a correct copy constructor that
 		// will copy all values that would otherwise be deleted when object being serialized
@@ -35,7 +35,7 @@ namespace SteelEngine {
 		A m_ValueArray[N];
 	};
 
-	namespace Interface {
+	namespace HotReload {
 
 	struct ISerializer
 	{
