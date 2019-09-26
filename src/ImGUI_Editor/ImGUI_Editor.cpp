@@ -196,7 +196,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void ImGUI_Editor::ProcessEvents(void* event)
     {
-        // ImGui_ImplSDL2_ProcessEvent((SDL_Event*)event);
+        m_API_Context->ProcessEvent(event);
     }
 
     void ImGUI_Editor::operator()(const RecompiledEvent& event)

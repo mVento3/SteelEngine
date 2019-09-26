@@ -30,7 +30,6 @@ namespace SteelEngine {
         m_Context = ImGui::GetCurrentContext();
 
         Reflection::GetType("SteelEngine::OpenGL_Window")->Invoke("MakeCurrent", window);
-        Reflection::GetType("SteelEngine::Graphics::OpenGL::Renderer")->Invoke("GlewInit", renderer);
     }
 
     void OpenGL_Context::Update()
@@ -42,6 +41,11 @@ namespace SteelEngine {
     void OpenGL_Context::UploadDrawData()
     {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
+    void OpenGL_Context::ProcessEvent(const void* event)
+    {
+        ImGui_ImplSDL2_ProcessEvent((const SDL_Event*)event);
     }
 
     void OpenGL_Context::operator()(const RecompiledEvent& event)

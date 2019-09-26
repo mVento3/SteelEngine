@@ -17,14 +17,14 @@
 #include "Logger/Logger.h"
 
 #include "Graphics/IRenderer.h"
+#include "Graphics/IEditor.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/IContext.h"
 
 #include "Window/IWindow.h"
 #include "Window/ResizeEvent.h"
 #include "Window/MinimizedEvent.h"
 #include "Window/MaximizedEvent.h"
-
-#include "Graphics/IEditor.h"
-#include "Graphics/Renderer.h"
 
 #include "VirtualProject/IVirtualProject.h"
 #include "VirtualProject/LoadedProjectEvent.h"
@@ -32,8 +32,6 @@
 #include "PythonCore/IPythonCore.h"
 
 #include "nlohmann/json.hpp"
-
-#include "ImGUI_Editor/IContext.h"
 
 #include "Core/ICore.h"
 #include "Core/ReflectionAttributes.h"

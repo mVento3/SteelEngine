@@ -6,9 +6,7 @@
 
 #include "RuntimeCompiler/IRuntimeObject.h"
 
-// #include "Graphics/Vulkan/IProgramUserData.h"
-#include "ImGUI_Editor/IContext.h"
-
+#include "Graphics/IContext.h"
 #include "Graphics/IRenderer.h"
 
 namespace SteelEngine { namespace Editor {

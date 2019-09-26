@@ -5,7 +5,14 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     Renderer::Renderer(IWindow* window) :
         m_Window(window)
     {
-
+        m_Shader = new Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/testShader");
+        m_Mesh = new Mesh(
+            {
+                Vertex(glm::vec3(-0.5f, -0.5f, 0)),
+                Vertex(glm::vec3(0, 0.5f, 0)),
+                Vertex(glm::vec3(0.5f, -0.5f, 0))
+            }
+        );
     }
 
     Renderer::~Renderer()
@@ -26,29 +33,20 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             return SE_FALSE;
         }
 
+        m_Shader->Init();
+        m_Mesh->Setup();
+
         return SE_TRUE;
     }
 
     void Renderer::Update()
     {
-        
+
     }
 
     void Renderer::Cleanup()
     {
 
-    }
-
-    Result Renderer::GlewInit()
-    {
-        glewExperimental = GL_TRUE;
-
-        if(glewInit() != GL_TRUE)
-        {
-            return SE_FALSE;
-        }
-
-        return SE_TRUE;
     }
 
     void Renderer::PreRender()
@@ -59,7 +57,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     void Renderer::Render()
     {
-
+        m_Shader->Bind();
+        m_Mesh->Draw();
     }
 
     void Renderer::PostRender()

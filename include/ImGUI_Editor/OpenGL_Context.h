@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ImGUI_Editor/IContext.h"
+#include "Graphics/IContext.h"
 
 #include "imgui/imgui.h"
 #include "imgui/examples/imgui_impl_sdl.h"
@@ -27,6 +27,7 @@ namespace SteelEngine {
         void Init(IWindow* window, Graphics::IRenderer* renderer) override;
         void Update() override;
         void UploadDrawData() override;
+        void ProcessEvent(const void* event) override;
 
         SE_METHOD()
         inline void* GetContext() { return m_Context; }

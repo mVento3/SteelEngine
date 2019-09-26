@@ -22,15 +22,14 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 .Constructor<IWindow*>()
 (
 )
-.Method("GlewInit", &Renderer::GlewInit)
-(
-)
 ;
 }
 
 void Renderer::Serialize(SteelEngine::HotReload::ISerializer* serializer)
 {
 SERIALIZE(Renderer::m_Window)
+SERIALIZE(Renderer::m_Shader)
+SERIALIZE(Renderer::m_Mesh)
 }
 
 #ifdef RUNTIME_COMPILE

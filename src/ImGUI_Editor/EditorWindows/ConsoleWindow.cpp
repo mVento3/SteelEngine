@@ -12,9 +12,14 @@ namespace SteelEngine {
 
     }
 
+    void ConsoleWindow::Draw()
+    {
+        ImGui::Text("XXXXXX");
+    }
+
     void ConsoleWindow::operator()(const RecompiledEvent& event)
     {
-
+        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
     }
 
 }

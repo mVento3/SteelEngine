@@ -3,8 +3,6 @@
 #include "Graphics/IEditor.h"
 
 #include "imgui/imgui.h"
-// #include "imgui/examples/imgui_impl_sdl.h"
-// #include "imgui/examples/imgui_impl_vulkan.h"
 
 #include "RuntimeReflection/Macro.h"
 
@@ -14,7 +12,6 @@
 #include "ImGUI_Editor/Window.h"
 #include "ImGUI_Editor/SelectableProject.h"
 #include "ImGUI_Editor/ChangeSceneEvent.h"
-#include "ImGUI_Editor/IContext.h"
 
 #include "RuntimeReflection/Variant.h"
 

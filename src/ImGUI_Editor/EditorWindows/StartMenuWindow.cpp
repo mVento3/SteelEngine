@@ -50,11 +50,6 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     }
 
-    void StartMenuWindow::operator()(const RecompiledEvent& event)
-    {
-        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
-    }
-
     void StartMenuWindow::Init()
     {
         m_ProjectsPath = Reflection::GetType("SteelEngine::Core")->GetMetaData(ReflectionAttribute::PROJECTS_PATH)->Convert<const char*>();
@@ -169,6 +164,11 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                 // None cuz disabled
             }
         }
+    }
+
+    void StartMenuWindow::operator()(const RecompiledEvent& event)
+    {
+        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
     }
 
 }}}

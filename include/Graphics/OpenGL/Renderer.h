@@ -6,6 +6,9 @@
 
 #include "Window/IWindow.h"
 
+#include "Graphics/OpenGL/Shader.h"
+#include "Graphics/OpenGL/Mesh.h"
+
 #include "Graphics/OpenGL/Renderer.Generated.h"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
@@ -19,6 +22,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     private:
         IWindow* m_Window;
 
+        Shader* m_Shader;
+        Mesh* m_Mesh;
+
     public:
         Renderer(IWindow* window);
         ~Renderer();
@@ -30,9 +36,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void PreRender() override;
         void Render() override;
         void PostRender() override;
-
-        SE_METHOD()
-        Result GlewInit();
     };
 
 }}}

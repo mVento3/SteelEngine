@@ -118,7 +118,7 @@ namespace SteelEngine {
         {
             SDL_Event* event = (SDL_Event*)event_;
 
-            // (*m_Editor)->ProcessEvents(event);
+            (*m_Editor)->ProcessEvents(event);
 
             if(event->type == SDL_QUIT)
             {

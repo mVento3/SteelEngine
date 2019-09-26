@@ -23,6 +23,8 @@ namespace SteelEngine {
     public:
         ConsoleWindow();
         ~ConsoleWindow();
+
+        void Draw() override;
     };
 
 }
