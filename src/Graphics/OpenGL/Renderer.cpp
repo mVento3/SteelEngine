@@ -8,11 +8,12 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_Shader = new Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/testShader");
         m_Mesh = new Mesh(
             {
-                Vertex(glm::vec3(-0.5f, -0.5f, 0)),
-                Vertex(glm::vec3(0, 0.5f, 0)),
-                Vertex(glm::vec3(0.5f, -0.5f, 0))
+                Vertex(glm::vec3(-0.5f, -0.5f, 0), glm::vec2(0, 0)),
+                Vertex(glm::vec3(0, 0.5f, 0), glm::vec2(0.5f, 1)),
+                Vertex(glm::vec3(0.5f, -0.5f, 0), glm::vec2(1, 0))
             }
         );
+        m_Texture = new Texture("D:/Projects/C++/SteelEngine/bin/Resources/Textures/test.jpg");
     }
 
     Renderer::~Renderer()
@@ -35,6 +36,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         m_Shader->Init();
         m_Mesh->Setup();
+        m_Texture->Setup();
 
         return SE_TRUE;
     }
@@ -58,6 +60,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     void Renderer::Render()
     {
         m_Shader->Bind();
+        m_Texture->Bind(0);
         m_Mesh->Draw();
     }
 

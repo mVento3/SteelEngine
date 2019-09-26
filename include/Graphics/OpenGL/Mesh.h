@@ -17,6 +17,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         enum Buffer
         {
             POSITION_VB,
+            TEXTURE_VB,
 
             NUM_BUFFERS
         };
@@ -29,7 +30,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         std::vector<Vertex> m_Vertices;
 
     public:
-        Mesh(/*Vertex* vertices, Type::uint32 verticesCount*/ const std::vector<Vertex>& vertices);
+        Mesh(const std::vector<Vertex>& vertices);
         ~Mesh();
 
         void Setup();

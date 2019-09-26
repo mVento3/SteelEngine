@@ -30,6 +30,7 @@ void Renderer::Serialize(SteelEngine::HotReload::ISerializer* serializer)
 SERIALIZE(Renderer::m_Window)
 SERIALIZE(Renderer::m_Shader)
 SERIALIZE(Renderer::m_Mesh)
+SERIALIZE(Renderer::m_Texture)
 }
 
 #ifdef RUNTIME_COMPILE
