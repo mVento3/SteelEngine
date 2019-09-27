@@ -37,6 +37,8 @@ namespace SteelEngine {
         m_Context = SDL_GL_CreateContext(m_Window);
         SDL_GL_MakeCurrent(m_Window, m_Context);
 
+        Event::GlobalEvent::Add<ChangeMousePositionEvent>(this);
+
         return SE_TRUE;
     }
 
@@ -91,6 +93,11 @@ namespace SteelEngine {
     void* OpenGL_Window::GetWindow() const
     {
         return m_Window;
+    }
+
+    void OpenGL_Window::operator()(const ChangeMousePositionEvent& event)
+    {
+        SDL_WarpMouseInWindow(m_Window, event.m_X, event.m_Y);
     }
 
 }

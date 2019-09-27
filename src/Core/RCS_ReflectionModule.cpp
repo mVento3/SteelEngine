@@ -38,11 +38,14 @@ namespace SteelEngine {
             }
         }
 
-        const std::vector<IReflectionInheritance*> inhs = event.m_Data->GetInheritances();
-
-        for(Type::uint32 i = 0; i < inhs.size(); i++)
+        if(event.m_Data)
         {
-            m_Inheritance.push_back(inhs[i]->GetTypeID());
+            const std::vector<IReflectionInheritance*> inhs = event.m_Data->GetInheritances();
+
+            for(Type::uint32 i = 0; i < inhs.size(); i++)
+            {
+                m_Inheritance.push_back(inhs[i]->GetTypeID());
+            }
         }
     }
 

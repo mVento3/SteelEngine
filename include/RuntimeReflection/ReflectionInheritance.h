@@ -2,8 +2,6 @@
 
 #include "RuntimeReflection/IReflectionInheritance.h"
 
-#include "string"
-
 namespace SteelEngine {
 
     class ReflectionInheritance : public IReflectionInheritance

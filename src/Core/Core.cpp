@@ -149,6 +149,18 @@ namespace SteelEngine {
                     break;
                 }
             }
+            else if(event->type == SDL_KEYDOWN)
+            {
+                Event::GlobalEvent::Broadcast(KeyDownEvent{ event->key.keysym.sym });
+            }
+            else if(event->type == SDL_KEYUP)
+            {
+                Event::GlobalEvent::Broadcast(KeyUpEvent{ event->key.keysym.sym });
+            }
+            else if(event->type == SDL_MOUSEMOTION)
+            {
+                Event::GlobalEvent::Broadcast(MouseMotionEvent{ event->motion.x, event->motion.y });
+            }
         };
 
         Reflection::GetType("SteelEngine::OpenGL_Window")->Invoke("SetProcessEventsCallback", m_Window, func);

@@ -183,16 +183,6 @@ namespace SteelEngine {
 		{
 			CHECK_DATABASE
 
-			// for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
-			// {
-			// 	IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
-
-			// 	if(type->GetTypeName() == name)
-			// 	{
-			// 		return type;
-			// 	}
-			// }
-
 			std::string name_ = name;
 
 			replaceAll(name_, "::", ":");

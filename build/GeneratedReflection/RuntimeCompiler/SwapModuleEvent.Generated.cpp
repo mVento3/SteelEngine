@@ -11,16 +11,13 @@ SteelEngine::Reflection::Register<SwapModuleEvent>("SwapModuleEvent",{
 }
 )
 (
+SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SwapModuleEvent))
 )
 .Property("m_ModuleName", &SwapModuleEvent::m_ModuleName)
 (
 )
 ;
-}
-
-void SwapModuleEvent::Serialize(SteelEngine::HotReload::ISerializer* serializer)
-{
 }
 
 }

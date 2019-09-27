@@ -30,7 +30,6 @@ void Window::Serialize(SteelEngine::HotReload::ISerializer* serializer)
 {
 SERIALIZE(Window::m_Title)
 SERIALIZE(Window::m_Context)
-HotReload::IRuntimeObject::Serialize(serializer);
 }
 
 }

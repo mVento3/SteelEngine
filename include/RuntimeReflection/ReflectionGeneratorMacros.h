@@ -1,7 +1,7 @@
 #pragma once
 
-#define RTTR_CAT_IMPL(a, b) a##b
-#define RTTR_CAT(a, b) RTTR_CAT_IMPL(a, b)
+#define SE_CAT_IMPL(a, b) a##b
+#define SE_CAT(a, b) SE_CAT_IMPL(a, b)
 
 #define SERIALIZE(name) \
 serializer->SerializeProperty(#name, name);
@@ -17,7 +17,7 @@ namespace { \
 		} \
 	}; \
 } \
-static const __auto__register__ RTTR_CAT(auto_register__, __LINE__); \
+static const __auto__register__ SE_CAT(auto_register__, __LINE__); \
 static void auto_register_reflection_function_()
 
 #define DECLARE_TYPE_INFO(classType) \

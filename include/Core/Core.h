@@ -33,6 +33,10 @@
 
 #include "nlohmann/json.hpp"
 
+#include "Input/Events/KeyDownEvent.h"
+#include "Input/Events/KeyUpEvent.h"
+#include "Input/Events/MouseMotionEvent.h"
+
 #include "Core/ICore.h"
 #include "Core/ReflectionAttributes.h"
 #include "Core/Core.Generated.h"

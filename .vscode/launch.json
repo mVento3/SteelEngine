@@ -76,7 +76,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/ReflectionGenerator.exe",
-            "args": ["-b bin", "-s src/RuntimeCompiler/RuntimeCompiler.cpp", "-i include/RuntimeCompiler/RuntimeCompiler.h", "-cwd D:/Projects/C++/SteelEngine"],
+            "args": ["-b bin", "-i include/Input/Events/KeyUpEvent.h", "-cwd D:/Projects/C++/SteelEngine"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

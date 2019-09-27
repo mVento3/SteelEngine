@@ -1,19 +1,18 @@
 #pragma once
 
-#include "string"
-
 #include "RuntimeReflection/Macro.h"
 
 #include "Core/ReflectionAttributes.h"
 
 namespace SteelEngine {
 
-    SE_CLASS(
+    SE_STRUCT(
         SteelEngine::ReflectionAttribute::NO_SERIALIZE
     )
-    struct SwapModuleEvent
+    struct ChangeMousePositionEvent
     {
-        std::string m_ModuleName;
+        int m_X;
+        int m_Y;
     };
 
 }

@@ -1,5 +1,5 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/IContext.Generated.h"
-#include "ImGUI_Editor/IContext.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/IContext.Generated.h"
+#include "Graphics/IContext.h"
 #include "RuntimeCompiler/IRuntimeObject.h"
 #include "RuntimeReflection/Reflection.h"
 

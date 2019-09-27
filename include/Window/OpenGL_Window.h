@@ -11,6 +11,8 @@
 
 #include "Event/GlobalEvent.h"
 
+#include "Input/Events/ChangeMousePositionEvent.h"
+
 namespace SteelEngine {
 
     SE_CLASS(
@@ -63,6 +65,8 @@ namespace SteelEngine {
         {
             SDL_GL_MakeCurrent(m_Window, m_Context);
         }
+
+        void operator()(const ChangeMousePositionEvent& event);
     };
 
 }

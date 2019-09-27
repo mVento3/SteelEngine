@@ -35,18 +35,18 @@ class Module:
             except:
                 print(os.sys.exc_info())
 
-            for src in self.source_files:
-                if os.path.splitext(os.path.basename(h))[0] == os.path.splitext(os.path.basename(src))[0]:
-                    splitted = h.split(os.sep)
-                    res = ''
+            # for src in self.source_files:
+            #     if os.path.splitext(os.path.basename(h))[0] == os.path.splitext(os.path.basename(src))[0]:
+            splitted = h.split(os.sep)
+            res = ''
 
-                    for i in range(1, len(splitted) - 1):
-                        res += splitted[i] + '\\'
+            for i in range(1, len(splitted) - 1):
+                res += splitted[i] + '\\'
 
-                    res += splitted[len(splitted) - 1].split('.')[0] + '.Generated.cpp'
+            res += splitted[len(splitted) - 1].split('.')[0] + '.Generated.cpp'
 
-                    if os.path.isfile(self.cwd + '/build/GeneratedReflection/' + res):
-                        self.reflection_src_files.append(res)
+            if os.path.isfile(self.cwd + '/build/GeneratedReflection/' + res):
+                self.reflection_src_files.append(res)
 
     def compileWhole(self):
         flags = ''

@@ -14,6 +14,13 @@
 
 #include "Graphics/OpenGL/Renderer.Generated.h"
 
+#include "Input/Events/KeyDownEvent.h"
+#include "Input/Events/KeyUpEvent.h"
+#include "Input/Events/MouseMotionEvent.h"
+#include "Input/Events/ChangeMousePositionEvent.h"
+
+#include "Event/GlobalEvent.h"
+
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     SE_CLASS(
@@ -33,6 +40,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         float m_Counter;
 
+        bool m_Keys[256] = { false };
+        bool m_RotateCamera;
+
     public:
         Renderer(IWindow* window);
         ~Renderer();
@@ -44,6 +54,10 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void PreRender() override;
         void Render() override;
         void PostRender() override;
+
+        void operator()(const KeyDownEvent& event);
+        void operator()(const KeyUpEvent& event);
+        void operator()(const MouseMotionEvent& event);
     };
 
 }}}

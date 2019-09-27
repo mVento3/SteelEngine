@@ -32,7 +32,10 @@ SERIALIZE(Renderer::m_Shader)
 SERIALIZE(Renderer::m_Mesh)
 SERIALIZE(Renderer::m_Texture)
 SERIALIZE(Renderer::m_Trans)
+SERIALIZE(Renderer::m_Camera)
 SERIALIZE(Renderer::m_Counter)
+SERIALIZE(Renderer::m_Keys)
+SERIALIZE(Renderer::m_RotateCamera)
 }
 
 #ifdef RUNTIME_COMPILE
