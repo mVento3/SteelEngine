@@ -102,6 +102,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         glValidateProgram(m_Program);
         CheckShaderError(m_Program, GL_VALIDATE_STATUS, true, "Program is invalid");
+
+        m_Uniforms[MODEL_U] = glGetUniformLocation(m_Program, "model");
     }
 
     void Shader::Cleanup()
@@ -113,6 +115,13 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         }
 
         glDeleteProgram(m_Program);
+    }
+
+    void Shader::Update(const Transform& transform)
+    {
+        glm::mat4 model = transform.GetModel();
+
+        glUniformMatrix4fv(m_Uniforms[MODEL_U], 1, GL_FALSE, &model[0][0]);
     }
 
     void Shader::Bind() const

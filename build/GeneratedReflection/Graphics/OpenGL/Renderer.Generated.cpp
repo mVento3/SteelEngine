@@ -31,6 +31,8 @@ SERIALIZE(Renderer::m_Window)
 SERIALIZE(Renderer::m_Shader)
 SERIALIZE(Renderer::m_Mesh)
 SERIALIZE(Renderer::m_Texture)
+SERIALIZE(Renderer::m_Trans)
+SERIALIZE(Renderer::m_Counter)
 }
 
 #ifdef RUNTIME_COMPILE

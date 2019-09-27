@@ -14,6 +14,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             }
         );
         m_Texture = new Texture("D:/Projects/C++/SteelEngine/bin/Resources/Textures/test.jpg");
+
+        m_Counter = 0;
     }
 
     Renderer::~Renderer()
@@ -60,8 +62,13 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     void Renderer::Render()
     {
         m_Shader->Bind();
+        m_Shader->Update(m_Trans);
         m_Texture->Bind(0);
         m_Mesh->Draw();
+
+        m_Counter += 0.01f;
+
+        m_Trans.SetRotation(glm::rotate(m_Counter, glm::vec3(1, 0, 0)));
     }
 
     void Renderer::PostRender()

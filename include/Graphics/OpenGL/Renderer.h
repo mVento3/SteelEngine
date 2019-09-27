@@ -9,6 +9,7 @@
 #include "Graphics/OpenGL/Shader.h"
 #include "Graphics/OpenGL/Mesh.h"
 #include "Graphics/OpenGL/Texture.h"
+#include "Graphics/OpenGL/Transform.h"
 
 #include "Graphics/OpenGL/Renderer.Generated.h"
 
@@ -26,6 +27,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         Shader* m_Shader;
         Mesh* m_Mesh;
         Texture* m_Texture;
+        Transform m_Trans;
+
+        float m_Counter;
 
     public:
         Renderer(IWindow* window);

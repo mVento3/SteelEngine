@@ -7,6 +7,8 @@
 
 #include "Core/Type.h"
 
+#include "Graphics/OpenGL/Transform.h"
+
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     class Shader
@@ -14,9 +16,17 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     public:
         static const unsigned int NUM_SHADERS = 2;
 
+        enum Uniform
+        {
+            MODEL_U,
+
+            NUM_UNIFORMS
+        };
+
     private:
         GLuint m_Program;
         GLuint m_Shaders[NUM_SHADERS];
+        GLuint m_Uniforms[NUM_UNIFORMS];
 
         std::string m_Filename;
 
@@ -31,6 +41,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Init();
         void Cleanup();
 
+        void Update(const Transform& transform);
         void Bind() const;
     };
 
