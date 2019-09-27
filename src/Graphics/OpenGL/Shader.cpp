@@ -117,9 +117,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         glDeleteProgram(m_Program);
     }
 
-    void Shader::Update(const Transform& transform)
+    void Shader::Update(const Transform& transform, const Camera& camera)
     {
-        glm::mat4 model = transform.GetModel();
+        glm::mat4 model = camera.GetProjection() * camera.GetView() * transform.GetModel();
 
         glUniformMatrix4fv(m_Uniforms[MODEL_U], 1, GL_FALSE, &model[0][0]);
     }

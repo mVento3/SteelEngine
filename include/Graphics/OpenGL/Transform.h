@@ -22,9 +22,13 @@ namespace SteelEngine {
 
         glm::mat4 GetModel() const;
 
-        inline glm::vec3& GetPosition() { return m_Position; }
-        inline glm::quat& GetRotation() { return m_Rotation; }
-        inline glm::vec3& GetScale() { return m_Scale; }
+        inline const glm::vec3& GetPosition() { return m_Position; }
+        inline const glm::quat& GetRotation() { return m_Rotation; }
+        inline const glm::vec3& GetScale() { return m_Scale; }
+
+        inline glm::vec3 GetPosition() const { return m_Position; }
+        inline glm::quat GetRotation() const { return m_Rotation; }
+        inline glm::vec3 GetScale() const { return m_Scale; }
 
         inline void SetPosition(const glm::vec3& position) { m_Position = position; }
         inline void SetRotation(const glm::quat& rotation) { m_Rotation = rotation; }

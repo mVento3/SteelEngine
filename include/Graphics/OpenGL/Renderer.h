@@ -10,6 +10,7 @@
 #include "Graphics/OpenGL/Mesh.h"
 #include "Graphics/OpenGL/Texture.h"
 #include "Graphics/OpenGL/Transform.h"
+#include "Graphics/OpenGL/Camera.h"
 
 #include "Graphics/OpenGL/Renderer.Generated.h"
 
@@ -28,6 +29,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         Mesh* m_Mesh;
         Texture* m_Texture;
         Transform m_Trans;
+        Camera* m_Camera;
 
         float m_Counter;
 

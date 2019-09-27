@@ -8,6 +8,7 @@
 #include "Core/Type.h"
 
 #include "Graphics/OpenGL/Transform.h"
+#include "Graphics/OpenGL/Camera.h"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
@@ -41,7 +42,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Init();
         void Cleanup();
 
-        void Update(const Transform& transform);
+        void Update(const Transform& transform, const Camera& camera);
         void Bind() const;
     };
 

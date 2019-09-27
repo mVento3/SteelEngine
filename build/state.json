@@ -669,7 +669,7 @@
                 },
                 {
                     "filename": "NetworkManager.cpp",
-                    "hash": "3bee25c79bdb3e926a03678502fffe8ed5abe87e5b351cdb92c4a6fc372a9bbdbe9804fdc81d5cbedbd55d8b1c93bdbc7c3084faf5172ac59f5c1742dbcc127b"
+                    "hash": "859c5c2e1ed3cf848ff6a89b85e9b86ebc479c7b6dba3db39c2e6ee10a8c0976590e4927d805abc645c0e5d4ce2d61b7a281bff652ad8e40680d7be116f4f0d6"
                 }
             ]
         },
@@ -908,7 +908,7 @@
             "files": [
                 {
                     "filename": "Renderer.Generated.cpp",
-                    "hash": "c8e6289643dd2c24dfca2de7467355ec9291f4e3ae3b429ca822629b709f9e0dd2552c014a21cb507e01932a68fc7330566a311e067f14303bf28e357932679c"
+                    "hash": "b1fb172079eb641c7a68f30fc6a8569cf2758104de5d5d37f6513c374c1f0d5f54344d745430f829cb15d45cb75860df20cfd47c93265aa4816d9df18612ac42"
                 },
                 {
                     "filename": "OpenGL_Renderer.Generated.cpp",
@@ -921,7 +921,7 @@
             "files": [
                 {
                     "filename": "Renderer.cpp",
-                    "hash": "5d898b47696d4b2edee51e2952ea2c71f086a19b84719cecad94e2c7a362c1018d1db247b92479333b49b94e88da43da4813164832a6cd8a50713f9f471ac052"
+                    "hash": "5a4c06ee49be63a6798a2cb9207064f4970a069b23aae1a2fab68f47a5cd25fe31c6456177ddf6128718295269dbed2c93e13610a1e9c71e57fa65624745bfd0"
                 },
                 {
                     "filename": "OpenGL_Renderer.cpp",
@@ -929,7 +929,7 @@
                 },
                 {
                     "filename": "Shader.cpp",
-                    "hash": "098b383012c4206f65202271ead193c0f42c8f9b6e0eb43004339deceaf8080d3ee5fe3c6a1d066efa9c92611873747287a8d66e9da1cac001acdab98fb83c75"
+                    "hash": "b540d430e7b7ff7a9fbfc07e0aded88bea8d381cfcaa6147451244f04b6026a92520faa44a73b307111b50067a0727eea68ac7c81968583e2a37e56b8cd8f3ff"
                 },
                 {
                     "filename": "Mesh.cpp",
@@ -942,6 +942,10 @@
                 {
                     "filename": "Transform.cpp",
                     "hash": "a6ee82245576e2da7757bf5adf103a548132670c6a1b74f3baa3a82bae189380aa1033024ed9afadcf6571c61d5c9efc9da6f2577642819cc18849293ad6f5a6"
+                },
+                {
+                    "filename": "Camera.cpp",
+                    "hash": "71b90c854e7799696920b53acd7122cf84a1aa4077ca05d7729d32b70161752bceb6737f432837658d346e36a5da2803cf985a7d37c9a1aa77390da9a32740c5"
                 }
             ]
         },

@@ -82,7 +82,7 @@ namespace SteelEngine { namespace Network {
 
         m_Network->SetNetworkManager(this);
 
-        Reflection::GetType("Server")->Invoke("Start", m_Network);
+        Reflection::GetType("SteelEngine::Server")->Invoke("Start", m_Network);
 
         printf("Hosting started!\n");
 
