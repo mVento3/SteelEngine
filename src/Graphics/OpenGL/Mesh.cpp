@@ -9,6 +9,34 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     }
 
+    Mesh::Mesh(const std::string& filename)
+    {
+        Assimp::Importer importer;
+
+        const aiScene* scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+        if(scene)
+        {
+            aiMesh* mesh = scene->mMeshes[0];
+
+            for(Type::uint32 i = 0; i < mesh->mNumVertices; i++)
+            {
+                glm::vec3 position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+                glm::vec2 texCoord;
+
+                if(mesh->mTextureCoords[0])
+                {
+                    texCoord.x = mesh->mTextureCoords[0][i].x;
+                    texCoord.y = mesh->mTextureCoords[0][i].y;
+                }
+
+                m_Vertices.push_back(Vertex(position, texCoord));
+            }
+
+            m_DrawCount = m_Vertices.size();
+        }
+    }
+
     Mesh::~Mesh()
     {
 

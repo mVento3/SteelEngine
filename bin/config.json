@@ -24,7 +24,9 @@
 			"external/imgui",
 			"external/json/include",
 			"external/Python/include",
-			"external/glew-2.1.0/include"
+			"external/glew-2.1.0/include",
+			"external/assimp/include",
+			"external/assimp/build/include"
 		],
 		"lib_paths": [
 			"bin",
@@ -44,7 +46,8 @@
 			"imgui.lib",
 			"python37.lib",
 			"glew32.lib",
-			"OpenGL32.lib"
+			"OpenGL32.lib",
+			"assimp-vc142-mt.lib"
 		],
 		"libs2": [
 			"SDL2.lib",
@@ -53,7 +56,8 @@
 			"imgui.lib",
 			"python37.lib",
 			"glew32.lib",
-			"OpenGL32.lib"
+			"OpenGL32.lib",
+			"assimp-vc142-mt.lib"
 		]
 	},
 	"projects_path": "D:/Projects/SteelEngine",

@@ -26,9 +26,10 @@
             "name": "Windows",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/external/json-develop/include",
+                "${workspaceFolder}/external/json/include",
                 "${workspaceFolder}/external/Python/include",
-                "${workspaceFolder}/external/glew-2.1.0/include"
+                "${workspaceFolder}/external/glew-2.1.0/include",
+                "${workspaceFolder}/external/assimp/include"
             ],
             "defines": [
                 "_DEBUG",

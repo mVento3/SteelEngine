@@ -8,13 +8,14 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_Window(window)
     {
         m_Shader = new Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/testShader");
-        m_Mesh = new Mesh(
-            {
-                Vertex(glm::vec3(-0.5f, -0.5f, 0), glm::vec2(0, 0)),
-                Vertex(glm::vec3(0, 0.5f, 0), glm::vec2(0.5f, 1)),
-                Vertex(glm::vec3(0.5f, -0.5f, 0), glm::vec2(1, 0))
-            }
-        );
+        // m_Mesh = new Mesh(
+        //     {
+        //         Vertex(glm::vec3(-0.5f, -0.5f, 0), glm::vec2(0, 0)),
+        //         Vertex(glm::vec3(0, 0.5f, 0), glm::vec2(0.5f, 1)),
+        //         Vertex(glm::vec3(0.5f, -0.5f, 0), glm::vec2(1, 0))
+        //     }
+        // );
+        m_Mesh = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj");
         m_Texture = new Texture("D:/Projects/C++/SteelEngine/bin/Resources/Textures/test.jpg");
 
         m_Counter = 0;
@@ -40,6 +41,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             return SE_FALSE;
         }
 
+        glEnable(GL_DEPTH_TEST);
+
         m_Shader->Init();
         m_Mesh->Setup();
         m_Texture->Setup();
@@ -63,7 +66,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     void Renderer::PreRender()
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.2f, 0.2f, 0.2f, 1);
     }
 

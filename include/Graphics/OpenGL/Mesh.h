@@ -9,6 +9,10 @@
 
 #include "GL/glew.h"
 
+#include "assimp/scene.h"
+#include "assimp/Importer.hpp"
+#include "assimp/postprocess.h"
+
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     class Mesh
@@ -31,6 +35,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     public:
         Mesh(const std::vector<Vertex>& vertices);
+        Mesh(const std::string& filename);
         ~Mesh();
 
         void Setup();
