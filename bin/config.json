@@ -22,7 +22,7 @@
 			"external/glm",
 			"external",
 			"external/imgui",
-			"external/json-develop/include",
+			"external/json/include",
 			"external/Python/include",
 			"external/glew-2.1.0/include"
 		],
