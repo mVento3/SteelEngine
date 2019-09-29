@@ -11,6 +11,9 @@
 #include "Graphics/OpenGL/Texture.h"
 #include "Graphics/OpenGL/Transform.h"
 #include "Graphics/OpenGL/Camera.h"
+#include "Graphics/OpenGL/Framebuffer.h"
+#include "Graphics/OpenGL/QuadMesh.h"
+#include "Graphics/OpenGL/Renderbuffer.h"
 
 #include "Graphics/OpenGL/Renderer.Generated.h"
 
@@ -35,8 +38,18 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         Shader* m_Shader;
         Mesh* m_Mesh;
         Texture* m_Texture;
+        Texture* m_NormalMapTexture;
         Transform m_Trans;
         Camera* m_Camera;
+
+        Shader* m_G_Shader;
+
+        Texture* m_PositionTexture;
+        Texture* m_NormalTexture;
+        Texture* m_AlbedoTexture;
+        Framebuffer* m_G_Buffer;
+        QuadMesh* m_QuadMesh;
+        Renderbuffer* m_Renderbuffer;
 
         float m_Counter;
 

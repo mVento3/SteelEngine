@@ -9,22 +9,15 @@
 
 #include "GL/glew.h"
 
-#include "assimp/scene.h"
-#include "assimp/Importer.hpp"
-#include "assimp/postprocess.h"
-
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
-    class Mesh
+    class QuadMesh
     {
     public:
         enum Buffer
         {
             POSITION_VB,
             TEXTURE_VB,
-            NORMAL_VB,
-            TANGENT_VB,
-            INDEX_VB,
 
             NUM_BUFFERS
         };
@@ -33,15 +26,12 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         GLuint m_VAO;
         GLuint m_VBOs[NUM_BUFFERS];
         Type::uint32 m_DrawCount;
-        bool m_HasTangents;
 
         std::vector<Vertex> m_Vertices;
-        std::vector<Type::uint32> m_Indicies;
 
     public:
-        Mesh(const std::vector<Vertex>& vertices);
-        Mesh(const std::string& filename);
-        ~Mesh();
+        QuadMesh();
+        ~QuadMesh();
 
         void Setup();
         void Cleanup();

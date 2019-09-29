@@ -20,6 +20,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         enum Uniform
         {
             MODEL_U,
+            VIEWPROJECTION_U,
 
             NUM_UNIFORMS
         };
@@ -44,6 +45,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         void Update(const Transform& transform, const Camera& camera);
         void Bind() const;
+
+        void SetInt(const std::string& name, int value) const;
     };
 
 }}}

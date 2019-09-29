@@ -104,6 +104,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         CheckShaderError(m_Program, GL_VALIDATE_STATUS, true, "Program is invalid");
 
         m_Uniforms[MODEL_U] = glGetUniformLocation(m_Program, "model");
+        m_Uniforms[VIEWPROJECTION_U] = glGetUniformLocation(m_Program, "viewProjection");
     }
 
     void Shader::Cleanup()
@@ -119,14 +120,21 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     void Shader::Update(const Transform& transform, const Camera& camera)
     {
-        glm::mat4 model = camera.GetProjection() * camera.GetView() * transform.GetModel();
+        glm::mat4 model = transform.GetModel();
+        glm::mat4 viewProjection = camera.GetProjection() * camera.GetView();
 
         glUniformMatrix4fv(m_Uniforms[MODEL_U], 1, GL_FALSE, &model[0][0]);
+        glUniformMatrix4fv(m_Uniforms[VIEWPROJECTION_U], 1, GL_FALSE, &viewProjection[0][0]);
     }
 
     void Shader::Bind() const
     {
         glUseProgram(m_Program);
+    }
+
+    void Shader::SetInt(const std::string& name, int value) const
+    {
+        glUniform1i(glGetUniformLocation(m_Program, name.c_str()), value);
     }
 
 }}}

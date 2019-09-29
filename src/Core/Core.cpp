@@ -151,11 +151,11 @@ namespace SteelEngine {
             }
             else if(event->type == SDL_KEYDOWN)
             {
-                Event::GlobalEvent::Broadcast(KeyDownEvent{ event->key.keysym.sym });
+                Event::GlobalEvent::Broadcast(KeyDownEvent{ event->key.keysym.scancode });
             }
             else if(event->type == SDL_KEYUP)
             {
-                Event::GlobalEvent::Broadcast(KeyUpEvent{ event->key.keysym.sym });
+                Event::GlobalEvent::Broadcast(KeyUpEvent{ event->key.keysym.scancode });
             }
             else if(event->type == SDL_MOUSEMOTION)
             {
@@ -227,6 +227,7 @@ namespace SteelEngine {
         m_ImGUI_ContextAPI->Update();
         (*m_Editor)->Draw();
         m_Window->m_Object->Update();
+        (*m_Renderer)->Update();
         (*m_Renderer)->PreRender();
         (*m_Renderer)->Render();
         m_ImGUI_ContextAPI->UploadDrawData();
