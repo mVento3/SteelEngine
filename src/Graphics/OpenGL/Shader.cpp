@@ -104,7 +104,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         CheckShaderError(m_Program, GL_VALIDATE_STATUS, true, "Program is invalid");
 
         m_Uniforms[MODEL_U] = glGetUniformLocation(m_Program, "model");
-        m_Uniforms[VIEWPROJECTION_U] = glGetUniformLocation(m_Program, "viewProjection");
+        m_Uniforms[PROJECTION_U] = glGetUniformLocation(m_Program, "projection");
+        m_Uniforms[VIEW_U] = glGetUniformLocation(m_Program, "view");
     }
 
     void Shader::Cleanup()
@@ -121,10 +122,12 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     void Shader::Update(const Transform& transform, const Camera& camera)
     {
         glm::mat4 model = transform.GetModel();
-        glm::mat4 viewProjection = camera.GetProjection() * camera.GetView();
+        glm::mat4 projection = camera.GetProjection();
+        glm::mat4 view = camera.GetView();
 
         glUniformMatrix4fv(m_Uniforms[MODEL_U], 1, GL_FALSE, &model[0][0]);
-        glUniformMatrix4fv(m_Uniforms[VIEWPROJECTION_U], 1, GL_FALSE, &viewProjection[0][0]);
+        glUniformMatrix4fv(m_Uniforms[PROJECTION_U], 1, GL_FALSE, &projection[0][0]);
+        glUniformMatrix4fv(m_Uniforms[VIEW_U], 1, GL_FALSE, &view[0][0]);
     }
 
     void Shader::Bind() const
@@ -135,6 +138,21 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     void Shader::SetInt(const std::string& name, int value) const
     {
         glUniform1i(glGetUniformLocation(m_Program, name.c_str()), value);
+    }
+
+    void Shader::SetFloat(const std::string& name, float value) const
+    {
+        glUniform1f(glGetUniformLocation(m_Program, name.c_str()), value);
+    }
+
+    void Shader::SetVec3(const std::string& name, const glm::vec3& value) const
+    {
+        glUniform3f(glGetUniformLocation(m_Program, name.c_str()), value.x, value.y, value.z);
+    }
+
+    void Shader::SetVec2(const std::string& name, const glm::vec2& value) const
+    {
+        glUniform2f(glGetUniformLocation(m_Program, name.c_str()), value.x, value.y);
     }
 
 }}}

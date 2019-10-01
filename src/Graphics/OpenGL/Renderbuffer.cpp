@@ -28,4 +28,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    void Renderbuffer::Bind() const
+    {
+        glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
+    }
+
 }}}

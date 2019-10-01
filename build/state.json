@@ -631,7 +631,7 @@
                 },
                 {
                     "filename": "OpenGL_Window.cpp",
-                    "hash": "df3f33774a810766cc2912ed15206d27649c2dbd58381e925f896678cb818209d0f3aa688b23cf76e470cef7e29ebf8ae0b4d4fdf88bcc7f13b0ed4e03eb5797"
+                    "hash": "2154f6205a3687ce97b4de73009454c93b2dde5950c9d419b0b3eb59bce530d127c16a93b5326805bd0901a5932dd6f4e89c794f4582862739777f892e89d598"
                 }
             ]
         },
@@ -1236,7 +1236,7 @@
             "files": [
                 {
                     "filename": "Renderer.Generated.cpp",
-                    "hash": "d7e732420654d28430a9649520bd7e09b95fa1f927eb34b51b7a82840262d4812ce58f76552d1ffb77a62be5def2357a45504ee2a915b4772187eeb15336ace1"
+                    "hash": "ef1a8931e547db886cd1569449ecc8a7a1e5973d9e4c04b67a22d8a294ac1b37e7637fd7481a0ab0e2ad53861ffd6809930af7bd21b44fb67e4348bca58ee3bc"
                 },
                 {
                     "filename": "OpenGL_Renderer.Generated.cpp",
@@ -1281,6 +1281,10 @@
                 {
                     "filename": "Renderbuffer.Generated.cpp",
                     "hash": "a68c0541d7c46490b8197d661c646f7cc1fc21444c8829a393f8bb45afd12f189e1dd9680589f05e1d0ae1aef328ed9f4a833a43f77ece945656bac82013ddc4"
+                },
+                {
+                    "filename": "Quaternion.Generated.cpp",
+                    "hash": "ee39132162b9374508ef68f74d77c6cb37e5f6f351572bd8b8619505840a1b6174bee262dc45dcbaa39752b6c007dbee9bef13ee0dc2bd04a591f2690ac49a84"
                 }
             ]
         },
@@ -1289,7 +1293,7 @@
             "files": [
                 {
                     "filename": "Renderer.cpp",
-                    "hash": "274eac620c97bba52d279b842d75fe23039f55960b226c6555a1e2a2dbbf6f2a9182afafabba7baa845214d7afea7337b2d59feab00446014f13d3081c8605d2"
+                    "hash": "efed9ca2b26eeb60c559731cf38c69bbb883967396e999de5bf3e2f610125c3c2a4c94ca3a628177856a8186cb58c70680dda27da875a86ef65e6b8b3ebbf07f"
                 },
                 {
                     "filename": "OpenGL_Renderer.cpp",
@@ -1297,11 +1301,11 @@
                 },
                 {
                     "filename": "Shader.cpp",
-                    "hash": "a283567604e911d848086f72352f04f3b60fca3713b4f1eb4d967ffeb4b0425f85a2ed7badbac430fe99911df66a033ad279f391ea791457c40d81ba970c6b14"
+                    "hash": "01dc395e93c7bff7fe7fe8c5608eebcc260d6d0b1e6e4a230ab8c06f1224ecb60720ab3dd5d63f6efa898507d00c0cc4cb920106bf168a3b47f60445c34d061f"
                 },
                 {
                     "filename": "Mesh.cpp",
-                    "hash": "60dd76325855ca0ef87481512bbed072a8eceb23fb63ae85be1ec236216a8d64569b8a62d2ff46b8ca4502d8d66422be8a9c097da03aee133974fd00d70c4218"
+                    "hash": "eae92ef62525ae3d5ea3fc4aeb08b947bec0ca5d45d43e4447db7ea66f69a91bc7b933aa733e3a4762eb0f859c4325dff7cf6c1111fe36ac3aabc1a93ffb082b"
                 },
                 {
                     "filename": "Texture.cpp",
@@ -1309,11 +1313,11 @@
                 },
                 {
                     "filename": "Transform.cpp",
-                    "hash": "a6ee82245576e2da7757bf5adf103a548132670c6a1b74f3baa3a82bae189380aa1033024ed9afadcf6571c61d5c9efc9da6f2577642819cc18849293ad6f5a6"
+                    "hash": "44a330cd61d068af4b20ae752cace82ff454db0a1f077a0973218c526caa93c097ccad65031929fa6940d30b20b102778f73f30ccdaf09fadae17e84c8515d21"
                 },
                 {
                     "filename": "Camera.cpp",
-                    "hash": "71b90c854e7799696920b53acd7122cf84a1aa4077ca05d7729d32b70161752bceb6737f432837658d346e36a5da2803cf985a7d37c9a1aa77390da9a32740c5"
+                    "hash": "e8d07389e689e49f3ee768746041eacaa1334d28983ab4500edcd96d0e1f77093b275086cec3354455195d819e42ca77fb1a667de1fb906592b3b487520c306f"
                 },
                 {
                     "filename": "Framebuffer.cpp",
@@ -1325,7 +1329,7 @@
                 },
                 {
                     "filename": "Renderbuffer.cpp",
-                    "hash": "b63c4f7363db1e6aaf9645b25a816c1ceaa6dd2d204dceeb2ed51bc03ddb21c48315262db83b3d1b0a0a7bbc41a00d85e81a5994ede00460b31a64857e9a5fcd"
+                    "hash": "3153475a7429dd5dc7422e727c3e6d02de2c517b024895cfc42a4088e0b87ffc983f8930c4858357fa49425c36dac5ce74cec59395f83793309618d0026c5c48"
                 }
             ]
         },

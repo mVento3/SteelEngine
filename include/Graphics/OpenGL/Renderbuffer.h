@@ -16,6 +16,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         ~Renderbuffer();
 
         void Setup();
+
+        void Bind() const;
     };
 
 }}}

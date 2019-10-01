@@ -10,6 +10,8 @@
 #include "Graphics/OpenGL/Transform.h"
 #include "Graphics/OpenGL/Camera.h"
 
+#include "glm/glm.hpp"
+
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     class Shader
@@ -20,7 +22,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         enum Uniform
         {
             MODEL_U,
-            VIEWPROJECTION_U,
+            PROJECTION_U,
+            VIEW_U,
 
             NUM_UNIFORMS
         };
@@ -47,6 +50,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Bind() const;
 
         void SetInt(const std::string& name, int value) const;
+        void SetFloat(const std::string& name, float value) const;
+        void SetVec3(const std::string& name, const glm::vec3& value) const;
+        void SetVec2(const std::string& name, const glm::vec2& value) const;
     };
 
 }}}

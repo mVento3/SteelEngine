@@ -35,21 +35,25 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     private:
         IWindow* m_Window;
 
-        Shader* m_Shader;
-        Mesh* m_Mesh;
-        Texture* m_Texture;
-        Texture* m_NormalMapTexture;
-        Transform m_Trans;
         Camera* m_Camera;
 
-        Shader* m_G_Shader;
+        Shader* m_QuadShader;
+        QuadMesh* m_QuadMesh;
+        Renderbuffer* m_Renderbuffer;
 
+        Mesh* m_Mesh;
+        Mesh* m_Mesh2;
+        Texture* m_Texture;
+        Texture* m_NormalMapTexture;
+        Texture* m_DispMapTexture;
+        Transform m_Trans;
+        Transform m_Trans2;
+
+        Shader* m_G_Shader;
         Texture* m_PositionTexture;
         Texture* m_NormalTexture;
         Texture* m_AlbedoTexture;
         Framebuffer* m_G_Buffer;
-        QuadMesh* m_QuadMesh;
-        Renderbuffer* m_Renderbuffer;
 
         float m_Counter;
 

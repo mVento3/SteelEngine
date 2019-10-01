@@ -35,8 +35,11 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         Type::uint32 m_DrawCount;
         bool m_HasTangents;
 
-        std::vector<Vertex> m_Vertices;
-        std::vector<Type::uint32> m_Indicies;
+        std::vector<glm::vec3> m_Positions;
+        std::vector<glm::vec2> m_TexCoords;
+        std::vector<glm::vec3> m_Normals;
+        std::vector<glm::vec3> m_Tangents;
+        std::vector<unsigned int> m_Indicies;
 
     public:
         Mesh(const std::vector<Vertex>& vertices);

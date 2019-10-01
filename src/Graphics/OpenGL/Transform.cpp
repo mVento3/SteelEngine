@@ -2,7 +2,7 @@
 
 namespace SteelEngine {
 
-    Transform::Transform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale) :
+    Transform::Transform(const glm::vec3& position, const Quaternion& rotation, const glm::vec3& scale) :
         m_Position(position),
         m_Rotation(rotation),
         m_Scale(scale)
