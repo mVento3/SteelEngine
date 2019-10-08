@@ -1,6 +1,6 @@
 #include "Graphics/Vulkan/Buffer.h"
 
-#include "Graphics/Vulkan/DeepLayer/Device.h"
+#include "Graphics/Vulkan/DeepLayer/IDevice.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
@@ -17,7 +17,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     }
 
     Result Buffer::CreateBuffer(
-        const Device* device,
+        const IDevice* device,
         VkDeviceSize size,
         VkBufferUsageFlags usage,
         VkMemoryPropertyFlags properties)
@@ -26,7 +26,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     }
 
     Result Buffer::CreateBuffer(
-        const Device* device,
+        const IDevice* device,
         VkDeviceSize size,
         VkBufferUsageFlags usage,
         VkMemoryPropertyFlags properties,
@@ -72,7 +72,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     }
 
     Result Buffer::CopyBuffer(
-        const Device* device,
+        const IDevice* device,
         VkBuffer srcBuffer,
         VkBuffer dstBuffer,
         VkDeviceSize size)
@@ -116,8 +116,28 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
+    Result Buffer::CopyBuffer(
+        const IDevice* device,
+        void* srcBuffer,
+        VkDeviceSize size)
+    {
+        device->MapMemory(
+            m_BufferMemory,
+            VK_WHOLE_SIZE,
+            &m_Mapped
+        );
+
+        memcpy(m_Mapped, srcBuffer, size);
+
+        device->UnmapMemory(
+            m_BufferMemory
+        );
+
+        return SE_TRUE;
+    }
+
     Result Buffer::Map(
-        const Device* device,
+        const IDevice* device,
         VkDeviceSize size,
         VkDeviceSize offset)
     {
@@ -133,7 +153,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     }
 
     Result Buffer::Unmap(
-        const Device* device)
+        const IDevice* device)
     {
         if(m_Mapped)
         {
@@ -146,7 +166,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     }
 
     Result Buffer::Flush(
-        const Device* device,
+        const IDevice* device,
         VkDeviceSize size,
         VkDeviceSize offset)
     {
@@ -165,7 +185,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     }
 
     void Buffer::Cleanup(
-        const Device* device)
+        const IDevice* device)
     {
         if(m_Buffer)
         {

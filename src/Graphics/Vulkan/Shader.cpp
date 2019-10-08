@@ -60,8 +60,6 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         const std::string& name,
         std::vector<VkPipelineShaderStageCreateInfo>& stages)
     {
-        m_Filename = name;
-
         auto vertShaderCode = ReadFile((FileSystem::Get("shaders") / name).string() + ".vs");
         auto fragShaderCode = ReadFile((FileSystem::Get("shaders") / name).string() + ".fs");
 
@@ -91,12 +89,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
-    Result Shader::LoadShader(
-        const LogicalDevice& logicalDevice,
-        std::vector<VkPipelineShaderStageCreateInfo>& stages)
-    {
-        return LoadShader(logicalDevice, m_Filename, stages);
-    }
+    // Result Shader::LoadShader(
+    //     const LogicalDevice& logicalDevice,
+    //     std::vector<VkPipelineShaderStageCreateInfo>& stages)
+    // {
+    //     return LoadShader(logicalDevice, m_Filename, stages);
+    // }
 
     void Shader::Destroy(const LogicalDevice& logicalDevice)
     {

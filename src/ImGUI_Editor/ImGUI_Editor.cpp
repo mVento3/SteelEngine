@@ -6,8 +6,6 @@
 
 #include "RuntimeReflection/Reflection.h"
 
-#include "Graphics/Vulkan/ProgramUserData.h"
-
 #undef min
 #undef max
 
@@ -46,7 +44,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     Result ImGUI_Editor::Init(Graphics::IRenderer* renderer, IContext* context)
     {
         m_API_Context = context;
-        m_Context = (ImGuiContext*)Reflection::GetType("SteelEngine::OpenGL_Context")->Invoke("GetContext", context).Convert<void*>();
+        m_Context = (ImGuiContext*)Reflection::GetType("SteelEngine::VulkanContext")->Invoke("GetContext", context).Convert<void*>();
 
         ImGui::SetCurrentContext(m_Context);
 

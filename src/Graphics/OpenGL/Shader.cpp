@@ -106,6 +106,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_Uniforms[MODEL_U] = glGetUniformLocation(m_Program, "model");
         m_Uniforms[PROJECTION_U] = glGetUniformLocation(m_Program, "projection");
         m_Uniforms[VIEW_U] = glGetUniformLocation(m_Program, "view");
+        m_Uniforms[LIGHT_MATRIX_U] = glGetUniformLocation(m_Program, "lightMatrix");
+        m_Uniforms[LIGHT_MATRIX2_U] = glGetUniformLocation(m_Program, "lightMatrix2");
     }
 
     void Shader::Cleanup()
@@ -119,7 +121,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         glDeleteProgram(m_Program);
     }
 
-    void Shader::Update(const Transform& transform, const Camera& camera)
+    void Shader::Update(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2)
     {
         glm::mat4 model = transform.GetModel();
         glm::mat4 projection = camera.GetProjection();
@@ -128,6 +130,17 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         glUniformMatrix4fv(m_Uniforms[MODEL_U], 1, GL_FALSE, &model[0][0]);
         glUniformMatrix4fv(m_Uniforms[PROJECTION_U], 1, GL_FALSE, &projection[0][0]);
         glUniformMatrix4fv(m_Uniforms[VIEW_U], 1, GL_FALSE, &view[0][0]);
+
+        if(shadow && shadow2)
+        {
+            glm::mat4 lightMatrix = shadow->m_LightMatrix * model;
+
+            glUniformMatrix4fv(m_Uniforms[LIGHT_MATRIX_U], 1, GL_FALSE, &lightMatrix[0][0]);
+
+            lightMatrix = shadow2->m_LightMatrix * model;
+
+            glUniformMatrix4fv(m_Uniforms[LIGHT_MATRIX2_U], 1, GL_FALSE, &lightMatrix[0][0]);
+        }
     }
 
     void Shader::Bind() const
@@ -153,6 +166,11 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     void Shader::SetVec2(const std::string& name, const glm::vec2& value) const
     {
         glUniform2f(glGetUniformLocation(m_Program, name.c_str()), value.x, value.y);
+    }
+
+    void Shader::SetMat4(const std::string& name, const glm::mat4& value) const
+    {
+        glUniformMatrix4fv(glGetUniformLocation(m_Program, name.c_str()), 1, GL_FALSE, &value[0][0]);
     }
 
 }}}

@@ -4,12 +4,19 @@
 
 #include "Core/Result.h"
 
-#include "Graphics/IBuffer.h"
+#include "Graphics/Vulkan/IBuffer.h"
+
+#include "Graphics/Vulkan/DeepLayer/IDevice.h"
+
+#include "RuntimeReflection/Macro.h"
+
+#include "Core/ReflectionAttributes.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    class Device;
-
+    SE_CLASS(
+        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+    )
     class Buffer : public IBuffer
     {
     protected:
@@ -23,7 +30,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         ~Buffer();
 
         static Result CreateBuffer(
-            const Device* device,
+            const IDevice* device,
             VkDeviceSize size,
             VkBufferUsageFlags usage,
             VkMemoryPropertyFlags properties,
@@ -32,70 +39,45 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         );
 
         Result CreateBuffer(
-            const Device* device,
+            const IDevice* device,
             VkDeviceSize size,
             VkBufferUsageFlags usage,
             VkMemoryPropertyFlags properties
-        );
+        ) override;
         Result CopyBuffer(
-            const Device* device,
+            const IDevice* device,
             VkBuffer srcBuffer,
             VkBuffer dstBuffer,
             VkDeviceSize size
-        );
-
-        template <typename A>
+        ) override;
         Result CopyBuffer(
-            const Device* device,
-            A srcBuffer,
+            const IDevice* device,
+            void* srcBuffer,
             VkDeviceSize size
-        );
+        ) override;
 
         Result Map(
-            const Device* device,
+            const IDevice* device,
             VkDeviceSize size = VK_WHOLE_SIZE,
             VkDeviceSize offset = 0
-        );
+        ) override;
         Result Unmap(
-            const Device* device
-        );
+            const IDevice* device
+        ) override;
         Result Flush(
-            const Device* device,
+            const IDevice* device,
             VkDeviceSize size = VK_WHOLE_SIZE,
             VkDeviceSize offset = 0
-        );
+        ) override;
 
-        virtual void Cleanup(
-            const Device* device
-        );
+        void Cleanup(
+            const IDevice* device
+        ) override;
 
-        inline const VkBuffer GetBuffer() { return m_Buffer; }
-        inline const Type::uint32 GetCount() { return m_Count; }
-        inline const VkDeviceMemory GetMemory() { return m_BufferMemory; }
-
-        template <typename A>
-        inline A GetMapped() { return (A)m_Mapped; }
+        inline const VkBuffer& GetBuffer() const override { return m_Buffer; }
+        inline const Type::uint32 GetCount() const override { return m_Count; }
+        inline const VkDeviceMemory& GetMemory() const override { return m_BufferMemory; }
+        inline const void* GetMapped() const { return m_Mapped; }
     };
-
-    template <typename A>
-    Result Buffer::CopyBuffer(
-        const Device* device,
-        A srcBuffer,
-        VkDeviceSize size)
-    {
-        device->MapMemory(
-            m_BufferMemory,
-            VK_WHOLE_SIZE,
-            &m_Mapped
-        );
-
-        memcpy(m_Mapped, srcBuffer, size);
-
-        device->UnmapMemory(
-            m_BufferMemory
-        );
-
-        return SE_TRUE;
-    }
 
 }}}

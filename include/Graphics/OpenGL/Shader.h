@@ -7,8 +7,10 @@
 
 #include "Core/Type.h"
 
-#include "Graphics/OpenGL/Transform.h"
-#include "Graphics/OpenGL/Camera.h"
+#include "Graphics/Math/Transform.h"
+#include "Graphics/Math/Camera.h"
+
+#include "Graphics/OpenGL/ShadowInfo.h"
 
 #include "glm/glm.hpp"
 
@@ -24,6 +26,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             MODEL_U,
             PROJECTION_U,
             VIEW_U,
+            LIGHT_MATRIX_U,
+            LIGHT_MATRIX2_U,
 
             NUM_UNIFORMS
         };
@@ -46,13 +50,14 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Init();
         void Cleanup();
 
-        void Update(const Transform& transform, const Camera& camera);
+        void Update(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2);
         void Bind() const;
 
         void SetInt(const std::string& name, int value) const;
         void SetFloat(const std::string& name, float value) const;
         void SetVec3(const std::string& name, const glm::vec3& value) const;
         void SetVec2(const std::string& name, const glm::vec2& value) const;
+        void SetMat4(const std::string& name, const glm::mat4& value) const;
     };
 
 }}}

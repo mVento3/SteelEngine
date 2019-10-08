@@ -36,6 +36,8 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
+        Event::GlobalEvent::Add<ChangeMousePositionEvent>(this);
+
         return SE_TRUE;
     }
 
@@ -116,6 +118,11 @@ namespace SteelEngine {
         }
 
         return SE_TRUE;
+    }
+
+    void VulkanWindow::operator()(const ChangeMousePositionEvent& event)
+    {
+        SDL_WarpMouseInWindow(m_Window, event.m_X, event.m_Y);
     }
 
 }

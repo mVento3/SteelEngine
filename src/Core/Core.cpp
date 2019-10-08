@@ -10,8 +10,6 @@
 
 #include "SDL_events.h"
 
-#include "Graphics/Vulkan/ProgramUserData.h"
-
 namespace SteelEngine {
 
     void Core::Loop()
@@ -55,6 +53,10 @@ namespace SteelEngine {
         }
 
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::PYTHON, m_Python);
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(
+            Graphics::IRenderer::SELECTED_RENDER_API,
+            Graphics::IRenderer::VULKAN_API
+        );
 
         m_Logger = (Interface::ILogger*)Reflection::CreateInstance("SteelEngine::Logger", "log.log");
 
@@ -106,8 +108,8 @@ namespace SteelEngine {
         (*m_VirtualProject)->Init();
 
     // Graphics stuff
-        m_Window = (IWindow*)Reflection::CreateInstance("SteelEngine::OpenGL_Window");
-        m_Renderer = (Graphics::IRenderer**)&Reflection::CreateInstance("SteelEngine::Graphics::OpenGL::Renderer", m_Window)->m_Object;
+        m_Window = (IWindow*)Reflection::CreateInstance("SteelEngine::VulkanWindow");
+        m_Renderer = (Graphics::IRenderer**)&Reflection::CreateInstance("SteelEngine::Graphics::Vulkan::Renderer", m_Window)->m_Object;
         m_Editor = (Editor::IEditor**)&Reflection::CreateInstance("SteelEngine::Editor::ImGUI::ImGUI_Editor")->m_Object;
 
         m_Window->SetTitle("Test Window!");
@@ -163,7 +165,7 @@ namespace SteelEngine {
             }
         };
 
-        Reflection::GetType("SteelEngine::OpenGL_Window")->Invoke("SetProcessEventsCallback", m_Window, func);
+        Reflection::GetType("SteelEngine::VulkanWindow")->Invoke("SetProcessEventsCallback", m_Window, func);
 
         if(m_Window->Create() == SE_FALSE)
         {
@@ -183,7 +185,7 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
-        m_ImGUI_ContextAPI = (IContext*)Reflection::CreateInstance("SteelEngine::OpenGL_Context");
+        m_ImGUI_ContextAPI = (IContext*)Reflection::CreateInstance("SteelEngine::VulkanContext");
 
         m_ImGUI_ContextAPI->Init(m_Window, *m_Renderer);
 

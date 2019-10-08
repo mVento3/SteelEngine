@@ -765,7 +765,8 @@ namespace SteelEngine {
 				
 				if(splitted.size() == 2 &&
 					splitted[1].find("(") == std::string::npos &&
-					splitted[1].find(")") == std::string::npos)
+					splitted[1].find(")") == std::string::npos &&
+					splitted[splitted.size() - 1] != "override")
 				{
 					std::string& sec = splitted[1];
 

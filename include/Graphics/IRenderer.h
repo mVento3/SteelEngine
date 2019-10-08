@@ -8,6 +8,14 @@ namespace SteelEngine { namespace Graphics {
 
     struct IRenderer : public HotReload::IRuntimeObject
     {
+        enum API
+        {
+            OPENGL_API,
+            VULKAN_API,
+            SELECTED_RENDER_API
+        };
+
+    // General functions
         virtual Result Init() { return SE_NOT_IMPLEMENTED; }
         virtual void Update() override { }
         virtual void Cleanup() { }

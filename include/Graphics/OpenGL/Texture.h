@@ -22,12 +22,14 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         GLint m_InternalFormat;
         GLenum m_Format;
         GLenum m_Type;
-        GLfloat m_MinFilter;
-        GLfloat m_MagFilter;
+        GLfloat m_Filter;
+        GLenum m_TextureTarget;
+        bool m_Clamp;
 
     public:
         Texture(const std::string& filename);
-        Texture(int width, int height, GLint internalFormat, GLenum format, GLenum type, GLfloat minFilter, GLfloat magFilter);
+        Texture(int width, int height, GLint internalFormat, GLenum format, GLenum type, GLfloat filter, bool clamp);
+        Texture(GLint internalFormat, GLenum format, GLenum type, GLfloat filter, bool clamp);
         ~Texture();
 
         void Setup();

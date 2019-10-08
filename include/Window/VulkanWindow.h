@@ -11,6 +11,8 @@
 
 #include "RuntimeCompiler/IRuntimeObject.h"
 
+#include "Input/Events/ChangeMousePositionEvent.h"
+
 #include "functional"
 
 namespace SteelEngine {
@@ -57,6 +59,8 @@ namespace SteelEngine {
         {
             m_ProcessEventsCallback = callback;
         }
+
+        void operator()(const ChangeMousePositionEvent& event);
     };
 
 }

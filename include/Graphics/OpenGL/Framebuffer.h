@@ -13,7 +13,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     public:
         struct Attachment
         {
-            Attachment(Texture* texture, GLuint attachment) :
+            Attachment(Texture* texture, GLenum attachment) :
                 m_Texture(texture),
                 m_Attachment(attachment)
             {
@@ -21,7 +21,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             }
 
             Texture* m_Texture;
-            GLuint m_Attachment;
+            GLenum m_Attachment;
 
             void Setup()
             {
@@ -31,11 +31,15 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     private:
         GLuint m_FBO;
+        GLuint m_RBO;
+
+        Type::uint32 m_Width;
+        Type::uint32 m_Height;
 
         std::vector<Attachment*> m_Attachments;
 
     public:
-        Framebuffer(const std::vector<Attachment*>& attachments);
+        Framebuffer(Type::uint32 width, Type::uint32 height, const std::vector<Attachment*>& attachments);
         ~Framebuffer();
 
         void Setup();

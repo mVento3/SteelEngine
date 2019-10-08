@@ -7,10 +7,14 @@ out vec4 gAlbedoSpec;
 in vec2 texCoord0;
 in vec3 worldPos0;
 in mat3 tbnMatrix0;
+in vec4 shadowMapCoord0;
+in vec4 shadowMapCoord1;
 
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D dispMap;
+uniform sampler2D directionalLightShadowMap;
+uniform sampler2D spotLightShadowMap;
 
 uniform vec3 ambientLight;
 uniform vec3 baseColor;
@@ -33,9 +37,34 @@ struct DirectionalLight
 {
 	BaseLight base;
 	vec3 direction;
+	bool shadowMap;
+};
+
+struct Attenuation
+{
+	float constant;
+	float linear;
+	float exponent;
+};
+
+struct PointLight
+{
+	BaseLight base;
+	Attenuation attenuation;
+	vec3 position;
+	float range;
+};
+
+struct SpotLight
+{
+	PointLight pointLight;
+	vec3 direction;
+	float cutoff;
 };
 
 uniform DirectionalLight directionalLight;
+uniform PointLight pointLight;
+uniform SpotLight spotLight;
 
 vec4 calcLight(BaseLight base, vec3 direction, vec3 normal)
 {
@@ -67,6 +96,63 @@ vec4 calcDirectionalLight(DirectionalLight light, vec3 normal)
 	return calcLight(light.base, -light.direction, normal);
 }
 
+vec4 calcPointLight(PointLight light, vec3 normal)
+{
+	vec3 lightDirection = worldPos0 - light.position;
+	float distanceToPoint = length(lightDirection);
+	
+	if(distanceToPoint > light.range)
+	{
+		return vec4(0, 0, 0, 0);
+	}
+	
+	lightDirection = normalize(lightDirection);
+	
+	vec4 color = calcLight(light.base, lightDirection, normal);
+	float attenuation = light.attenuation.constant +
+						light.attenuation.linear * distanceToPoint +
+						light.attenuation.exponent * (distanceToPoint * distanceToPoint);
+	
+	return color * (1.0 / attenuation);
+}
+
+vec4 calcSpotLight(SpotLight light, vec3 normal)
+{
+	vec3 lightDirection = normalize(worldPos0 - light.pointLight.position);
+	float spotFactor = dot(lightDirection, light.direction);
+	vec4 color = vec4(0, 0, 0, 0);
+	
+	if(spotFactor > light.cutoff)
+	{
+		color = calcPointLight(light.pointLight, normal) * (1.0 - (1.0 - spotFactor) / (1.0 - light.cutoff));
+	}
+	
+	return color;
+}
+
+float linstep(float low, float height, float v)
+{
+	return clamp((v - low) / (height - low), 0.0, 1.0);
+}
+
+float sampleShadowMap(sampler2D shadowMap, vec2 coord, float compare)
+{
+	vec2 moments = texture2D(shadowMap, coord).xy;
+	float p = step(compare, moments.x);
+	float variance = max(moments.y - moments.x * moments.x, 0.00002);
+	float d = compare - moments.x;
+	float pMax = linstep(0.2, 1.0, variance / (variance + d * d));
+	
+	return min(max(p, pMax), 1.0);
+}
+
+float calcShadowAmount(sampler2D shadowMap, vec4 initialShadowMapCoord)
+{
+	vec3 shadowMapCoord = (initialShadowMapCoord.xyz / initialShadowMapCoord.w) * 0.5 + 0.5;
+	
+	return sampleShadowMap(shadowMap, shadowMapCoord.xy, shadowMapCoord.z);
+}
+
 void main()
 {
 	vec3 directionToEye = normalize(eyePosition - worldPos0);
@@ -87,7 +173,10 @@ void main()
 		color *= textureColor;
 	}
 	
-	totalLight += calcDirectionalLight(directionalLight, gNormal);
+	totalLight += calcDirectionalLight(directionalLight, gNormal) * calcShadowAmount(directionalLightShadowMap, shadowMapCoord1);
+	// totalLight += calcPointLight(pointLight, gNormal);
+	totalLight += calcSpotLight(spotLight, gNormal) * calcShadowAmount(spotLightShadowMap, shadowMapCoord0);
+
 	
 	gAlbedoSpec = color * totalLight;
 }

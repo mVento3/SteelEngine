@@ -4,13 +4,19 @@
 
 #include "Event/GlobalEvent.h"
 
-#include "Graphics/UniformBufferObject.h"
+#include "Graphics/Vulkan/UniformBufferObject.h"
+#include "Graphics/Vulkan/Color.h"
 
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "RuntimeReflection/Reflection.h"
+
+#include "FileSystem/FileSystem.h"
+
+#include "SDL_events.h"
 
 #undef max
 #undef min
@@ -183,6 +189,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     Result Renderer::GeneralInit()
     {
+        FileSystem::Map("shaders", "D:/Projects/C++/SteelEngine/bin/Resources/Shaders");
+
         if(mc_EnableValidationLayers && !CheckValidationLayerSupport())
         {
             printf("Disabled validation layers or check failed!\n");
@@ -227,7 +235,150 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             return SE_FALSE;
         }
 
+        m_CommandBuffer = new CommandBuffer();
+
         printf("General vulkan init success!\n");
+
+        return SE_TRUE;
+    }
+
+    Result Renderer::CreatePipeline()
+    {
+        auto bindingDescription = Vertex::GetBindingDescription();
+        auto attributeDescription = Vertex::GetAttributeDescriptions();
+
+        VkPipelineVertexInputStateCreateInfo vertexInputInfo =
+            VertexInput(bindingDescription, attributeDescription);
+
+        VkPipelineInputAssemblyStateCreateInfo inputAssembly =
+            InputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE);
+
+        VkViewport viewport = Viewport();
+        VkRect2D scissor = Scissor(m_SwapChain->m_SwapChainExtent);
+
+        VkPipelineViewportStateCreateInfo viewportState =
+            ViewportState(viewport, scissor);
+
+        VkPipelineRasterizationStateCreateInfo rasterizer =
+            Rasterizer(VK_FRONT_FACE_COUNTER_CLOCKWISE, VK_CULL_MODE_BACK_BIT);
+
+        VkPipelineMultisampleStateCreateInfo multisampling =
+            Multisampling();
+
+        VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
+
+        colorBlendAttachment.colorWriteMask =   VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        colorBlendAttachment.blendEnable =      VK_FALSE;
+
+        VkPipelineColorBlendStateCreateInfo colorBlending = {};
+
+        colorBlending.sType =           VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        colorBlending.logicOpEnable =   VK_FALSE;
+        colorBlending.logicOp =         VK_LOGIC_OP_COPY;
+        colorBlending.attachmentCount = 1;
+        colorBlending.pAttachments =    &colorBlendAttachment;
+
+        colorBlending.blendConstants[0] = 0.0f;
+        colorBlending.blendConstants[1] = 0.0f;
+        colorBlending.blendConstants[2] = 0.0f;
+        colorBlending.blendConstants[3] = 0.0f;
+
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
+
+        pipelineLayoutInfo.sType =          VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 1;
+        pipelineLayoutInfo.pSetLayouts =    &m_DescriptorSetLayout;
+
+        if(m_Device->CreatePipelineLayout(
+            &pipelineLayoutInfo,
+            m_PipelineLayout) == SE_FALSE)
+        {
+            return SE_FALSE;
+        }
+
+        VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
+
+		pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+
+        if(m_Device->CreatePipelineCache(
+            &pipelineCacheCreateInfo,
+            m_PipelineCache) == SE_FALSE)
+        {
+            return SE_FALSE;
+        }
+
+        VkGraphicsPipelineCreateInfo pipelineInfo = {};
+
+        pipelineInfo.sType =                VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipelineInfo.stageCount =           m_ShaderStages.size();
+        pipelineInfo.pStages =              m_ShaderStages.data();
+        pipelineInfo.pVertexInputState =    &vertexInputInfo;
+        pipelineInfo.pInputAssemblyState =  &inputAssembly;
+        pipelineInfo.pViewportState =       &viewportState;
+        pipelineInfo.pRasterizationState =  &rasterizer;
+        pipelineInfo.pMultisampleState =    &multisampling;
+        pipelineInfo.pDepthStencilState =   nullptr; // Optional
+        pipelineInfo.pColorBlendState =     &colorBlending;
+        pipelineInfo.pDynamicState =        nullptr; // Optional
+        pipelineInfo.layout =               m_PipelineLayout;
+        pipelineInfo.renderPass =           m_RenderPass;
+        pipelineInfo.subpass =              0;
+        pipelineInfo.basePipelineHandle =   VK_NULL_HANDLE; // Optional
+        pipelineInfo.basePipelineIndex =    -1; // Optional
+
+        if(m_Device->CreatePipelines(
+            { pipelineInfo },
+            m_Pipeline,
+            m_PipelineCache) == SE_FALSE)
+        {
+            return SE_FALSE;
+        }
+
+        return SE_TRUE;
+    }
+
+    Result Renderer::CreateFramebuffers()
+    {
+        m_Framebuffers.resize(m_SwapChain->m_SwapChainImageViews.size());
+
+        for(size_t i = 0; i < m_SwapChain->m_SwapChainImageViews.size(); i++)
+        {
+            VkImageView attachments[] =
+            {
+                m_SwapChain->m_SwapChainImageViews[i]
+            };
+
+            VkFramebufferCreateInfo framebufferInfo = {};
+
+            framebufferInfo.sType =             VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            framebufferInfo.renderPass =        m_RenderPass;
+            framebufferInfo.attachmentCount =   1;
+            framebufferInfo.pAttachments =      attachments;
+            framebufferInfo.width =             m_SwapChain->m_SwapChainExtent.width;
+            framebufferInfo.height =            m_SwapChain->m_SwapChainExtent.height;
+            framebufferInfo.layers =            1;
+
+            if(m_Device->CreateFramebuffer(
+                &framebufferInfo,
+                m_Framebuffers[i]) == SE_FALSE)
+            {
+                return SE_FALSE;
+            }
+        }
+
+        return SE_TRUE;
+    }
+
+    Result Renderer::CreateCommandBuffers()
+    {
+        m_CommandBuffers.clear();
+        m_CommandBuffers.resize(m_Framebuffers.size());
+
+        if(m_Device->AllocateCommandBuffers(
+            m_CommandBuffers) == SE_FALSE)
+        {
+            return SE_FALSE;
+        }
 
         return SE_TRUE;
     }
@@ -425,11 +576,13 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     }
 
     Renderer::Renderer(IWindow* window) :
-        m_Window(window)
+        m_Window(window),
+        m_Camera(Transform())
     {
         m_Device = new Device();
         m_Validation = new Validation();
         m_CommandPool = new CommandPool();
+        m_DescriptorPool = new DescriptorPool();
 
         m_Surface = new Surface();
         m_SwapChain = new SwapChain();
@@ -443,7 +596,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         m_FramebufferResized = false;
         m_WindowMinimized = false;
 
-        // m_ImGUI = new ImGUI_Program();
+        m_Camera.GetTransform().SetPosition(glm::vec3(0, 0, -10));
+        m_RotateCamera = false;
     }
 
     Renderer::~Renderer()
@@ -510,7 +664,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         uboLayoutBinding.binding =              0;
         uboLayoutBinding.descriptorType =       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uboLayoutBinding.descriptorCount =      1;
+        uboLayoutBinding.descriptorCount =      1; // If it is an array, you can specify the size
         uboLayoutBinding.stageFlags =           VK_SHADER_STAGE_VERTEX_BIT;
         uboLayoutBinding.pImmutableSamplers =   nullptr; // Optional
 
@@ -531,124 +685,11 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             return SE_FALSE;
         }
 
-        auto bindingDescription = Vertex::GetBindingDescription();
-        auto attributeDescription = Vertex::GetAttributeDescriptions();
+        CreatePipeline();
 
-        VkPipelineVertexInputStateCreateInfo vertexInputInfo =
-            VertexInput(bindingDescription, attributeDescription);
+        // m_Device->DestroyShader(m_SomeShader);
 
-        VkPipelineInputAssemblyStateCreateInfo inputAssembly =
-            InputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE);
-
-        VkViewport viewport = Viewport();
-        VkRect2D scissor = Scissor(m_SwapChain->m_SwapChainExtent);
-
-        VkPipelineViewportStateCreateInfo viewportState =
-            ViewportState(viewport, scissor);
-
-        VkPipelineRasterizationStateCreateInfo rasterizer =
-            Rasterizer(VK_FRONT_FACE_COUNTER_CLOCKWISE, VK_CULL_MODE_BACK_BIT);
-
-        VkPipelineMultisampleStateCreateInfo multisampling =
-            Multisampling();
-
-        VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
-
-        colorBlendAttachment.colorWriteMask =   VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-        colorBlendAttachment.blendEnable =      VK_FALSE;
-
-        VkPipelineColorBlendStateCreateInfo colorBlending = {};
-
-        colorBlending.sType =           VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-        colorBlending.logicOpEnable =   VK_FALSE;
-        colorBlending.logicOp =         VK_LOGIC_OP_COPY;
-        colorBlending.attachmentCount = 1;
-        colorBlending.pAttachments =    &colorBlendAttachment;
-
-        colorBlending.blendConstants[0] = 0.0f;
-        colorBlending.blendConstants[1] = 0.0f;
-        colorBlending.blendConstants[2] = 0.0f;
-        colorBlending.blendConstants[3] = 0.0f;
-
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
-
-        pipelineLayoutInfo.sType =          VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts =    &m_DescriptorSetLayout;
-
-        if(m_Device->CreatePipelineLayout(
-            &pipelineLayoutInfo,
-            m_PipelineLayout) == SE_FALSE)
-        {
-            return SE_FALSE;
-        }
-
-        VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
-
-		pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-
-        if(m_Device->CreatePipelineCache(
-            &pipelineCacheCreateInfo,
-            m_PipelineCache) == SE_FALSE)
-        {
-            return SE_FALSE;
-        }
-
-        VkGraphicsPipelineCreateInfo pipelineInfo = {};
-
-        pipelineInfo.sType =                VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipelineInfo.stageCount =           m_ShaderStages.size();
-        pipelineInfo.pStages =              m_ShaderStages.data();
-        pipelineInfo.pVertexInputState =    &vertexInputInfo;
-        pipelineInfo.pInputAssemblyState =  &inputAssembly;
-        pipelineInfo.pViewportState =       &viewportState;
-        pipelineInfo.pRasterizationState =  &rasterizer;
-        pipelineInfo.pMultisampleState =    &multisampling;
-        pipelineInfo.pDepthStencilState =   nullptr; // Optional
-        pipelineInfo.pColorBlendState =     &colorBlending;
-        pipelineInfo.pDynamicState =        nullptr; // Optional
-        pipelineInfo.layout =               m_PipelineLayout;
-        pipelineInfo.renderPass =           m_RenderPass;
-        pipelineInfo.subpass =              0;
-        pipelineInfo.basePipelineHandle =   VK_NULL_HANDLE; // Optional
-        pipelineInfo.basePipelineIndex =    -1; // Optional
-
-        if(m_Device->CreatePipelines(
-            { pipelineInfo },
-            m_Pipeline,
-            m_PipelineCache) == SE_FALSE)
-        {
-            return SE_FALSE;
-        }
-
-        m_Device->DestroyShader(m_SomeShader);
-
-        m_Framebuffers.resize(m_SwapChain->m_SwapChainImageViews.size());
-
-        for(size_t i = 0; i < m_SwapChain->m_SwapChainImageViews.size(); i++)
-        {
-            VkImageView attachments[] =
-            {
-                m_SwapChain->m_SwapChainImageViews[i]
-            };
-
-            VkFramebufferCreateInfo framebufferInfo = {};
-
-            framebufferInfo.sType =             VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            framebufferInfo.renderPass =        m_RenderPass;
-            framebufferInfo.attachmentCount =   1;
-            framebufferInfo.pAttachments =      attachments;
-            framebufferInfo.width =             m_SwapChain->m_SwapChainExtent.width;
-            framebufferInfo.height =            m_SwapChain->m_SwapChainExtent.height;
-            framebufferInfo.layers =            1;
-
-            if(m_Device->CreateFramebuffer(
-                &framebufferInfo,
-                m_Framebuffers[i]) == SE_FALSE)
-            {
-                return SE_FALSE;
-            }
-        }
+        CreateFramebuffers();
 
         if(m_Device->CreateCommandPool(m_CommandPool) == SE_FALSE)
         {
@@ -657,119 +698,71 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         m_Buffer->CreateVertexBuffer(
             m_Device,
+            sizeof(Vertex),
             m_Vertices.data(),
             m_Vertices.size()
         );
         m_Buffer2->CreateVertexBuffer(
             m_Device,
+            sizeof(Vertex),
             m_Vertices2.data(),
             m_Vertices2.size()
         );
         m_IndexBuffer->CreateIndexBuffer(
             m_Device,
+            sizeof(Type::uint16),
             m_Indices.data(),
             m_Indices.size()
         );
 
         m_VertexArray = { m_Buffer, m_Buffer2 };
 
-        m_Uniforms.resize(m_SwapChain->m_SwapChainImages.size());
+        m_MVP_Uniform = new Buffer();
 
-        for(size_t i = 0; i < m_SwapChain->m_SwapChainImages.size(); i++)
-        {
-            m_Uniforms[i] = new Buffer();
+        m_MVP_Uniform->CreateBuffer(
+            m_Device,
+            sizeof(UniformBufferObject),
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        );
 
-            m_Uniforms[i]->CreateBuffer(
-                m_Device,
-                sizeof(UniformBufferObject),
-                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-            );
-        }
+        m_MVP_Uniform2 = new Buffer();
 
-        VkDescriptorPoolSize poolSize = {};
+        m_MVP_Uniform2->CreateBuffer(
+            m_Device,
+            sizeof(UniformBufferObject),
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        );
 
-        poolSize.type =             VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSize.descriptorCount =  m_SwapChain->m_SwapChainImages.size();
+        m_DescriptorPool->Create(m_Device, 2, 2);
+        m_DescriptorPool->AllocateDescriptorSets(m_Device, m_DescriptorSetLayout);
 
-        VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
+        std::vector<VkDescriptorBufferInfo> buffers;
 
-        descriptorPoolInfo.sType =            VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        descriptorPoolInfo.poolSizeCount =    1;
-        descriptorPoolInfo.pPoolSizes =       &poolSize;
-        descriptorPoolInfo.maxSets =          m_SwapChain->m_SwapChainImages.size();
+        VkDescriptorBufferInfo bufferInfo = {};
 
-        if(m_Device->CreateDescriptorPool(
-            &descriptorPoolInfo,
-            m_DescriptorPool) == SE_FALSE)
-        {
-            return SE_FALSE;
-        }
+        bufferInfo.buffer = m_MVP_Uniform->GetBuffer();
+        bufferInfo.offset = 0;
+        bufferInfo.range =  sizeof(UniformBufferObject);
 
-        std::vector<VkDescriptorSetLayout> layouts(m_SwapChain->m_SwapChainImages.size(), m_DescriptorSetLayout);
-        VkDescriptorSetAllocateInfo descriptorAllocInfo = {};
+        buffers.push_back(bufferInfo);
 
-        descriptorAllocInfo.sType =               VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        descriptorAllocInfo.descriptorPool =      m_DescriptorPool;
-        descriptorAllocInfo.descriptorSetCount =  m_SwapChain->m_SwapChainImages.size();
-        descriptorAllocInfo.pSetLayouts =         layouts.data();
+        std::vector<VkDescriptorBufferInfo> buffers2;
 
-        m_DescriptorSets.resize(m_SwapChain->m_SwapChainImages.size());
+        VkDescriptorBufferInfo bufferInfo2 = {};
 
-        if(m_Device->AllocateDescriptorSets(
-            &descriptorAllocInfo,
-            m_DescriptorSets) == SE_FALSE)
-        {
-            return SE_FALSE;
-        }
+        bufferInfo2.buffer = m_MVP_Uniform2->GetBuffer();
+        bufferInfo2.offset = 0;
+        bufferInfo2.range =  sizeof(UniformBufferObject);
 
-        for(size_t i = 0; i < m_SwapChain->m_SwapChainImages.size(); i++)
-        {
-            VkDescriptorBufferInfo bufferInfo = {};
+        buffers2.push_back(bufferInfo2);
 
-            bufferInfo.buffer = m_Uniforms[i]->GetBuffer();
-            bufferInfo.offset = 0;
-            bufferInfo.range =  sizeof(UniformBufferObject);
+        m_DescriptorPool->WriteDescriptorSet(buffers);
+        m_DescriptorPool->WriteDescriptorSet(buffers2);
+        m_DescriptorPool->UpdateDescriptorSets(m_Device);
 
-            VkWriteDescriptorSet descriptorWrite = {};
-
-            descriptorWrite.sType =             VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrite.dstSet =            m_DescriptorSets[i];
-            descriptorWrite.dstBinding =        0;
-            descriptorWrite.dstArrayElement =   0;
-            descriptorWrite.descriptorType =    VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            descriptorWrite.descriptorCount =   1;
-            descriptorWrite.pBufferInfo =       &bufferInfo;
-            descriptorWrite.pImageInfo =        nullptr; // Optional
-            descriptorWrite.pTexelBufferView =  nullptr; // Optional
-
-            m_Device->UpdateDescriptorSets(
-                { descriptorWrite }
-            );
-        }
-
-        m_CommandBuffers.resize(m_Framebuffers.size());
-
-        if(m_Device->AllocateCommandBuffers(
-            m_CommandBuffers) == SE_FALSE)
-        {
-            return SE_FALSE;
-        }
-
-    // Not here!!!!!
-        // ProgramUserData* udata = new ProgramUserData(m_Window);
-
-        // udata->m_Editor = m_Editor;
-
-        // if(m_ImGUI->Init(
-        //     m_Device,
-        //     m_Device->m_LogicalDevice->m_GraphicsQueue,
-        //     m_RenderPass,
-        //     udata) == SE_FALSE)
-        // {
-        //     return SE_FALSE;
-        // }
-    // ----------------------------------------------------------
+        CreateCommandBuffers();
 
         if(CreateSyncObjects() == SE_FALSE)
         {
@@ -779,20 +772,57 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         Event::GlobalEvent::Add<ResizeEvent>(this);
         Event::GlobalEvent::Add<MinimizedEvent>(this);
         Event::GlobalEvent::Add<MaximizedEvent>(this);
+        Event::GlobalEvent::Add<KeyDownEvent>(this);
+        Event::GlobalEvent::Add<KeyUpEvent>(this);
+        Event::GlobalEvent::Add<MouseMotionEvent>(this);
+
+        for(uint32_t i = 0; i < 256; i++)
+        {
+            m_Keys[i] = false;
+        }
 
         return SE_TRUE;
     }
 
     void Renderer::Update()
     {
-        // m_ImGUI->DrawUI();
-        // m_ImGUI->UpdateBuffers();
+        if(m_RotateCamera)
+        {
+            Event::GlobalEvent::Broadcast(ChangeMousePositionEvent{ 1600 / 2, 900 / 2 });
+        }
+
+        Transform& cameraTransform = m_Camera.GetTransform();
+
+        if(m_Keys[SDL_SCANCODE_W])
+        {
+            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetForward() * 0.01f);
+        }
+
+        if(m_Keys[SDL_SCANCODE_S])
+        {
+            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetBackward() * 0.01f);
+        }
+
+        if(m_Keys[SDL_SCANCODE_A])
+        {
+            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetRight() * 0.01f);
+        }
+
+        if(m_Keys[SDL_SCANCODE_D])
+        {
+            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetLeft() * 0.01f);
+        }
 
         m_Device->WaitForFences(
             { m_InFlightFences[m_CurrentFrame] },
             VK_TRUE,
             std::numeric_limits<uint64_t>::max()
         );
+
+        for(std::function<void()> func : m_UpdateBuffers)
+        {
+            func();
+        }
 
         Type::uint32 frameIndex;
 
@@ -837,9 +867,16 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         renderPassInfo.clearValueCount =    1;
         renderPassInfo.pClearValues =       &clearColor;
 
+        static auto startTime = std::chrono::high_resolution_clock::now();
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
         vkCmdBeginRenderPass(m_CommandBuffers[frameIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
             vkCmdBindPipeline(m_CommandBuffers[frameIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);
+
+            uint32_t i = 0;
 
             for(Buffer* data : m_VertexArray)
             {
@@ -848,11 +885,18 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
                 vkCmdBindVertexBuffers(m_CommandBuffers[frameIndex], 0, 1, &buff, offsets);
                 vkCmdBindIndexBuffer(m_CommandBuffers[frameIndex], m_IndexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
-                vkCmdBindDescriptorSets(m_CommandBuffers[frameIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSets[frameIndex], 0, nullptr);
+                vkCmdBindDescriptorSets(m_CommandBuffers[frameIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorPool->GetDescriptorSet(i), 0, nullptr);
                 vkCmdDrawIndexed(m_CommandBuffers[frameIndex], m_IndexBuffer->GetCount(), 1, 0, 0, 0);
+
+                i++;
             }
 
-            // m_ImGUI->Render(m_CommandBuffers[frameIndex]);
+            for(std::function<void(Vulkan::ICommandBuffer*)> command : m_Commands)
+            {
+                m_CommandBuffer->Update(m_CommandBuffers[frameIndex]);
+
+                command(m_CommandBuffer);
+            }
 
         vkCmdEndRenderPass(m_CommandBuffers[frameIndex]);
 
@@ -861,21 +905,34 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             return;
         }
 
-        static auto startTime = std::chrono::high_resolution_clock::now();
-
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
         UniformBufferObject ubo;
 
-        ubo.m_Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.m_View = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.m_Projection = glm::perspective(glm::radians(70.0f), (float)m_Width / (float)m_Height, 0.01f, 1000.0f);
-        ubo.m_Projection[1][1] *= -1;
+        // m_Trans.SetRotation(
+        //     glm::quat(glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)))
+        // );
+
+        ubo.m_Projection = m_Camera.GetProjection();
+        ubo.m_View = m_Camera.GetView();
+        ubo.m_Model = m_Trans.GetModel();
 
         m_Device->Copy(
-            m_Uniforms[frameIndex]->GetMemory(),
-            &ubo
+            m_MVP_Uniform->GetMemory(),
+            &ubo,
+            sizeof(UniformBufferObject)
+        );
+
+        UniformBufferObject ubo2;
+
+        m_Trans2.SetRotation(glm::quat(glm::rotate(sinf(time) * glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f))));
+
+        ubo2.m_Projection = m_Camera.GetProjection();
+        ubo2.m_View = m_Camera.GetView();
+        ubo2.m_Model = m_Trans2.GetModel();
+
+        m_Device->Copy(
+            m_MVP_Uniform2->GetMemory(),
+            &ubo2,
+            sizeof(UniformBufferObject)
         );
 
         VkSubmitInfo submitInfo = {};
@@ -976,35 +1033,96 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         //     return;
         // }
 
-        // vkDeviceWaitIdle(m_LogicalDevice->GetLogicalDevice());
+        m_Device->WaitIdle();
 
-        // m_Framebuffer->Cleanup(*m_LogicalDevice);
-        // m_CommandPool->CleanupCommandBuffers(*m_LogicalDevice);
-        // m_GraphicsPipeline->Cleanup(*m_LogicalDevice, *m_SwapChain);
-        // m_RenderPass->Cleanup(*m_LogicalDevice);
-        // m_SwapChain->Cleanup(*m_LogicalDevice);
-        // m_DescriptorPool->Cleanup(*m_LogicalDevice);
+        if(m_WindowMinimized)
+        {
+            return;
+        }
 
-        // m_SwapChain->Create(*m_PhysicalDevice, *m_LogicalDevice, *m_Surface);
-        // m_RenderPass->Create(*m_LogicalDevice, *m_SwapChain);
+        for(auto framebuffer : m_Framebuffers)
+        {
+            m_Device->DestroyFramebuffer(framebuffer);
+        }
 
-        // m_ShaderStages.clear();
-        // m_SomeShader->LoadShader(m_ShaderStages);
-        // m_GraphicsPipeline->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass, *m_Descriptor, m_ShaderStages);
-        // m_SomeShader->Destroy();
-        // m_Framebuffer->Create(*m_LogicalDevice, *m_SwapChain, *m_RenderPass);
-        // m_GraphicsPipeline->CreateUniformBuffers(*m_PhysicalDevice, *m_LogicalDevice, *m_SwapChain, sizeof(UniformBufferObject));
-        // m_DescriptorPool->Create(*m_LogicalDevice, *m_SwapChain, *m_Descriptor, *m_GraphicsPipeline);
-        // m_CommandPool->CreateCommandBuffers(
-        //     *m_LogicalDevice,
-        //     *m_Framebuffer,
-        //     *m_RenderPass,
-        //     *m_SwapChain,
-        //     *m_GraphicsPipeline,
-        //     *m_DescriptorPool,
-        //     m_VertexArray,
-        //     m_IndexBuffer
-        // );
+        for(auto commandBuffer : m_CommandBuffers)
+        {
+            m_Device->FreeCommandBuffer(commandBuffer);
+        }
+
+        m_Device->DestroyPipeline(m_Pipeline);
+        m_Device->DestroyPipelineLayout(m_PipelineLayout);
+        m_Device->DestroyRenderPass(m_RenderPass);
+
+        m_SwapChain->Cleanup(*m_Device->m_LogicalDevice);
+
+        m_Device->CreateSwapChain(m_Surface, m_SwapChain);
+
+        std::vector<VkAttachmentDescription> attachments =
+        {
+            AttachmentDescription(m_SwapChain->m_SwapChainImageFormat)
+        };
+
+        std::vector<VkAttachmentReference> attachmentRefs =
+        {
+            AttachmentReference(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+        };
+
+        std::vector<VkSubpassDescription> subpasses =
+        {
+            Subpass(attachmentRefs)
+        };
+
+        std::vector<VkSubpassDependency> dependencies =
+        {
+            Dependency()
+        };
+
+        VkRenderPassCreateInfo renderPassInfo =
+            RenderPass(attachments, subpasses, dependencies);
+
+        m_Device->CreateRenderPass(&renderPassInfo, m_RenderPass);
+        CreatePipeline();
+        CreateFramebuffers();
+        CreateCommandBuffers();
+    }
+
+    void Renderer::BindCommands(std::function<void(Vulkan::ICommandBuffer*)> func)
+    {
+        m_Commands.push_back(func);
+    }
+
+    void Renderer::BindUpdateUniforms(std::function<void()> func)
+    {
+        m_UpdateBuffers.push_back(func);
+    }
+
+    void Renderer::operator()(const KeyDownEvent& event)
+    {
+        m_Keys[event.m_KeyCode] = true;
+
+        if(event.m_KeyCode == SDL_SCANCODE_K)
+        {
+            m_RotateCamera = !m_RotateCamera;
+        }
+    }
+
+    void Renderer::operator()(const KeyUpEvent& event)
+    {
+        m_Keys[event.m_KeyCode] = false;
+    }
+
+    void Renderer::operator()(const MouseMotionEvent& event)
+    {
+        glm::vec2 deltaPos = glm::vec2(event.m_X, event.m_Y) - glm::vec2(1600 / 2, 900 / 2);
+
+        if(m_RotateCamera && (deltaPos.x != 0 || deltaPos.y != 0))
+        {
+            Transform& camTrans = m_Camera.GetTransform();
+
+            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.x * -0.001f, glm::vec3(0, 1, 0)) * camTrans.GetRotation()));
+            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.y * -0.001f, camTrans.GetRotation().GetRight()) * camTrans.GetRotation()));
+        }
     }
 
     void Renderer::operator()(const RecompiledEvent& event)

@@ -9,11 +9,16 @@
 #include "Graphics/OpenGL/Shader.h"
 #include "Graphics/OpenGL/Mesh.h"
 #include "Graphics/OpenGL/Texture.h"
-#include "Graphics/OpenGL/Transform.h"
-#include "Graphics/OpenGL/Camera.h"
 #include "Graphics/OpenGL/Framebuffer.h"
 #include "Graphics/OpenGL/QuadMesh.h"
-#include "Graphics/OpenGL/Renderbuffer.h"
+#include "Graphics/OpenGL/ShadowInfo.h"
+#include "Graphics/OpenGL/Model.h"
+
+#include "Graphics/Math/Transform.h"
+#include "Graphics/Math/Camera.h"
+
+#include "Graphics/OpenGL/Lights/SpotLight.h"
+#include "Graphics/OpenGL/Lights/DirectionalLight.h"
 
 #include "Graphics/OpenGL/Renderer.Generated.h"
 
@@ -23,6 +28,8 @@
 #include "Input/Events/ChangeMousePositionEvent.h"
 
 #include "Event/GlobalEvent.h"
+
+#include "vector"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
@@ -39,21 +46,35 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         Shader* m_QuadShader;
         QuadMesh* m_QuadMesh;
-        Renderbuffer* m_Renderbuffer;
+
+        std::vector<Model> m_Models;
+        std::vector<Light*> m_Lights;
 
         Mesh* m_Mesh;
         Mesh* m_Mesh2;
+        Mesh* m_Mesh3;
         Texture* m_Texture;
         Texture* m_NormalMapTexture;
         Texture* m_DispMapTexture;
         Transform m_Trans;
         Transform m_Trans2;
+        Transform m_Trans3;
 
         Shader* m_G_Shader;
         Texture* m_PositionTexture;
         Texture* m_NormalTexture;
         Texture* m_AlbedoTexture;
+        Texture* m_ShadowTexture;
         Framebuffer* m_G_Buffer;
+
+        Shader* m_ShadowShader;
+        Camera* m_ShadowCamera;
+
+        SpotLight* m_SpotLight;
+        Quaternion m_SpotRotation;
+        DirectionalLight* m_DirectionalLight;
+
+        Transform m_DirectionalLightTransform;
 
         float m_Counter;
 

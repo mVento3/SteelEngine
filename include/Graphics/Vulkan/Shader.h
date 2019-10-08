@@ -5,18 +5,22 @@
 
 #include "Core/Type.h"
 #include "Core/Result.h"
+#include "Core/ReflectionAttributes.h"
 
 #include "Vulkan/vulkan.h"
 
-#include "Graphics/Vulkan/DeepLayer/LogicalDevice.h"
+#include "Graphics/Vulkan/IShader.h"
+
+#include "RuntimeReflection/Macro.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    class Shader
+    SE_CLASS(
+        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+    )
+    class Shader : public IShader
     {
     private:
-        std::string m_Filename;
-
         std::vector<VkShaderModule> m_Modules;
 
         static std::vector<char> ReadFile(const std::string& filename);
@@ -34,12 +38,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             const LogicalDevice& logicalDevice,
             const std::string& name,
             std::vector<VkPipelineShaderStageCreateInfo>& stages
-        );
-        Result LoadShader(
-            const LogicalDevice& logicalDevice,
-            std::vector<VkPipelineShaderStageCreateInfo>& stages
-        );
-        void Destroy(const LogicalDevice& logicalDevice);
+        ) override;
+        // Result LoadShader(
+        //     const LogicalDevice& logicalDevice,
+        //     std::vector<VkPipelineShaderStageCreateInfo>& stages
+        // ) override;
+        void Destroy(const LogicalDevice& logicalDevice) override;
     };
 
 }}}

@@ -170,6 +170,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     }
 
+// Semaphore and fence
     Result Device::CreateSemaphore(
         const VkSemaphoreCreateInfo* semaphoreCreateInfo,
         VkSemaphore& semaphore) const
@@ -195,6 +196,19 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         return SE_TRUE;
     }
 
+    void Device::DestroySemaphore(
+        const VkSemaphore& semaphore) const
+    {
+        vkDestroySemaphore(m_LogicalDevice->GetLogicalDevice(), semaphore, 0);
+    }
+
+    void Device::DestroyFence(
+        const VkFence& fence) const
+    {
+        vkDestroyFence(m_LogicalDevice->GetLogicalDevice(), fence, 0);
+    }
+
+// RenderPass
     Result Device::CreateRenderPass(
         const VkRenderPassCreateInfo* renderPassCreateInfo,
         VkRenderPass& renderPass) const
@@ -209,6 +223,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         );
 
         return SE_TRUE;
+    }
+
+    void Device::DestroyRenderPass(
+        const VkRenderPass& renderPass) const
+    {
+        vkDestroyRenderPass(m_LogicalDevice->GetLogicalDevice(), renderPass, 0);
     }
 
     void Device::WaitForFences(
@@ -290,6 +310,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         );
     }
 
+// Pipeline
     Result Device::CreatePipelineLayout(
         const VkPipelineLayoutCreateInfo* pipelineLayoutCreateInfo,
         VkPipelineLayout& pipelineLayout) const
@@ -337,6 +358,18 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         );
 
         return SE_TRUE;
+    }
+
+    void Device::DestroyPipeline(
+        const VkPipeline& pipeline) const
+    {
+        vkDestroyPipeline(m_LogicalDevice->GetLogicalDevice(), pipeline, 0);
+    }
+
+    void Device::DestroyPipelineLayout(
+        const VkPipelineLayout& pipelineLayout) const
+    {
+        vkDestroyPipelineLayout(m_LogicalDevice->GetLogicalDevice(), pipelineLayout, 0);
     }
 
     Result Device::CreateDescriptorSetLayout(
@@ -495,7 +528,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     Result Device::LoadShader(
         const std::string& filename,
-        Shader* shader,
+        IShader* shader,
         std::vector<VkPipelineShaderStageCreateInfo>& stages) const
     {
         return shader->LoadShader(
@@ -506,7 +539,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     }
 
     void Device::DestroyShader(
-        Shader* shader) const
+        IShader* shader) const
     {
         shader->Destroy(*m_LogicalDevice);
     }
@@ -723,6 +756,13 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         vkUnmapMemory(m_LogicalDevice->GetLogicalDevice(), memory);
 
         return SE_TRUE;
+    }
+
+// Framebuffer
+    void Device::DestroyFramebuffer(
+        const VkFramebuffer& framebuffer) const
+    {
+        vkDestroyFramebuffer(m_LogicalDevice->GetLogicalDevice(), framebuffer, 0);
     }
 
 }}}

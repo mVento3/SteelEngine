@@ -49,6 +49,8 @@ namespace SteelEngine {
         m_Context = SDL_GL_CreateContext(m_Window);
         SDL_GL_MakeCurrent(m_Window, m_Context);
 
+        SDL_GL_SetSwapInterval(0);
+
         Event::GlobalEvent::Add<ChangeMousePositionEvent>(this);
 
         return SE_TRUE;

@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Graphics/IRenderer.h"
+#include "Graphics/IRendererVulkan.h"
 
 #include "RuntimeReflection/Macro.h"
+
 #include "Core/ReflectionAttributes.h"
 
 #include "Vulkan/vulkan.h"
-
-#include "Graphics/Vulkan/Vulkan.Generated.h"
 
 #include "Window/IWindow.h"
 #include "Window/ResizeEvent.h"
@@ -25,12 +24,22 @@
 #include "Graphics/Vulkan/IndexBuffer.h"
 #include "Graphics/Vulkan/Buffer.h"
 #include "Graphics/Vulkan/VertexBuffer.h"
-#include "Graphics/Vulkan/IProgram.h"
+#include "Graphics/Vulkan/CommandBuffer.h"
+#include "Graphics/Vulkan/DescriptorPool.h"
 
 #include "Graphics/IEditor.h"
 #include "Graphics/Vertex.h"
 
 #include "vector"
+
+#include "Graphics/Math/Camera.h"
+
+#include "Input/Events/KeyUpEvent.h"
+#include "Input/Events/KeyDownEvent.h"
+#include "Input/Events/MouseMotionEvent.h"
+#include "Input/Events/ChangeMousePositionEvent.h"
+
+#include "Graphics/Vulkan/Renderer.Generated.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -40,7 +49,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     SE_CLASS(
         SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
     )
-    class Renderer : public IRenderer
+    class Renderer : public IRendererAPI<IRenderer::API::VULKAN_API>
     {
         GENERATED_BODY
 
@@ -62,18 +71,18 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         const std::vector<Vertex> m_Vertices =
         {
-            {{ -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
-            {{ 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }},
-            {{ 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }},
-            {{ -0.5f, 0.5f }, { 1.0f, 1.0f, 1.0f }}
+            Vertex(glm::vec3(-0.5f, -0.5f, 0), glm::vec3(1, 0, 0)),
+            Vertex(glm::vec3(0.5f, -0.5f, 0), glm::vec3(0, 1, 0)),
+            Vertex(glm::vec3(0.5f, 0.5f, 0), glm::vec3(0, 0, 1)),
+            Vertex(glm::vec3(-0.5f, 0.5f, 0), glm::vec3(1, 0, 1))
         };
 
         const std::vector<Vertex> m_Vertices2 =
         {
-            {{ -0.2f, -0.2f }, { 1.0f, 0.0f, 0.0f }},
-            {{ 0.2f, -0.2f }, { 0.0f, 1.0f, 0.0f }},
-            {{ 0.2f, 0.2f }, { 0.0f, 0.0f, 1.0f }},
-            {{ -0.2f, 0.2f }, { 1.0f, 1.0f, 1.0f }}
+            Vertex(glm::vec3(-0.2f, -0.2f, 0), glm::vec3(0, 0, 1)),
+            Vertex(glm::vec3(0.2f, -0.2f, 0), glm::vec3(0, 1, 0)),
+            Vertex(glm::vec3(0.2f, 0.2f, 0), glm::vec3(1, 0, 0)),
+            Vertex(glm::vec3(-0.2f, 0.2, 0), glm::vec3(1, 1, 0))
         };
 
         const std::vector<Type::uint16> m_Indices =
@@ -84,24 +93,26 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     private:
         VkInstance m_Instance;
 
-        Device*             m_Device;
-        Validation*         m_Validation;
-        CommandPool*        m_CommandPool;
+        Device*         m_Device;
+        Validation*     m_Validation;
+        CommandPool*    m_CommandPool;
+        CommandBuffer*  m_CommandBuffer;
+        DescriptorPool* m_DescriptorPool;
 
-        Surface*            m_Surface;
-        SwapChain*          m_SwapChain;
+        Surface*    m_Surface;
+        SwapChain*  m_SwapChain;
+
+        Camera m_Camera;
 
         VkRenderPass            m_RenderPass;
         VkDescriptorSetLayout   m_DescriptorSetLayout;
         VkPipelineLayout        m_PipelineLayout;
         VkPipeline              m_Pipeline;
         VkPipelineCache         m_PipelineCache;
-        VkDescriptorPool        m_DescriptorPool;
 
         std::vector<VkFramebuffer>      m_Framebuffers;
         std::vector<VkCommandBuffer>    m_CommandBuffers;
-        std::vector<Buffer*>            m_Uniforms;
-        std::vector<VkDescriptorSet>    m_DescriptorSets;
+        // std::vector<VkDescriptorSet>    m_DescriptorSets;
 
         IWindow* m_Window;
 
@@ -111,9 +122,14 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         std::vector<VkPipelineShaderStageCreateInfo> m_ShaderStages;
 
+        std::vector<std::function<void(Vulkan::ICommandBuffer*)>> m_Commands;
+        std::vector<std::function<void()>> m_UpdateBuffers;
+
         size_t m_CurrentFrame;
         bool m_FramebufferResized;
         bool m_WindowMinimized;
+        bool m_Keys[256];
+        bool m_RotateCamera;
 
         Type::uint32 m_Width;
         Type::uint32 m_Height;
@@ -123,6 +139,12 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         VertexBuffer*   m_Buffer2;
         IndexBuffer*    m_IndexBuffer;
 
+        Buffer* m_MVP_Uniform;
+        Buffer* m_MVP_Uniform2;
+
+        Transform m_Trans;
+        Transform m_Trans2;
+
         std::vector<Buffer*> m_VertexArray;
 
         std::vector<const char*> GetSDL_Extensions();
@@ -131,6 +153,9 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         Result CreateInstance();
         Result CreateSyncObjects();
+        Result CreatePipeline();
+        Result CreateFramebuffers();
+        Result CreateCommandBuffers();
 
         Result GeneralInit();
 
@@ -198,9 +223,19 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         SE_METHOD()
         void RecreateSwapChain();
 
+        inline void* GetDevice() const override { return m_Device; }
+        inline VkQueue GetQueue() const override { return m_Device->m_LogicalDevice->m_GraphicsQueue; }
+        inline VkRenderPass GetRenderPass() const override { return m_RenderPass; }
+
+        void BindCommands(std::function<void(Vulkan::ICommandBuffer*)> func) override;
+        void BindUpdateUniforms(std::function<void()> func) override;
+
         void operator()(const ResizeEvent& event);
         void operator()(const MinimizedEvent& event);
         void operator()(const MaximizedEvent& event);
+        void operator()(const KeyDownEvent& event);
+        void operator()(const KeyUpEvent& event);
+        void operator()(const MouseMotionEvent& event);
     };
 
 }}}

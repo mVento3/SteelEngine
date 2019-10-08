@@ -199,7 +199,7 @@
             "files": [
                 {
                     "filename": "Core.cpp",
-                    "hash": "d351470ed495f2b3461e1d1d9372cf7541276310e13d2952df7c3c788d6a96b7e767fe79d89cfa460624e0d0611e63cfdfd3f7cfad7f87c7c64034dc9189f045"
+                    "hash": "06244dfc02ca22ba49007d3d9007bf8c4d10c4f43b3a6e72ad36f86d7e8d79655b7e607f266e99963581078c1895217cd6cc535d8cbe270ca643d1580a59ca52"
                 },
                 {
                     "filename": "NCE_ReflectionModule.cpp",
@@ -257,6 +257,10 @@
                 {
                     "filename": "Vertex.Generated.cpp",
                     "hash": "7c8833dedb1fa54d084e493722f39a01bbc06125acfd649850d6d53886881414ce6df01745566c6657db0098ff5d11d9e9dd5803abc1f45cb2d4d5d09ee219c5"
+                },
+                {
+                    "filename": "IRendererVulkan.Generated.cpp",
+                    "hash": "16ea39e17b5804bedbc43466c625b0b1d354d4a93d8c3c2709f9d0bd695a72294336aa07a2b1c386b709b60fc157c331ff69d1950e74b415dcd904155a873c4b"
                 }
             ]
         },
@@ -265,7 +269,7 @@
             "files": [
                 {
                     "filename": "Buffer.Generated.cpp",
-                    "hash": "00cc5ab6f0a948d8a0e0b183d93734910fdad0b7ae00d3687a63a3f6e085c0279031f30fa905c2eb93d2e6cc2423f01b40cc7a89fdf52cb0a8c0115e174f895d"
+                    "hash": "5cc3967448eadcd83135654697e1a26263b5d360f83ddd17b503565123976c307851f85cbbb59355e9176bd4130d7d3f4f8da814c659e6b7e7b4bd7520d9b41c"
                 },
                 {
                     "filename": "ImGUI_Program.Generated.cpp",
@@ -273,15 +277,15 @@
                 },
                 {
                     "filename": "IndexBuffer.Generated.cpp",
-                    "hash": "ab3e07d2c89c0a1376b8427ede648f37bef2d473999983fb6bedff8d785485a6e3d70a7319212f0bf9e92ac2c24ec929ab26cc0b18590b214152606e04bac67c"
+                    "hash": "428e96fba8b8b2182376e99a5ec0611c871110e3f70e9c179cbceea2da2c156100bcc3290bc6fa93bb2fa2c7d7fb3b76e59ef50d08d672d2bc6059d0f6021bcc"
                 },
                 {
                     "filename": "Shader.Generated.cpp",
-                    "hash": "7167c6b4a244a42b6de0346c77f7f40a0647dd5851bf8199ecc4f86b7dbbcec18b48057b393ff14f17736576bd98b37949a23dcb6f6e680c24e2319c7905fe85"
+                    "hash": "cbb1e4607c6eb7da997c147423303e88b696dd3b2c0ac74fea26a3d7e66331b0a2ebd0361b2cdfb845d495784afb757b56cfe07b5b1b19fd7a9b0717f9bf853f"
                 },
                 {
                     "filename": "VertexBuffer.Generated.cpp",
-                    "hash": "f41a2539dc0d722028eb0e732c7b9c1f864d0fce50f7b3f5368437578f0534837c6ae614670810ecf16c7605be38660981780152ebca9180ce1a9b0be26ade89"
+                    "hash": "4bf3cbc73be3f2db294552283aeafd6d9b1a1f6775ed0f559737fc70f34f22117edff60701835871f2ae4f129e26fdb02cbfb0ba36edecb67152bf60c1e007d4"
                 },
                 {
                     "filename": "Vulkan.Generated.cpp",
@@ -289,7 +293,7 @@
                 },
                 {
                     "filename": "Renderer.Generated.cpp",
-                    "hash": "f8741e9183fef011884807deb7a04511ac8a234827a62def59ade26023755af625a1a439bb8b596a1def3f3144e2a0deb2bc96cd4518149918c5a67b73a16ee8"
+                    "hash": "d494a4dfdf3f1cce9c09d00ac62c3da149ffab100990c07ce74d180b4dc820493d02ece4faef7c666f3f0a1913abdfc23e207220895a866d582e26f33d97696f"
                 },
                 {
                     "filename": "IProgram.Generated.cpp",
@@ -306,6 +310,34 @@
                 {
                     "filename": "Utils.Generated.cpp",
                     "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+                },
+                {
+                    "filename": "IBuffer.Generated.cpp",
+                    "hash": "a2f87c2b016d9828380dafb04d27950e5ce9a482df773ed2df9fccdc16ccdfa7558ce6a4296f2aa49dd78b0a4e33aa09e43bea579478a501cdbcea39bc52c604"
+                },
+                {
+                    "filename": "IShader.Generated.cpp",
+                    "hash": "540f2d7dc54c8d36c7b8d20cec0eeb2e85fc2eae8bb5a87136ef8c187db38b21d3e24553a7a1aea3aea6ecce8917292d6c982d85d9e15dd9cf62c369c910019b"
+                },
+                {
+                    "filename": "CommandBuffer.Generated.cpp",
+                    "hash": "ba2d919d709b481c48a4cf50b4e5bb4a7d69a8f9c13be3d5a3ee403bacfcf140abe2d985cf8b066170c30f19a40a4b7e4e9f1860589d5e3ec1191fc8b96b17f5"
+                },
+                {
+                    "filename": "ICommandBuffer.Generated.cpp",
+                    "hash": "6279c4e7a5e4a6333dbf783781e41bc7fc7a793593038fb22b9414519eb1e8b6efe4545ded0d1ad3c147975fddca89d632835d36f54fe612b26acb50fd6c63c9"
+                },
+                {
+                    "filename": "Color.Generated.cpp",
+                    "hash": "c50a31905e1589c99897b724cc0a83b6047a0892d68c01dabdce31e897af6a582a9f372fbf3117cf3c9615bcfbc1d6cb4d5c97094e9940593851170b55217673"
+                },
+                {
+                    "filename": "UniformBufferObject.Generated.cpp",
+                    "hash": "5ffeaec33193b5313fc8e1a98ea568489e45100ce906b9f3612e3534dd1c881acc5d8932898dbdbc572db484c83177ea840a5fbf85883c8715c9c94ad156bc49"
+                },
+                {
+                    "filename": "DescriptorPool.Generated.cpp",
+                    "hash": "4e1cd32a120571d8776eb58235268dace0c58c5e70aa6937fa1191a36b33577d746fb4822072a103d4f1f2860ae2acfa3bd5ed347e50753851dcdca4fc6a27ed"
                 }
             ]
         },
@@ -335,6 +367,14 @@
                 {
                     "filename": "QueueFamilyIndices.Generated.cpp",
                     "hash": "d6004a1975346a03824f57f8cd461d0327feca6ab556d458497690d4dbe7d753680234e68cf7f3c4e909d8256faa9366707d501a3614b8a2049f728ee78d259f"
+                },
+                {
+                    "filename": "IDevice.Generated.cpp",
+                    "hash": "6050a3ca4806c300c89066448ddc2b4ba3c6eb32846b21f74d8251afb1a23250630d2c07ebd038da29f722943dfd1920fc4287d1663f41b043df9ea873d64af7"
+                },
+                {
+                    "filename": "ICommandBuffer.Generated.cpp",
+                    "hash": "8f15f2d390ff77412541656385a21951e3f4f7203bcf24403ed6365f6285ad3becb50a6575bdd3343dbdde805ebc433407b79250fb9c168b721e953b6643e3f9"
                 }
             ]
         },
@@ -369,7 +409,7 @@
             "files": [
                 {
                     "filename": "Buffer.cpp",
-                    "hash": "e85d97f4cf15facc5d75dffe03f6c1c14530a1a9b75d62b3a8eb88a107ebfe2f5b962a5908c3f91a5a6fb604764b79e458f6486637b0479d94e308491ce44f9c"
+                    "hash": "e9634602424dd105bd6a86e53d44c25cd942b7dff6bfc6e3a0def84f39940ab1166872a3007aa577703752583dedb28a641d86b1ac4cdd665252587a706f4ed3"
                 },
                 {
                     "filename": "ImGUI_Program.cpp",
@@ -377,15 +417,15 @@
                 },
                 {
                     "filename": "IndexBuffer.cpp",
-                    "hash": "b6397eb3434fe810f156d0b57867defd6a35ce8601582630a18820d002883b0f18e6b7878fbd8833b64a2a71e7643d281970e826d8b16d44db5888f7c495cc9a"
+                    "hash": "e5531d746f728cad22801f20543a521b24fb6f19fd71b2e13bbf6a165c26b6e0568b96b87701a9da6f55d8e154a5f07d8191d3cf508a1692454c8b22d23c686c"
                 },
                 {
                     "filename": "Shader.cpp",
-                    "hash": "500aa7498f769f30778eaadf6acb7519791ebf021d596513537f90303fb113812067c871781bf2079b9cd3683d11191d656f7025fc5206d968bea2ec8e39c516"
+                    "hash": "6225a246a702c1402c3aea24ee87c5a2b9a88da632c0e5921a688f131fea16a2e7d1f433843b2a9138aec302f6477ec111281b7708ca7af4d0e1c356654dab08"
                 },
                 {
                     "filename": "VertexBuffer.cpp",
-                    "hash": "039a218d1b6ed97fd879262917213bb47040e509ae27911b60a4c2a75aab514c488b2ea7a6bb6183c086fc45d86b35e044431831e31d243254d2b00fdeda83ff"
+                    "hash": "5519dbdd46d3cfc065561bba0c42ab506d66365ef13f6beceb6af0a89a4a7123930b5e195594a9fd3aa32a8c2aec2e40a09c3d24ff11526a8ac5ada110368566"
                 },
                 {
                     "filename": "Vulkan.cpp",
@@ -393,7 +433,15 @@
                 },
                 {
                     "filename": "Renderer.cpp",
-                    "hash": "1133ff11ee0c419431a007cd52f4a0df0388d57821b5036318611f87027637399776de4f61a7709f3aea391d60e0f3fd5ba27345645b5bf15caf9b6701c61a0e"
+                    "hash": "26d05b04d5891aabe29c77c383bfbd2600162797848d370a8947f422ff85cbc202d9a28ee27fb4b7457b814cfa7f8116fc93243fc02fb4303463ffdcf3f91b04"
+                },
+                {
+                    "filename": "CommandBuffer.cpp",
+                    "hash": "11c26bb0a32c25a581ea02a0b66ab18606d25d73d0e44b73091d2b77cad3977a16c4f2fbbcef24933e2c953fad3a3ee68ceefded778365657e35b36311a02297"
+                },
+                {
+                    "filename": "DescriptorPool.cpp",
+                    "hash": "a5c60de4eee03492b8a72910534634d8a8bb6e11c2ed74c010106f687101195aa79a7eea4431fd0f7acec76b33b103d99df6cf9267bdf65ca99f8ffc955643d6"
                 }
             ]
         },
@@ -406,7 +454,7 @@
                 },
                 {
                     "filename": "Device.cpp",
-                    "hash": "84db6e99dff042a5ba70a423683ff9c4517cdeac8113ccd969cacee175cd74c55633ad86af7770d037fd75792ba4d1d4b4d66dee211c6a36c2eede0f9ed1704c"
+                    "hash": "838e8880a31fb59f2c7fbed4051940d03665367f4a67e327714958cb42486d9d6b093cbf5b9cafa9ccf1737d5227c2877ec28f7a1dd7af4982a9c6b479c49f64"
                 },
                 {
                     "filename": "LogicalDevice.cpp",
@@ -473,6 +521,10 @@
                 {
                     "filename": "SelectableProject.Generated.cpp",
                     "hash": "90b23f66521bd0afeeb426725dde9643df57a8e7753b878396f6a4cd35905dc8e8f360398a57ee75d12b04b1604666b650fbdf314d8243f1ba39c3a69b938057"
+                },
+                {
+                    "filename": "VulkanContext.Generated.cpp",
+                    "hash": "f00e2745351e0de1742c1175bae52c0bea62bdce62202b2f7e8c5227faa6bd23c82c7c44bd06338d7bce47779736df173b83b9c51d8cab8f3b0e1a3cc220aed9"
                 }
             ]
         },
@@ -510,7 +562,7 @@
             "files": [
                 {
                     "filename": "ImGUI_Editor.cpp",
-                    "hash": "3bbf224cf05c63564111fd982c5f17250b9a977351bff8b1c23afd4b633d2ab452ee834b042385b454b9c0fe940e5ee2d40bd967f9657a40ba547924aa3fc7ac"
+                    "hash": "7f2a9f85697ae7a00e97cf74a0e2ed0709cd80ab471fe8fe60ea841d1dd191c730323a288e0c96b2b3e072506f2283111741a4027685bba88bcd8289a4c4fb98"
                 },
                 {
                     "filename": "Window.cpp",
@@ -523,6 +575,10 @@
                 {
                     "filename": "OpenGL_Context.cpp",
                     "hash": "b8e9f443e62260283aff2e36e43a8e101385055e007754be36286cb07cbc851a54165078e3c255d2e40ce08db59f42311a77483b7c6efc4fed633a0006002787"
+                },
+                {
+                    "filename": "VulkanContext.cpp",
+                    "hash": "530afe0262548faf183917ea6aaa9a098df045b789dcd0bc0afe378989cdeb87213a9b68b9655a402894d0ce32a2c177e6b9caf53ddf6fd25da6a19e61218447"
                 }
             ]
         },
@@ -627,11 +683,11 @@
             "files": [
                 {
                     "filename": "VulkanWindow.cpp",
-                    "hash": "62ad9297fb1cac428780b90e8231ab611eecaab535d3fc28e5603cc67c6f772c9ab7a3858f88c5804502017aa74f8f2a05690b028703560b9e896653ca6f12aa"
+                    "hash": "a02ff55743e64c64e50e1140dc2b0f268f280c112d9266bd690a558ee7c668f2907075cecc98a0794328f0874e2bb3eedb99dae8f5b39b422020c470831c5cca"
                 },
                 {
                     "filename": "OpenGL_Window.cpp",
-                    "hash": "2154f6205a3687ce97b4de73009454c93b2dde5950c9d419b0b3eb59bce530d127c16a93b5326805bd0901a5932dd6f4e89c794f4582862739777f892e89d598"
+                    "hash": "158df3ab7d60d13a9039f093e5e740d9a5772b395c5284d12377b5fa6a5188ba0e2fdfc6f15eb7a4ec33513a883c96f161385f36277e93096ca18d0a09111a5d"
                 }
             ]
         },
@@ -759,7 +815,7 @@
             "files": [
                 {
                     "filename": "ReflectionGenerator.cpp",
-                    "hash": "3d4d4d7c5ad8af0d234e68d2d3eac19ad4c3c0b5ed1e6529b1b957140448ba5a984de68f36a8feb1d0a295a389360be5e6b3fee215ff3373bc12c7324dff95f3"
+                    "hash": "efdef01156d643561213d71a0453d2c72c9b5e5cdee13e0403f2c282da6882592ed397b584fbeefe941a78220f22f36d0e21a2ba19d4eb21923abce3675d387f"
                 }
             ]
         },
@@ -1236,7 +1292,7 @@
             "files": [
                 {
                     "filename": "Renderer.Generated.cpp",
-                    "hash": "ef1a8931e547db886cd1569449ecc8a7a1e5973d9e4c04b67a22d8a294ac1b37e7637fd7481a0ab0e2ad53861ffd6809930af7bd21b44fb67e4348bca58ee3bc"
+                    "hash": "f379238838baa135ada85e09732ad1fe077495bcb47e1bb4c8c2fb114f0c34b89d6cc6acfbcfefebd2bb4a4366711cb8a1e3a8e3e7eaab275d0313b9ec5385dd"
                 },
                 {
                     "filename": "OpenGL_Renderer.Generated.cpp",
@@ -1285,6 +1341,18 @@
                 {
                     "filename": "Quaternion.Generated.cpp",
                     "hash": "ee39132162b9374508ef68f74d77c6cb37e5f6f351572bd8b8619505840a1b6174bee262dc45dcbaa39752b6c007dbee9bef13ee0dc2bd04a591f2690ac49a84"
+                },
+                {
+                    "filename": "TextureData.Generated.cpp",
+                    "hash": "1f514b55ce2811d48ba38fbef208abb3c47ac4e926c7a6556405eac654f98382de909307c7f086188a5ca3364de81ab0b857057dcf03a9ee3fa17cb3f6037a63"
+                },
+                {
+                    "filename": "ShadowInfo.Generated.cpp",
+                    "hash": "938bfb8b7daf940022b6add0e81bdbc6f29d999e40efa17520057335f2ae9773f790a4bef87d9f9f701b19ad68f14872e11e7e3db6a0825857e7a698262e59d0"
+                },
+                {
+                    "filename": "Model.Generated.cpp",
+                    "hash": "d9efa83b273e38153dee6b7b2f2860033fa3f16396f9c784d4f840c3a9fe72c0e722598c5f5a78132c0a548f5eadef91646faf3aec0f1c1648090a975598c410"
                 }
             ]
         },
@@ -1293,7 +1361,7 @@
             "files": [
                 {
                     "filename": "Renderer.cpp",
-                    "hash": "efed9ca2b26eeb60c559731cf38c69bbb883967396e999de5bf3e2f610125c3c2a4c94ca3a628177856a8186cb58c70680dda27da875a86ef65e6b8b3ebbf07f"
+                    "hash": "74c6b071913472a6455fec573740c7bb308133b5701b492dd2656fd690e78040d7a703a2e7c8c133800e9347c0400401fb466d4a93a8d9dff135670e564016e0"
                 },
                 {
                     "filename": "OpenGL_Renderer.cpp",
@@ -1301,7 +1369,7 @@
                 },
                 {
                     "filename": "Shader.cpp",
-                    "hash": "01dc395e93c7bff7fe7fe8c5608eebcc260d6d0b1e6e4a230ab8c06f1224ecb60720ab3dd5d63f6efa898507d00c0cc4cb920106bf168a3b47f60445c34d061f"
+                    "hash": "9f769914abc159880dbdaafe75e896d3a82392705fa0d3da7480f1014590dad652c357eb79f7647c7217aed167b189f0602c2d6b2e2f4b36664c18622a80fc37"
                 },
                 {
                     "filename": "Mesh.cpp",
@@ -1309,7 +1377,7 @@
                 },
                 {
                     "filename": "Texture.cpp",
-                    "hash": "e5d933edffe1722c85b0305cd7638a85380b49777e9f86b9537a45410e4c01dd2d4a249d0a015120ce6606812cccb0a9b10ffd6fe85e96976178bc8fd7f53d69"
+                    "hash": "ac0a584d1ed10c7cbe04a56c245127bf123b2321df9e0ff62c303ce2e67815aeac2735c8f47d24a15c6d4f84bf135334656e803ca06d0d8de3c1fca04df9ed26"
                 },
                 {
                     "filename": "Transform.cpp",
@@ -1321,7 +1389,7 @@
                 },
                 {
                     "filename": "Framebuffer.cpp",
-                    "hash": "d3451205cf4260e64e7c8ea8a2d77ff68421a14f58b5cdf6b01fabdda162bb3f46272daf9cc1c760a648531bb4facb3e217f0b3f1318d650c6796d7548c9aa0c"
+                    "hash": "8110f876cfdda0756441a5ae1d75b4ba2b10af71084bf0b5357bc958c777250cff20e02356a044d48775803addd3482200c58072515f79e322b2fe3cf6a9a54e"
                 },
                 {
                     "filename": "QuadMesh.cpp",
@@ -1330,6 +1398,14 @@
                 {
                     "filename": "Renderbuffer.cpp",
                     "hash": "3153475a7429dd5dc7422e727c3e6d02de2c517b024895cfc42a4088e0b87ffc983f8930c4858357fa49425c36dac5ce74cec59395f83793309618d0026c5c48"
+                },
+                {
+                    "filename": "TextureData.cpp",
+                    "hash": "eff66230c9cf50cc955d8c8405221bf2c3cd326b1f3927c9926a965bc6c48db75d49c0454c29002507add010bc284ba005ec6c4a7039ebe11d15be04c049c735"
+                },
+                {
+                    "filename": "ShadowInfo.cpp",
+                    "hash": "47939a96de3536d66b86e912d712ef0e0ca9cb938ded2bd76d879733854e919f7d9487d375f17b7643e136333e51592226d7d604a4e6c6fadc42bbb42e4cdbf1"
                 }
             ]
         },
@@ -1455,6 +1531,82 @@
                 {
                     "filename": "StopRecompilingEvent.Generated.cpp",
                     "hash": "70cebc5e28169749366bb27ad67d4d2fe1f3fdf11cfb119ed0fc0daeace9588fea83737cfc3b9c1a8236e9997678f2610bde679eb55064504137986348d5bc22"
+                }
+            ]
+        },
+        {
+            "folder": "Graphics/OpenGL/Lights",
+            "files": [
+                {
+                    "filename": "SpotLight.Generated.cpp",
+                    "hash": "6db7df2e9e0991a2e7c1f3d2af6a9b3b280d774dae2d2fd637337768ee985b53bee8fd63c1d45c03795751ad8dd543d46d34bf245c7fc3b7114cf538aa378ec2"
+                },
+                {
+                    "filename": "BaseLight.Generated.cpp",
+                    "hash": "11f37b30932c7f43c92060b65dba5417e4457ecd6aa396e9647810c638e6c7d195f98a57b13abbeb027f797d0a7c9695e65f8c1d8e169816d3b4607819005000"
+                },
+                {
+                    "filename": "DirectionalLight.Generated.cpp",
+                    "hash": "146b5e8afc81f20b7c295aef1216908703c96d58c271db876a8ef7e7108004aac7b08ca128d10f6d97da5279394d8f60ab1ec3a2d26a57be8b281d43b2ee7013"
+                },
+                {
+                    "filename": "Light.Generated.cpp",
+                    "hash": "d79ddce391bec0dcef34a2a035bdbbcccd9fa9e0332a00f03e3968e1baf6e0caefe0259e5f66eccbfc2a1a0e97d78c613e7bc74c1320feb28248750c05b3722e"
+                },
+                {
+                    "filename": "AmbientLight.Generated.cpp",
+                    "hash": "66bd15cae9441047cb535129624f25d23a05f172269685d7520b5f983f57b3785a8ca85fae2bca55324371b4312917815cdef33b775cc7d748c75f33d957ac0c"
+                }
+            ]
+        },
+        {
+            "folder": "src/Graphics/OpenGL/Lights",
+            "files": [
+                {
+                    "filename": "SpotLight.cpp",
+                    "hash": "6ce11393878ce4efec10548dde3e293af1445fa16cc18b3868b0174d997984bfb78046c94b5e15a36bc75cbe83cccf0ece59c114c35fc39f9ee3146d35ea619a"
+                },
+                {
+                    "filename": "DirectionalLight.cpp",
+                    "hash": "08d1b8373a35c9b306179eab9a5804183351829b1ee0b6f3cd34b4180abd6187777355b80a8d28c1eccc6c1cce079612997322dd24fb7b407e84d6626934aa6b"
+                },
+                {
+                    "filename": "Light.cpp",
+                    "hash": "2e43cfaf25b693640f31d23dad23ee171e4e48ce56c2692453945b43afda00570881faa3c2987db5d2f30187da135ba80e059ce447b202e862500edadb973567"
+                },
+                {
+                    "filename": "AmbientLight.cpp",
+                    "hash": "3eafbb58d1a91f1eb77ad94f631ae2689da261ee2e127a93b356b5be0ca135e27c00c9551f93ed7af1e336b8e9052d4fbd1fcaef91b8c4d657c2fc5e4fa0443f"
+                }
+            ]
+        },
+        {
+            "folder": "Graphics/Math",
+            "files": [
+                {
+                    "filename": "Camera.Generated.cpp",
+                    "hash": "1ba391dc4799e9ca831268b893ed6b223ce239558e6db2dada5b1f02f0f8c5fe38ac0f500dafe545f8c2597192460a6a8a6614d5406167d64422366f860cdba5"
+                },
+                {
+                    "filename": "Quaternion.Generated.cpp",
+                    "hash": "e3395c6fbfac4a13188da80cdc6b2c0fa3e301cd5b05fdcbd687ff9e9ea3f484c8abc7333961cd9790adf1f97bdabf71391f73073122d3f56f000a0d959b9875"
+                },
+                {
+                    "filename": "Transform.Generated.cpp",
+                    "hash": "b9245bc4ac0d4d2b519c9436c67ea360c8677bfff10f77211505847553dc4213833eb77201852c60ded8c10cee3aa02d6641b72cb70940cf6c2d4de8543f2fba"
+                }
+            ]
+        },
+        {
+            "folder": "src/Graphics/Math",
+            "files": [
+                {
+                    "filename": "Camera.cpp",
+                    "hash": "5ba1094da0ebb4211f0449ec5bfd2ed4d7f3a2772942bae99397f125e0c8a937da4d2d79391c5aa7c1e18c945ad52c2c2c9fc899550aa37ee57ce7b48e2ba308"
+                },
+                {
+                    "filename": "Transform.cpp",
+                    "hash": "0b6605a2a530b0b0e29b350e8809fed2bd6161de544d30f5b5dde868f1537a453198e69f871603f9cabc40c1ea3959511229ae09bf34599ba07f572c916734c9"
                 }
             ]
         }
