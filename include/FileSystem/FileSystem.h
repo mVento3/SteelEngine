@@ -12,6 +12,8 @@
 
 #include "map"
 
+#include "Core/Core.h"
+
 namespace SteelEngine {
 
     SE_CLASS()
@@ -30,16 +32,14 @@ namespace SteelEngine {
 
         static void Map(const std::string& name, const std::filesystem::path& dir)
         {
-            static RuntimeDatabase* rd = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
-            static FileSystem* fs = (FileSystem*)rd->m_FileSystem;
+            static IFileSystem* fs = Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::FILE_SYSTEM)->Convert<IFileSystem*>();
 
             fs->MapImpl(name, dir);
         }
 
         static const std::filesystem::path& Get(const std::string& name)
         {
-            static RuntimeDatabase* rd = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
-            static FileSystem* fs = (FileSystem*)rd->m_FileSystem;
+            static IFileSystem* fs = Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::FILE_SYSTEM)->Convert<IFileSystem*>();
 
             return fs->GetImpl(name);
         }

@@ -20,6 +20,7 @@
 
 #undef max
 #undef min
+#undef CreateSemaphore
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
@@ -607,6 +608,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     Result Renderer::Init()
     {
+        m_DeltaTimeVariant = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::DELTA_TIME);
+
         m_Window->GetWindowSize(m_Width, m_Height);
 
         if(GeneralInit() == SE_FALSE)
@@ -786,31 +789,33 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     void Renderer::Update()
     {
+        float delta = m_DeltaTimeVariant->Convert<IDeltaTime*>()->GetDeltaTime();
+
         if(m_RotateCamera)
         {
-            Event::GlobalEvent::Broadcast(ChangeMousePositionEvent{ 1600 / 2, 900 / 2 });
+            Event::GlobalEvent::Broadcast(ChangeMousePositionEvent{ (int)(m_Width / 2), (int)(m_Height / 2) });
         }
 
         Transform& cameraTransform = m_Camera.GetTransform();
 
         if(m_Keys[SDL_SCANCODE_W])
         {
-            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetForward() * 0.01f);
+            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetForward() * delta * 10.f);
         }
 
         if(m_Keys[SDL_SCANCODE_S])
         {
-            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetBackward() * 0.01f);
+            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetBackward() * delta * 10.f);
         }
 
         if(m_Keys[SDL_SCANCODE_A])
         {
-            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetRight() * 0.01f);
+            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetRight() * delta * 10.f);
         }
 
         if(m_Keys[SDL_SCANCODE_D])
         {
-            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetLeft() * 0.01f);
+            cameraTransform.SetPosition(cameraTransform.GetPosition() + cameraTransform.GetRotation().GetLeft() * delta * 10.f);
         }
 
         m_Device->WaitForFences(
@@ -1114,14 +1119,14 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     void Renderer::operator()(const MouseMotionEvent& event)
     {
-        glm::vec2 deltaPos = glm::vec2(event.m_X, event.m_Y) - glm::vec2(1600 / 2, 900 / 2);
+        glm::vec2 deltaPos = glm::vec2(event.m_X, event.m_Y) - glm::vec2(m_Width / 2, m_Height / 2);
+        Transform& camTrans = m_Camera.GetTransform();
+        float delta = m_DeltaTimeVariant->Convert<IDeltaTime*>()->GetDeltaTime();
 
         if(m_RotateCamera && (deltaPos.x != 0 || deltaPos.y != 0))
         {
-            Transform& camTrans = m_Camera.GetTransform();
-
-            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.x * -0.001f, glm::vec3(0, 1, 0)) * camTrans.GetRotation()));
-            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.y * -0.001f, camTrans.GetRotation().GetRight()) * camTrans.GetRotation()));
+            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.x * delta * -0.5f, glm::vec3(0, 1, 0)) * camTrans.GetRotation()));
+            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.y * delta * -0.5f, camTrans.GetRotation().GetRight()) * camTrans.GetRotation()));
         }
     }
 
@@ -1136,6 +1141,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         m_Width = event.m_Width;
         m_Height = event.m_Height;
+
+        // TODO: Update camera
     }
 
     void Renderer::operator()(const MinimizedEvent& event)

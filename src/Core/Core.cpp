@@ -8,6 +8,8 @@
 
 #include "FileWatcher/FileWatcher.h"
 
+#include "FileSystem/FileSystem.h"
+
 #include "SDL_events.h"
 
 namespace SteelEngine {
@@ -79,7 +81,10 @@ namespace SteelEngine {
             }
         }
 
-        ((RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase"))->m_GlobalLogger = m_Logger;
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::LOGGER, m_Logger);
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::DELTA_TIME, Reflection::CreateInstance("SteelEngine::DeltaTime"));
+
+        m_DeltaTimeVariant = Reflection::GetType("SteelEngine::Core")->GetMetaData(GlobalSystems::DELTA_TIME);
 
         m_ReflectionGenerator = (IReflectionGenerator*)ModuleManager::GetModule("ReflectionGenerator");
 
@@ -113,8 +118,8 @@ namespace SteelEngine {
         m_Editor = (Editor::IEditor**)&Reflection::CreateInstance("SteelEngine::Editor::ImGUI::ImGUI_Editor")->m_Object;
 
         m_Window->SetTitle("Test Window!");
-        m_Window->SetWidth(1600);
-        m_Window->SetHeight(900);
+        m_Window->SetWidth(1920);
+        m_Window->SetHeight(1080);
 
         std::function<void(void*, IWindow*)> func = [&](void* event_, IWindow* window)
         {
@@ -217,7 +222,11 @@ namespace SteelEngine {
 
     void Core::Update()
     {
-        static auto startTime = std::chrono::high_resolution_clock::now();
+        m_DeltaTimeVariant->Convert<IDeltaTime*>()->Update();
+
+        float delta = m_DeltaTimeVariant->Convert<IDeltaTime*>()->GetDeltaTime();
+
+        // static auto startTime = std::chrono::high_resolution_clock::now();
 
         // The runtime compiler file watcher is not too perform
         if(m_RuntimeCompiler)
@@ -236,10 +245,10 @@ namespace SteelEngine {
         (*m_Renderer)->PostRender();
         (*m_VirtualProject)->Update();
 
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        float delta = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+        // auto currentTime = std::chrono::high_resolution_clock::now();
+        // float delta = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-        startTime = currentTime;
+        // startTime = currentTime;
         m_Delta += delta;
         m_Frames++;
 

@@ -16,14 +16,6 @@ namespace SteelEngine {
 	namespace HotReload {
 
 		struct IRuntimeObject;
-		struct IRuntimeCompiler;
-
-	}
-
-	namespace Interface {
-
-		struct ILogger;
-		struct IFileSystem;
 
 	}
 
@@ -106,8 +98,6 @@ namespace SteelEngine {
 			m_Objects = new ConstructedObjectsVector();
 			m_LastPerObjectID = 0;
 			m_LastPerVariantID = 0;
-			m_GlobalLogger = 0;
-			m_FileSystem = 0;
 		}
 
 		~RuntimeDatabase()
@@ -120,12 +110,8 @@ namespace SteelEngine {
 		TypesVector* m_Types; // Only for reflection
 		ConstructedObjectsVector* m_Objects; // Created and running objects
 
-		HotReload::IRuntimeCompiler* m_Compiler;
 		size_t m_LastPerObjectID;
 		size_t m_LastPerVariantID;
-
-		Interface::ILogger* m_GlobalLogger;
-		Interface::IFileSystem* m_FileSystem;
   };
 
 }

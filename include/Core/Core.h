@@ -1,7 +1,5 @@
 #pragma once
 
-#include "FileSystem/FileSystem.h"
-
 #include "Networking/INetwork.h"
 #include "Networking/INetworkManager.h"
 
@@ -39,8 +37,10 @@
 
 #include "Core/ICore.h"
 #include "Core/ReflectionAttributes.h"
-#include "Core/Core.Generated.h"
 #include "Core/GetCompileConfigEvent.h"
+#include "Core/IDeltaTime.h"
+
+#include "Core/Core.Generated.h"
 
 // 1. Fix problem with properties in proper class, especially while nesting
 // 2. Replace ImGUI_Program from vulkan to editor module, to do this i need create good render api
@@ -63,15 +63,12 @@ namespace SteelEngine {
             GAME_DEV
         };
 
-        // enum EngineInfo
-        // {
-        //     IS_SERVER,
-        //     SERVER_IP
-        // };
-
         enum GlobalSystems
         {
-            PYTHON
+            PYTHON,
+            LOGGER,
+            FILE_SYSTEM,
+            DELTA_TIME
         };
 
     private:
@@ -85,6 +82,8 @@ namespace SteelEngine {
         Network::INetworkManager*   m_NetworkManager;
         Script::IPython*            m_Python;
         IContext*                   m_ImGUI_ContextAPI;
+
+        Variant* m_DeltaTimeVariant;
 
         json m_CompileConfig;
 

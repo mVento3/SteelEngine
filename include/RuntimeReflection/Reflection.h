@@ -167,9 +167,9 @@ namespace SteelEngine {
 
 		static std::vector<IReflectionData*> GetTypes()
 		{
-			std::vector<IReflectionData*> res;
-
 			CHECK_DATABASE
+
+			std::vector<IReflectionData*> res;
 
 			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
 			{
@@ -254,9 +254,9 @@ namespace SteelEngine {
 		template <typename T>
 		static IReflectionData* GetType()
 		{
-			size_t typeID = typeid(T).hash_code();
-
 			CHECK_DATABASE
+
+			size_t typeID = typeid(T).hash_code();
 
 			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
 			{
@@ -313,9 +313,9 @@ namespace SteelEngine {
 		template <typename T, typename... Args>
 		static HotReload::IRuntimeObject* CreateInstance(Args... args)
 		{
-			size_t typeID = typeid(T).hash_code();
-
 			CHECK_DATABASE
+
+			size_t typeID = typeid(T).hash_code();
 
 			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
 			{

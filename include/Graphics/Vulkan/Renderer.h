@@ -39,6 +39,8 @@
 #include "Input/Events/MouseMotionEvent.h"
 #include "Input/Events/ChangeMousePositionEvent.h"
 
+#include "RuntimeReflection/Variant.h"
+
 #include "Graphics/Vulkan/Renderer.Generated.h"
 
 #define WIDTH 800
@@ -146,6 +148,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         Transform m_Trans2;
 
         std::vector<Buffer*> m_VertexArray;
+
+        Variant* m_DeltaTimeVariant;
 
         std::vector<const char*> GetSDL_Extensions();
         void PrintAvailableExtensions();

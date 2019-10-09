@@ -69,6 +69,7 @@ SERIALIZE(Renderer::m_MVP_Uniform2)
 SERIALIZE(Renderer::m_Trans)
 SERIALIZE(Renderer::m_Trans2)
 SERIALIZE(Renderer::m_VertexArray)
+SERIALIZE(Renderer::m_DeltaTimeVariant)
 }
 
 #ifdef RUNTIME_COMPILE

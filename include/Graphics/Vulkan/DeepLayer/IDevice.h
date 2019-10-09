@@ -15,7 +15,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     struct IDevice : public HotReload::IRuntimeObject
     {
-    // Semaphore and femce
+    // Semaphore and fence
         virtual Result CreateSemaphore(
             const VkSemaphoreCreateInfo* semaphoreCreateInfo,
             VkSemaphore& semaphore

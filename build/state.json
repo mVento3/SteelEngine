@@ -146,7 +146,7 @@
             "files": [
                 {
                     "filename": "Core.Generated.cpp",
-                    "hash": "2e98d36f70611cca6a3122069973fc305e94e77f54f1500ea1a3059ec288bff5e6d33f91a898f716d792c77231f94f3d46346b38b6502024306a4ee6100a45da"
+                    "hash": "1ad2051b3b277b061031506243e848adcdc80abc654dddb958a64476b8879087957d0711e012a649851eea28677e8d17bf81cb8017b85a2e7f3691da0f25d414"
                 },
                 {
                     "filename": "NCE_ReflectionModule.Generated.cpp",
@@ -191,6 +191,14 @@
                 {
                     "filename": "Type.Generated.cpp",
                     "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+                },
+                {
+                    "filename": "DeltaTime.Generated.cpp",
+                    "hash": "671f46022ca987c3dcfb38886a243df0828fdadc1c8fe39b3753e2073bfabf3b233384f14af15f8f1567b6619cbae05659805c2a075e326ff87ff05f00a61596"
+                },
+                {
+                    "filename": "IDeltaTime.Generated.cpp",
+                    "hash": "d582c6b55cc9fcb7b319c9095e3667448917719c9e2354b87f0a9d3c7c67d08317f5f263a564c993d8447c2ed8fe19480b6dd855408ac0c393221189327ffb93"
                 }
             ]
         },
@@ -199,7 +207,7 @@
             "files": [
                 {
                     "filename": "Core.cpp",
-                    "hash": "06244dfc02ca22ba49007d3d9007bf8c4d10c4f43b3a6e72ad36f86d7e8d79655b7e607f266e99963581078c1895217cd6cc535d8cbe270ca643d1580a59ca52"
+                    "hash": "790982cc5e43314acfc5c94a0f82f725965cf3d33bffc82f5340b9daa863cb659a4b778fb1e07541fccec5603aeb82abb81c38e3765091e77e3b02c5e38f0397"
                 },
                 {
                     "filename": "NCE_ReflectionModule.cpp",
@@ -224,6 +232,10 @@
                 {
                     "filename": "ParentClassCasterRM.cpp",
                     "hash": "3827d84540361de5722ce91707d7a1d7e90b9d9776793cd83c6a2a4ee5fa041ad659df9e6d26e3f684f17fa53ef252a8ac578952d8b0b098cbc4895aa701d5a6"
+                },
+                {
+                    "filename": "DeltaTime.cpp",
+                    "hash": "3e2cfa7a92ecb99922e3a6b4f7ad5745b9898796be29f80db3d25b63f76e22a590f567418491c2ff7eac98dd5fea23af73428f6212082737b812b212927dbb2a"
                 }
             ]
         },
@@ -293,7 +305,7 @@
                 },
                 {
                     "filename": "Renderer.Generated.cpp",
-                    "hash": "d494a4dfdf3f1cce9c09d00ac62c3da149ffab100990c07ce74d180b4dc820493d02ece4faef7c666f3f0a1913abdfc23e207220895a866d582e26f33d97696f"
+                    "hash": "068a526c8e60719ee5a453af76728e1aba4c6d36ee724b19e9514ea3d1ec9e8d3d84e14f8a5ff877750e2ea2e30c8e7d35a328ac91dee34b818276879d395881"
                 },
                 {
                     "filename": "IProgram.Generated.cpp",
@@ -433,7 +445,7 @@
                 },
                 {
                     "filename": "Renderer.cpp",
-                    "hash": "26d05b04d5891aabe29c77c383bfbd2600162797848d370a8947f422ff85cbc202d9a28ee27fb4b7457b814cfa7f8116fc93243fc02fb4303463ffdcf3f91b04"
+                    "hash": "a049e03dc2ab4053021d84edbae403454627001477580ae52b448b996e49c76dd60463ede072c6a4034d09c10e7d0e141fff9aad2dcd757b75a5fc6d7ced6a84"
                 },
                 {
                     "filename": "CommandBuffer.cpp",
@@ -709,7 +721,7 @@
             "files": [
                 {
                     "filename": "ModuleManager.cpp",
-                    "hash": "ed095f43ee3c6466fe8c7c15b178d879eb2935ed4b683578d9a08585b14f7368a64faff74bcb59db4cafe5cf57883e533dafaa3c6d289a7605fecd6bfb16c9e3"
+                    "hash": "31e366c871a60708b68be5a16d6d91b0c7a7ce4a2df077e2052179740fbf09211b49307a2daa95645c56dd7d651e74229a6500a4575da89e2ac75bb6d170d521"
                 }
             ]
         },
@@ -816,6 +828,10 @@
                 {
                     "filename": "ReflectionGenerator.cpp",
                     "hash": "efdef01156d643561213d71a0453d2c72c9b5e5cdee13e0403f2c282da6882592ed397b584fbeefe941a78220f22f36d0e21a2ba19d4eb21923abce3675d387f"
+                },
+                {
+                    "filename": "Reflection.cpp",
+                    "hash": "342c6a61df02f2a2e275715861dc2641d52241e52c6cde4772511135878f3f882fe1dee33054930fcce9f00d1f24048b898c490025fff13d024d5c91b228ee27"
                 }
             ]
         },
@@ -1046,7 +1062,7 @@
             "files": [
                 {
                     "filename": "Engine.cpp",
-                    "hash": "30df0b1cb9a5ac8c79be7581894d271034a2f18410446c8ae60f64f04bc51f300c39ae6c49ae121a9b3da9a4e8b6988a544240f43a48f221a4fb05d9a51ed77b"
+                    "hash": "ffb66373629bd564807d4357cde7dd4b01e6931fc1b4e72386a3d8066793abe0e407a154c7089d246f2577cae09b6e182b2163c79fed2cb3e0f2e8d7d4ec4fa3"
                 }
             ]
         },
@@ -1607,6 +1623,15 @@
                 {
                     "filename": "Transform.cpp",
                     "hash": "0b6605a2a530b0b0e29b350e8809fed2bd6161de544d30f5b5dde868f1537a453198e69f871603f9cabc40c1ea3959511229ae09bf34599ba07f572c916734c9"
+                }
+            ]
+        },
+        {
+            "folder": "src/RuntimeDatabaseContext",
+            "files": [
+                {
+                    "filename": "RuntimeDatabaseContext.cpp",
+                    "hash": "78f0492ee2c98931df643fcf385fe3be628cb82d97c84156164b31a529ec9ca52db5afe9d75e044b2ce750ea2c1ed41b628d07f1db8a6844e7acc3645ae61792"
                 }
             ]
         }

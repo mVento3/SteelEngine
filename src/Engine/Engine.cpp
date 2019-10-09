@@ -49,9 +49,10 @@ int main(int argc, char* argv[])
 
     SteelEngine::HotReload::IRuntimeObject* core = SteelEngine::Reflection::CreateInstance("SteelEngine::Core");
 
-    SteelEngine::RuntimeDatabase* rd = (SteelEngine::RuntimeDatabase*)SteelEngine::ModuleManager::GetModule("RuntimeDatabase");
-
-    rd->m_FileSystem = (SteelEngine::Interface::IFileSystem*)SteelEngine::Reflection::CreateInstance("SteelEngine::FileSystem");
+    SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
+        SteelEngine::Core::GlobalSystems::FILE_SYSTEM,
+        (SteelEngine::Interface::IFileSystem*)SteelEngine::Reflection::CreateInstance("SteelEngine::FileSystem")
+    );
 
     // Then after that we need to prepare file system
     SteelEngine::FileSystem::Map("bin", getBinaryLocation());

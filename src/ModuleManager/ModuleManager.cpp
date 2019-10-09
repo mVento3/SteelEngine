@@ -90,25 +90,29 @@ namespace SteelEngine {
 
 				Module::Get("exports", module, (void**)&info);
 
-				if (info)
+				if(info)
 				{
-					for (ModuleInfo info_ : m_Modules)
+					for(ModuleInfo info_ : m_Modules)
 					{
-						if (info_.m_ModuleName == info->m_PluginName)
+						if(info_.m_ModuleName == info->m_PluginName)
 						{
+							Module::Free((void**)&module);
+
 							return;
 						}
 					}
 
-					for (StaticModuleInfo info_ : m_StaticGlobalModules)
+					for(StaticModuleInfo info_ : m_StaticGlobalModules)
 					{
-						if (info_.m_ModuleName == info->m_PluginName)
+						if(info_.m_ModuleName == info->m_PluginName)
 						{
+							Module::Free((void**)&module);
+
 							return;
 						}
 					}
 
-					if (info->m_PluginFlags == Module::Details::PluginFlag::ONCE)
+					if(info->m_PluginFlags == Module::Details::PluginFlag::ONCE)
 					{
 						StaticModuleInfo moduleInfo;
 
@@ -133,9 +137,9 @@ namespace SteelEngine {
 				{
 					bool found = false;
 
-					for (ReflectionModuleInfo info_ : m_ReflectedModules)
+					for(ReflectionModuleInfo info_ : m_ReflectedModules)
 					{
-						if (info_.m_ModuleName == path)
+						if(info_.m_ModuleName == path)
 						{
 							found = true;
 							break;
@@ -151,6 +155,10 @@ namespace SteelEngine {
 
 						m_ReflectedModules.push_back(moduleInfo);
 					}
+					else
+					{
+						Module::Free((void**)&module);
+					}
 				}
 			}
 		}
@@ -160,25 +168,25 @@ namespace SteelEngine {
 	{
 		std::vector<std::string> splitted = split(blackList, ' ');
 
-		for (ReflectionModuleInfo info : m_ReflectedModules)
+		for(ReflectionModuleInfo info : m_ReflectedModules)
 		{
-			if (!FreeIf(splitted, info.m_ModuleName, mode))
+			if(!FreeIf(splitted, info.m_ModuleName, mode))
 			{
 				Module::Free(&info.m_Raw);
 			}
 		}
 
-		for (ModuleInfo info : m_Modules)
+		for(ModuleInfo info : m_Modules)
 		{
-			if (!FreeIf(splitted, info.m_ModuleName, mode))
+			if(!FreeIf(splitted, info.m_ModuleName, mode))
 			{
 				Module::Free(&info.m_Raw);
 			}
 		}
 
-		for (StaticModuleInfo info : m_StaticGlobalModules)
+		for(StaticModuleInfo info : m_StaticGlobalModules)
 		{
-			if (!FreeIf(splitted, info.m_ModuleName, mode))
+			if(!FreeIf(splitted, info.m_ModuleName, mode))
 			{
 				Module::Free(&info.m_Raw);
 			}
