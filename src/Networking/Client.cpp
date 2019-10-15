@@ -239,11 +239,6 @@ namespace SteelEngine {
         return Send(m_Socket, ser, size);
     }
 
-    void Client::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
     void Client::operator()(Network::INetworkCommand* event)
     {
         event->m_Flow = Network::CommunicationFlow::CLIENT_TO_SERVER;

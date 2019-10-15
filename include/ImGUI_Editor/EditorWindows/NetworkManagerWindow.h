@@ -52,6 +52,8 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
         void DrawConnectToServer();
 
+        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
+
         void operator()(const LoadedProjectEvent& event);
         void operator()(Network::ShouldOverrideEvent* event);
     };

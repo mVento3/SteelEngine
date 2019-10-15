@@ -19,11 +19,6 @@ namespace SteelEngine {
 
     }
 
-    void NCE_ReflectionModule::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
     void NCE_ReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)
     {
         for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)

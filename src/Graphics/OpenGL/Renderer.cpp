@@ -315,9 +315,4 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         }
     }
 
-    void Renderer::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
 }}}

@@ -43,6 +43,8 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
         void Init() override;
         void Draw() override;
+
+        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
     };
 
 }}}

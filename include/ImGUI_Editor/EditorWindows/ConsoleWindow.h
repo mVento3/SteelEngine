@@ -25,6 +25,8 @@ namespace SteelEngine {
         ~ConsoleWindow();
 
         void Draw() override;
+
+        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
     };
 
 }

@@ -25,6 +25,8 @@ namespace SteelEngine {
 	class Reflection
 	{
 	private:
+		static RuntimeDatabase* ms_RuntimeDatabase;
+
 		static RuntimeDatabase* LoadDatabase()
 		{
 			ModuleManager::LoadAll();
@@ -35,16 +37,24 @@ namespace SteelEngine {
 		}
 
 	public:
+		static void Init()
+		{
+			if(!ms_RuntimeDatabase)
+			{
+				ms_RuntimeDatabase = LoadDatabase();
+			}
+		}
+
 		template <typename Type>
 		static ReflectionData<Type>& Register(const std::string& name, const std::vector<std::string>& namespaces)
 		{
-			CHECK_DATABASE
+			ms_RuntimeDatabase = LoadDatabase();
 
 			ReflectionData<Type>* type = 0;
 
-			for(SteelEngine::Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(SteelEngine::Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
-				IReflectionData* data = (IReflectionData*)db->m_Types->at(i);
+				IReflectionData* data = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
 				std::string dataTypeName = "";
 
 				for(std::string name : data->m_Namespaces)
@@ -78,7 +88,7 @@ namespace SteelEngine {
 				type->m_TypeName = name;
 				type->m_TypeID = typeid(Type).hash_code();
 
-				db->m_Types->push_back(type);
+				ms_RuntimeDatabase->m_Types->push_back(type);
 
 				type->m_Namespaces.insert(type->m_Namespaces.begin(), namespaces.begin(), namespaces.end());
 			}
@@ -115,13 +125,13 @@ namespace SteelEngine {
 		template <typename Type>
 		static ReflectionData<Type>& Register(const std::string& name)
 		{
-			CHECK_DATABASE
+			ms_RuntimeDatabase = LoadDatabase();
 
 			ReflectionData<Type>* type = 0;
 
-			for(SteelEngine::Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(SteelEngine::Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
-				IReflectionData* data = (IReflectionData*)db->m_Types->at(i);
+				IReflectionData* data = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
 
 				if(data->m_TypeName == name)
 				{
@@ -138,7 +148,7 @@ namespace SteelEngine {
 				type->m_TypeName = name;
 				type->m_TypeID = typeid(Type).hash_code();
 
-				db->m_Types->push_back(type);
+				ms_RuntimeDatabase->m_Types->push_back(type);
 			}
 			else
 			{
@@ -167,13 +177,11 @@ namespace SteelEngine {
 
 		static std::vector<IReflectionData*> GetTypes()
 		{
-			CHECK_DATABASE
-
 			std::vector<IReflectionData*> res;
 
-			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
-				res.push_back((IReflectionData*)db->m_Types->at(i));
+				res.push_back((IReflectionData*)ms_RuntimeDatabase->m_Types->at(i));
 			}
 
 			return res;
@@ -181,17 +189,15 @@ namespace SteelEngine {
 
 		static IReflectionData* GetType(const std::string& name)
 		{
-			CHECK_DATABASE
-
 			std::string name_ = name;
 
 			replaceAll(name_, "::", ":");
 
 			std::vector<std::string> splitted = split(name_, ':');
 
-			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
 
 				if(type->m_Namespaces.size() == splitted.size() - 1)
 				{
@@ -219,11 +225,9 @@ namespace SteelEngine {
 
 		static IReflectionData* GetType(size_t typeID)
 		{
-			CHECK_DATABASE
-
-			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
 
 				if(type->m_TypeID == typeID)
 				{
@@ -236,11 +240,9 @@ namespace SteelEngine {
 
 		static IReflectionData* GetType(const HotReload::IRuntimeObject* object)
 		{
-			CHECK_DATABASE
-
-			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
 
 				if(type->m_TypeID == object->m_TypeID)
 				{
@@ -254,13 +256,11 @@ namespace SteelEngine {
 		template <typename T>
 		static IReflectionData* GetType()
 		{
-			CHECK_DATABASE
-
 			size_t typeID = typeid(T).hash_code();
 
-			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
 
 				if (type->m_TypeID == typeID)
 				{
@@ -274,17 +274,15 @@ namespace SteelEngine {
 		template <typename... Args>
 		static HotReload::IRuntimeObject* CreateInstance(const std::string& name, Args... args)
 		{
-			CHECK_DATABASE
-
 			std::string name_ = name;
 
 			replaceAll(name_, "::", ":");
 
 			std::vector<std::string> splitted = split(name_, ':');
 
-			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
 
 				if(type->m_Namespaces.size() == splitted.size() - 1)
 				{
@@ -313,13 +311,11 @@ namespace SteelEngine {
 		template <typename T, typename... Args>
 		static HotReload::IRuntimeObject* CreateInstance(Args... args)
 		{
-			CHECK_DATABASE
-
 			size_t typeID = typeid(T).hash_code();
 
-			for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
 
 				if(type->m_Namespaces.size() == splitted.size() - 1)
 				{

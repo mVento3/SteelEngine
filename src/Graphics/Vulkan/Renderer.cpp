@@ -789,7 +789,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     void Renderer::Update()
     {
-        float delta = m_DeltaTimeVariant->Convert<IDeltaTime*>()->GetDeltaTime();
+        float delta = (*m_DeltaTimeVariant->Convert<IDeltaTime**>())->GetDeltaTime();
 
         if(m_RotateCamera)
         {
@@ -946,7 +946,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphores[m_CurrentFrame] };
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-        
+
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores =    waitSemaphores;
         submitInfo.pWaitDstStageMask =  waitStages;
@@ -1121,18 +1121,13 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     {
         glm::vec2 deltaPos = glm::vec2(event.m_X, event.m_Y) - glm::vec2(m_Width / 2, m_Height / 2);
         Transform& camTrans = m_Camera.GetTransform();
-        float delta = m_DeltaTimeVariant->Convert<IDeltaTime*>()->GetDeltaTime();
+        float delta = (*m_DeltaTimeVariant->Convert<IDeltaTime**>())->GetDeltaTime();
 
         if(m_RotateCamera && (deltaPos.x != 0 || deltaPos.y != 0))
         {
             camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.x * delta * -0.5f, glm::vec3(0, 1, 0)) * camTrans.GetRotation()));
             camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.y * delta * -0.5f, camTrans.GetRotation().GetRight()) * camTrans.GetRotation()));
         }
-    }
-
-    void Renderer::operator()(const RecompiledEvent& event)
-    {
-
     }
 
     void Renderer::operator()(const ResizeEvent& event)

@@ -209,9 +209,10 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         m_ProjectLoaded = true;
     }
 
-    void NetworkManagerWindow::operator()(const RecompiledEvent& event)
+    void NetworkManagerWindow::OnRecompile(HotReload::IRuntimeObject* oldObject)
     {
-
+        Window::OnRecompile(oldObject);
+        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
     }
 
     void NetworkManagerWindow::operator()(Network::ShouldOverrideEvent* event)

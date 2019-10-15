@@ -106,9 +106,4 @@ namespace SteelEngine { namespace Script { namespace Python {
         return 0;
     }
 
-    void Script::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
 }}}

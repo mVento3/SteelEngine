@@ -24,9 +24,4 @@ namespace SteelEngine { namespace Script {
         Py_Finalize();
     }
 
-    void PythonCore::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
 }}

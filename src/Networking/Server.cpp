@@ -289,11 +289,6 @@ namespace SteelEngine {
         return &m_Commands[sock];
     }
 
-    void Server::operator()(const RecompiledEvent& event)
-    {
-        // m_ServerInfo = Reflection::GetType("Server")->GetMetaData(SERVER_INFO)->Convert<ServerInfo>();
-    }
-
     void Server::operator()(Network::INetworkCommand* event)
     {
         event->m_Flow = Network::CommunicationFlow::SERVER_TO_CLIENT;

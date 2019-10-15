@@ -1,13 +1,17 @@
 #pragma once
 
 #include "Core/Type.h"
+#include "Core/ReflectionAttributes.h"
 
 #include "RuntimeDatabase/RuntimeDatabase.h"
 
-#include "RuntimeCompiler/RecompiledEvent.h"
+#include "RuntimeReflection/Macro.h"
+
 #include "RuntimeCompiler/ISerializer.h"
 
 #include "functional"
+
+#include "Event/LocalEvent.h"
 
 namespace SteelEngine { namespace HotReload {
 
@@ -24,8 +28,7 @@ namespace SteelEngine { namespace HotReload {
 
 		virtual void Serialize(ISerializer* serializer) { }
 		virtual void Update() { }
-
-		virtual void operator()(const RecompiledEvent& event) { }
+		virtual void OnRecompile(IRuntimeObject* oldObject) { }
 	};
 
 }}

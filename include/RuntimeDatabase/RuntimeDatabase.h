@@ -4,6 +4,7 @@
 
 #include "vector"
 #include "tuple"
+#include "unordered_map"
 #include "map"
 
 #ifdef SE_WINDOWS
@@ -104,8 +105,6 @@ namespace SteelEngine {
 		{
 
 		}
-
-		std::map<size_t, void*> m_EventGlobalHandlers;
 
 		TypesVector* m_Types; // Only for reflection
 		ConstructedObjectsVector* m_Objects; // Created and running objects

@@ -23,6 +23,9 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Window))
 .Property("m_Context", &Window::m_Context)
 (
 )
+.Property("m_Editor", &Window::m_Editor)
+(
+)
 ;
 }
 
@@ -30,6 +33,7 @@ void Window::Serialize(SteelEngine::HotReload::ISerializer* serializer)
 {
 SERIALIZE(Window::m_Title)
 SERIALIZE(Window::m_Context)
+SERIALIZE(Window::m_Editor)
 IRuntimeObject::Serialize(serializer);
 }
 

@@ -17,8 +17,9 @@ namespace SteelEngine {
         ImGui::Text("XXXXXX");
     }
 
-    void ConsoleWindow::operator()(const RecompiledEvent& event)
+    void ConsoleWindow::OnRecompile(HotReload::IRuntimeObject* oldObject)
     {
+        Window::OnRecompile(oldObject);
         ImGui::SetCurrentContext((ImGuiContext*)m_Context);
     }
 

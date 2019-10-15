@@ -48,9 +48,4 @@ namespace SteelEngine {
         ImGui_ImplSDL2_ProcessEvent((const SDL_Event*)event);
     }
 
-    void OpenGL_Context::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
 }

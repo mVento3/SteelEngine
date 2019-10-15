@@ -168,7 +168,7 @@ namespace SteelEngine {
 		}
 
 		template <typename Type>
-		Type Convert()
+		Type& Convert()
 		{
 			if(!IsValid())
 			{

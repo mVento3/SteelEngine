@@ -41,6 +41,7 @@
 			"Module.lib",
 			"Utils.lib",
 			"Event.lib",
+			"RuntimeReflection.lib",
 			"InformationTracker.lib",
 			"Ws2_32.lib",
 			"imgui.lib",
@@ -83,6 +84,10 @@
 			"type": "lib"
 		},
 		{
+			"name": "RuntimeReflection",
+			"type": "lib"
+		},
+		{
 			"name": "Core",
 			"type": "dll"
 		},
@@ -112,10 +117,6 @@
 		},
 		{
 			"name": "ModuleManager",
-			"type": "dll"
-		},
-		{
-			"name": "RuntimeReflection",
 			"type": "dll"
 		},
 		{

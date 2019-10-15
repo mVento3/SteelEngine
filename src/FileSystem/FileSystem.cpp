@@ -27,9 +27,4 @@ namespace SteelEngine {
         return m_MappedDirectories[name];
     }
 
-    void FileSystem::operator()(const RecompiledEvent& event)
-	{
-
-	}
-
 }

@@ -10,7 +10,7 @@
 
 #include "FileSystem/FileSystem.h"
 
-SE_PLUGIN(SteelEngine::ReflectionGenerator, "ReflectionGenerator", SteelEngine::Module::Details::PluginType::CORE_PLUGIN, SteelEngine::Module::Details::PluginFlag::NONE)
+// SE_PLUGIN(SteelEngine::ReflectionGenerator, "ReflectionGenerator", SteelEngine::Module::Details::PluginType::CORE_PLUGIN, SteelEngine::Module::Details::PluginFlag::NONE)
 
 namespace SteelEngine {
 

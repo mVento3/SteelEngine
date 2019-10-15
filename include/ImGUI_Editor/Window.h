@@ -12,6 +12,12 @@
 
 namespace SteelEngine { namespace Editor {
 
+    namespace ImGUI {
+
+        class ImGUI_Editor;
+
+    }
+
     SE_STRUCT(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE)
     struct Window : public HotReload::IRuntimeObject
     {
@@ -19,9 +25,12 @@ namespace SteelEngine { namespace Editor {
 
         std::string m_Title;
         void* m_Context;
+        ImGUI::ImGUI_Editor** m_Editor;
 
         virtual void Init() { }
         virtual void Draw() { }
+
+        virtual void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
     };
 
 }}

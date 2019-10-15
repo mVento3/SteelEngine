@@ -12,6 +12,8 @@
 
 #include "SDL_events.h"
 
+#include "RuntimeReflection/ReflectionGenerator.h"
+
 namespace SteelEngine {
 
     void Core::Loop()
@@ -82,11 +84,11 @@ namespace SteelEngine {
         }
 
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::LOGGER, m_Logger);
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::DELTA_TIME, Reflection::CreateInstance("SteelEngine::DeltaTime"));
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::DELTA_TIME, &Reflection::CreateInstance("SteelEngine::DeltaTime")->m_Object);
 
         m_DeltaTimeVariant = Reflection::GetType("SteelEngine::Core")->GetMetaData(GlobalSystems::DELTA_TIME);
 
-        m_ReflectionGenerator = (IReflectionGenerator*)ModuleManager::GetModule("ReflectionGenerator");
+        m_ReflectionGenerator = new ReflectionGenerator();//(IReflectionGenerator*)ModuleManager::GetModule("ReflectionGenerator");
 
         if(m_EnginePathVariant == EnginePathVariant::ENGINE_DEV)
         {
@@ -222,11 +224,9 @@ namespace SteelEngine {
 
     void Core::Update()
     {
-        m_DeltaTimeVariant->Convert<IDeltaTime*>()->Update();
+        (*m_DeltaTimeVariant->Convert<IDeltaTime**>())->Update();
 
-        float delta = m_DeltaTimeVariant->Convert<IDeltaTime*>()->GetDeltaTime();
-
-        // static auto startTime = std::chrono::high_resolution_clock::now();
+        float delta = (*m_DeltaTimeVariant->Convert<IDeltaTime**>())->GetDeltaTime();
 
         // The runtime compiler file watcher is not too perform
         if(m_RuntimeCompiler)
@@ -245,10 +245,6 @@ namespace SteelEngine {
         (*m_Renderer)->PostRender();
         (*m_VirtualProject)->Update();
 
-        // auto currentTime = std::chrono::high_resolution_clock::now();
-        // float delta = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-        // startTime = currentTime;
         m_Delta += delta;
         m_Frames++;
 
@@ -296,9 +292,9 @@ namespace SteelEngine {
         Reflection::GetType("SteelEngine::Core")->SetMetaData(ReflectionAttribute::ENGINE_START_TYPE, variant);
     }
 
-    void Core::operator()(const RecompiledEvent& event)
+    void Core::OnRecompile(HotReload::IRuntimeObject* oldObject)
     {
-        Event::GlobalEvent::Remove<IWindow::WindowCloseEvent>(event.m_OldObject);
+        Event::GlobalEvent::Remove<IWindow::WindowCloseEvent>(oldObject);
         Event::GlobalEvent::Add<IWindow::WindowCloseEvent>((Core*)m_Object);
     }
 

@@ -11,5 +11,4 @@ Script::Python::Scriptable* Cast_Scriptable()\
 return static_cast<NetworkManagerWindow*>(this);\
 }\
 public:\
-virtual void Serialize(SteelEngine::HotReload::ISerializer* serializer) override;\
-virtual void operator()(const SteelEngine::RecompiledEvent& event_) override;
+virtual void Serialize(SteelEngine::HotReload::ISerializer* serializer) override;

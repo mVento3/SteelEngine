@@ -37,10 +37,14 @@ int main(int argc, char* argv[])
 {
     SteelEngine::Options parser(argv, argc, desc);
 
-    // We need to prepare modules for engine
-    SteelEngine::ModuleManager::LoadAll();
+    SteelEngine::Reflection::Init();
 
-    SteelEngine::HotReload::IRuntimeObject* ooo = SteelEngine::Reflection::CreateInstance("SteelEngine::InformationTracker");
+    SteelEngine::IReflectionData* type = SteelEngine::Reflection::GetType("SteelEngine::Core");
+
+    if(!type->GetMetaData(SteelEngine::Core::GlobalSystems::GLOBAL_EVENTS)->IsValid())
+    {
+        type->SetMetaData(SteelEngine::Core::GlobalSystems::GLOBAL_EVENTS, std::unordered_map<size_t, void*>());
+    }
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
         SteelEngine::ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER,
@@ -51,7 +55,7 @@ int main(int argc, char* argv[])
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
         SteelEngine::Core::GlobalSystems::FILE_SYSTEM,
-        (SteelEngine::Interface::IFileSystem*)SteelEngine::Reflection::CreateInstance("SteelEngine::FileSystem")
+        (SteelEngine::IFileSystem*)SteelEngine::Reflection::CreateInstance("SteelEngine::FileSystem")
     );
 
     // Then after that we need to prepare file system

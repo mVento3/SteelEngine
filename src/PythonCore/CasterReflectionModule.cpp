@@ -19,11 +19,6 @@ namespace SteelEngine {
 
     }
 
-    void CasterReflectionModule::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
     void CasterReflectionModule::operator()(const ReflectionGenerator::GenerateHeaderEvent& event)
     {
         if(m_GenerateCastFunctions)

@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 {
     SteelEngine::Options parser(argv, argc, desc);
 
-    SteelEngine::ModuleManager::LoadAll();
+    SteelEngine::Reflection::Init();
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
         SteelEngine::ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER,
@@ -45,16 +45,18 @@ int main(int argc, char* argv[])
 
     void* dll;
 
-#ifdef SE_WINDOWS
-    SteelEngine::Module::Load("RuntimeReflection.dll", &dll);
-#else
-    SteelEngine::Module::Load("RuntimeReflection.so", &dll);
-#endif
-    SteelEngine::Module::Details* info;
+// #ifdef SE_WINDOWS
+//     SteelEngine::Module::Load("RuntimeReflection.dll", &dll);
+// #else
+//     SteelEngine::Module::Load("RuntimeReflection.so", &dll);
+// #endif
+//     SteelEngine::Module::Details* info;
 
-    SteelEngine::Module::Get("exports", dll, (void**)&info);
+//     SteelEngine::Module::Get("exports", dll, (void**)&info);
 
-    SteelEngine::IReflectionGenerator* rg = (SteelEngine::IReflectionGenerator*)info->m_AllocateCallback(0, 0);
+//     SteelEngine::IReflectionGenerator* rg = (SteelEngine::IReflectionGenerator*)info->m_AllocateCallback(0, 0);
+
+    SteelEngine::IReflectionGenerator* rg = new SteelEngine::ReflectionGenerator();
 
     std::vector<SteelEngine::HotReload::IRuntimeObject*> modules;
     std::vector<SteelEngine::IReflectionData*> types =

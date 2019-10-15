@@ -441,9 +441,6 @@ namespace SteelEngine { namespace HotReload {
 			obj = info->m_CreateObjectCallback(currentObject->m_ObjectID, currentObject->m_ConstructorID);
 			old = currentObject->m_Object;
 
-			Event::GlobalEvent::Remove<RecompiledEvent>(old);
-			Event::GlobalEvent::Add<RecompiledEvent>(obj);
-
 			serializer.SetIsLoading(false);
 			serializer.Serialize(old);
 
@@ -473,14 +470,12 @@ namespace SteelEngine { namespace HotReload {
 			obj->m_ObjectID = 		objectID;
 			obj->m_TypeID = 		info->m_TypeID;
 
-			Event::GlobalEvent::Add<RecompiledEvent>(obj);
-
 			db->m_Objects->push_back(new ConstrucedObject(obj->m_ObjectID, constructorID, m_TypeID, new Tuple(std::tuple()), obj));
 		}
 
 		m_IsSwapComplete = true;
 
-		Event::GlobalEvent::Broadcast(RecompiledEvent{ info->m_TypeID, obj, old });
+		obj->OnRecompile(old);
 
 		if(info)
 		{
@@ -509,11 +504,6 @@ namespace SteelEngine { namespace HotReload {
 	void RuntimeCompiler::operator()(const StartRecompilingEvent& event)
 	{
 		m_Paused = false;
-	}
-
-	void RuntimeCompiler::operator()(const RecompiledEvent& event)
-	{
-
 	}
 
 }}

@@ -166,8 +166,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         }
     }
 
-    void StartMenuWindow::operator()(const RecompiledEvent& event)
+    void StartMenuWindow::OnRecompile(HotReload::IRuntimeObject* oldObject)
     {
+        Window::OnRecompile(oldObject);
         ImGui::SetCurrentContext((ImGuiContext*)m_Context);
     }
 

@@ -55,7 +55,6 @@ namespace SteelEngine {
         {
             event.m_GeneratedBodyMacro->push_back("public:");
             event.m_GeneratedBodyMacro->push_back("virtual void Serialize(SteelEngine::HotReload::ISerializer* serializer) override;");
-            event.m_GeneratedBodyMacro->push_back("virtual void operator()(const SteelEngine::RecompiledEvent& event_) override;");
         }
     }
 
@@ -114,11 +113,6 @@ namespace SteelEngine {
 
         m_GenerateSerializeFunction = true;
         m_SerializeAll = false;
-    }
-
-    void RCS_ReflectionModule::operator()(const RecompiledEvent& event)
-    {
-        
     }
 
 }

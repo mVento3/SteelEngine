@@ -772,9 +772,4 @@ namespace SteelEngine {
         ImGui_ImplSDL2_ProcessEvent((SDL_Event*)event);
     }
 
-    void VulkanContext::operator()(const RecompiledEvent& event)
-    {
-        
-    }
-
 }

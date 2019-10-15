@@ -76,9 +76,4 @@ namespace SteelEngine {
         }
     }
 
-    void Logger::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
 }

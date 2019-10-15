@@ -63,6 +63,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
                     (*window)->m_Title = type->GetTypeName();
                     (*window)->m_Context = m_Context;
+                    (*window)->m_Editor = (ImGUI_Editor**)&m_Object;
 
                     if(type->GetMetaData(ReflectionAttributes::EDITOR_WINDOW)->Convert<bool>())
                     {
@@ -197,40 +198,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         m_API_Context->ProcessEvent(event);
     }
 
-    void ImGUI_Editor::operator()(const RecompiledEvent& event)
+    void ImGUI_Editor::OnRecompile(HotReload::IRuntimeObject* oldObject)
     {
         ImGui::SetCurrentContext(m_Context);
-
-        if(Reflection::GetType(event.m_NewObject)->GetMetaData(Editor::ReflectionAttributes::EDITOR_WINDOW)->Convert<bool>())
-        {
-            bool found = false;
-
-            for(Window** wnd : m_Windows)
-            {
-                if((*wnd)->m_TypeID == event.m_NewObject->m_TypeID)
-                {
-                    found = true;
-                }
-            }
-
-            for(Window** wnd : m_StartMenuWindows)
-            {
-                if((*wnd)->m_TypeID == event.m_NewObject->m_TypeID)
-                {
-                    found = true;
-                }
-            }
-
-            if(!found)
-            {
-                Window** wnd = (Window**)&event.m_NewObject->m_Object;
-
-                m_Windows.push_back(wnd);
-
-                (*wnd)->m_Title = Reflection::GetType(event.m_NewObject)->GetTypeName();
-                (*wnd)->m_Context = m_Context;
-            }
-        }
     }
 
     void ImGUI_Editor::operator()(const ChangeSceneEvent& event)

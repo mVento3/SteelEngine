@@ -291,9 +291,4 @@ namespace SteelEngine {
         event->m_Path = m_LoadedProject;
     }
 
-    void VirtualProject::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
 }

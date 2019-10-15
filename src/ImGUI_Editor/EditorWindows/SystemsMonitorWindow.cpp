@@ -4,6 +4,8 @@
 
 #include "Event/GlobalEventTracker.h"
 
+#include "Core/Core.h"
+
 namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     SystemsMonitorWindow::SystemsMonitorWindow()
@@ -36,6 +38,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void SystemsMonitorWindow::Draw()
     {
+        float delta = (*Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::DELTA_TIME)->Convert<IDeltaTime**>())->GetDeltaTime();
+
+        ImGui::Text("%f ms", delta * 1000.f);
         ImGui::Text("Some info about engine systems...");
 
         if(ImGui::IsItemHovered())
@@ -67,7 +72,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
             ImGui::Text("%s", info[m_CurrentItem].m_EventType.c_str());
         }
 
-        ImGui::Text("Loaded reflections");
+        ImGui::Text("Loaded modules");
 
         std::vector<const char*> rees;
 
@@ -79,8 +84,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         ImGui::ListBox("Reflection", &m_CurrentReflectionItem, rees.data(), rees.size());
     }
 
-    void SystemsMonitorWindow::operator()(const RecompiledEvent& event)
+    void SystemsMonitorWindow::OnRecompile(HotReload::IRuntimeObject* oldObject)
     {
+        Window::OnRecompile(oldObject);
         ImGui::SetCurrentContext((ImGuiContext*)m_Context);
     }
 

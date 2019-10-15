@@ -7,12 +7,35 @@
 #include "InformationTracker/InformationTracker.h"
 
 #include "Core/ReflectionAttributes.h"
+#include "Core/Core.h"
 
 namespace SteelEngine { namespace Event {
 
     ISystemTracker* GlobalEvent::m_Tracker;
 
-    void GlobalEvent::Test(void* object, const std::string& name, size_t typeID, const std::string& name2, size_t eventTypeID)
+    void* GlobalEvent::Check(void* object, size_t typeID)
+    {
+        Variant* var = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::GLOBAL_EVENTS);
+
+        if(!var->IsValid())
+        {
+            Reflection::GetType("SteelEngine::Core")->SetMetaData(Core::GlobalSystems::GLOBAL_EVENTS, std::unordered_map<size_t, void*>());
+        }
+
+        std::unordered_map<size_t, void*>* map =
+            &var->Convert<std::unordered_map<size_t, void*>>();
+
+        void** res = &((*map)[typeID]);
+
+        if(!*res)
+        {
+            *res = object;
+        }
+
+        return *res;
+    }
+
+    void GlobalEvent::TraceInfo(void* object, const std::string& name, size_t typeID, const std::string& name2, size_t eventTypeID)
     {
         IReflectionData* coreData = Reflection::GetType("SteelEngine::Core");
         IInformationTracker* iinfo = coreData->GetMetaData(ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER)->Convert<IInformationTracker*>();

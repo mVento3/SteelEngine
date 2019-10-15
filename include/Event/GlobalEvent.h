@@ -9,35 +9,15 @@ namespace SteelEngine { namespace Event {
 	class GlobalEvent
 	{
 	private:
+		static void* Check(void* object, size_t typeID);
+
 		template <typename tMessage>
 		inline static InternalChannel<tMessage>* Get()
 		{
-			static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
-			size_t typeID = typeid(tMessage).hash_code();
-
-			if (!db->m_EventGlobalHandlers[typeID])
-			{
-				db->m_EventGlobalHandlers[typeID] = &InternalChannel<tMessage>::Instance();
-			}
-
-			return (InternalChannel<tMessage>*)db->m_EventGlobalHandlers[typeID];
+			return (InternalChannel<tMessage>*)Check(&InternalChannel<tMessage>::Instance(), typeid(tMessage).hash_code());
 		}
 
-		template <typename tMessage>
-		inline static InternalChannel<tMessage>* Get_()
-		{
-			static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
-			size_t typeID = typeid(tMessage*).hash_code();
-
-			if (!db->m_EventGlobalHandlers[typeID])
-			{
-				db->m_EventGlobalHandlers[typeID] = &InternalChannel<tMessage>::Instance();
-			}
-
-			return (InternalChannel<tMessage>*)db->m_EventGlobalHandlers[typeID];
-		}
-
-		static void Test(void* object, const std::string& name, size_t typeID, const std::string& name2, size_t eventTypeID);
+		static void TraceInfo(void* object, const std::string& name, size_t typeID, const std::string& name2, size_t eventTypeID);
 
 		static ISystemTracker* m_Tracker;
 
@@ -49,7 +29,7 @@ namespace SteelEngine { namespace Event {
 
 			channel->Add(handler);
 
-			Test(
+			TraceInfo(
 				handler,
 				typeid(tHandler).name(),
 				typeid(tHandler).hash_code(),
@@ -61,7 +41,7 @@ namespace SteelEngine { namespace Event {
 		template <typename tMessage, typename tHandler>
 		inline static void Add_(tHandler* handler)
 		{
-			InternalChannel<tMessage>* channel = Get_<tMessage>();
+			InternalChannel<tMessage>* channel = Get<tMessage>();
 
 			channel->Add_(handler);
 		}
@@ -85,7 +65,7 @@ namespace SteelEngine { namespace Event {
 		template <typename tMessage>
 		inline static void Broadcast_(tMessage* message)
 		{
-			InternalChannel<tMessage>* channel = Get_<tMessage>();
+			InternalChannel<tMessage>* channel = Get<tMessage>();
 
 			channel->Broadcast_(message);
 		}

@@ -43,11 +43,6 @@ namespace SteelEngine { namespace Network {
         return m_ConnectedClients.size();
     }
 
-    void NetworkManager::operator()(const RecompiledEvent& event)
-    {
-
-    }
-
     void NetworkManager::operator()(GetNetworkInfo* event)
     {
         event->m_Network = m_Network;

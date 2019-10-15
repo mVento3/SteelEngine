@@ -20,11 +20,6 @@
 
 #include "Core/ReflectionAttributes.h"
 
-#define CHECK_DATABASE \
-	static RuntimeDatabase* db; \
-	if(!db) \
-		db = LoadDatabase();
-
 namespace SteelEngine {
 
 	struct IReflectionData : public MetaDataImplementation
@@ -194,8 +189,6 @@ namespace SteelEngine {
 					createdObject->m_ConstructorID = 	cons->m_ConstructorID;
 					createdObject->m_ObjectID = 		db->m_LastPerObjectID++;
 					createdObject->m_TypeID = 			m_TypeID;
-
-					Event::GlobalEvent::Add<RecompiledEvent>(createdObject);
 
 					db->m_Objects->push_back(new ConstrucedObject(createdObject->m_ObjectID, cons->m_ConstructorID, m_TypeID, new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
 

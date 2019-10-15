@@ -27,6 +27,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     class ImGUI_Editor : public IEditor
     {
         GENERATED_BODY
+        friend struct Window;
     private:
         const size_t m_FloatTypeID = typeid(float).hash_code();
         const size_t m_IntTypeID = typeid(int).hash_code();
@@ -49,6 +50,8 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         Result Init(Graphics::IRenderer* renderer, IContext* context) override;
         void Draw() override;
         void ProcessEvents(void* event) override;
+
+        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
 
         void operator()(const ChangeSceneEvent& event);
     };

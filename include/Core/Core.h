@@ -68,7 +68,8 @@ namespace SteelEngine {
             PYTHON,
             LOGGER,
             FILE_SYSTEM,
-            DELTA_TIME
+            DELTA_TIME,
+            GLOBAL_EVENTS
         };
 
     private:
@@ -112,6 +113,8 @@ namespace SteelEngine {
 
         SE_METHOD()
         void SetPathVariant(EnginePathVariant variant);
+
+        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
 
         void operator()(const IWindow::WindowCloseEvent& event);
         void operator()(const LoadedProjectEvent& event);
