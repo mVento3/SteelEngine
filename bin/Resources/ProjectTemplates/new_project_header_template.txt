@@ -1,0 +1,16 @@
+#pragma once
+
+#include "Application/Application.h"
+
+namespace %PROJECT_NAME% {
+
+	class Application : public SteelEngine::Application
+	{
+	private:
+	
+	public:
+		Application();
+		~Application();
+	};
+
+}

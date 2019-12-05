@@ -1,0 +1,15 @@
+#include "%PROJECT_NAME%.h"
+
+namespace %PROJECT_NAME% {
+
+	Application::Application()
+	{
+
+	}
+
+	Application::~Application()
+	{
+
+	}
+
+}

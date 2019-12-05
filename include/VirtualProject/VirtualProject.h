@@ -6,12 +6,12 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "VirtualProject/VirtualProject.Generated.h"
 #include "VirtualProject/IVirtualProject.h"
 #include "VirtualProject/LoadedProjectEvent.h"
 #include "VirtualProject/LoadProjectEvent.h"
 #include "VirtualProject/GetLoadedProjectPathEvent.h"
 #include "VirtualProject/CreateNewProjectEvent.h"
+#include "VirtualProject/FileTemplateCreator.h"
 
 #include "PythonProcess/IPythonProcess.h"
 
@@ -23,6 +23,8 @@
 #include "Utils/Json.h"
 
 #include "PythonCore/Scriptable.h"
+
+#include "VirtualProject/VirtualProject.Generated.h"
 
 // Aka project manager. This module should handle whole project. By this module we can load/create project. It should also handle all scripts, assets, actions, etc.
 

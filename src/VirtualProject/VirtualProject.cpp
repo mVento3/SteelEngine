@@ -171,45 +171,38 @@ namespace SteelEngine {
                 }
             )
         );
+
+        FileTemplateCreator headerTemplate(getBinaryLocation() / "Resources/ProjectTemplates/new_project_source_template.txt");
+
         project.m_Other.push_back(
             ProjectStructure(
                 "src",
                 {
                     ProjectStructure(
                         project.m_DirectoryName + ".cpp",
-                        "#include \"" + project.m_DirectoryName + ".h\"\n"
-                        "\n"
-                        "namespace " + project.m_DirectoryName + " {\n"
-                        "Application::Application()\n"
-                        "{\n"
-                        "}\n"
-                        "Application::~Application()\n"
-                        "{\n"
-                        "}\n"
-                        "}"
+                        headerTemplate.Create(
+                            {
+                                { "PROJECT_NAME", project.m_DirectoryName }
+                            }
+                        )
                     )
                 }
             )
         );
+
+        FileTemplateCreator sourceTemplate(getBinaryLocation() / "Resources/ProjectTemplates/new_project_header_template.txt");
+
         project.m_Other.push_back(
             ProjectStructure(
                 "include",
                 {
                     ProjectStructure(
                         project.m_DirectoryName + ".h",
-                        "#pragma once\n"
-                        "\n"
-                        "#include \"Application/Application.h\"\n"
-                        "\n"
-                        "namespace " + project.m_DirectoryName + " {\n"
-                        "class Application : public SteelEngine::Application\n"
-                        "{\n"
-                        "private:\n"
-                        "public:\n"
-                        "Application();\n"
-                        "~Application();\n"
-                        "};\n"
-                        "}"
+                        sourceTemplate.Create(
+                            {
+                                { "PROJECT_NAME", project.m_DirectoryName }
+                            }
+                        )
                     )
                 }
             )
@@ -334,6 +327,11 @@ namespace SteelEngine {
         }
 
         m_Compiler = (IRuntimeCompiler*)Reflection::CreateInstance("SteelEngine::RuntimeCompiler", m_Process);
+
+        if(!m_Compiler)
+        {
+            SE_ERROR("Something wrong with runtime compiler!");
+        }
 
         Event::GlobalEvent::Add_<LoadProjectEvent>(this);
         Event::GlobalEvent::Add_<CreateNewProjectEvent>(this);

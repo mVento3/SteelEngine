@@ -46,7 +46,10 @@ namespace SteelEngine {
 
         void WaitUntilComplete() const override;
 
-        inline const bool IsCompileComplete() const override { return m_Process->IsCompileComplete(); }
+        inline const bool IsCompileComplete() const override
+        {
+            return m_Process->IsCompileComplete();
+        }
     };
 
 }

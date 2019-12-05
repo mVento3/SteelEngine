@@ -240,7 +240,7 @@
             "files": [
                 {
                     "filename": "Core.cpp",
-                    "hash": "0c4491c97addbf17131e4e7f6aaa49fb834f33580ba24d55e39ba6a7e89fe979aec3e868bb1a71035e6e4d2176e1bd36bda5b1f9e3307ef46afd5070a09a9f2e"
+                    "hash": "b1c1fdca44db64e456773e1e049cf3f313f3f97978d78c15ba8c12c164c7fae92d0167b4e9251cebb75b62a97bdf557139390b1c051e30c12886948765cb8e51"
                 },
                 {
                     "filename": "DeltaTime.cpp",
@@ -803,6 +803,10 @@
                 {
                     "filename": "CreateNewProjectEvent.Generated.cpp",
                     "hash": "2f3b1c5cb17c14134deb2addf8cf9b1aa7680b68c92edebb2b39cb1123310a703c37df94ffca80d1af32422b4eefe575eaae5a49727b8040f869039a6c43c36a"
+                },
+                {
+                    "filename": "FileTemplateCreator.Generated.cpp",
+                    "hash": "72587ba4ce4be2bdcfe5dffc69459265a50e6f31b0f84b334cab1d31f27daee2a6445c4da29fff68f89d9150621aa1e92eb89048d378b347b3ec43e05ccc66cf"
                 }
             ]
         },
@@ -811,7 +815,11 @@
             "files": [
                 {
                     "filename": "VirtualProject.cpp",
-                    "hash": "e6989b15f118db248c195de0e22f84928fe77ea45d650aec741fc3454868fb95376342f9b5d6408db954e06c9bd4072e958cdda4491868371153833d4910e26c"
+                    "hash": "a7cb87642792b369246271f375b9365bc5496c8d4c8699d0463f04b524212e2f109a09d42f388a66acbe5d4ac62d4e26f824f7cfc5cb5a4f03177a05f4c34c03"
+                },
+                {
+                    "filename": "FileTemplateCreator.cpp",
+                    "hash": "8182cf2d3eabb7db8d24027b4018674d196051c66875512b051372c5481c0715227d518296a54ab8b84493d28d0a5d81ccc94ba0c89a3e1b1afb7a7d7c22b4c1"
                 }
             ]
         },
@@ -1575,7 +1583,7 @@
                 },
                 {
                     "filename": "RuntimeCompiler.Generated.cpp",
-                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+                    "hash": "c752eddcc1a6ada2d649225c09a1dd439c7f21cd8074e24aed51d3d335b77347ddf7e3be4d89e9a27971dd31e28fe3b001ec54115c69d8f8531623f9097bdcd5"
                 }
             ]
         },
