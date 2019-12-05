@@ -4,7 +4,7 @@
 
 namespace SteelEngine { namespace Utils {
 
-    json LoadJsonFile(const std::filesystem::path& path)
+    json loadJsonFile(const std::filesystem::path& path)
     {
         std::ifstream file(path);
 

@@ -1,12 +1,12 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/DeltaTime.Generated.h"
 #include "Core/DeltaTime.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<DeltaTime>("DeltaTime",{
+SteelEngine::ReflectionRecorder::Register<DeltaTime>("DeltaTime",{
 "SteelEngine"
 }
 )
@@ -16,13 +16,11 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(DeltaTime))
 )
 .Inheritance<IDeltaTime>("IDeltaTime")
 .Constructor<>()
-(
-)
 ;
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(DeltaTime)
 {

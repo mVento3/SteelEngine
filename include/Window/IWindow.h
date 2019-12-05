@@ -1,12 +1,12 @@
 #pragma once
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "Core/Result.h"
 
 namespace SteelEngine {
 
-    struct IWindow : public HotReload::IRuntimeObject
+    struct IWindow : public HotReloader::IRuntimeObject
     {
         struct WindowCloseEvent
         {

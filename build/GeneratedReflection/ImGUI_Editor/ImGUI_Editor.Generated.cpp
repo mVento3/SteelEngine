@@ -1,14 +1,14 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/ImGUI_Editor.Generated.h"
 #include "ImGUI_Editor/ImGUI_Editor.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 namespace Editor {
 namespace ImGUI {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<ImGUI_Editor>("ImGUI_Editor",{
+SteelEngine::ReflectionRecorder::Register<ImGUI_Editor>("ImGUI_Editor",{
 "SteelEngine",
 "Editor",
 "ImGUI"
@@ -22,23 +22,21 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(ImGUI_Editor))
 )
 .Inheritance<IEditor>("IEditor")
 .Constructor<>()
-(
-)
 ;
 }
 
-void ImGUI_Editor::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void ImGUI_Editor::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(ImGUI_Editor::m_Context)
 SERIALIZE(ImGUI_Editor::m_CurrentScene)
 SERIALIZE(ImGUI_Editor::m_API_Context)
-SERIALIZE(ImGUI_Editor::m_Windows)
+SERIALIZE(ImGUI_Editor::m_MainEditorWindows)
 SERIALIZE(ImGUI_Editor::m_StartMenuWindows)
-SERIALIZE(ImGUI_Editor::m_NonWindows)
+SERIALIZE(ImGUI_Editor::m_UIs)
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(ImGUI_Editor)
 {

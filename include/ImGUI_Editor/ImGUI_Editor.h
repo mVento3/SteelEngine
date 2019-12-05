@@ -15,6 +15,8 @@
 
 #include "RuntimeReflection/Variant.h"
 
+#include "EditorComponents/ImGUI/UserInterface.h"
+
 #include "ImGUI_Editor/ImGUI_Editor.Generated.h"
 
 namespace SteelEngine { namespace Editor { namespace ImGUI {
@@ -36,9 +38,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         SceneType m_CurrentScene;
         IContext* m_API_Context;
 
-        std::vector<Window**> m_Windows;
-        std::vector<Window**> m_StartMenuWindows;
-        std::vector<Window**> m_NonWindows;
+        std::vector<EditorComponents::ImGUI::UserInterface**> m_MainEditorWindows;
+        std::vector<EditorComponents::ImGUI::UserInterface**> m_StartMenuWindows;
+        std::vector<HotReloader::IRuntimeObject**> m_UIs;
 
         void LoadProject();
         void CreateNewProject();
@@ -51,7 +53,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         void Draw() override;
         void ProcessEvents(void* event) override;
 
-        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
+        void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
 
         void operator()(const ChangeSceneEvent& event);
     };

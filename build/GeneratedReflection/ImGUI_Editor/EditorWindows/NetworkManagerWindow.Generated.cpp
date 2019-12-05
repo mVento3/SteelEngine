@@ -1,14 +1,14 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/EditorWindows/NetworkManagerWindow.Generated.h"
 #include "ImGUI_Editor/EditorWindows/NetworkManagerWindow.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 namespace Editor {
 namespace ImGUI {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<NetworkManagerWindow>("NetworkManagerWindow",{
+SteelEngine::ReflectionRecorder::Register<NetworkManagerWindow>("NetworkManagerWindow",{
 "SteelEngine",
 "Editor",
 "ImGUI"
@@ -17,30 +17,24 @@ SteelEngine::Reflection::Register<NetworkManagerWindow>("NetworkManagerWindow",{
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE, SteelEngine::Editor::SceneType::EDITOR_SCENE|SteelEngine::Editor::SceneType::START_MENU_SCENE),
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NetworkManagerWindow))
 )
-.Inheritance<Window>("Window")
+.Inheritance<EditorComponents::ImGUI::UserInterface>("EditorComponents::ImGUI::UserInterface")
 .Inheritance<Script::Python::Scriptable>("Script::Python::Scriptable")
 .Constructor<>()
-(
-)
-.Method("Cast_Window", &NetworkManagerWindow::Cast_Window)
-(
-)
+.Method("Cast_UserInterface", &NetworkManagerWindow::Cast_UserInterface)
 .Method("Cast_Scriptable", &NetworkManagerWindow::Cast_Scriptable)
-(
-)
 ;
 }
 
-void NetworkManagerWindow::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void NetworkManagerWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
-Window::Serialize(serializer);
-Scriptable::Serialize(serializer);
+UserInterface::Serialize(serializer);
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(NetworkManagerWindow)
 {

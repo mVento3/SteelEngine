@@ -1,6 +1,6 @@
 from ctypes import cdll
 
-pythonProcess = cdll.LoadLibrary('bin/PythonProcess.dll')
+pythonProcess = cdll.LoadLibrary('build/PythonProcess.dll')
 
 class PythonProcess(object):
     def __init__(self):

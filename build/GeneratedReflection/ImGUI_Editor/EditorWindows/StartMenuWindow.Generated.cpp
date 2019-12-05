@@ -1,14 +1,14 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/EditorWindows/StartMenuWindow.Generated.h"
 #include "ImGUI_Editor/EditorWindows/StartMenuWindow.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 namespace Editor {
 namespace ImGUI {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<StartMenuWindow>("StartMenuWindow",{
+SteelEngine::ReflectionRecorder::Register<StartMenuWindow>("StartMenuWindow",{
 "SteelEngine",
 "Editor",
 "ImGUI"
@@ -18,16 +18,17 @@ SteelEngine::Reflection::Register<StartMenuWindow>("StartMenuWindow",{
 SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW, true),
 SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE, SteelEngine::Editor::SceneType::START_MENU_SCENE),
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
+SteelEngine::Reflection::MetaData(SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(StartMenuWindow))
 )
-.Inheritance<Window>("Window")
+.Inheritance<SteelEngine::EditorComponents::ImGUI::UserInterface>("SteelEngine::EditorComponents::ImGUI::UserInterface")
 .Constructor<>()
-(
-)
+.Method("Cast_UserInterface", &StartMenuWindow::Cast_UserInterface)
 ;
 }
 
-void StartMenuWindow::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void StartMenuWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(StartMenuWindow::m_SelectedProject)
 SERIALIZE(StartMenuWindow::m_VirtualProject)
@@ -35,11 +36,12 @@ SERIALIZE(StartMenuWindow::m_ProjectsPath)
 SERIALIZE(StartMenuWindow::m_LoadProjectThread)
 SERIALIZE(StartMenuWindow::m_SelectableProjects)
 SERIALIZE(StartMenuWindow::m_NewProjectName)
-Window::Serialize(serializer);
+SERIALIZE(StartMenuWindow::m_Size)
+UserInterface::Serialize(serializer);
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(StartMenuWindow)
 {

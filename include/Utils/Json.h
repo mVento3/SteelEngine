@@ -8,6 +8,6 @@ namespace SteelEngine { namespace Utils {
 
     using json = nlohmann::json;
 
-    json LoadJsonFile(const std::filesystem::path& path);
+    json loadJsonFile(const std::filesystem::path& path);
 
 }}

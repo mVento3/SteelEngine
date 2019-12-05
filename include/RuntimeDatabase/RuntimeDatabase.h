@@ -14,7 +14,9 @@
 
 namespace SteelEngine {
 
-	namespace HotReload {
+	struct IReflectionData;
+
+	namespace HotReloader {
 
 		struct IRuntimeObject;
 
@@ -68,9 +70,9 @@ namespace SteelEngine {
 		size_t m_TypeID;
 
 		ITuple* m_Args;
-		HotReload::IRuntimeObject* m_Object;
+		HotReloader::IRuntimeObject* m_Object;
 
-		ConstrucedObject(size_t objectID, size_t constructorID, size_t typeID, ITuple* args, HotReload::IRuntimeObject* obj) :
+		ConstrucedObject(size_t objectID, size_t constructorID, size_t typeID, ITuple* args, HotReloader::IRuntimeObject* obj) :
 			m_ObjectID(objectID),
 			m_ConstructorID(constructorID),
 			m_TypeID(typeID),
@@ -85,7 +87,7 @@ namespace SteelEngine {
 	{
   	public:
 		typedef void*(*GetStateCallback)();
-		typedef std::vector<void*> TypesVector;
+		typedef std::vector<IReflectionData*> TypesVector;
 		typedef std::vector<ConstrucedObject*> ConstructedObjectsVector;
 
 		static const size_t s_InvalidID = std::numeric_limits<size_t>::max();

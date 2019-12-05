@@ -11,7 +11,7 @@ namespace SteelEngine {
         glm::mat4 m_Projection;
 
     public:
-        Camera(const Transform& transform);
+        Camera(const Transform& transform, float aspect, float fov = 70.f, float near = 0.1f, float far = 1000.f);
         ~Camera();
 
         glm::mat4 GetView() const;

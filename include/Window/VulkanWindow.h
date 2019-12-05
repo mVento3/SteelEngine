@@ -9,7 +9,7 @@
 
 #include "Core/ReflectionAttributes.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "Input/Events/ChangeMousePositionEvent.h"
 

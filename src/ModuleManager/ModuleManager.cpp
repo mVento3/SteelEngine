@@ -1,6 +1,6 @@
 #include "ModuleManager/ModuleManager.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "Utils/Utils.h"
 

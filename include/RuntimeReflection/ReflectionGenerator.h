@@ -44,6 +44,7 @@ namespace SteelEngine {
 			std::string m_ReturnType;
 			std::string m_Name;
 			// Eventually add the arguments
+			std::vector<ArgumentInfo> m_Arguments;
 		};
 
 		struct ClassProperty
@@ -81,6 +82,7 @@ namespace SteelEngine {
 
 		struct InheritanceInfo
 		{
+			std::vector<MetaDataInfo> m_MetaData;
 			std::string m_Name;
 			ProtectionFlag m_Protection;
 		};
@@ -114,7 +116,7 @@ namespace SteelEngine {
 			const std::vector<ReflectionGenerator::MetaDataInfo>* m_MetaData;
 			const std::string m_ClassName;
 			const std::vector<InheritanceInfo>* m_Inheritance;
-			const IReflectionData* m_Data;
+			IReflectionData* m_Data;
 		};
 
 		struct SE_ValueMacroEvent
@@ -127,6 +129,12 @@ namespace SteelEngine {
 		{
 			const ReflectionGenerator::ClassMethod* m_Info;
 			std::vector<ClassMethod>* m_Methods;
+		};
+
+		struct SE_InheritanceMacroEvent
+		{
+			const ReflectionGenerator::InheritanceInfo* m_Info;
+			std::vector<InheritanceInfo>* m_Inheritances;
 		};
 
 		struct ClearValuesEvent
@@ -168,6 +176,7 @@ namespace SteelEngine {
 		void ParseHeader();
 		std::vector<MetaDataInfo> ParseMeta(const std::string& line);
 		void GenerateMetaDataInfo(std::ofstream& out, std::vector<MetaDataInfo> meta);
+		void ProcessMetaData(Lexer& lexer, std::vector<MetaDataInfo>& res, std::string& word, ProtectionFlag* flag = 0);
 
 	public:
 		ReflectionGenerator();

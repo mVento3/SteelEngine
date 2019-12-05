@@ -8,7 +8,7 @@ namespace SteelEngine {
 	struct NoTupleReflectionConstructor : public IReflectionConstructor
 	{
 		template <typename... Args>
-		HotReload::IRuntimeObject* Invoke(Args... args)
+		HotReloader::IRuntimeObject* Invoke(Args... args)
 		{
 			static void* module;
 
@@ -37,7 +37,7 @@ namespace SteelEngine {
 					{
 						IReflectionConstructor* cons = type->m_Constructors[j];
 
-						if (cons->m_ConstructorID == typeid(HotReload::IRuntimeObject*(Args...)).hash_code())
+						if (cons->m_ConstructorID == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
 						{
 							Tuple2 result(args...);
 

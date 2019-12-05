@@ -4,11 +4,13 @@
 
 #include "Networking/Config.h"
 
-#include "RuntimeCompiler/Events/StartRecompilingEvent.h"
-#include "RuntimeCompiler/Events/StopRecompilingEvent.h"
+#include "HotReloader/Events/StartRecompilingEvent.h"
+#include "HotReloader/Events/StopRecompilingEvent.h"
 
 #include "Utils/Network.h"
 #include "Utils/Json.h"
+
+#include "imgui/imgui.h"
 
 #include "fstream"
 
@@ -20,6 +22,8 @@ namespace SteelEngine { namespace Network {
 
         m_Header = SE_GET_TYPE_NAME(SynchronizeProjectNCE);
         m_Buffer = new char[m_BufferSize];
+
+        m_DrawShouldOverridePopup = false;
     }
 
     SynchronizeProjectNCE::~SynchronizeProjectNCE()
@@ -202,9 +206,35 @@ namespace SteelEngine { namespace Network {
 
             if(state != State::UP_TO_DATE)
             {
+                printf("File %s is not up to date!\n", filename.c_str());
+
                 if(state == State::OVERRIDE)
                 {
-                    if(!overrideEvent.m_ShouldOverrideForAll)
+                    if(overrideEvent.m_ShouldOverrideForAll)
+                    {
+                        network->Send(sock, "UPDATE", m_BufferSize);
+                        network->Receive(sock, m_Buffer, m_BufferSize);
+
+                        std::ofstream file(
+                            event.m_Path.string() + "\\" + filename,
+                            std::ios::binary
+                        );
+
+                        for(size_t j = 0; j < fileSize; j += m_BufferSize)
+                        {
+                            std::string fileBuf;
+
+                            fileBuf.resize(m_BufferSize);
+
+                            network->Send(sock, "DONE", m_BufferSize);
+                            network->Receive(sock, &fileBuf[0], m_BufferSize);
+
+                            file.write(&fileBuf[0], m_BufferSize);
+                        }
+
+                        file.close();
+                    }
+                    else
                     {
                         overrideEvent.m_File = filename;
 
@@ -217,7 +247,7 @@ namespace SteelEngine { namespace Network {
 
                         overrideEvent.m_IsSet = false;
 
-                        if(overrideEvent.m_ShouldOverride)
+                        if(overrideEvent.m_ShouldOverride || overrideEvent.m_ShouldOverrideForAll)
                         {
                             network->Send(sock, "UPDATE", m_BufferSize);
                             network->Receive(sock, m_Buffer, m_BufferSize);
@@ -247,35 +277,78 @@ namespace SteelEngine { namespace Network {
                             network->Receive(sock, m_Buffer, m_BufferSize);
                         }
                     }
-                    else
-                    {
-                        network->Send(sock, "UPDATE", m_BufferSize);
-                        network->Receive(sock, m_Buffer, m_BufferSize);
-
-                        std::ofstream file(
-                            event.m_Path.string() + "\\" + filename,
-                            std::ios::binary
-                        );
-
-                        for(size_t j = 0; j < fileSize; j += m_BufferSize)
-                        {
-                            std::string fileBuf;
-
-                            fileBuf.resize(m_BufferSize);
-
-                            network->Send(sock, "DONE", m_BufferSize);
-                            network->Receive(sock, &fileBuf[0], m_BufferSize);
-
-                            file.write(&fileBuf[0], m_BufferSize);
-                        }
-
-                        file.close();
-                    }
                 }
+            }
+            else
+            {
+                printf("File %s is up to date!\n", filename.c_str());
             }
         }
 
         Event::GlobalEvent::Broadcast(StartRecompilingEvent{});
+    }
+
+    void SynchronizeProjectNCE::Init()
+    {
+        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
+
+        m_ShouldOverrideEvent.Add_(this);
+    }
+
+    void SynchronizeProjectNCE::Draw()
+    {
+        if(m_DrawShouldOverridePopup)
+        {
+            ImGui::OpenPopup("##shouldOverrideFiles");
+
+            m_DrawShouldOverridePopup = false;
+        }
+
+        if(ImGui::BeginPopup("##shouldOverrideFiles"))
+        {
+            ImGui::Text("Do you want override %s?", m_ShouldOverrideEventData->m_File.c_str());
+
+            if(ImGui::Button("Yes"))
+            {
+                m_ShouldOverrideEventData->m_ShouldOverride = true;
+                m_ShouldOverrideEventData->m_IsSet = true;
+
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::SameLine();
+
+            if(ImGui::Button("No"))
+            {
+                m_ShouldOverrideEventData->m_ShouldOverride = false;
+                m_ShouldOverrideEventData->m_IsSet = true;
+
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::SameLine();
+
+            if(ImGui::Button("Yes for all files"))
+            {
+                m_ShouldOverrideEventData->m_ShouldOverrideForAll = true;
+                m_ShouldOverrideEventData->m_IsSet = true;
+
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+
+    void SynchronizeProjectNCE::OnRecompile(HotReloader::IRuntimeObject* oldObject)
+    {
+        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
+    }
+
+    void SynchronizeProjectNCE::operator()(ShouldOverrideEvent* event)
+    {
+        m_ShouldOverrideEventData = event;
+        m_DrawShouldOverridePopup = true;
     }
 
 }}

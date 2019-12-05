@@ -26,8 +26,10 @@ namespace SteelEngine {
         GAME_SCRIPT,
         ENGINE_START_TYPE,
         GENERATE_CAST_FUNCTIONS,
+        DO_NOT_GENERATE_CAST_FUNCTIONS,
         SYSTEMS_INFORMATION_TRACKER,
-        NO_RECOMPILE
+        NO_RECOMPILE,
+        INHERITANCE_MODULE
     };
 
 }

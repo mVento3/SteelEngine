@@ -4,7 +4,7 @@
 
 #include "Utils/Reflection.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "ModuleManager/ModuleManager.h"
 
@@ -23,7 +23,7 @@ namespace SteelEngine {
 
 		}
 
-		HotReload::IRuntimeObject* Invoke(ITuple* args) override
+		HotReloader::IRuntimeObject* Invoke(ITuple* args) override
 		{
 			static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
 
@@ -38,7 +38,7 @@ namespace SteelEngine {
 				tuple = (Tuple<Args...>*)args;
 			}
 
-			HotReload::IRuntimeObject* object = (HotReload::IRuntimeObject*)apply(m_Function, tuple->m_Args);
+			HotReloader::IRuntimeObject* object = (HotReloader::IRuntimeObject*)apply(m_Function, tuple->m_Args);
 
 			object->m_Object = object;
 			object->m_ConstructorID = m_ConstructorID;

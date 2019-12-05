@@ -6,6 +6,8 @@
 
 #include "Core/Core.h"
 
+#include "imgui/imgui.h"
+
 namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     SystemsMonitorWindow::SystemsMonitorWindow()
@@ -38,9 +40,10 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void SystemsMonitorWindow::Draw()
     {
-        float delta = (*Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::DELTA_TIME)->Convert<IDeltaTime**>())->GetDeltaTime();
+        IDeltaTime** delta = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::DELTA_TIME)->Convert<IDeltaTime**>();
 
-        ImGui::Text("%f ms", delta * 1000.f);
+        ImGui::Text("%f ms", (*delta)->GetDeltaTime() * 1000.f);
+        ImGui::Text("%u fps", (*delta)->GetUPS());
         ImGui::Text("Some info about engine systems...");
 
         if(ImGui::IsItemHovered())
@@ -84,9 +87,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         ImGui::ListBox("Reflection", &m_CurrentReflectionItem, rees.data(), rees.size());
     }
 
-    void SystemsMonitorWindow::OnRecompile(HotReload::IRuntimeObject* oldObject)
+    void SystemsMonitorWindow::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
-        Window::OnRecompile(oldObject);
+        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
         ImGui::SetCurrentContext((ImGuiContext*)m_Context);
     }
 

@@ -2,4 +2,9 @@
 
 #define GENERATED_BODY \
 public:\
-virtual void Serialize(SteelEngine::HotReload::ISerializer* serializer) override;
+SteelEngine::EditorComponents::ImGUI::UserInterface* Cast_UserInterface()\
+{\
+return static_cast<StartMenuWindow*>(this);\
+}\
+public:\
+virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer) override;

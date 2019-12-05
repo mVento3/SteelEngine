@@ -13,7 +13,7 @@
 
 namespace SteelEngine { namespace Network {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::NO_SERIALIZE = true, SteelEngine::ReflectionAttribute::NETWORK_COMMAND)
+    SE_CLASS(SteelEngine::ReflectionAttribute::NO_SERIALIZE, SteelEngine::ReflectionAttribute::NETWORK_COMMAND)
     class SwapModuleNetCommandEvent : public INetworkCommand
     {
         GENERATED_BODY

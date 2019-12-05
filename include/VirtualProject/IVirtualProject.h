@@ -3,7 +3,7 @@
 #include "string"
 #include "filesystem"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "RuntimeReflection/IReflectionGenerator.h"
 
@@ -13,12 +13,12 @@
 
 namespace SteelEngine {
 
-    struct IVirtualProject : public HotReload::IRuntimeObject
+    struct IVirtualProject : public HotReloader::IRuntimeObject
     {
         virtual Result Init() { return SE_NOT_IMPLEMENTED; }
 
         virtual void CreateProject(const std::filesystem::path& projectName, const ProjectStructure& proj) { }
-        virtual void LoadProject() { }
+        virtual void LoadProject(const std::vector<std::string>& additionalFilesToCompile) { }
 
         virtual void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) { }
         virtual Result IsProjectLoaded() { return SE_NOT_IMPLEMENTED; }

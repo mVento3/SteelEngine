@@ -1,18 +1,20 @@
 #pragma once
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "RuntimeDatabase/RuntimeDatabase.h"
 
 namespace SteelEngine {
 
     struct IReflectionData;
+    class PythonScriptableInheritance;
 
     namespace Script { namespace Python {
 
-    struct IScript : public HotReload::IRuntimeObject
+    struct IScript : public HotReloader::IRuntimeObject
     {
         friend struct IReflectionData;
+        friend class PythonScriptableInheritance;
     protected:
         virtual void LoadScript(const std::string& scriptFile) = 0;
 

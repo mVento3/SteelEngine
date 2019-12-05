@@ -1,13 +1,13 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/INetworkCommand.Generated.h"
 #include "Networking/INetworkCommand.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 namespace Network {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<INetworkCommand>("INetworkCommand",{
+SteelEngine::ReflectionRecorder::Register<INetworkCommand>("INetworkCommand",{
 "SteelEngine",
 "Network"
 }
@@ -16,7 +16,7 @@ SteelEngine::Reflection::Register<INetworkCommand>("INetworkCommand",{
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(INetworkCommand))
 )
-.Inheritance<HotReload::IRuntimeObject>("HotReload::IRuntimeObject")
+.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Property("m_Flow", &INetworkCommand::m_Flow)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NET_VALUE, true)
@@ -26,11 +26,7 @@ SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NET_VALUE, t
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NET_VALUE, true)
 )
 .Property("m_Deserialized", &INetworkCommand::m_Deserialized)
-(
-)
 .Property("m_Busy", &INetworkCommand::m_Busy)
-(
-)
 ;
 }
 

@@ -93,15 +93,13 @@ namespace SteelEngine { namespace Network {
 
         m_Network->SetNetworkManager(this);
 
-        // std::string ip = Reflection::GetType("Core")->GetMetaData(Core::EngineInfo::SERVER_IP)->Convert<std::string>();
-
-        if(Reflection::GetType("Client")->Invoke("Connect", m_Network, event.m_ServerIP.c_str()).Convert<Result>() == SE_TRUE)
+        if(Reflection::GetType("SteelEngine::Client")->Invoke("Connect", m_Network, event.m_ServerIP.c_str()).Convert<Result>() == SE_TRUE)
         {
             printf("Connected successful!\n");
 
             *m_Connected = true;
 
-            Reflection::GetType("Client")->Invoke("Process", m_Network);
+            Reflection::GetType("SteelEngine::Client")->Invoke("Process", m_Network);
         }
 
         m_Network->m_DisconnectEvent.Add(this);

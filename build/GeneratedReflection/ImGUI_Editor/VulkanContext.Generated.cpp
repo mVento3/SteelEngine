@@ -1,12 +1,12 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/VulkanContext.Generated.h"
 #include "ImGUI_Editor/VulkanContext.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<VulkanContext>("VulkanContext",{
+SteelEngine::ReflectionRecorder::Register<VulkanContext>("VulkanContext",{
 "SteelEngine"
 }
 )
@@ -15,23 +15,17 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(VulkanContext))
 )
 .Inheritance<IContext>("IContext")
 .Constructor<>()
-(
-)
 .Property("m_PushConstBlock", &VulkanContext::m_PushConstBlock)
-(
-)
 .Method("GetContext", &VulkanContext::GetContext)
-(
-)
 ;
 }
 
-void VulkanContext::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void VulkanContext::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(VulkanContext)
 {

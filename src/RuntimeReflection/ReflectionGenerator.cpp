@@ -64,6 +64,10 @@ namespace SteelEngine {
 			{
 				lexer.SkipLine();
 			}
+			else if(lexer.GetToken() == "return")
+			{
+				lexer.SkipLine();
+			}
 			else if(lexer.GetToken() == "struct" ||
 				lexer.GetToken() == "class")
 			{
@@ -122,6 +126,8 @@ namespace SteelEngine {
 
 					while(1)
 					{
+						InheritanceInfo inherit;
+
 						if(lexer.GetToken() == "{")
 						{
 							lexer.SaveToken(lexer.GetToken());
@@ -131,7 +137,19 @@ namespace SteelEngine {
 						else if(lexer.GetToken() == ",")
 						{
 							lexer++;
+
 							continue;
+						}
+
+						if(lexer.GetToken() == "SE_INHERITANCE")
+						{
+							lexer++;
+
+							std::string word = "";
+
+							ProcessMetaData(lexer, inherit.m_MetaData, word);
+
+							lexer++;
 						}
 
 						if(lexer.GetToken() == "public")
@@ -153,7 +171,10 @@ namespace SteelEngine {
 								word += lexer.GetToken();
 							}
 
-							currentData->m_Inheritance.push_back(InheritanceInfo{ word, ProtectionFlag::PUBLIC });
+							inherit.m_Name = word;
+							inherit.m_Protection = ProtectionFlag::PUBLIC;
+
+							currentData->m_Inheritance.push_back(inherit);
 						}
 						else if(lexer.GetToken() == "private")
 						{
@@ -174,7 +195,10 @@ namespace SteelEngine {
 								word += lexer.GetToken();
 							}
 
-							currentData->m_Inheritance.push_back(InheritanceInfo{ word, ProtectionFlag::PRIVATE });
+							inherit.m_Name = word;
+							inherit.m_Protection = ProtectionFlag::PRIVATE;
+
+							currentData->m_Inheritance.push_back(inherit);
 						}
 						else if(lexer.GetToken() == "protected")
 						{
@@ -195,7 +219,10 @@ namespace SteelEngine {
 								word += lexer.GetToken();
 							}
 
-							currentData->m_Inheritance.push_back(InheritanceInfo{ word, ProtectionFlag::PROTECTED });
+							inherit.m_Name = word;
+							inherit.m_Protection = ProtectionFlag::PROTECTED;
+
+							currentData->m_Inheritance.push_back(inherit);
 						}
 						else
 						{
@@ -203,6 +230,13 @@ namespace SteelEngine {
 						}
 
 						lexer++;
+
+						// TODO: todo idk lol
+						Event::GlobalEvent::Broadcast(SE_InheritanceMacroEvent
+						{
+							&inherit,
+							&currentData->m_Inheritance
+						});
 					}
 				}
 				else if(lexer.GetToken() == ";")
@@ -481,76 +515,10 @@ namespace SteelEngine {
 				}
 
 				lexer++; // (
-				
+
 				std::string word = "";
-				bool wasEqual = false;
-				MetaDataInfo meta;
-				std::stack<bool> roundBraces;
 
-				roundBraces.push(true);
-
-				while(1)
-				{
-					lexer++;
-
-					if(lexer.GetToken() == ")" && roundBraces.size() == 1)
-					{
-						if(wasEqual && word != "")
-						{
-							meta.m_Value = word;
-						}
-						else if(word != "")
-						{
-							meta.m_Key = word;
-							meta.m_Value = "true";
-						}
-						else
-						{
-							break;
-						}
-						
-						word.clear();
-						currentData->m_ClassMetaDataInfo.push_back(meta);
-
-						break;
-					}
-					else if(lexer.GetToken() == ")")
-					{
-						word += lexer.GetToken();
-						roundBraces.pop();
-					}
-					else if(lexer.GetToken() == "(")
-					{
-						word += lexer.GetToken();
-						roundBraces.push(true);
-					}
-					else if(lexer.GetToken() == "," && roundBraces.size() == 1)
-					{
-						if(wasEqual)
-						{
-							meta.m_Value = word;
-						}
-						else
-						{
-							meta.m_Key = word;
-							meta.m_Value = "true";
-						}
-
-						wasEqual = false;
-						word.clear();
-						currentData->m_ClassMetaDataInfo.push_back(meta);
-					}
-					else if(lexer.GetToken() == "=")
-					{
-						wasEqual = true;
-						meta.m_Key = word;
-						word.clear();
-					}
-					else
-					{
-						word += lexer.GetToken();
-					}
-				}
+				ProcessMetaData(lexer, currentData->m_ClassMetaDataInfo, word);
 			}
 			else if(lexer.GetToken() == "SE_VALUE")
 			{
@@ -559,74 +527,8 @@ namespace SteelEngine {
 				lexer++;
 
 				std::string word = "";
-				bool wasEqual = false;
-				MetaDataInfo meta;
-				std::stack<bool> roundBraces;
 
-				roundBraces.push(true);
-
-				while(1)
-				{
-					lexer++;
-
-					if(lexer.GetToken() == ")" && roundBraces.size() == 1)
-					{
-						if(wasEqual && word != "")
-						{
-							meta.m_Value = word;
-						}
-						else if(word != "")
-						{
-							meta.m_Key = word;
-							meta.m_Value = "true";
-						}
-						else
-						{
-							break;
-						}
-						
-						word.clear();
-						prop.m_MetaData.push_back(meta);
-
-						break;
-					}
-					else if(lexer.GetToken() == ")")
-					{
-						word += lexer.GetToken();
-						roundBraces.pop();
-					}
-					else if(lexer.GetToken() == "(")
-					{
-						word += lexer.GetToken();
-						roundBraces.push(true);
-					}
-					else if(lexer.GetToken() == "," && roundBraces.size() == 1)
-					{
-						if(wasEqual)
-						{
-							meta.m_Value = word;
-						}
-						else
-						{
-							meta.m_Key = word;
-							meta.m_Value = "true";
-						}
-
-						wasEqual = false;
-						word.clear();
-						prop.m_MetaData.push_back(meta);
-					}
-					else if(lexer.GetToken() == "=")
-					{
-						wasEqual = true;
-						meta.m_Key = word;
-						word.clear();
-					}
-					else
-					{
-						word += lexer.GetToken();
-					}
-				}
+				ProcessMetaData(lexer, prop.m_MetaData, word);
 			}
 			else if(lexer.GetToken() == "SE_METHOD")
 			{
@@ -635,63 +537,8 @@ namespace SteelEngine {
 				lexer++;
 
 				std::string word = "";
-				bool wasEqual = false;
-				MetaDataInfo meta;
 
-				while(1)
-				{
-					lexer++;
-
-					if(lexer.GetToken() == ")")
-					{
-						if(wasEqual && word != "")
-						{
-							meta.m_Value = word;
-						}
-						else if(word != "")
-						{
-							meta.m_Key = word;
-							meta.m_Value = "true";
-						}
-						else
-						{
-							break;
-						}
-						
-						word.clear();
-						meth.m_MetaData.push_back(meta);
-						meth.m_ProtectionFlag = m_LastProtectionFlag;
-
-						break;
-					}
-					else if(lexer.GetToken() == ",")
-					{
-						if(wasEqual && word != "")
-						{
-							meta.m_Value = word;
-						}
-						else if(word != "")
-						{
-							meta.m_Key = word;
-							meta.m_Value = "true";
-						}
-
-						wasEqual = false;
-						word.clear();
-						meth.m_MetaData.push_back(meta);
-						meth.m_ProtectionFlag = m_LastProtectionFlag;
-					}
-					else if(lexer.GetToken() == "=")
-					{
-						wasEqual = true;
-						meta.m_Key = word;
-						word.clear();
-					}
-					else
-					{
-						word += lexer.GetToken();
-					}
-				}
+				ProcessMetaData(lexer, meth.m_MetaData, word, &meth.m_ProtectionFlag);
 
 				lexer++;
 
@@ -712,6 +559,10 @@ namespace SteelEngine {
 					{
 						lexer++;
 					}
+					else if(lexer.GetToken() == "static")
+					{
+						lexer++;
+					}
 
 					word += lexer.GetToken();
 
@@ -728,11 +579,69 @@ namespace SteelEngine {
 				meth.m_MethodInfo.m_ReturnType = word;
 				meth.m_MethodInfo.m_Name = lexer.GetToken();
 
+				lexer++;
+
+				bool openRoundBracket = false;
+				std::string argumentWord = "";
+				std::vector<ArgumentInfo> argTypes;
+				bool wasComma = false;
+
+				while(1)
+				{
+					if(lexer.GetToken() == "(")
+					{
+						openRoundBracket = true;
+					}
+					else if(lexer.GetToken() == ")")
+					{
+						openRoundBracket = false;
+					}
+					else if(openRoundBracket)
+					{
+						if(lexer.GetToken() == ",")
+						{
+							wasComma = true;
+
+							size_t found = argumentWord.find_last_of(" ");
+
+							argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
+							argumentWord.clear();
+						}
+						else
+						{
+							argumentWord += lexer.GetToken();
+
+							if(lexer.Space())
+							{
+								argumentWord += " ";
+							}
+						}
+					}
+					else if(!openRoundBracket)
+					{
+						if(wasComma)
+						{
+							wasComma = false;
+
+							size_t found = argumentWord.find_last_of(" ");
+
+							argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
+						}
+
+						break;
+					}
+
+					lexer++;
+				}
+
+				meth.m_MethodInfo.m_Arguments.insert(meth.m_MethodInfo.m_Arguments.begin(), argTypes.begin(), argTypes.end());
+
 				currentData->m_Methods.push_back(meth);
 
 				Event::GlobalEvent::Broadcast(SE_MethodMacroEvent{ &meth, &currentData->m_Methods });
 
 				meth.m_MetaData.clear();
+				meth.m_MethodInfo.m_Arguments.clear();
 			}
 			else if(lexer.GetToken() == "GENERATED_BODY")
 			{
@@ -917,25 +826,111 @@ namespace SteelEngine {
 
 	void ReflectionGenerator::GenerateMetaDataInfo(std::ofstream& out, std::vector<MetaDataInfo> meta)
 	{
-		out << "(\n";
-
-		for (Type::uint32 i = 0; i < meta.size(); i++)
+		if(!meta.empty())
 		{
-			out << "SteelEngine::Reflection::MetaData(" <<
-				meta[i].m_Key << ", " <<
-				meta[i].m_Value << ")";
+			out << "(\n";
 
-			if (i < meta.size() - 1)
+			for(Type::uint32 i = 0; i < meta.size(); i++)
 			{
-				out << ",\n";
+				out << "SteelEngine::Reflection::MetaData(" <<
+					meta[i].m_Key << ", " <<
+					meta[i].m_Value << ")";
+
+				if(i < meta.size() - 1)
+				{
+					out << ",\n";
+				}
+				else
+				{
+					out << "\n";
+				}
+			}
+
+			out << ")\n";
+		}
+	}
+
+	void ReflectionGenerator::ProcessMetaData(Lexer& lexer, std::vector<MetaDataInfo>& res, std::string& word, ProtectionFlag* flag)
+	{
+		// std::string word = "";
+		bool wasEqual = false;
+		MetaDataInfo meta;
+		std::stack<bool> roundBraces;
+
+		roundBraces.push(true);
+
+		while(1)
+		{
+			lexer++;
+
+			if(lexer.GetToken() == ")" && roundBraces.size() == 1)
+			{
+				if(wasEqual && word != "")
+				{
+					meta.m_Value = word;
+				}
+				else if(word != "")
+				{
+					meta.m_Key = word;
+					meta.m_Value = "true";
+				}
+				else
+				{
+					break;
+				}
+				
+				word.clear();
+				res.push_back(meta);
+				
+				if(flag)
+				{
+					*flag = m_LastProtectionFlag;
+				}
+
+				break;
+			}
+			else if(lexer.GetToken() == ")")
+			{
+				word += lexer.GetToken();
+				roundBraces.pop();
+			}
+			else if(lexer.GetToken() == "(")
+			{
+				word += lexer.GetToken();
+				roundBraces.push(true);
+			}
+			else if(lexer.GetToken() == "," && roundBraces.size() == 1)
+			{
+				if(wasEqual)
+				{
+					meta.m_Value = word;
+				}
+				else
+				{
+					meta.m_Key = word;
+					meta.m_Value = "true";
+				}
+
+				wasEqual = false;
+				word.clear();
+				res.push_back(meta);
+
+				if(flag)
+				{
+					*flag = m_LastProtectionFlag;
+				}
+			}
+			else if(lexer.GetToken() == "=")
+			{
+				wasEqual = true;
+				meta.m_Key = word;
+				word.clear();
 			}
 			else
 			{
-				out << "\n";
+				word += lexer.GetToken();
 			}
 		}
-
-		out << ")\n";
 	}
 
 	ReflectionGenerator::ReflectionGenerator()
@@ -1082,8 +1077,8 @@ namespace SteelEngine {
 		sourceFile << "#include \"" << finalPath << rawFilename << ".Generated.h" << "\"\n";
 
 		sourceFile << "#include \"" << includePath << "\"\n";
-		sourceFile << "#include \"RuntimeCompiler/IRuntimeObject.h\"\n";
-		sourceFile << "#include \"RuntimeReflection/Reflection.h\"\n";
+		sourceFile << "#include \"HotReloader/IRuntimeObject.h\"\n";
+		sourceFile << "#include \"RuntimeReflection/ReflectionRecorder.h\"\n";
 		sourceFile << "\n";
 
 		// Here we are generating the reflection info
@@ -1098,7 +1093,7 @@ namespace SteelEngine {
 			sourceFile << "REGISTER_REFLECTION\n";
 			sourceFile << "{\n";
 			{
-				sourceFile << "SteelEngine::Reflection::Register<";
+				sourceFile << "SteelEngine::ReflectionRecorder::Register<";
 				sourceFile << data->m_ClassName;
 				sourceFile << ">(\"" << data->m_ClassName << "\"";
 
@@ -1131,6 +1126,8 @@ namespace SteelEngine {
 					sourceFile << ".Inheritance<";
 					sourceFile << inh.m_Name << ">";
 					sourceFile << "(\"" << inh.m_Name << "\")\n";
+
+					GenerateMetaDataInfo(sourceFile, inh.m_MetaData);
 				}
 
 				for(ConstructorInfo consInfo : data->m_Constructors)
@@ -1176,8 +1173,47 @@ namespace SteelEngine {
 						continue;
 					}
 
-					sourceFile << ".Method(";
-					sourceFile << "\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
+					std::vector<ClassMethod> sameNamedMethods;
+
+					for(ClassMethod isOverloaded : data->m_Methods)
+					{
+						if(isOverloaded.m_MethodInfo.m_Name == clsMeth.m_MethodInfo.m_Name)
+						{
+							sameNamedMethods.push_back(isOverloaded);
+						}
+					}
+
+					sourceFile << ".Method";
+
+					if(sameNamedMethods.size() > 1)
+					{
+						sourceFile << "<";
+
+						size_t size = clsMeth.m_MethodInfo.m_Arguments.size();
+
+						sourceFile << clsMeth.m_MethodInfo.m_ReturnType;
+
+						if(size > 0)
+						{
+							sourceFile << ", ";
+						}
+
+						for(Type::uint32 i = 0; i < size; i++)
+						{
+							ArgumentInfo arg = clsMeth.m_MethodInfo.m_Arguments[i];
+
+							sourceFile << arg.m_Type;
+
+							if(i < size - 1)
+							{
+								sourceFile << ", ";
+							}
+						}
+
+						sourceFile << ">";
+					}
+
+					sourceFile << "(\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
 					sourceFile << "&" << data->m_ClassName << "::" << clsMeth.m_MethodInfo.m_Name;
 					sourceFile << ")\n";
 
@@ -1188,8 +1224,10 @@ namespace SteelEngine {
 
 				Event::GlobalEvent::Broadcast_(ev);
 
-				for(ClassMethod clsMeth : ev->m_Methods)
+				for(/*ClassMethod clsMeth : ev->m_Methods*/ Type::uint32 i = 0; i < ev->m_Methods.size(); i++)
 				{
+					ClassMethod clsMeth = ev->m_Methods[i];
+
 					if(clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
 						clsMeth.m_ProtectionFlag == ProtectionFlag::PROTECTED)
 					{
@@ -1249,7 +1287,7 @@ namespace SteelEngine {
 			if (data->m_Constructors.size() > 0)
 			{
 				sourceFile << "#ifdef RUNTIME_COMPILE\n";
-				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)\n";
+				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)\n";
 				sourceFile << "{\n";
 				{
 					sourceFile << "DECLARE_TYPE_INFO(" << data->m_ClassName << ")\n";

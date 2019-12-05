@@ -1,14 +1,14 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/OpenGL/Renderer.Generated.h"
 #include "Graphics/OpenGL/Renderer.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 namespace Graphics {
 namespace OpenGL {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<Renderer>("Renderer",{
+SteelEngine::ReflectionRecorder::Register<Renderer>("Renderer",{
 "SteelEngine",
 "Graphics",
 "OpenGL"
@@ -20,12 +20,10 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 )
 .Inheritance<IRenderer>("IRenderer")
 .Constructor<IWindow*>()
-(
-)
 ;
 }
 
-void Renderer::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void Renderer::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(Renderer::m_Window)
 SERIALIZE(Renderer::m_Camera)
@@ -60,7 +58,7 @@ SERIALIZE(Renderer::m_RotateCamera)
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(Renderer)
 {

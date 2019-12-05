@@ -48,15 +48,15 @@ class Module:
             if os.path.isfile(self.cwd + '/build/GeneratedReflection/' + res):
                 self.reflection_src_files.append(res)
 
-    def compileWhole(self):
+    def compileWhole(self, lib_updated):
         flags = ''
         defs = ''
         whole_compile = False
         includes = ''
-        external_libs = ''
+        libs = ''
 
         for key in self.compile_config['flags']:
-            flags += '/' + key + ' '
+            flags += key + ' '
 
         for key in self.compile_config['definitions']:
             defs += '/D' + key + ' '
@@ -65,10 +65,14 @@ class Module:
             includes += '/I' + self.cwd + '/' + key + ' '
 
         for key in self.compile_config['lib_paths']:
-            external_libs += '/LIBPATH:' + self.cwd + '/' + key + ' '
+            libs += '/LIBPATH:' + self.cwd + '/' + key + ' '
 
-        for key in self.compile_config['libs2']:
-            external_libs += key + ' '
+        for key in self.compile_config['libs']:
+            libs += key + ' '
+
+        for key in self.modules:
+            if key['type'] == 'lib':
+                libs += key['name'] + '.lib '
 
         for src in self.reflection_src_files:
             splitted = src.split(os.sep)
@@ -186,18 +190,7 @@ class Module:
 
             self.object_files.append(self.working_directory + '/' + obj_dir + splitted[len(splitted) - 1].split('.')[0] + '.obj')
 
-        if whole_compile:
-            dll_type = ''
-
-            for key in self.compile_config['dll']:
-                dll_type += '/' + key + ' '
-
-            libs = ''
-
-            for key in self.modules:
-                if key['type'] == 'lib':
-                    libs += self.cwd + '/bin/' + key['name'] + '.lib '
-
+        if whole_compile or lib_updated:
             obj_files = ''
 
             for o in self.object_files:
@@ -207,15 +200,19 @@ class Module:
             self.process.Wait()
 
             if self.type == 'lib':
+                lib_updated = True
                 self.process.WriteInput('lib ' + obj_files + '/OUT:' + self.cwd + '/bin/' + self.name + '.lib')
                 self.process.Wait()
             elif self.type == 'dll':
+                for key in self.compile_config['dll']:
+                    flags += key + ' '
+
                 self.process.WriteInput('cl ' +
                     flags + ' ' +
                     defs + ' ' +
                     includes + ' ' +
-                    dll_type + '/Fe' + self.cwd + '/bin/' + self.name + '.dll ' +
-                    obj_files + '/link ' + libs + ' ' + external_libs
+                    ' /Fe' + self.cwd + '/bin/' + self.name + '.dll ' +
+                    obj_files + '/link ' + ' ' + libs
                 )
                 self.process.Wait()
             elif self.type == 'exe':
@@ -224,6 +221,8 @@ class Module:
                     defs + ' ' +
                     includes + ' ' +
                     '/Fe' + self.cwd + '/bin/' + self.name + '.exe ' +
-                    obj_files + ' /link ' + libs + ' ' + external_libs
+                    obj_files + ' /link ' + ' ' + libs
                 )
                 self.process.Wait()
+
+        return lib_updated

@@ -6,8 +6,11 @@
 #include "RuntimeReflection/Reflection.h"
 
 #include "VirtualProject/LoadProjectEvent.h"
+#include "VirtualProject/CreateNewProjectEvent.h"
 
 #include "Networking/NetworkManager.h"
+
+#include "Utils/Json.h"
 
 namespace SteelEngine { namespace Editor { namespace ImGUI {
 
@@ -42,7 +45,13 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     StartMenuWindow::StartMenuWindow()
     {
+        m_Size = 32;
+        m_NewProjectName = new char[m_Size];
 
+        for(Type::uint32 i = 0; i < m_Size; i++)
+        {
+            m_NewProjectName[i] = '\0';
+        }
     }
 
     StartMenuWindow::~StartMenuWindow()
@@ -83,19 +92,19 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
         if(ImGui::BeginPopup("##createNewProject"))
         {
-            ImGui::InputText("Project name", m_NewProjectName, IM_ARRAYSIZE(m_NewProjectName));
+            ImGui::InputText("Project name", m_NewProjectName, m_Size);
 
             if(ImGui::Button("Create"))
             {
-                ProjectStructure proj;
+                ProjectStructure proj(m_NewProjectName);
+                CreateNewProjectEvent event(proj, m_ProjectsPath);
 
-                proj.m_DirectoryName = m_NewProjectName;
-                proj.m_Other.push_back(ProjectStructure{ "bin" });
-                proj.m_Other.push_back(ProjectStructure{ "build", { ProjectStructure{ "Windows" }, ProjectStructure{ "Linux" } } });
-                proj.m_Other.push_back(ProjectStructure{ "src" });
-                proj.m_Other.push_back(ProjectStructure{ "include" });
+                Event::GlobalEvent::Broadcast_(&event);
 
-                (*m_VirtualProject)->CreateProject(m_ProjectsPath.string(), proj);
+                m_VirtualProject = event.m_Project;
+
+                LoadProject(m_ProjectsPath / proj.m_DirectoryName);
+
                 ImGui::CloseCurrentPopup();
             }
 
@@ -166,9 +175,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         }
     }
 
-    void StartMenuWindow::OnRecompile(HotReload::IRuntimeObject* oldObject)
+    void StartMenuWindow::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
-        Window::OnRecompile(oldObject);
+        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
         ImGui::SetCurrentContext((ImGuiContext*)m_Context);
     }
 

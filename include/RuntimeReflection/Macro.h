@@ -4,6 +4,7 @@
 #define SE_STRUCT(...)
 #define SE_VALUE(...)
 #define SE_METHOD(...)
+#define SE_INHERITANCE(...)
 #define SE_CONSTRUCTOR(...)
 #define SE_DESTRUCTOR(...)
 #define SE_ENUM(...)

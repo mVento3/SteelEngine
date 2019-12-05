@@ -7,8 +7,6 @@
 #include "RuntimeReflection/Macro.h"
 #include "RuntimeReflection/Reflection.h"
 
-#include "Networking/Client.Generated.h"
-
 #include "Core/Result.h"
 #include "Core/ReflectionAttributes.h"
 
@@ -19,7 +17,9 @@
 
 #include "Event/globalevent.h"
 
-#include "RuntimeCompiler/SwapModuleEvent.h"
+#include "HotReloader/Events/SwapModuleEvent.h"
+
+#include "Networking/Client.Generated.h"
 
 namespace SteelEngine {
 

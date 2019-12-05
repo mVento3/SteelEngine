@@ -578,7 +578,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     Renderer::Renderer(IWindow* window) :
         m_Window(window),
-        m_Camera(Transform())
+        m_Camera(Transform(), (float)1600 / (float)900, 90)
     {
         m_Device = new Device();
         m_Validation = new Validation();
@@ -1138,6 +1138,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         m_Height = event.m_Height;
 
         // TODO: Update camera
+        m_Camera.SetProjection(glm::perspective(glm::radians(70.f), (float)m_Width / (float)m_Height, 0.1f, 1000.f));
     }
 
     void Renderer::operator()(const MinimizedEvent& event)

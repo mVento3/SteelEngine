@@ -4,11 +4,11 @@
 
 #include "Graphics/Vulkan/DeepLayer/LogicalDevice.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    struct IShader : public HotReload::IRuntimeObject
+    struct IShader : public HotReloader::IRuntimeObject
     {
         virtual Result LoadShader(
             const LogicalDevice& logicalDevice,

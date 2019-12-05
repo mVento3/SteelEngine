@@ -6,7 +6,7 @@ namespace SteelEngine {
 
 	struct IReflectionMethod : public MetaDataImplementation
 	{
-		
+
 	};
 
 }

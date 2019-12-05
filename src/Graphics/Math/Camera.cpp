@@ -2,10 +2,10 @@
 
 namespace SteelEngine {
 
-    Camera::Camera(const Transform& transform) :
+    Camera::Camera(const Transform& transform, float aspect, float fov, float near, float far) :
         m_Transform(transform)
     {
-        m_Projection = glm::perspective(glm::radians(70.f), (float)1600 / (float)900, 0.1f, 1000.f);
+        m_Projection = glm::perspective(glm::radians(fov), aspect, near, far);
     }
 
     Camera::~Camera()

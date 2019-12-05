@@ -10,6 +10,10 @@ Script::Python::Scriptable* Cast_Scriptable()\
 {\
 return static_cast<SynchronizeProjectNCE*>(this);\
 }\
+EditorComponents::ImGUI::UserInterface* Cast_UserInterface()\
+{\
+return static_cast<SynchronizeProjectNCE*>(this);\
+}\
 private:\
 char* Serialize(char* data, size_t& totalSize) override\
 {\
@@ -24,4 +28,6 @@ return out;\
 void CalculateSize(size_t& totalSize) override\
 {\
 SteelEngine::Network::INetworkCommand::CalculateSize(totalSize);\
-}
+}\
+public:\
+virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer) override;

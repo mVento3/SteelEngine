@@ -36,6 +36,14 @@ namespace SteelEngine {
 
 			return none;
 		}
+
+		Variant Invoke(Args... args) override
+		{
+			static Result noneRes(SE_FALSE, "NONE");
+			static Variant none(noneRes, typeid(noneRes).hash_code());
+
+			return none;
+		}
 	};
 
 	template <typename T, typename R, typename ...Args>
@@ -60,6 +68,85 @@ namespace SteelEngine {
 		{
 			T* type = (T*)obj;
 			R r(Call(type, args...));
+
+			return Variant(r, typeid(r).hash_code());
+		}
+
+		Variant Invoke(Args... args) override
+		{
+			static Result noneRes(SE_FALSE, "NONE");
+			static Variant none(noneRes, typeid(noneRes).hash_code());
+
+			return none;
+		}
+	};
+
+	template <typename ...Args>
+	struct ProxyMethod<void(*)(Args...)> : public IProxyMethod<Args...>
+	{
+		typedef void(*FunctionCallback)(Args...);
+
+		FunctionCallback m_FunctionCallback;
+
+		ProxyMethod(FunctionCallback func) :
+			m_FunctionCallback(func)
+		{
+
+		}
+
+		void Call(Args... args)
+		{
+			(*m_FunctionCallback)(std::forward<Args>(args)...);
+		}
+
+		Variant Invoke(void* obj, Args... args) override
+		{
+			static Result noneRes(SE_FALSE, "NONE");
+			static Variant none(noneRes, typeid(noneRes).hash_code());
+
+			return none;
+		}
+
+		Variant Invoke(Args... args) override
+		{
+			Call(args...);
+
+			static Result noneRes(SE_FALSE, "NONE");
+			static Variant none(noneRes, typeid(noneRes).hash_code());
+
+			return none;
+		}
+	};
+
+	template <typename R, typename ...Args>
+	struct ProxyMethod<R(*)(Args...)> : public IProxyMethod<Args...>
+	{
+		typedef R(*FunctionCallback)(Args...);
+
+		FunctionCallback m_FunctionCallback;
+
+		ProxyMethod(FunctionCallback func) :
+			m_FunctionCallback(func)
+		{
+
+		}
+
+		R Call(Args... args)
+		{
+			return (*m_FunctionCallback)(std::forward<Args>(args)...);
+		}
+
+		Variant Invoke(void* obj, Args... args) override
+		{
+			static Result noneRes(SE_FALSE, "NONE");
+			static Variant none(noneRes, typeid(noneRes).hash_code());
+
+			return none;
+		}
+
+		Variant Invoke(Args... args) override
+		{
+			R r(Call(args...));
 
 			return Variant(r, typeid(r).hash_code());
 		}

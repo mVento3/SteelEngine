@@ -27,13 +27,12 @@ result->m_TypeID = typeid(classType).hash_code(); \
 result->m_CreateObjectCallback = [=](size_t objectID, size_t constructorID)
 
 #define FIND_THE_RIGHT_OBJECT \
-SteelEngine::RuntimeDatabase::ConstructedObjectsVector* vec = (SteelEngine::RuntimeDatabase::ConstructedObjectsVector*)typeInfo; \
 SteelEngine::ConstrucedObject* obj = 0; \
-for (SteelEngine::Type::uint32 i = 0; i < vec->size(); i++) \
+for(SteelEngine::Type::uint32 i = 0; i < typeInfo->size(); i++) \
 { \
-	SteelEngine::ConstrucedObject* obj_ = vec->at(i); \
+	SteelEngine::ConstrucedObject* obj_ = typeInfo->at(i); \
  \
-	if (obj_->m_ObjectID == objectID && obj_->m_ConstructorID == constructorID) \
+	if(obj_->m_ObjectID == objectID && obj_->m_ConstructorID == constructorID) \
 	{ \
 		obj = obj_; \
 		break; \
@@ -41,15 +40,15 @@ for (SteelEngine::Type::uint32 i = 0; i < vec->size(); i++) \
 }
 
 #define COMPARE_CONSTRUCTOR_() \
-if (constructorID == typeid(SteelEngine::HotReload::IRuntimeObject*()).hash_code()) \
+if(constructorID == typeid(SteelEngine::HotReloader::IRuntimeObject*()).hash_code()) \
 { \
-	return (SteelEngine::HotReload::IRuntimeObject*)SteelEngine::createType<ClassType>(); \
+	return (SteelEngine::HotReloader::IRuntimeObject*)SteelEngine::createType<ClassType>(); \
 }
 
 #define COMPARE_CONSTRUCTOR(...) \
-if (constructorID == typeid(SteelEngine::HotReload::IRuntimeObject*(__VA_ARGS__)).hash_code()) \
+if(constructorID == typeid(SteelEngine::HotReloader::IRuntimeObject*(__VA_ARGS__)).hash_code()) \
 { \
 	SteelEngine::Tuple<__VA_ARGS__>* tupleArguments = (SteelEngine::Tuple<__VA_ARGS__>*)obj->m_Args; \
  \
-	return (SteelEngine::HotReload::IRuntimeObject*)apply(SteelEngine::createType<ClassType, __VA_ARGS__>, tupleArguments->m_Args); \
+	return (SteelEngine::HotReloader::IRuntimeObject*)apply(SteelEngine::createType<ClassType, __VA_ARGS__>, tupleArguments->m_Args); \
 }

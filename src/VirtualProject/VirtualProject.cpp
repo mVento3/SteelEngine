@@ -50,6 +50,8 @@ namespace SteelEngine {
 
         res = (m_LoadedProject / "build/Windows").string();
 
+        m_Process->WriteInput("cd " + res + "\n__COMPLETION_TOKEN_\n");
+
         std::string toRem = toRemove.string();
 
         replaceAll(toRem, "\\", "/");
@@ -69,41 +71,238 @@ namespace SteelEngine {
             }
         }
 
-        std::string flags = "";
-        std::string definitions = "";
-
         std::vector<std::string> flagVector = m_CompileConfig["flags"];
         std::vector<std::string> definitionVector = m_CompileConfig["definitions"];
+        std::vector<std::string> includeVector = m_CompileConfig["includes"];
+        std::vector<std::string> libPathVector = m_CompileConfig["lib_paths"];
+        std::vector<std::string> libVector = m_CompileConfig["libs"];
 
-        for(Type::uint32 i = 0; i < flagVector.size(); i++)
-        {
-            flags += "/" + flagVector[i] + " ";
-        }
+        flagVector.push_back("/c");
 
-        for(Type::uint32 i = 0; i < definitionVector.size(); i++)
-        {
-            definitions += "/D" + definitionVector[i] + " ";
-        }
+        for(std::string& file : includeVector)
+		{
+			file = m_EnginePath + "/" + file;
+		}
 
-        m_Process->WriteInput(
-            "cl " + flags + definitions + "/I" +
-            (m_LoadedProject / "include").string() +
-            " /I" + m_EnginePath + "/include" +
-            " /I" + m_EnginePath + "/build/GeneratedReflection" +
-            " /I" + m_EnginePath + "/external" +
-            " /I" + m_EnginePath + "/external/Vulkan/Include" +
-            " /I" + (m_LoadedProject / "build/GeneratedReflection").string() +
-            " /c " + filePath.string() + "\n__COMPLETION_TOKEN_\n"
-        );
+		for(std::string& file : libPathVector)
+		{
+			file = m_EnginePath + "/" + file;
+		}
 
-        while(!m_Process->IsCompileComplete())
-        {
+        includeVector.push_back((m_LoadedProject / "include").string());
+		includeVector.push_back((m_LoadedProject / "build/GeneratedReflection").string());
 
-        }
+        m_Compiler->Compile(filePath.string(), flagVector, definitionVector, includeVector, libPathVector, libVector);
+        m_Compiler->WaitUntilComplete();
 
         m_Process->WriteInput("cd " + (m_LoadedProject / "build/Windows").string() + "\n__COMPLETION_TOKEN_\n");
+    }
 
-        m_ObjectFiles.append(res + "/" + filePath.filename().replace_extension("obj").string()).append(" ");
+    void VirtualProject::SetupProjectStructure(ProjectStructure& project)
+    {
+        Utils::json projectSettings = {};
+
+        projectSettings["name"] = project.m_DirectoryName;
+        projectSettings["version"] = "0.0.0";
+        projectSettings["compiler"]["definitions"] = Utils::json::array();
+        projectSettings["compiler"]["includes"] = Utils::json::array();
+
+        Utils::json vsProjectSettings = {};
+
+        vsProjectSettings["configurations"] = Utils::json::array();
+        // vsProjectSettings["configurations"][0] = {};
+        // vsProjectSettings["configurations"][0]["name"] = "Win32";
+        Utils::json& config = vsProjectSettings["configurations"][0];
+        config["name"] = "Win32";
+        config["includePath"] = Utils::json::array();
+        config["includePath"][0] = "${workspaceFolder}/**";
+        config["includePath"][1] = "D:/Projects/C++/SteelEngine/include";
+        config["defines"] = Utils::json::array();
+        config["defines"][0] = "_DEBUG";
+        config["defines"][1] = "UNICODE";
+        config["defines"][2] = "_UNICODE";
+        config["intelliSenseMode"] = "msvc-x64";
+        config["browse"]["path"] = Utils::json::array();
+        config["browse"]["path"][0] = "D:/Projects/C++/SteelEngine/include";
+        vsProjectSettings["version"] = 4;
+
+        Utils::json state = {};
+
+        state["filesHash"] = Utils::json::array();
+
+        project.m_Other.push_back(
+            ProjectStructure(
+                ".vscode",
+                {
+                    ProjectStructure(
+                        "c_cpp_properties.json",
+                        vsProjectSettings.dump(4)
+                    )
+                }
+            )
+        );
+        project.m_Other.push_back(ProjectStructure("bin"));
+        project.m_Other.push_back(
+            ProjectStructure(
+                "build",
+                {
+                    ProjectStructure(
+                        "Windows",
+                        {
+                            ProjectStructure(".gitkeep", true)
+                        }
+                    ),
+                    ProjectStructure(
+                        "Linux",
+                        {
+                            ProjectStructure(".gitkeep", true)
+                        }
+                    ),
+                    ProjectStructure(
+                        "GeneratedReflection",
+                        {
+                            ProjectStructure(".gitkeep", true)
+                        }
+                    ),
+                    ProjectStructure(
+                        "state.json",
+                        state.dump(4)
+                    )
+                }
+            )
+        );
+        project.m_Other.push_back(
+            ProjectStructure(
+                "src",
+                {
+                    ProjectStructure(
+                        project.m_DirectoryName + ".cpp",
+                        "#include \"" + project.m_DirectoryName + ".h\"\n"
+                        "\n"
+                        "namespace " + project.m_DirectoryName + " {\n"
+                        "Application::Application()\n"
+                        "{\n"
+                        "}\n"
+                        "Application::~Application()\n"
+                        "{\n"
+                        "}\n"
+                        "}"
+                    )
+                }
+            )
+        );
+        project.m_Other.push_back(
+            ProjectStructure(
+                "include",
+                {
+                    ProjectStructure(
+                        project.m_DirectoryName + ".h",
+                        "#pragma once\n"
+                        "\n"
+                        "#include \"Application/Application.h\"\n"
+                        "\n"
+                        "namespace " + project.m_DirectoryName + " {\n"
+                        "class Application : public SteelEngine::Application\n"
+                        "{\n"
+                        "private:\n"
+                        "public:\n"
+                        "Application();\n"
+                        "~Application();\n"
+                        "};\n"
+                        "}"
+                    )
+                }
+            )
+        );
+        project.m_Other.push_back(ProjectStructure("project.json", projectSettings.dump(4)));
+    }
+
+    std::vector<std::string> VirtualProject::UpdateState(const std::filesystem::path& statePath, const std::filesystem::path& projectPath)
+    {
+        Utils::json state = Utils::loadJsonFile(statePath);
+        Utils::json& files = state["filesHash"];
+        std::vector<std::string> res;
+
+        for(auto& p : std::filesystem::recursive_directory_iterator(projectPath / "include"))
+        {
+            if(p.is_regular_file())
+            {
+                bool found = false;
+
+                for(Utils::json::iterator it = files.begin(); it != files.end(); ++it)
+                {
+                    if((*it)["file"] == std::filesystem::relative(p.path(), projectPath).string())
+                    {
+                        found = true;
+                        std::string hash = (*it)["hash"];
+                        const char* currentHash = Call("sha512", p.path().string().c_str())->ToString();
+
+                        if(strcmp(hash.c_str(), currentHash) != 0)
+                        {
+                            (*it)["hash"] = currentHash;
+                        }
+
+                        break;
+                    }
+                }
+
+                if(!found)
+                {
+                    Utils::json newFile = {};
+
+                    newFile["file"] = std::filesystem::relative(p.path(), projectPath).string();
+                    newFile["hash"] = Call("sha512", p.path().string().c_str())->ToString();
+
+                    files.push_back(newFile);
+                }
+            }
+        }
+
+        for(auto& p : std::filesystem::recursive_directory_iterator(projectPath / "src"))
+        {
+            if(p.is_regular_file())
+            {
+                bool found = false;
+
+                for(Utils::json::iterator it = files.begin(); it != files.end(); ++it)
+                {
+                    if((*it)["file"] == std::filesystem::relative(p.path(), projectPath).string())
+                    {
+                        found = true;
+                        std::string hash = (*it)["hash"];
+                        const char* currentHash = Call("sha512", p.path().string().c_str())->ToString();
+
+                        if(strcmp(hash.c_str(), currentHash) != 0)
+                        {
+                            (*it)["hash"] = currentHash;
+
+                            res.push_back(p.path().string());
+                        }
+
+                        break;
+                    }
+                }
+
+                if(!found)
+                {
+                    Utils::json newFile = {};
+
+                    newFile["file"] = std::filesystem::relative(p.path(), projectPath).string();
+                    newFile["hash"] = Call("sha512", p.path().string().c_str())->ToString();
+
+                    files.push_back(newFile);
+                    res.push_back(p.path().string());
+                }
+            }
+        }
+
+        std::ofstream file(statePath.string());
+        
+        file << state.dump(4);
+
+        file.close();
+
+        return res;
     }
 
     VirtualProject::VirtualProject()
@@ -118,42 +317,6 @@ namespace SteelEngine {
 
     Result VirtualProject::Init()
     {
-        Event::GlobalEvent::Add_<LoadProjectEvent>(this);
-
-        GetCompileConfigEvent event;
-
-        Event::GlobalEvent::Broadcast_(&event);
-
-        m_CompileConfig = event.m_Config;
-
-        return SE_TRUE;
-    }
-
-    void VirtualProject::Update()
-    {
-        for(HotReload::IRuntimeObject** obj : m_ProjectScripts)
-        {
-            (*obj)->Update();
-        }
-    }
-
-    void VirtualProject::CreateProject(const std::filesystem::path& projectName, const ProjectStructure& proj)
-    {
-        std::filesystem::path curr = projectName / proj.m_DirectoryName;
-        std::filesystem::create_directory(curr);
-
-        for(Type::uint32 i = 0; i < proj.m_Other.size(); i++)
-        {
-            ProjectStructure current = proj.m_Other[i];
-
-            CreateProject(curr, current);
-        }
-    }
-
-    void VirtualProject::LoadProject()
-    {
-        m_ProjectName = m_LoadedProject.filename().string();
-
         if(!m_Process)
         {
             void* dll;
@@ -166,89 +329,210 @@ namespace SteelEngine {
 
             if(!m_Process->Setup())
             {
-                return;
+                return SE_FALSE;
             }
         }
+
+        m_Compiler = (IRuntimeCompiler*)Reflection::CreateInstance("SteelEngine::RuntimeCompiler", m_Process);
+
+        Event::GlobalEvent::Add_<LoadProjectEvent>(this);
+        Event::GlobalEvent::Add_<CreateNewProjectEvent>(this);
+        Event::GlobalEvent::Add<RecompiledEvent>(this);
+
+        GetCompileConfigEvent event;
+
+        Event::GlobalEvent::Broadcast_(&event);
+
+        m_CompileConfig = event.m_Config;
+
+        return SE_TRUE;
+    }
+
+    void VirtualProject::Update()
+    {
+        for(HotReloader::IRuntimeObject** obj : m_ProjectScripts)
+        {
+            (*obj)->Update();
+        }
+    }
+
+    void VirtualProject::CreateProject(const std::filesystem::path& projectName, const ProjectStructure& proj)
+    {
+        std::filesystem::path curr = projectName / proj.m_DirectoryName;
+
+        if(proj.m_ForceFile || curr.has_extension())
+        {
+            std::ofstream o(curr.string().c_str());
+
+            o << proj.m_Content;
+
+            o.close();
+        }
+        else
+        {
+            std::filesystem::create_directory(curr);
+        }
+
+        for(Type::uint32 i = 0; i < proj.m_Other.size(); i++)
+        {
+            ProjectStructure current = proj.m_Other[i];
+
+            CreateProject(curr, current);
+        }
+    }
+
+    void VirtualProject::LoadProject(const std::vector<std::string>& additionalFilesToCompile)
+    {
+        m_ProjectName = m_LoadedProject.filename().string();
 
         if(Reflection::GetType("SteelEngine::Core")->GetMetaData(ReflectionAttribute::ENGINE_START_TYPE)->Convert<Core::EnginePathVariant>() == Core::EnginePathVariant::GAME_DEV)
         {
             FileSystem::Map("fileWatcherPath", m_LoadedProject);
         }
 
-        std::string generatedFiles;
+        bool compile = false;
+        std::string dllFilename = (m_LoadedProject / "bin/").string() + m_ProjectName + ".dll";
 
-        if(!std::filesystem::exists((m_LoadedProject / "bin" / m_ProjectName).string() + ".dll"))
+        if(!std::filesystem::exists(dllFilename))
         {
-            std::string flags = "";
-            std::string definitions = "";
-
-            std::vector<std::string> flagVector = m_CompileConfig["flags"];
-            std::vector<std::string> definitionVector = m_CompileConfig["definitions"];
-
-            for(Type::uint32 i = 0; i < flagVector.size(); i++)
-            {
-                flags += "/" + flagVector[i] + " ";
-            }
-
-            for(Type::uint32 i = 0; i < definitionVector.size(); i++)
-            {
-                definitions += "/D" + definitionVector[i] + " ";
-            }
-
             for(auto& p : std::filesystem::recursive_directory_iterator(m_LoadedProject / "src"))
             {
                 if(p.path().extension() == ".cpp")
                 {
-                    std::string path = p.path().string();
                     std::string orgPath = m_LoadedProject.string();
                     std::string res = (m_LoadedProject / "build/GeneratedReflection").string();
+                    std::string path = p.path().string();
 
                     replaceAll(path, "\\", "/");
                     replaceAll(orgPath, "\\", "/");
 
                     std::vector<std::string> splitted = split(path, '/');
 
-                    ProcessFile(m_LoadedProject / "src", p);
+                    ProcessFile(m_LoadedProject / "src", path);
 
                     for(Type::uint32 i = split(orgPath, '/').size() + 1; i < splitted.size() - 1; i++)
                     {
                         res.append("/").append(splitted[i]);
                     }
 
-                    res.append("/").append(split(p.path().filename().string(), '.')[0] + ".Generated.cpp");
+                    res.append("/").append(split(std::filesystem::path(path).filename().string(), '.')[0] + ".Generated.cpp");
 
                     ProcessFile(m_LoadedProject / "build/GeneratedReflection", res);
                 }
             }
 
-            m_Process->WriteInput(
-                "cl " + flags + definitions + "/I" +
-                (m_LoadedProject / "include").string() +
-                " /I" + m_EnginePath + "/build/GeneratedReflection" +
-                " /I" + m_EnginePath + "/include /MT /LD /Fe" + (m_LoadedProject / "bin/").string() + m_ProjectName + ".dll " + m_ObjectFiles + "/link " +
-                m_EnginePath + "/bin/Module.lib " +
-                m_EnginePath + "/bin/Application.lib " +
-                m_EnginePath + "/bin/Utils.lib " +
-                m_EnginePath + "/bin/imgui.lib" +
-                "\n_COMPLETION_TOKEN_\n"
-            );
-
-            while(!m_Process->IsCompileComplete() && !std::filesystem::exists((m_LoadedProject / "bin" / m_ProjectName).string() + ".dll"))
+            compile = true;
+        }
+        else
+        {
+            if(!additionalFilesToCompile.empty())
             {
+                for(std::string file : additionalFilesToCompile)
+                {
+                    std::string orgPath = m_LoadedProject.string();
+                    std::string res = (m_LoadedProject / "build/GeneratedReflection").string();
 
+                    replaceAll(file, "\\", "/");
+                    replaceAll(orgPath, "\\", "/");
+
+                    std::vector<std::string> splitted = split(file, '/');
+
+                    ProcessFile(m_LoadedProject / "src", file);
+
+                    for(Type::uint32 i = split(orgPath, '/').size() + 1; i < splitted.size() - 1; i++)
+                    {
+                        res.append("/").append(splitted[i]);
+                    }
+
+                    res.append("/").append(split(std::filesystem::path(file).filename().string(), '.')[0] + ".Generated.cpp");
+
+                    ProcessFile(m_LoadedProject / "build/GeneratedReflection", res);
+                }
+
+                compile = true;
             }
+        }
+
+        if(compile)
+        {
+            std::string source = "";
+
+            for(auto& p : std::filesystem::recursive_directory_iterator(m_LoadedProject / "build/Windows"))
+            {
+                if(p.path().extension() == ".obj")
+                {
+                    source.append(p.path().string()).append(" ");
+                }
+            }
+
+            std::vector<std::string> flagVector = m_CompileConfig["flags"];
+            std::vector<std::string> definitionVector = m_CompileConfig["definitions"];
+            std::vector<std::string> includeVector = m_CompileConfig["includes"];
+            std::vector<std::string> libPathVector = m_CompileConfig["lib_paths"];
+            std::vector<std::string> libVector = m_CompileConfig["libs"];
+
+            for(std::string& file : includeVector)
+            {
+                file = m_EnginePath + "/" + file;
+            }
+
+            for(std::string& file : libPathVector)
+            {
+                file = m_EnginePath + "/" + file;
+            }
+
+            includeVector.push_back((m_LoadedProject / "include").string());
+            includeVector.push_back((m_LoadedProject / "build/GeneratedReflection").string());
+
+            Utils::json dllOptions = m_CompileConfig["dll"];
+
+            for(Utils::json::iterator it = dllOptions.begin(); it != dllOptions.end(); ++it)
+            {
+                flagVector.push_back((*it));
+            }
+
+            flagVector.push_back("/Fe" + dllFilename);
+            flagVector.push_back("/Fd" + (m_LoadedProject / "bin/").string() + m_ProjectName + ".pdb");
+
+            Utils::json modules = Utils::loadJsonFile(getBinaryLocation() / "config.json")["modules"];
+
+            for(Utils::json::iterator it = modules.begin(); it != modules.end(); ++it)
+            {
+                Utils::json module = (*it);
+
+                if(module["type"] == "lib")
+                {
+                    std::string name = module["name"];
+
+                    libVector.push_back(name + ".lib");
+                }
+            }
+
+            std::filesystem::remove(dllFilename);
+
+            m_Compiler->Compile(source, flagVector, definitionVector, includeVector, libPathVector, libVector);
+            m_Compiler->WaitUntilComplete();
 
             m_Process->Release();
 
-        // TODO: Not like that!!!!!
-            Sleep(5000);
+            FILE* file = 0;
+
+            while(!file && !m_Process->WasError())
+            {
+                file = fopen(dllFilename.c_str(), "r");
+            }
+
+            if(file)
+            {
+                fclose(file);
+            }
         }
 
-        Module::Load((m_LoadedProject / "bin/").string() + m_ProjectName + ".dll", &m_ProjectDLL);
+        Module::Load(dllFilename, &m_ProjectDLL);
         Event::GlobalEvent::Add<LoadedProjectEvent>(this);
         Event::GlobalEvent::Broadcast(LoadedProjectEvent{  });
 
-        m_ProjectConfig = Utils::LoadJsonFile(m_LoadedProject / "project.json");
+        m_ProjectConfig = Utils::loadJsonFile(m_LoadedProject / "project.json");
     }
 
     Result VirtualProject::IsProjectLoaded()
@@ -283,12 +567,37 @@ namespace SteelEngine {
         event->m_VirtualProject = (IVirtualProject**)&m_Object;
         m_LoadedProject = event->m_Path;
 
-        LoadProject();
+        // Here might be some changes, so we need to compile them
+        std::vector<std::string> toCompile = UpdateState(m_LoadedProject / "build/state.json", m_LoadedProject);
+        LoadProject(toCompile);
     }
 
     void VirtualProject::operator()(GetLoadedProjectPathEvent* event)
     {
         event->m_Path = m_LoadedProject;
+    }
+
+    void VirtualProject::operator()(CreateNewProjectEvent* event)
+    {
+        event->m_Project = (IVirtualProject**)&m_Object;
+
+        SetupProjectStructure(event->m_Structure);
+        CreateProject(event->m_Path.string(), event->m_Structure);
+        // Here should not be any changes, cuz new project lol
+        // UpdateState(event->m_Path / event->m_Structure.m_DirectoryName / "build/state.json", event->m_Path / event->m_Structure.m_DirectoryName);
+    }
+
+    void VirtualProject::operator()(const RecompiledEvent& event)
+    {
+        std::vector<IReflectionData*> types = Reflection::GetTypes();
+
+        for(IReflectionData* data : types)
+        {
+            if(data->GetMetaData(ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
+            {
+                m_ProjectScripts.push_back(&data->Create()->m_Object);
+            }
+        }
     }
 
 }

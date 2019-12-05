@@ -6,8 +6,8 @@
 #include "RuntimeReflection/Macro.h"
 #include "RuntimeReflection/Reflection.h"
 
-#include "RuntimeCompiler/RuntimeCompiler.h"
-#include "RuntimeCompiler/Serializer.h"
+#include "HotReloader/RuntimeReloader.h"
+#include "HotReloader/Serializer.h"
 
 #include "Utils/Utils.h"
 #include "Utils/Time.h"
@@ -69,13 +69,15 @@ namespace SteelEngine {
             LOGGER,
             FILE_SYSTEM,
             DELTA_TIME,
-            GLOBAL_EVENTS
+            GLOBAL_EVENTS,
+            MEMORY_TRACKER,
+            NETWORK_MANAGER
         };
 
     private:
-        HotReload::RuntimeCompiler* m_RuntimeCompiler;
+        HotReloader::RuntimeReloader* m_RuntimeReloader;
         IReflectionGenerator*       m_ReflectionGenerator;
-        Interface::ILogger*         m_Logger;
+        ILogger*                    m_Logger;
         Graphics::IRenderer**       m_Renderer;
         IWindow*                    m_Window;
         Editor::IEditor**           m_Editor;
@@ -92,8 +94,7 @@ namespace SteelEngine {
 
         EnginePathVariant m_EnginePathVariant;
 
-        float m_Delta;
-        Type::uint32 m_Frames;
+        std::vector<HotReloader::IRuntimeObject*> m_ReflectionModules;
 
         void Loop();
         Result Init();
@@ -114,7 +115,7 @@ namespace SteelEngine {
         SE_METHOD()
         void SetPathVariant(EnginePathVariant variant);
 
-        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
+        void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
 
         void operator()(const IWindow::WindowCloseEvent& event);
         void operator()(const LoadedProjectEvent& event);

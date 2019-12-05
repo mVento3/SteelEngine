@@ -2,20 +2,31 @@
 
 #include "Networking/INetworkCommand.h"
 
-#include "Networking/Commands/SynchronizeProjectNCE.Generated.h"
-
 #include "PythonCore/Scriptable.h"
 
 #include "Networking/Events/ShouldOverrideEvent.h"
 
+#include "EditorComponents/ImGUI/UserInterface.h"
+
+#include "ImGUI_Editor/ReflectionAttribs.h"
+#include "ImGUI_Editor/SceneType.h"
+
+#include "Networking/Commands/SynchronizeProjectNCE.Generated.h"
+
 namespace SteelEngine { namespace Network {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::NO_SERIALIZE,
         SteelEngine::ReflectionAttribute::NETWORK_COMMAND,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
+        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE,
+        // SteelEngine::EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW,
+        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
     )
-    class SynchronizeProjectNCE : public INetworkCommand, public Script::Python::Scriptable
+    class SynchronizeProjectNCE :
+        // SE_INHERITANCE(SteelEngine::ReflectionAttribute::DO_NOT_GENERATE_CAST_FUNCTIONS)
+        public INetworkCommand,
+        public Script::Python::Scriptable,
+        public EditorComponents::ImGUI::UserInterface
     {
         GENERATED_BODY
     public:
@@ -27,7 +38,14 @@ namespace SteelEngine { namespace Network {
         };
 
     private:
+        SE_VALUE(
+            SteelEngine::ReflectionAttribute::NO_SERIALIZE
+        )
         Event::LocalEvent<ShouldOverrideEvent> m_ShouldOverrideEvent;
+        // SE_VALUE(SteelEngine::ReflectionAttribute::NO_SERIALIZE)
+        ShouldOverrideEvent* m_ShouldOverrideEventData;
+        bool m_DrawShouldOverridePopup;
+
         char* m_Buffer;
         size_t m_BufferSize;
 
@@ -38,8 +56,12 @@ namespace SteelEngine { namespace Network {
         void ServerSide(Network::INetwork* network, SOCKET sock) override;
         void ClientSide(Network::INetwork* network, SOCKET sock) override;
 
-        SE_METHOD()
-        inline Event::LocalEvent<ShouldOverrideEvent>* GetShouldOverrideEvent() { return &m_ShouldOverrideEvent; }
+        void Init() override;
+        void Draw() override;
+
+        void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
+
+        void operator()(ShouldOverrideEvent* event);
     };
 
 }}

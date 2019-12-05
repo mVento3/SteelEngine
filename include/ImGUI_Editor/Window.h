@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "RuntimeReflection/Macro.h"
 
@@ -19,7 +19,7 @@ namespace SteelEngine { namespace Editor {
     }
 
     SE_STRUCT(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE)
-    struct Window : public HotReload::IRuntimeObject
+    struct Window : public HotReloader::IRuntimeObject
     {
         GENERATED_BODY
 
@@ -30,7 +30,7 @@ namespace SteelEngine { namespace Editor {
         virtual void Init() { }
         virtual void Draw() { }
 
-        virtual void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
+        virtual void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
     };
 
 }}

@@ -1,12 +1,12 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Window/VulkanWindow.Generated.h"
 #include "Window/VulkanWindow.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<VulkanWindow>("VulkanWindow",{
+SteelEngine::ReflectionRecorder::Register<VulkanWindow>("VulkanWindow",{
 "SteelEngine"
 }
 )
@@ -16,16 +16,12 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(VulkanWindow))
 )
 .Inheritance<IWindow>("IWindow")
 .Constructor<>()
-(
-)
 .Method("SetProcessEventsCallback", &VulkanWindow::SetProcessEventsCallback)
-(
-)
 ;
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(VulkanWindow)
 {

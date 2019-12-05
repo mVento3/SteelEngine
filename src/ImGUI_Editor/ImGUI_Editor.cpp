@@ -6,6 +6,8 @@
 
 #include "RuntimeReflection/Reflection.h"
 
+#include "Core/Core.h"
+
 #undef min
 #undef max
 
@@ -57,11 +59,11 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
             for(Type::uint32 i = 0; i < inhs.size(); i++)
             {
-                if(inhs[i]->GetTypeID() == typeid(Window).hash_code())
+                if(inhs[i]->GetTypeID() == typeid(EditorComponents::ImGUI::UserInterface).hash_code() && type->GetMetaData(ReflectionAttributes::EDITOR_WINDOW)->Convert<bool>())
                 {
-                    Window** window = (Window**)&type->Create()->m_Object;
+                    EditorComponents::ImGUI::UserInterface** window = (EditorComponents::ImGUI::UserInterface**)&type->Create()->m_Object;
 
-                    (*window)->m_Title = type->GetTypeName();
+                    strcpy((*window)->m_Title, type->GetTypeName().c_str());
                     (*window)->m_Context = m_Context;
                     (*window)->m_Editor = (ImGUI_Editor**)&m_Object;
 
@@ -69,17 +71,13 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                     {
                         if(type->GetMetaData(ReflectionAttributes::SCENE_TYPE)->Convert<SceneType>() & SceneType::EDITOR_SCENE)
                         {
-                            m_Windows.push_back(window);
+                            m_MainEditorWindows.push_back(window);
                         }
 
                         if(type->GetMetaData(ReflectionAttributes::SCENE_TYPE)->Convert<SceneType>() & SceneType::START_MENU_SCENE)
                         {
                             m_StartMenuWindows.push_back(window);
                         }
-                    }
-                    else
-                    {
-                        m_NonWindows.push_back(window);
                     }
 
                     (*window)->Init();
@@ -131,63 +129,93 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         {
             for(Type::uint32 i = 0; i < m_StartMenuWindows.size(); i++)
             {
-                Window* window = *m_StartMenuWindows[i];
+                HotReloader::IRuntimeObject* uiObject = (*m_StartMenuWindows[i]);
+                EditorComponents::ImGUI::UserInterface* ui = Reflection::GetType(uiObject)->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
 
-                ImGui::Begin(window->m_Title.c_str());
+                if(Reflection::GetType(uiObject)->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
                 {
-                    window->Draw();
+                    ImGui::Begin(ui->m_Title);
+                    {
+                        ui->Draw();
+                    }
+                    ImGui::End();
                 }
-                ImGui::End();
+                else
+                {
+                    ui->Draw();
+                }
             }
         }
         else if(m_CurrentScene == SceneType::EDITOR_SCENE)
         {
-            for(Type::uint32 i = 0; i < m_Windows.size(); i++)
+            for(Type::uint32 i = 0; i < m_UIs.size(); i++)
             {
-                Window* window = *m_Windows[i];
+                HotReloader::IRuntimeObject* uiObject = (*m_UIs[i]);
+                EditorComponents::ImGUI::UserInterface* ui = Reflection::GetType(uiObject)->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
 
-                ImGui::Begin(window->m_Title.c_str());
+                if(Reflection::GetType(uiObject)->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
                 {
-                    window->Draw();
-
-                    const std::vector<IReflectionData::PropertyInfo> a = Reflection::GetType(window)->GetProperties();
-
-                    for(Type::uint32 i = 0; i < a.size(); i++)
+                    ImGui::Begin(ui->m_Title);
                     {
-                        IReflectionData::PropertyInfo info = a[i];
-                        Variant prop = Reflection::GetType(window)->GetProperty(info.m_Name, window);
+                        ui->Draw();
+                    }
+                    ImGui::End();
+                }
+                else
+                {
+                    ui->Draw();
+                }
+            }
 
-                        if(prop.GetType() == m_FloatTypeID)
+            for(Type::uint32 i = 0; i < m_MainEditorWindows.size(); i++)
+            {
+                HotReloader::IRuntimeObject* uiObject = (*m_MainEditorWindows[i]);
+                EditorComponents::ImGUI::UserInterface* ui = Reflection::GetType(uiObject)->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
+
+                if(Reflection::GetType(uiObject)->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
+                {
+                    ImGui::Begin(ui->m_Title);
+                    {
+                        ui->Draw();
+
+                        const std::vector<IReflectionData::PropertyInfo> a = Reflection::GetType(uiObject)->GetProperties();
+
+                        for(Type::uint32 i = 0; i < a.size(); i++)
                         {
-                            Variant* meta = info.m_Property->GetMetaData(ReflectionAttributes::RANGE);
+                            IReflectionData::PropertyInfo info = a[i];
+                            Variant prop = Reflection::GetType(uiObject)->GetProperty(info.m_Name, uiObject);
 
-                            if(meta->IsValid())
+                            if(prop.GetType() == m_FloatTypeID)
                             {
-                                Range range = meta->Convert<Range>();
+                                Variant* meta = info.m_Property->GetMetaData(ReflectionAttributes::RANGE);
 
-                                ImGui::SliderFloat(info.m_Name.c_str(), (float*)prop.GetAddress(), range.m_Min, range.m_Max);
+                                if(meta->IsValid())
+                                {
+                                    Range range = meta->Convert<Range>();
+
+                                    ImGui::SliderFloat(info.m_Name.c_str(), (float*)prop.GetAddress(), range.m_Min, range.m_Max);
+                                }
                             }
-                        }
-                        else if(prop.GetType() == m_IntTypeID)
-                        {
-                            Variant* meta = info.m_Property->GetMetaData(ReflectionAttributes::RANGE);
-
-                            if(meta->IsValid())
+                            else if(prop.GetType() == m_IntTypeID)
                             {
-                                Range range = meta->Convert<Range>();
+                                Variant* meta = info.m_Property->GetMetaData(ReflectionAttributes::RANGE);
 
-                                ImGui::SliderInt(info.m_Name.c_str(), (int*)prop.GetAddress(), range.m_Min, range.m_Max);
+                                if(meta->IsValid())
+                                {
+                                    Range range = meta->Convert<Range>();
+
+                                    ImGui::SliderInt(info.m_Name.c_str(), (int*)prop.GetAddress(), range.m_Min, range.m_Max);
+                                }
                             }
                         }
                     }
+                    ImGui::End();
                 }
-                ImGui::End();
+                else
+                {
+                    ui->Draw();
+                }
             }
-        }
-
-        for(Window** wnd : m_NonWindows)
-        {
-            (*wnd)->Draw();
         }
 
         ImGui::Render();
@@ -198,7 +226,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         m_API_Context->ProcessEvent(event);
     }
 
-    void ImGUI_Editor::OnRecompile(HotReload::IRuntimeObject* oldObject)
+    void ImGUI_Editor::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
         ImGui::SetCurrentContext(m_Context);
     }
@@ -215,7 +243,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
             bool found = false;
 
-            for(Window** wnd : m_Windows)
+            for(EditorComponents::ImGUI::UserInterface** wnd : m_MainEditorWindows)
             {
                 if((*wnd)->m_TypeID == type->GetTypeID())
                 {
@@ -223,7 +251,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                 }
             }
 
-            for(Window** wnd : m_StartMenuWindows)
+            for(EditorComponents::ImGUI::UserInterface** wnd : m_StartMenuWindows)
             {
                 if((*wnd)->m_TypeID == type->GetTypeID())
                 {
@@ -231,19 +259,79 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                 }
             }
 
-            if(!found && type->GetMetaData(ReflectionAttributes::EDITOR_WINDOW)->Convert<bool>())
+            if(!found)
             {
-                Window** wnd = (Window**)&type->Create()->m_Object;
+                std::vector<IReflectionInheritance*> inhs = type->GetInheritances();
 
-                m_Windows.push_back(wnd);
+                for(Type::uint32 i = 0; i < inhs.size(); i++)
+                {
+                    if(inhs[i]->GetTypeID() == Reflection::GetType(SE_GET_TYPE_NAME(SteelEngine::EditorComponents::ImGUI::UserInterface))->GetTypeID())
+                    {
+                        if(type->GetMetaData(ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
+                        {
+                            Network::INetworkManager** manager =
+                                Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager**>();
+                            std::vector<Network::INetworkCommand*> commands = (*manager)->GetCommands();
 
-                (*wnd)->m_Title = type->GetTypeName();
-                (*wnd)->m_Context = m_Context;
+                            for(Network::INetworkCommand* cmd : commands)
+                            {
+                                if(type->GetTypeID() == cmd->m_TypeID)
+                                {
+                                    EditorComponents::ImGUI::UserInterface* ui = type->Invoke("Cast_UserInterface", cmd->m_Object).Convert<EditorComponents::ImGUI::UserInterface*>();
 
-                (*wnd)->Init();
+                                    strcpy(ui->m_Title, type->GetTypeName().c_str());
 
-                break;
+                                    ui->m_Context = m_Context;
+
+                                    ui->Init();
+
+                                    m_UIs.push_back(&(cmd->m_Object));
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
+            // if(!found && type->GetMetaData(Utils::Editor::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
+            // {
+            //     if(type->GetMetaData(ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
+            //     {
+            //         Network::INetworkManager** manager =
+            //             Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager**>();
+
+            //         std::vector<Network::INetworkCommand*> commands = (*manager)->GetCommands();
+
+            //         for(Network::INetworkCommand* cmd : commands)
+            //         {
+            //             if(type->GetTypeID() == cmd->m_TypeID)
+            //             {
+            //                 Utils::Editor::UserInterface* ui = type->Invoke("Cast_UserInterface", cmd->m_Object).Convert<Utils::Editor::UserInterface*>();
+
+            //                 strcpy(ui->m_Title, type->GetTypeName().c_str());
+
+            //                 ui->m_Context = m_Context;
+
+            //                 ui->Init();
+
+            //                 m_OtherWindows.push_back(ui);
+            //             }
+            //         }
+            //     }
+            //     else
+            //     {
+            //         Window** wnd = (Window**)&type->Create()->m_Object;
+
+            //         m_Windows.push_back(wnd);
+
+            //         (*wnd)->m_Title = type->GetTypeName();
+            //         (*wnd)->m_Context = m_Context;
+
+            //         (*wnd)->Init();
+            //     }
+
+            //     break;
+            // }
         }
     }
 

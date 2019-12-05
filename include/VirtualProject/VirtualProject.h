@@ -1,6 +1,8 @@
 #pragma once
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
+
+#include "HotReloader/Events/RecompiledEvent.h"
 
 #include "RuntimeReflection/Macro.h"
 
@@ -9,20 +11,28 @@
 #include "VirtualProject/LoadedProjectEvent.h"
 #include "VirtualProject/LoadProjectEvent.h"
 #include "VirtualProject/GetLoadedProjectPathEvent.h"
+#include "VirtualProject/CreateNewProjectEvent.h"
 
 #include "PythonProcess/IPythonProcess.h"
+
+#include "RuntimeCompiler/IRuntimeCompiler.h"
 
 #include "Core/Type.h"
 #include "Core/ReflectionAttributes.h"
 
 #include "Utils/Json.h"
 
+#include "PythonCore/Scriptable.h"
+
 // Aka project manager. This module should handle whole project. By this module we can load/create project. It should also handle all scripts, assets, actions, etc.
 
 namespace SteelEngine {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE)
-    class VirtualProject : public IVirtualProject
+    SE_CLASS(
+        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
+        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
+    )
+    class VirtualProject : public IVirtualProject, public Script::Python::Scriptable
     {
         GENERATED_BODY
     public:
@@ -32,19 +42,21 @@ namespace SteelEngine {
         const std::string m_EnginePath = "D:/Projects/C++/SteelEngine";
 
         std::filesystem::path m_LoadedProject;
-        IReflectionGenerator* m_ReflectionGenerator;
-        IPythonProcess* m_Process;
-        void* m_ProjectDLL;
         std::string m_ProjectName;
+
+        IReflectionGenerator*   m_ReflectionGenerator;
+        IPythonProcess*         m_Process;
+        IRuntimeCompiler*       m_Compiler;
+        void*                   m_ProjectDLL;
 
         Utils::json m_ProjectConfig;
         Utils::json m_CompileConfig;
 
-        std::string m_ObjectFiles;
-
-        std::vector<HotReload::IRuntimeObject**> m_ProjectScripts;
+        std::vector<HotReloader::IRuntimeObject**> m_ProjectScripts;
 
         void ProcessFile(const std::filesystem::path& toRemove, const std::filesystem::path& filePath);
+        void SetupProjectStructure(ProjectStructure& project);
+        std::vector<std::string> UpdateState(const std::filesystem::path& statePath, const std::filesystem::path& projectPath);
 
     public:
         VirtualProject();
@@ -54,7 +66,7 @@ namespace SteelEngine {
         Result Init() override;
 
         void CreateProject(const std::filesystem::path& projectName, const ProjectStructure& proj) override;
-        void LoadProject() override;
+        void LoadProject(const std::vector<std::string>& additionalFilesToCompile) override;
 
         void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) override { m_ReflectionGenerator = reflectionGenerator; }
         Result IsProjectLoaded() override;
@@ -62,6 +74,8 @@ namespace SteelEngine {
         void operator()(const LoadedProjectEvent& event);
         void operator()(LoadProjectEvent* event);
         void operator()(GetLoadedProjectPathEvent* event);
+        void operator()(CreateNewProjectEvent* event);
+        void operator()(const RecompiledEvent& event);
     };
 
 }

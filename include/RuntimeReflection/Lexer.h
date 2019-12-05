@@ -181,6 +181,14 @@ namespace SteelEngine {
         inline void SkipLine()
         {
             m_LineIndex++;
+
+            if(m_LineIndex >= m_Lines->size())
+            {
+                m_End = true;
+
+                return;
+            }
+
             m_CurrentLine = m_Lines->at(m_LineIndex);
             m_CharacterIndex = 0;
             m_CurrentLineSize = m_CurrentLine.size();

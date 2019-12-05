@@ -15,6 +15,9 @@ namespace SteelEngine {
     {
     private:
         float m_DeltaTime;
+        Type::uint32 m_UPS;
+        Type::uint32 m_UPS_Counter;
+        float m_OneSecondTime;
 
     public:
         DeltaTime();
@@ -23,6 +26,7 @@ namespace SteelEngine {
         void Update() override;
 
         inline float GetDeltaTime() const override { return m_DeltaTime; }
+        inline Type::uint32 GetUPS() const override { return m_UPS; }
     };
 
 }

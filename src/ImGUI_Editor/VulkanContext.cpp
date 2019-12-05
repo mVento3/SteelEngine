@@ -754,6 +754,8 @@ namespace SteelEngine {
 
         m_Renderer->BindCommands(std::bind(&VulkanContext::PassCommands, this, std::placeholders::_1));
         m_Renderer->BindUpdateUniforms(std::bind(&VulkanContext::UpdateBuffers, this));
+
+        printf("Vulkan context init successful!\n");
     }
 
     void VulkanContext::Update()

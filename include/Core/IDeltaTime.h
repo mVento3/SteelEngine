@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 namespace SteelEngine {
 
-    struct IDeltaTime : public HotReload::IRuntimeObject
+    struct IDeltaTime : public HotReloader::IRuntimeObject
     {
         friend class Core;
     protected:
@@ -12,6 +12,7 @@ namespace SteelEngine {
 
     public:
         virtual float GetDeltaTime() const = 0;
+        virtual Type::uint32 GetUPS() const = 0;
     };
 
 }

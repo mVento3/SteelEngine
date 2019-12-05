@@ -8,6 +8,7 @@ config = json.load(open('bin/config.json'))
 state = json.load(open('build/state.json'))
 process = PythonProcessWrapper.PythonProcess()
 working_directory = 'build/Windows'
+lib_updated = False
 
 process.Setup()
 process.WriteInput('cd ' + working_directory)
@@ -44,7 +45,7 @@ for subdir, dirs, files in os.walk('include'):
 
 for module in modules:
     module.generateReflection()
-    module.compileWhole()
+    lib_updated = module.compileWhole(lib_updated)
 
 with open('build/state.json', 'w') as f:
     json.dump(state, f, indent=4)

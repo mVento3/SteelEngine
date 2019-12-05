@@ -53,6 +53,41 @@ namespace SteelEngine {
         }
     }
 
+    void Logger::Log(const std::string& message, int verbosity, va_list args)
+    {
+        char mes[1024];
+
+        vsprintf(mes, message.c_str(), args);
+
+        char res[1024];
+        std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        char* timeStr = std::ctime(&time);
+
+        if(verbosity == Verbosity::INFO)
+        {
+            sprintf(res, "INFO at %s: %s\n", timeStr, mes);
+        }
+        else if(verbosity == Verbosity::WARNING)
+        {
+            sprintf(res, "WARNING at %s: %s\n", timeStr, mes);
+        }
+        else if(verbosity == Verbosity::ERROR)
+        {
+            sprintf(res, "ERROR at %s: %s\n", timeStr, mes);
+        }
+        else if(verbosity == Verbosity::FATAL)
+        {
+            sprintf(res, "FATAL at %s: %s\n", timeStr, mes);
+        }
+
+        printf("%s", res);
+
+        if(m_LogToFile)
+        {
+            m_PendingLogs.push_back(res);
+        }
+    }
+
     Result Logger::Init()
     {
         if(strcmp(m_LogFilePath, "") != 0)
@@ -60,6 +95,8 @@ namespace SteelEngine {
             m_LogToFile = true;
             m_OutFile.open(m_LogFilePath, std::ios::trunc);
         }
+
+        Info("Successful initiazlied logger!");
 
         return SE_TRUE;
     }

@@ -2,7 +2,7 @@
 
 #include "winsock2.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "Event/LocalEvent.h"
 
@@ -14,7 +14,7 @@ namespace SteelEngine { namespace Network {
 
     struct INetworkManager;
 
-    struct INetwork : public HotReload::IRuntimeObject
+    struct INetwork : public HotReloader::IRuntimeObject
     {
         Event::LocalEvent<ServerDisconnectedEvent>  m_DisconnectEvent;
         Event::LocalEvent<ClientConnectedEvent>     m_ClientConnectedEvent;

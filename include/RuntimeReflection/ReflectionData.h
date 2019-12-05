@@ -94,7 +94,7 @@ namespace SteelEngine {
 
 			ReflectionConstructor<Args...>* cons = new ReflectionConstructor<Args...>(&createType<T, Args...>);
 
-			cons->m_ConstructorID = typeid(HotReload::IRuntimeObject*(Args...)).hash_code();
+			cons->m_ConstructorID = typeid(HotReloader::IRuntimeObject*(Args...)).hash_code();
 			cons->m_TypeID = m_TypeID;
 
 			m_Constructors.push_back(cons);
@@ -144,6 +144,26 @@ namespace SteelEngine {
 			return *this;
 		}
 
+		template <typename B, typename... Args>
+		ReflectionData& Method(const std::string& name, B(*func)(Args...))
+		{
+			m_CurrentBind = CurrentBindFlag::METHOD_BIND;
+
+			if(!m_Methods[name])
+			{
+				m_Methods[name] = new ProxyMethod<B(*)(Args...)>(func);
+			}
+			else
+			{
+				ProxyMethod<B(*)(Args...)>* meth =
+					(ProxyMethod<B(*)(Args...)>*)m_Methods[name];
+
+				meth->m_FunctionCallback = func;
+			}
+
+			return *this;
+		}
+
 		template <typename A>
 		ReflectionEnumeration<T, A>& Enum(const std::string& name)
 		{
@@ -168,6 +188,8 @@ namespace SteelEngine {
 		template <typename A>
 		ReflectionData& Inheritance(const std::string& name)
 		{
+			m_CurrentBind = CurrentBindFlag::INHERITANCE_BIND;
+
 			m_Inheritances.push_back(new ReflectionInheritance(name, typeid(A).hash_code()));
 
 			return *this;
@@ -214,6 +236,13 @@ namespace SteelEngine {
 				break;
 			case CurrentBindFlag::TYPE_BIND:
 				ProcessMetaData(db, this, infos);
+				break;
+			case CurrentBindFlag::INHERITANCE_BIND:
+			{
+				IReflectionInheritance* inherit = m_Inheritances[m_Inheritances.size() - 1];
+
+				ProcessMetaData(db, inherit, infos);
+			}
 				break;
 			default:
 				break;

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 namespace SteelEngine {
 
-    struct ICore : public HotReload::IRuntimeObject
+    struct ICore : public HotReloader::IRuntimeObject
     {
         virtual void Start() { }
         virtual void Stop() { }

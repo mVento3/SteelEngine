@@ -16,13 +16,13 @@ namespace SteelEngine {
 
 		MetaDataInfo()
 		{
-			
+
 		}
 
 		template <typename KeyType, typename ValueType>
-		MetaDataInfo(KeyType key, ValueType value, bool pending = false) :
-			m_PendingKey(key, typeid(KeyType).hash_code(), pending),
-			m_PendingValue(value, typeid(ValueType).hash_code(), pending)
+		MetaDataInfo(KeyType key, ValueType value) :
+			m_PendingKey(key, typeid(KeyType).hash_code()),
+			m_PendingValue(value, typeid(ValueType).hash_code())
 		{
 			
 		}

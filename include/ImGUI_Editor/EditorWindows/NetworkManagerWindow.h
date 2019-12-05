@@ -1,10 +1,9 @@
 #pragma once
 
-#include "ImGUI_Editor/Window.h"
+#include "EditorComponents/ImGUI/UserInterface.h"
+
 #include "ImGUI_Editor/ReflectionAttribs.h"
 #include "ImGUI_Editor/SceneType.h"
-
-#include "ImGUI_Editor/EditorWindows/NetworkManagerWindow.Generated.h"
 
 #include "VirtualProject/LoadedProjectEvent.h"
 
@@ -15,15 +14,16 @@
 
 #include "PythonCore/Scriptable.h"
 
-#include "Networking/Events/ShouldOverrideEvent.h"
+#include "ImGUI_Editor/EditorWindows/NetworkManagerWindow.Generated.h"
 
 namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     SE_CLASS(
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
+        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW
     )
-    class NetworkManagerWindow : public Window, public Script::Python::Scriptable
+    class NetworkManagerWindow : public EditorComponents::ImGUI::UserInterface, public Script::Python::Scriptable
     {
         GENERATED_BODY
     private:
@@ -34,11 +34,6 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         char m_Nickname[32];
 
         bool m_ProjectLoaded = false;
-
-        bool m_ShouldOverrideFilesPopup = false;
-        Network::ShouldOverrideEvent* m_ShouldOverrideFilesEvent;
-
-        Network::INetworkCommand* m_Event;
 
         void HostServer();
         void ConnectToServer();
@@ -52,10 +47,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
         void DrawConnectToServer();
 
-        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
+        void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
 
         void operator()(const LoadedProjectEvent& event);
-        void operator()(Network::ShouldOverrideEvent* event);
     };
 
 }}}

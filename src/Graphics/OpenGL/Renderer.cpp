@@ -31,7 +31,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         });
 
         m_ShadowShader = new Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/shadowShader");
-        m_ShadowCamera = new Camera(Transform());
+        m_ShadowCamera = new Camera(Transform(), 1600 / 900);
 
         m_DirectionalLightTransform.SetRotation(
             glm::quat(glm::rotate(glm::radians(-45.f), glm::vec3(1, 0, 0))) *
@@ -39,7 +39,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         );
 
         m_Counter = 0;
-        m_Camera = new Camera(Transform(glm::vec3(0, 0, -10)));
+        m_Camera = new Camera(Transform(glm::vec3(0, 0, -10)), 1600 / 900);
 
         m_SpotLight = new SpotLight(
             PointLight{ BaseLight{ glm::vec3(1, 0, 1), 100.f },

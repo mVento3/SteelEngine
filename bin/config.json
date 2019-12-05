@@ -1,18 +1,17 @@
 {
 	"compiler": {
 		"flags": [
-			"Od",
-			"ZI",
-			"DEBUG:FASTLINK",
-			"std:c++17"
+			"/Od",
+			"/Zi",
+			"/std:c++17"
 		],
 		"definitions": [
 			"SE_WINDOWS",
 			"_WINSOCKAPI_"
 		],
 		"dll": [
-			"MT",
-			"LD"
+			"/MT",
+			"/LD"
 		],
 		"includes": [
 			"include",
@@ -38,21 +37,6 @@
 		"libs": [
 			"SDL2.lib",
 			"vulkan-1.lib",
-			"Module.lib",
-			"Utils.lib",
-			"Event.lib",
-			"RuntimeReflection.lib",
-			"InformationTracker.lib",
-			"Ws2_32.lib",
-			"imgui.lib",
-			"python37.lib",
-			"glew32.lib",
-			"OpenGL32.lib",
-			"assimp-vc142-mt.lib"
-		],
-		"libs2": [
-			"SDL2.lib",
-			"vulkan-1.lib",
 			"Ws2_32.lib",
 			"imgui.lib",
 			"python37.lib",
@@ -65,6 +49,10 @@
 	"modules": [
 		{
 			"name": "FileWatcher",
+			"type": "lib"
+		},
+		{
+			"name": "Memory",
 			"type": "lib"
 		},
 		{
@@ -88,12 +76,16 @@
 			"type": "lib"
 		},
 		{
-			"name": "Core",
-			"type": "dll"
-		},
-		{
 			"name": "Application",
 			"type": "lib"
+		},
+		{
+			"name": "EditorComponents",
+			"type": "lib"
+		},
+		{
+			"name": "Core",
+			"type": "dll"
 		},
 		{
 			"name": "ReflectionGenerator",
@@ -112,6 +104,10 @@
 			"type": "dll"
 		},
 		{
+			"name": "MemoryTracker",
+			"type": "dll"
+		},
+		{
 			"name": "Window",
 			"type": "dll"
 		},
@@ -120,7 +116,7 @@
 			"type": "dll"
 		},
 		{
-			"name": "RuntimeCompiler",
+			"name": "HotReloader",
 			"type": "dll"
 		},
 		{
@@ -129,6 +125,10 @@
 		},
 		{
 			"name": "Networking",
+			"type": "dll"
+		},
+		{
+			"name": "RuntimeCompiler",
 			"type": "dll"
 		},
 		{
@@ -145,6 +145,10 @@
 		},
 		{
 			"name": "PythonCore",
+			"type": "dll"
+		},
+		{
+			"name": "PythonProcess",
 			"type": "dll"
 		},
 		{

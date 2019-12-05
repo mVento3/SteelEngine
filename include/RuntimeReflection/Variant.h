@@ -24,6 +24,8 @@ namespace SteelEngine {
 		ValuePointer* m_ValuePointer;
 		size_t m_VariantID = RuntimeDatabase::s_InvalidID;
 
+		static RuntimeDatabase* ms_Database;
+
 		template <typename T>
 		void Recheck()
 		{
@@ -57,7 +59,7 @@ namespace SteelEngine {
 		bool m_IsReference		= false;
 		bool m_IsEmpty			= false;
 
-		Variant(bool pending = false)
+		Variant()
 		{
 			m_TypeID = RuntimeDatabase::s_InvalidID;
 			m_ValuePointer = 0;
@@ -75,14 +77,16 @@ namespace SteelEngine {
 			m_IsReference		= false;
 			m_IsEmpty			= false;
 
-			static RuntimeDatabase* db =
-				(RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			if(!ms_Database)
+			{
+				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			}
 
-			m_VariantID = db->m_LastPerVariantID++;
+			m_VariantID = ms_Database->m_LastPerVariantID++;
 		}
 
 		template <typename T>
-		Variant(T& value, size_t typeID, bool pending = false) :
+		Variant(T& value, size_t typeID) :
 			m_TypeID(typeID)
 		{
 			m_ValuePointer = (ValuePointer*)(new T(value));
@@ -100,10 +104,12 @@ namespace SteelEngine {
 			m_IsReference		= std::is_reference<T>::value;
 			m_IsEmpty			= std::is_empty<T>::value;
 
-			static RuntimeDatabase* db =
-				(RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			if(!ms_Database)
+			{
+				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			}
 
-			m_VariantID = db->m_LastPerVariantID++;
+			m_VariantID = ms_Database->m_LastPerVariantID++;
 		}
 
 		template <typename T>
@@ -125,10 +131,12 @@ namespace SteelEngine {
 			m_IsReference		= std::is_reference<T>::value;
 			m_IsEmpty			= std::is_empty<T>::value;
 
-			static RuntimeDatabase* db =
-				(RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			if(!ms_Database)
+			{
+				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			}
 
-			m_VariantID = db->m_LastPerVariantID++;
+			m_VariantID = ms_Database->m_LastPerVariantID++;
 		}
 
 		~Variant()

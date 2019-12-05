@@ -1,5 +1,7 @@
 #include "ImGUI_Editor/EditorWindows/ConsoleWindow.h"
 
+#include "imgui/imgui.h"
+
 namespace SteelEngine {
 
     ConsoleWindow::ConsoleWindow()
@@ -17,9 +19,9 @@ namespace SteelEngine {
         ImGui::Text("XXXXXX");
     }
 
-    void ConsoleWindow::OnRecompile(HotReload::IRuntimeObject* oldObject)
+    void ConsoleWindow::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
-        Window::OnRecompile(oldObject);
+        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
         ImGui::SetCurrentContext((ImGuiContext*)m_Context);
     }
 

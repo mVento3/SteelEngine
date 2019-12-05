@@ -4,14 +4,14 @@
 
 #include "Window/IWindow.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "Graphics/IContext.h"
 #include "Graphics/IRenderer.h"
 
 namespace SteelEngine { namespace Editor {
 
-    struct IEditor : public HotReload::IRuntimeObject
+    struct IEditor : public HotReloader::IRuntimeObject
     {
         virtual Result Init(Graphics::IRenderer* renderer, IContext* context) { return SE_NOT_IMPLEMENTED; }
         virtual void Draw() { }

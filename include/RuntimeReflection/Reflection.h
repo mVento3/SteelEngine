@@ -24,6 +24,7 @@ namespace SteelEngine {
 
 	class Reflection
 	{
+		friend class ReflectionRecorder;
 	private:
 		static RuntimeDatabase* ms_RuntimeDatabase;
 
@@ -36,6 +37,8 @@ namespace SteelEngine {
 			return db;
 		}
 
+		static inline const RuntimeDatabase* GetDB() { return ms_RuntimeDatabase; }
+
 	public:
 		static void Init()
 		{
@@ -45,143 +48,48 @@ namespace SteelEngine {
 			}
 		}
 
-		template <typename Type>
-		static ReflectionData<Type>& Register(const std::string& name, const std::vector<std::string>& namespaces)
-		{
-			ms_RuntimeDatabase = LoadDatabase();
-
-			ReflectionData<Type>* type = 0;
-
-			for(SteelEngine::Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
-			{
-				IReflectionData* data = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
-				std::string dataTypeName = "";
-
-				for(std::string name : data->m_Namespaces)
-				{
-					dataTypeName += name + "::";
-				}
-
-				dataTypeName += data->m_TypeName;
-
-				std::string typeName = "";
-
-				for(std::string name : namespaces)
-				{
-					typeName += name + "::";
-				}
-
-				typeName += typeName;
-
-				if(dataTypeName == typeName)
-				{
-					type = (ReflectionData<Type>*)data;
-
-					break;
-				}
-			}
-
-			if(!type)
-			{
-				type = new ReflectionData<Type>();
-
-				type->m_TypeName = name;
-				type->m_TypeID = typeid(Type).hash_code();
-
-				ms_RuntimeDatabase->m_Types->push_back(type);
-
-				type->m_Namespaces.insert(type->m_Namespaces.begin(), namespaces.begin(), namespaces.end());
-			}
-			else if(type)
-			{
-				for(SteelEngine::Type::uint32 i = 0; i < type->m_ConstructorsToClear.size(); i++)
-				{
-					delete type->m_ConstructorsToClear[i];
-				}
-
-				type->m_ConstructorsToClear.clear();
-
-				type->m_ConstructorsToClear.insert(
-					type->m_ConstructorsToClear.begin(),
-					type->m_Constructors.begin(),
-					type->m_Constructors.end()
-				);
-
-				type->m_Constructors.clear();
-				type->m_MetaDatas.clear();
-				type->m_Namespaces.clear();
-
-				type->m_Namespaces.insert(type->m_Namespaces.begin(), namespaces.begin(), namespaces.end());
-			}
-
-			if(type)
-			{
-				type->m_CurrentBind = IReflectionData::CurrentBindFlag::TYPE_BIND;
-			}
-
-			return *type;
-		}
-
-		template <typename Type>
-		static ReflectionData<Type>& Register(const std::string& name)
-		{
-			ms_RuntimeDatabase = LoadDatabase();
-
-			ReflectionData<Type>* type = 0;
-
-			for(SteelEngine::Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
-			{
-				IReflectionData* data = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
-
-				if(data->m_TypeName == name)
-				{
-					type = (ReflectionData<Type>*)data;
-
-					break;
-				}
-			}
-
-			if(!type)
-			{
-				type = new ReflectionData<Type>();
-
-				type->m_TypeName = name;
-				type->m_TypeID = typeid(Type).hash_code();
-
-				ms_RuntimeDatabase->m_Types->push_back(type);
-			}
-			else
-			{
-				for(SteelEngine::Type::uint32 i = 0; i < type->m_ConstructorsToClear.size(); i++)
-				{
-					delete type->m_ConstructorsToClear[i];
-				}
-
-				type->m_ConstructorsToClear.clear();
-
-				type->m_ConstructorsToClear.insert(
-					type->m_ConstructorsToClear.begin(),
-					type->m_Constructors.begin(),
-					type->m_Constructors.end()
-				);
-
-				type->m_Constructors.clear();
-				type->m_MetaDatas.clear();
-				type->m_Namespaces.clear();
-			}
-
-			type->m_CurrentBind = IReflectionData::CurrentBindFlag::TYPE_BIND;
-
-			return *type;
-		}
-
 		static std::vector<IReflectionData*> GetTypes()
 		{
-			std::vector<IReflectionData*> res;
+			return *(ms_RuntimeDatabase->m_Types);
+		}
 
-			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
+		static const std::vector<IReflectionData*>* GetTypesPtr()
+		{
+			return ms_RuntimeDatabase->m_Types;
+		}
+
+		template <typename MetaType>
+		static std::vector<IReflectionData*> GetTypesByMetaData(const MetaType& key, bool(*compareFunction)(Variant*))
+		{
+			std::vector<IReflectionData*> res;
+			std::vector<IReflectionData*>* types = ms_RuntimeDatabase->m_Types;
+
+			for(Type::uint32 i = 0; i < types->size(); i++)
 			{
-				res.push_back((IReflectionData*)ms_RuntimeDatabase->m_Types->at(i));
+				IReflectionData* type = (IReflectionData*)types->at(i);
+
+				if(compareFunction(type->GetMetaData(key)))
+				{
+					res.push_back(type);
+				}
+			}
+
+			return res;
+		}
+
+		static std::vector<IReflectionData*> GetTypesByCustom(bool(*compareFunction)(IReflectionData*))
+		{
+			std::vector<IReflectionData*> res;
+			std::vector<IReflectionData*>* types = ms_RuntimeDatabase->m_Types;
+
+			for(Type::uint32 i = 0; i < types->size(); i++)
+			{
+				IReflectionData* type = (IReflectionData*)types->at(i);
+
+				if(compareFunction(type))
+				{
+					res.push_back(type);
+				}
 			}
 
 			return res;
@@ -238,7 +146,7 @@ namespace SteelEngine {
 			return 0;
 		}
 
-		static IReflectionData* GetType(const HotReload::IRuntimeObject* object)
+		static IReflectionData* GetType(const HotReloader::IRuntimeObject* object)
 		{
 			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
 			{
@@ -272,7 +180,7 @@ namespace SteelEngine {
 		}
 
 		template <typename... Args>
-		static HotReload::IRuntimeObject* CreateInstance(const std::string& name, Args... args)
+		static HotReloader::IRuntimeObject* CreateInstance(const std::string& name, Args... args)
 		{
 			std::string name_ = name;
 
@@ -305,11 +213,12 @@ namespace SteelEngine {
 				}
 			}
 
+			// TODO: change to throw exception!
 			return 0;
 		}
 
 		template <typename T, typename... Args>
-		static HotReload::IRuntimeObject* CreateInstance(Args... args)
+		static HotReloader::IRuntimeObject* CreateInstance(Args... args)
 		{
 			size_t typeID = typeid(T).hash_code();
 
@@ -341,7 +250,7 @@ namespace SteelEngine {
 			return 0;
 		}
 
-		// static void DestroyInstance(HotReload::IRuntimeObject* object)
+		// static void DestroyInstance(HotReloader::IRuntimeObject* object)
 		// {
 		// 	Event::GlobalEvent::Remove<RecompiledEvent>(object);
 		// 	delete object;

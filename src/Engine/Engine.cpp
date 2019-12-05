@@ -17,6 +17,8 @@
 
 #include "InformationTracker/InformationTracker.h"
 
+#include "stack"
+
 enum Index
 {
     SERVER,
@@ -33,9 +35,41 @@ std::vector<SteelEngine::Options::Descriptor> desc =
     { GAME_DEV, "gd" }
 };
 
+struct TEST
+{
+    TEST()
+    {
+
+    }
+
+    uint32_t a1;
+    uint64_t a2;
+};
+
+void testMemory()
+{
+    // unsigned char* hex = (unsigned char*)rootMemory;
+
+    // for(size_t i = 0; i < newSize;)
+    // {
+    //     printf("%x: ", hex);
+
+    //     for(size_t j = 0; j < 16; j++, i++)
+    //     {
+    //         printf("%02x ", hex[j]);
+
+    //         hex++;
+    //     }
+
+    //     printf("\n");
+    // }
+}
+
 int main(int argc, char* argv[])
 {
     SteelEngine::Options parser(argv, argc, desc);
+
+    // testMemory();
 
     SteelEngine::Reflection::Init();
 
@@ -51,7 +85,7 @@ int main(int argc, char* argv[])
         new SteelEngine::InformationTracker()
     );
 
-    SteelEngine::HotReload::IRuntimeObject* core = SteelEngine::Reflection::CreateInstance("SteelEngine::Core");
+    SteelEngine::HotReloader::IRuntimeObject* core = SteelEngine::Reflection::CreateInstance("SteelEngine::Core");
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
         SteelEngine::Core::GlobalSystems::FILE_SYSTEM,
@@ -60,6 +94,7 @@ int main(int argc, char* argv[])
 
     // Then after that we need to prepare file system
     SteelEngine::FileSystem::Map("bin", getBinaryLocation());
+    SteelEngine::FileSystem::Map("se_init_log", getBinaryLocation() / "se_init_log.log");
 
     if(!parser[ENGINE_DEV].m_IsSet && !parser[GAME_DEV].m_IsSet)
     {

@@ -9,6 +9,7 @@ namespace SteelEngine {
 	struct IProxyMethod : public IReflectionMethod
 	{
 		virtual Variant Invoke(void* obj, Args...) = 0;
+		virtual Variant Invoke(Args...) = 0;
 	};
 
 }

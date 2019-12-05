@@ -38,6 +38,21 @@ namespace SteelEngine {
 
     Result Core::Init()
     {
+        std::string logPath = FileSystem::Get("se_init_log").string();
+
+        m_Logger = (ILogger*)Reflection::CreateInstance("SteelEngine::Logger", logPath.c_str());
+
+        if(!m_Logger || m_Logger->Init() == SE_FALSE)
+        {
+            printf("Failed to setup logger!\n");
+
+            return SE_FALSE;
+        }
+
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::LOGGER, &m_Logger->m_Object);
+
+        SE_INFO("Initializing core!");
+
         std::ifstream configFile(getBinaryLocation() / "config.json");
 
         configFile >> m_CompileConfig;
@@ -51,9 +66,13 @@ namespace SteelEngine {
 
         if(m_Python->Init() == SE_FALSE)
         {
-            printf("Failed to initialize python!\n");
+            SE_FATAL("Failed to initialize python!");
 
             return SE_FALSE;
+        }
+        else
+        {
+            SE_INFO("Python initialization successful!");
         }
 
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::PYTHON, m_Python);
@@ -62,44 +81,33 @@ namespace SteelEngine {
             Graphics::IRenderer::VULKAN_API
         );
 
-        m_Logger = (Interface::ILogger*)Reflection::CreateInstance("SteelEngine::Logger", "log.log");
-
-        if(m_Logger->Init() == SE_FALSE)
-        {
-            return SE_FALSE;
-        }
-
-        std::vector<SteelEngine::HotReload::IRuntimeObject*> modules;
         std::vector<SteelEngine::IReflectionData*> types =
-            SteelEngine::Reflection::GetTypes();
-
-        for(SteelEngine::Type::uint32 i = 0; i < types.size(); i++)
-        {
-            SteelEngine::IReflectionData* type = types[i];
-
-            if(type->GetMetaData(SteelEngine::ReflectionAttribute::REFLECTION_MODULE)->Convert<bool>())
+            Reflection::GetTypesByMetaData(ReflectionAttribute::REFLECTION_MODULE, [](Variant* key) -> bool
             {
-                modules.push_back(type->Create());
-            }
+                return key->Convert<bool>();
+            });
+
+        for(Type::uint32 i = 0; i < types.size(); i++)
+        {
+            m_ReflectionModules.push_back(types[i]->Create());
         }
 
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::LOGGER, m_Logger);
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::DELTA_TIME, &Reflection::CreateInstance("SteelEngine::DeltaTime")->m_Object);
 
         m_DeltaTimeVariant = Reflection::GetType("SteelEngine::Core")->GetMetaData(GlobalSystems::DELTA_TIME);
 
-        m_ReflectionGenerator = new ReflectionGenerator();//(IReflectionGenerator*)ModuleManager::GetModule("ReflectionGenerator");
+        m_ReflectionGenerator = new ReflectionGenerator();
 
         if(m_EnginePathVariant == EnginePathVariant::ENGINE_DEV)
         {
-            m_RuntimeCompiler =
-                (HotReload::RuntimeCompiler*)SteelEngine::Reflection::CreateInstance("SteelEngine::HotReload::RuntimeCompiler");
+            m_RuntimeReloader =
+                (HotReloader::RuntimeReloader*)SteelEngine::Reflection::CreateInstance("SteelEngine::HotReloader::RuntimeReloader");
 
-            m_RuntimeCompiler->SetReflectionGenerator(m_ReflectionGenerator);
+            m_RuntimeReloader->SetReflectionGenerator(m_ReflectionGenerator);
 
-            if(m_RuntimeCompiler->Initalize() == SteelEngine::SE_FALSE)
+            if(m_RuntimeReloader->Initalize() == SteelEngine::SE_FALSE)
             {
-                SE_FATAL("Runtime Compiler initialization failed!");
+                SE_FATAL("Runtime compiler initialization failed!");
 
                 return SE_FALSE;
             }
@@ -108,6 +116,8 @@ namespace SteelEngine {
         m_NetworkManager = (Network::INetworkManager*)Reflection::CreateInstance("SteelEngine::Network::NetworkManager");
 
         m_NetworkManager->Init();
+
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::NETWORK_MANAGER, &m_NetworkManager->m_Object);
 
         m_VirtualProject = (IVirtualProject**)&Reflection::CreateInstance("SteelEngine::VirtualProject")->m_Object;
 
@@ -194,15 +204,32 @@ namespace SteelEngine {
 
         m_ImGUI_ContextAPI = (IContext*)Reflection::CreateInstance("SteelEngine::VulkanContext");
 
-        m_ImGUI_ContextAPI->Init(m_Window, *m_Renderer);
-
-        if((*m_Editor)->Init(*m_Renderer, m_ImGUI_ContextAPI) == SE_FALSE)
+        if(m_ImGUI_ContextAPI)
         {
-            return SE_FALSE;
+            m_ImGUI_ContextAPI->Init(m_Window, *m_Renderer);
+
+            SE_INFO("Editor API context initialization success!");
+
+            if((*m_Editor)->Init(*m_Renderer, m_ImGUI_ContextAPI) == SE_FALSE)
+            {
+                SE_FATAL("Editor initialization failed!");
+
+                return SE_FALSE;
+            }
+            else
+            {
+                SE_INFO("Editor initialization success!");
+            }
+            
         }
+        else
+        {
+            SE_FATAL("Problem with editor API context!");
+        }
+        
     // ---------------------------------------------------------------------
 
-        printf("Core init success!\n");
+        SE_INFO("Core initialized successful!");
 
         Event::GlobalEvent::Add<LoadedProjectEvent>(this);
 
@@ -212,9 +239,7 @@ namespace SteelEngine {
     Core::Core()
     {
         m_Running = false;
-        m_Delta = 0;
-        m_Frames = 0;
-        m_RuntimeCompiler = 0;
+        m_RuntimeReloader = 0;
     }
 
     Core::~Core()
@@ -226,12 +251,10 @@ namespace SteelEngine {
     {
         (*m_DeltaTimeVariant->Convert<IDeltaTime**>())->Update();
 
-        float delta = (*m_DeltaTimeVariant->Convert<IDeltaTime**>())->GetDeltaTime();
-
         // The runtime compiler file watcher is not too perform
-        if(m_RuntimeCompiler)
+        if(m_RuntimeReloader)
         {
-            m_RuntimeCompiler->m_Object->Update();
+            m_RuntimeReloader->m_Object->Update();
         }
 
         m_Logger->m_Object->Update();
@@ -244,18 +267,6 @@ namespace SteelEngine {
         m_ImGUI_ContextAPI->UploadDrawData();
         (*m_Renderer)->PostRender();
         (*m_VirtualProject)->Update();
-
-        m_Delta += delta;
-        m_Frames++;
-
-        if(m_Delta >= 1)
-        {
-            printf("Delta: %f ms\n", delta * 1000);
-            printf("FPS: %u\n", m_Frames);
-
-            m_Delta = 0;
-            m_Frames = 0;
-        }
     }
 
     void Core::Start()
@@ -292,7 +303,7 @@ namespace SteelEngine {
         Reflection::GetType("SteelEngine::Core")->SetMetaData(ReflectionAttribute::ENGINE_START_TYPE, variant);
     }
 
-    void Core::OnRecompile(HotReload::IRuntimeObject* oldObject)
+    void Core::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
         Event::GlobalEvent::Remove<IWindow::WindowCloseEvent>(oldObject);
         Event::GlobalEvent::Add<IWindow::WindowCloseEvent>((Core*)m_Object);
@@ -307,12 +318,12 @@ namespace SteelEngine {
     {
         if(m_EnginePathVariant == EnginePathVariant::GAME_DEV)
         {
-            m_RuntimeCompiler =
-                (HotReload::RuntimeCompiler*)SteelEngine::Reflection::CreateInstance("SteelEngine::HotReload::RuntimeCompiler");
+            m_RuntimeReloader =
+                (HotReloader::RuntimeReloader*)SteelEngine::Reflection::CreateInstance("SteelEngine::HotReloader::RuntimeReloader");
 
-            m_RuntimeCompiler->SetReflectionGenerator(m_ReflectionGenerator);
+            m_RuntimeReloader->SetReflectionGenerator(m_ReflectionGenerator);
 
-            if(m_RuntimeCompiler->Initalize() == SteelEngine::SE_FALSE)
+            if(m_RuntimeReloader->Initalize() == SteelEngine::SE_FALSE)
             {
                 SE_FATAL("Runtime Compiler initialization failed!");
             }

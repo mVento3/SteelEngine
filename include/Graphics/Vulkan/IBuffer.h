@@ -7,11 +7,11 @@
 
 #include "Graphics/Vulkan/DeepLayer/IDevice.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    struct IBuffer : public HotReload::IRuntimeObject
+    struct IBuffer : public HotReloader::IRuntimeObject
     {
         virtual Result CreateBuffer(
             const IDevice* device,

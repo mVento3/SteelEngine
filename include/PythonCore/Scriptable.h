@@ -3,7 +3,7 @@
 #include "PythonCore/IScript.h"
 #include "PythonCore/ResultConverter.h"
 
-// #include "RuntimeCompiler/IRuntimeObject.h"
+// #include "HotReloader/IRuntimeObject.h"
 
 #include "RuntimeReflection/Macro.h"
 
@@ -53,7 +53,7 @@ namespace SteelEngine { namespace Script { namespace Python {
         }
 
         // IDK
-        virtual void Serialize(SteelEngine::HotReload::ISerializer* serializer)
+        virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer)
         {
 
         }

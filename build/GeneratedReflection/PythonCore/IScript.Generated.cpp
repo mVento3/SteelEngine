@@ -1,5 +1,5 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/PythonCore/IScript.Generated.h"
 #include "PythonCore/IScript.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 

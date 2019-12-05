@@ -1,13 +1,13 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/NetworkManager.Generated.h"
 #include "Networking/NetworkManager.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 namespace Network {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<NetworkManager>("NetworkManager",{
+SteelEngine::ReflectionRecorder::Register<NetworkManager>("NetworkManager",{
 "SteelEngine",
 "Network"
 }
@@ -17,23 +17,17 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(NetworkManager))
 )
 .Inheritance<INetworkManager>("INetworkManager")
 .Constructor<>()
-(
-)
 .Method("GetConnectedClientsCount", &NetworkManager::GetConnectedClientsCount)
-(
-)
 .Method("GetConnectionStatus", &NetworkManager::GetConnectionStatus)
-(
-)
 ;
 }
 
-void NetworkManager::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void NetworkManager::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(NetworkManager)
 {

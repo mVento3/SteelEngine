@@ -9,11 +9,11 @@
 
 #include "vector"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
-    struct IDevice : public HotReload::IRuntimeObject
+    struct IDevice : public HotReloader::IRuntimeObject
     {
     // Semaphore and fence
         virtual Result CreateSemaphore(

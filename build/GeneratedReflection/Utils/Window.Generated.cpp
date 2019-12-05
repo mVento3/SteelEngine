@@ -1,6 +1,6 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Utils/Window.Generated.h"
 #include "Utils/Window.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/Reflection.h"
 
 namespace SteelEngine {
@@ -16,7 +16,7 @@ SteelEngine::Reflection::Register<Window>("Window",{
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Window))
 )
-.Inheritance<HotReload::IRuntimeObject>("HotReload::IRuntimeObject")
+.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Property("m_Title", &Window::m_Title)
 (
 )
@@ -26,7 +26,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Window))
 ;
 }
 
-void Window::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void Window::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(Window::m_Title)
 SERIALIZE(Window::m_Context)

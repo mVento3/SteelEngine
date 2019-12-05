@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ImGUI_Editor/Window.h"
+#include "EditorComponents/ImGUI/UserInterface.h"
+
 #include "ImGUI_Editor/SceneType.h"
 #include "ImGUI_Editor/ReflectionAttribs.h"
 
@@ -22,9 +23,11 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     SE_CLASS(
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::START_MENU_SCENE | SteelEngine::Editor::SceneType::EDITOR_SCENE,
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
+        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW
     )
-    class SystemsMonitorWindow : public Window
+    class SystemsMonitorWindow : public EditorComponents::ImGUI::UserInterface
     {
         GENERATED_BODY
     private:
@@ -44,7 +47,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         void Init() override;
         void Draw() override;
 
-        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
+        void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
     };
 
 }}}

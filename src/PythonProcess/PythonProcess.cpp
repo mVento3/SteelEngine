@@ -15,7 +15,7 @@ extern "C"
     DLL void PythonProcess_delete(SteelEngine::IPythonProcess* obj)
     {
         obj->Release();
-        Sleep(10);
+        // Sleep(10);
 
         delete obj;
     }

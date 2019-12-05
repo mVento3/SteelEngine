@@ -1,28 +1,49 @@
 #pragma once
 
-#include "filesystem"
+#include "HotReloader/IRuntimeObject.h"
 
-#include "Core/Result.h"
+#include "PythonProcess/IPythonProcess.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "Utils/Json.h"
 
-#include "RuntimeReflection/IReflectionGenerator.h"
+#include "string"
+#include "vector"
 
-namespace SteelEngine { namespace HotReload {
+namespace SteelEngine {
 
-    struct IRuntimeCompiler : public IRuntimeObject
+    struct IRuntimeCompiler : public HotReloader::IRuntimeObject
     {
-        virtual Result Initalize() { return SE_NOT_IMPLEMENTED; }
-        virtual void Cleanup() { }
+        virtual void Setup() = 0;
+        virtual void Compile(
+            const std::string& source,
+            const std::vector<std::string>& flags,
+            const std::vector<std::string>& defines,
+            const std::vector<std::string>& includes,
+            const std::vector<std::string>& libPaths,
+            const std::vector<std::string>& libs
+        ) = 0;
+        virtual void Compile(
+            const std::string& source,
+            const Utils::json& flags,
+            const Utils::json& definitions,
+            const Utils::json& includes,
+            const Utils::json& libPaths,
+            const Utils::json& libs
+        ) = 0;
+        // The options should contain:
+        // - "flags" string array
+        // - "definitions" string array
+        // - "includes" string array
+        // - "lib_paths" string array
+        // - "libs" string array
+        virtual void Compile(
+            const std::string& source,
+            const Utils::json& options
+        ) = 0;
 
-        virtual void Update() { }
-        virtual void Compile(const std::filesystem::path& file) { }
-        virtual void SwapModule(const std::string& moduleName) { }
+        virtual void WaitUntilComplete() const = 0;
 
-        virtual inline Result IsCompileComplete() { return SE_NOT_IMPLEMENTED; }
-        virtual inline Result IsSwapComplete() { return SE_NOT_IMPLEMENTED; }
-
-        virtual void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) { }
+        virtual const bool IsCompileComplete() const = 0;
     };
 
-}}
+}

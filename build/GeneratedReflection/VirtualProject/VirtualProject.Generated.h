@@ -2,4 +2,13 @@
 
 #define GENERATED_BODY \
 public:\
-virtual void Serialize(SteelEngine::HotReload::ISerializer* serializer) override;
+IVirtualProject* Cast_IVirtualProject()\
+{\
+return static_cast<VirtualProject*>(this);\
+}\
+Script::Python::Scriptable* Cast_Scriptable()\
+{\
+return static_cast<VirtualProject*>(this);\
+}\
+public:\
+virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer) override;

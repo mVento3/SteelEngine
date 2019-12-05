@@ -31,6 +31,8 @@
 *.app
 
 # My
+*.pyc
+*.mtl
 Engine.exe
 ReflectionGenerator.exe
 *.bin

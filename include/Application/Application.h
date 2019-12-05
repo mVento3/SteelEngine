@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 namespace SteelEngine {
 
-    class Application : public HotReload::IRuntimeObject
+    class Application : public HotReloader::IRuntimeObject
     {
     private:
 

@@ -45,7 +45,7 @@ namespace SteelEngine {
         sockaddr_in hint;
 
         hint.sin_family = AF_INET;
-        hint.sin_port = htons(Reflection::GetType("Server")->GetMetaData(SERVER_INFO)->Convert<ServerInfo>().m_Port);
+        hint.sin_port = htons(Reflection::GetType("SteelEngine::Server")->GetMetaData(SERVER_INFO)->Convert<ServerInfo>().m_Port);
         
         inet_pton(AF_INET, ip, &hint.sin_addr);
 
@@ -58,20 +58,6 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
-        std::vector<IReflectionData*> types = Reflection::GetTypes();
-
-        for(Type::uint32 i = 0; i < types.size(); i++)
-        {
-            IReflectionData* type = types[i];
-
-            if(type->GetMetaData(ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
-            {
-                Network::INetworkCommand* comm = (Network::INetworkCommand*)type->Create();
-
-                comm->m_Commands = &m_NetworkManager->GetCommands();
-            }
-        }
-
         Event::GlobalEvent::Add_<Network::INetworkCommand>(this);
 
         return SE_TRUE;
@@ -79,7 +65,7 @@ namespace SteelEngine {
 
     void Client::Process()
     {
-        bool* status = Reflection::GetType("NetworkManager")->Invoke("GetConnectionStatus", m_NetworkManager).Convert<bool*>();
+        bool* status = Reflection::GetType("SteelEngine::Network::NetworkManager")->Invoke("GetConnectionStatus", m_NetworkManager).Convert<bool*>();
 
         m_Thread = new std::thread([this, status]()
         {

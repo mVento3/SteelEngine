@@ -11,6 +11,7 @@
 #include "RuntimeReflection/IReflectionEnumeration.h"
 #include "RuntimeReflection/IReflectionInheritance.h"
 #include "RuntimeReflection/Variant.h"
+#include "RuntimeReflection/IProxyMethod.h"
 
 #include "RuntimeDatabase/RuntimeDatabase.h"
 
@@ -25,6 +26,7 @@ namespace SteelEngine {
 	struct IReflectionData : public MetaDataImplementation
 	{
 		friend class Reflection;
+		friend class ReflectionRecorder;
 		friend struct NoTupleReflectionConstructor;
 	private:
 		static RuntimeDatabase* LoadDatabase()
@@ -55,7 +57,8 @@ namespace SteelEngine {
 			CONSTRUCTOR_BIND,
 			METHOD_BIND,
 			PROPERTY_BIND,
-			TYPE_BIND
+			TYPE_BIND,
+			INHERITANCE_BIND
 		};
 
 	protected:
@@ -78,7 +81,7 @@ namespace SteelEngine {
 			var->m_TypeID = RuntimeDatabase::s_InvalidID;
 		}
 
-		HotReload::IRuntimeObject* CreateObject(RuntimeDatabase* db, const std::string& typeName)
+		HotReloader::IRuntimeObject* CreateObject(RuntimeDatabase* db, const std::string& typeName)
 		{
 			for(Type::uint32 j = 0; j < db->m_Types->size(); j++)
 			{
@@ -169,7 +172,7 @@ namespace SteelEngine {
 		}
 
 		template <typename... Args>
-		HotReload::IRuntimeObject* Create(Args... args)
+		HotReloader::IRuntimeObject* Create(Args... args)
 		{
 			static RuntimeDatabase* db;
 
@@ -180,10 +183,10 @@ namespace SteelEngine {
 
 			for(IReflectionConstructor* cons : m_Constructors)
 			{
-				if(cons->m_ConstructorID == typeid(HotReload::IRuntimeObject*(Args...)).hash_code())
+				if(cons->m_ConstructorID == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
 				{
 					ReflectionConstructor<Args...>* con_ = (ReflectionConstructor<Args...>*)cons;
-					HotReload::IRuntimeObject* createdObject = (HotReload::IRuntimeObject*)con_->m_Function(args...);
+					HotReloader::IRuntimeObject* createdObject = (HotReloader::IRuntimeObject*)con_->m_Function(args...);
 
 					createdObject->m_Object = 			createdObject;
 					createdObject->m_ConstructorID = 	cons->m_ConstructorID;
@@ -192,36 +195,20 @@ namespace SteelEngine {
 
 					db->m_Objects->push_back(new ConstrucedObject(createdObject->m_ObjectID, cons->m_ConstructorID, m_TypeID, new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
 
-					for(Type::uint32 i = 0; i < m_Inheritances.size(); i++)
+					std::vector<IReflectionData*> res;
+
+					for(Type::uint32 i = 0; i < db->m_Types->size(); i++)
 					{
-						IReflectionData* type = GetType(db, "SteelEngine::Script::Python::Scriptable");
+						res.push_back((IReflectionData*)db->m_Types->at(i));
+					}
 
-						if(m_Inheritances[i]->GetTypeID() == type->m_TypeID)
+					for(Type::uint32 i = 0; i < res.size(); i++)
+					{
+						IReflectionData* data = res[i];
+
+						if(data->GetMetaData(ReflectionAttribute::INHERITANCE_MODULE)->Convert<bool>())
 						{
-							void* scriptable = Invoke("Cast_Scriptable", createdObject).Convert<void*>();
-							Script::Python::IScript* script = (Script::Python::IScript*)CreateObject(db, "SteelEngine::Script::Python::Script");
-							HotReload::IRuntimeObject* obj = (HotReload::IRuntimeObject*)scriptable;
-
-							if(obj->m_TypeID == RuntimeDatabase::s_InvalidID)
-							{
-								obj->m_Object = 		createdObject;
-								obj->m_ConstructorID = 	createdObject->m_ConstructorID;
-								obj->m_ObjectID = 		createdObject->m_ObjectID;
-								obj->m_TypeID = 		createdObject->m_TypeID;
-							}
-
-							type->Invoke("SetPython", scriptable, script);
-
-							std::string name = type->Invoke("GetScriptName", scriptable).Convert<std::string>();
-
-							if(name == "")
-							{
-								script->LoadScript(m_TypeName);
-							}
-							else
-							{
-								script->LoadScript(name);
-							}
+							data->InvokeStatic("ProcessInheritance", m_Inheritances, this, createdObject);
 						}
 					}
 
@@ -261,7 +248,7 @@ namespace SteelEngine {
 		{
 			for(IReflectionConstructor* cons : m_Constructors)
 			{
-				if (cons->m_ConstructorID == typeid(HotReload::IRuntimeObject*(Args...)).hash_code())
+				if (cons->m_ConstructorID == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
 				{
 					return cons;
 				}
@@ -282,6 +269,22 @@ namespace SteelEngine {
 			}
 
 			return res->Invoke(object, args...);
+		}
+
+		template <typename... Args>
+		Variant InvokeStatic(const std::string& name, Args... args)
+		{
+			IProxyMethod<Args...>* res = (IProxyMethod<Args...>*)m_Methods.find(name.c_str())->second;
+
+			if(!res)
+			{
+				static Result noneRes(SE_FALSE, "NONE");
+				static Variant none(noneRes, typeid(noneRes).hash_code());
+
+				return none;
+			}
+
+			return res->Invoke(args...);
 		}
 
 		Variant GetInfo(IReflectionProperty* prop)

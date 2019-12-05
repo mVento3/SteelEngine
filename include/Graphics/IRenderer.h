@@ -1,12 +1,12 @@
 #pragma once
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "Core/Result.h"
 
 namespace SteelEngine { namespace Graphics {
 
-    struct IRenderer : public HotReload::IRuntimeObject
+    struct IRenderer : public HotReloader::IRuntimeObject
     {
         enum API
         {

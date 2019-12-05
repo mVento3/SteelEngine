@@ -1,6 +1,6 @@
 #include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Projects/C++/SteelEngine/include/VirtualProject/VirtualProject.Generated.h"
 #include "Projects/C++/SteelEngine/include/VirtualProject/VirtualProject.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/Reflection.h"
 
 REGISTER_REFLECTION
@@ -17,7 +17,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SteelEngine::VirtualProject))
 ;
 }
 
-void SteelEngine::VirtualProject::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void SteelEngine::VirtualProject::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(SteelEngine::VirtualProject::m_LoadedProject)
 SERIALIZE(SteelEngine::VirtualProject::m_ReflectionGenerator)

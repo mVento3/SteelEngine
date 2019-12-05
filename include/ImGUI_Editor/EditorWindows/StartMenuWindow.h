@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ImGUI_Editor/EditorWindows/StartMenuWindow.Generated.h"
-
 #include "Core/ReflectionAttributes.h"
 
 #include "RuntimeReflection/Macro.h"
@@ -16,14 +14,20 @@
 
 #include "thread"
 
+#include "EditorComponents/ImGUI/UserInterface.h"
+
+#include "ImGUI_Editor/EditorWindows/StartMenuWindow.Generated.h"
+
 namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     SE_CLASS(
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::START_MENU_SCENE,
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
+        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW
     )
-    class StartMenuWindow : public Window
+    class StartMenuWindow : public SteelEngine::EditorComponents::ImGUI::UserInterface
     {
         GENERATED_BODY
     private:
@@ -35,7 +39,8 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
         std::vector<SelectableProject> m_SelectableProjects;
 
-        char m_NewProjectName[32];
+        char* m_NewProjectName;
+        size_t m_Size;
 
         void LoadProject(const std::filesystem::path& path);
         void CreateNewProject();
@@ -47,7 +52,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         void Init() override;
         void Draw() override;
 
-        void OnRecompile(HotReload::IRuntimeObject* oldObject) override;
+        void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
     };
 
 }}}

@@ -1,12 +1,12 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Server.Generated.h"
 #include "Networking/Server.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<Server>("Server",{
+SteelEngine::ReflectionRecorder::Register<Server>("Server",{
 "SteelEngine"
 }
 )
@@ -16,29 +16,19 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Server))
 )
 .Inheritance<Network::INetwork>("Network::INetwork")
 .Constructor<>()
-(
-)
 .Method("Start", &Server::Start)
-(
-)
 .Method("Send", &Server::Send)
-(
-)
 .Method("Receive", &Server::Receive)
-(
-)
 .Method("GetCommands", &Server::GetCommands)
-(
-)
 ;
 }
 
-void Server::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void Server::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(Server)
 {

@@ -8,7 +8,7 @@
 
 #include "ModuleManager/ModuleManager.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "Utils/Options.h"
 
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
     SteelEngine::IReflectionGenerator* rg = new SteelEngine::ReflectionGenerator();
 
-    std::vector<SteelEngine::HotReload::IRuntimeObject*> modules;
+    std::vector<SteelEngine::HotReloader::IRuntimeObject*> modules;
     std::vector<SteelEngine::IReflectionData*> types =
         SteelEngine::Reflection::GetTypes();
 
@@ -86,19 +86,19 @@ int main(int argc, char* argv[])
         printf("Exception while loading in ReflectionGenerator.exe: %s!\n", e.what());
     }
 
-    try
-    {
+    // try
+    // {
         if(rg->Parse() == SteelEngine::SE_FALSE)
         {
             printf("Failed to parse!\n");
 
             return 0;
         }
-    }
-    catch(const std::exception& e)
-    {
-        printf("Exception while parsing in ReflectionGenerator.exe: %s!\n", e.what());
-    };
+    // }
+    // catch(const std::exception& e)
+    // {
+    //     printf("Exception while parsing in ReflectionGenerator.exe: %s!\n", e.what());
+    // };
 
     try
     {

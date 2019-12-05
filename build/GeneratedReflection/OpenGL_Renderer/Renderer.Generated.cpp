@@ -1,6 +1,6 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/OpenGL_Renderer/Renderer.Generated.h"
 #include "OpenGL_Renderer/Renderer.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/Reflection.h"
 
 namespace SteelEngine {
@@ -25,7 +25,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 ;
 }
 
-void Renderer::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void Renderer::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
 

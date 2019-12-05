@@ -1,14 +1,14 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Vulkan/Buffer.Generated.h"
 #include "Graphics/Vulkan/Buffer.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 namespace Graphics {
 namespace Vulkan {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<Buffer>("Buffer",{
+SteelEngine::ReflectionRecorder::Register<Buffer>("Buffer",{
 "SteelEngine",
 "Graphics",
 "Vulkan"
@@ -20,13 +20,11 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Buffer))
 )
 .Inheritance<IBuffer>("IBuffer")
 .Constructor<>()
-(
-)
 ;
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(Buffer)
 {

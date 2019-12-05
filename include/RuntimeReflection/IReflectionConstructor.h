@@ -2,7 +2,7 @@
 
 #include "RuntimeReflection/MetaDataImplementation.h"
 
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/IRuntimeObject.h"
 
 #include "RuntimeDatabase/RuntimeDatabase.h"
 
@@ -15,7 +15,7 @@ namespace SteelEngine {
 		size_t m_ConstructorID = RuntimeDatabase::s_InvalidID;
 		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
 
-		virtual HotReload::IRuntimeObject* Invoke(ITuple* args) { return 0; }
+		virtual HotReloader::IRuntimeObject* Invoke(ITuple* args) { return 0; }
 	};
 
 }

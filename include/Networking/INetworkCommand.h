@@ -2,8 +2,9 @@
 
 #include "Networking/INetwork.h"
 
-#include "RuntimeCompiler/SwapModuleEvent.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
+#include "HotReloader/Events/SwapModuleEvent.h"
+
+#include "HotReloader/IRuntimeObject.h"
 
 #include "RuntimeReflection/Reflection.h"
 #include "RuntimeReflection/Macro.h"
@@ -27,7 +28,7 @@ namespace SteelEngine { namespace Network {
     };
 
     SE_CLASS(SteelEngine::ReflectionAttribute::NO_SERIALIZE)
-    struct INetworkCommand : public HotReload::IRuntimeObject
+    struct INetworkCommand : public HotReloader::IRuntimeObject
     {
         SE_VALUE(SteelEngine::ReflectionAttribute::NET_VALUE)
         CommunicationFlow m_Flow;

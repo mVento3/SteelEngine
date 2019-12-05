@@ -16,6 +16,10 @@
 
 #include "VirtualProject/GetLoadedProjectPathEvent.h"
 
+#include "Core/Core.h"
+
+#include "imgui/imgui.h"
+
 namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void NetworkManagerWindow::HostServer()
@@ -27,19 +31,18 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     {
         Event::GlobalEvent::Broadcast(Network::ConnectToServerEvent(m_ServerIP));
 
-        m_Event = (Network::INetworkCommand*)Reflection::CreateInstance("SteelEngine::Network::SynchronizeProjectNCE");
+        Network::INetworkManager* networkManager =
+            *Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager**>();
 
-        Event::LocalEvent<Network::ShouldOverrideEvent>* test =
-            Reflection::GetType(m_Event)->Invoke("GetShouldOverrideEvent", m_Event).Convert<Event::LocalEvent<Network::ShouldOverrideEvent>*>();
+        std::vector<Network::INetworkCommand*> commands = networkManager->GetCommands();
 
-        test->Add_(this);
-
-        Event::GlobalEvent::Broadcast_(m_Event);
-
-        // while(!m_Event->m_Deserialized || m_Event->m_Flow == Network::CommunicationFlow::CLIENT_TO_SERVER)
-        // {
-
-        // }
+        for(Type::uint32 i = 0; i < commands.size(); i++)
+        {
+            if(commands[i]->m_TypeID == Reflection::GetType("SteelEngine::Network::SynchronizeProjectNCE")->GetTypeID())
+            {
+                Event::GlobalEvent::Broadcast_(commands[i]);
+            }
+        }
     }
 
     NetworkManagerWindow::NetworkManagerWindow()
@@ -71,8 +74,6 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         }
 
         Event::GlobalEvent::Add<LoadedProjectEvent>(this);
-
-        // Reflection::GetType("Server")->Invoke("", net);
     }
 
     void NetworkManagerWindow::Draw()
@@ -160,48 +161,6 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
             ImGui::EndPopup();
         }
-
-        if(m_ShouldOverrideFilesPopup)
-        {
-            ImGui::OpenPopup("##shouldOverrideFiles");
-
-            m_ShouldOverrideFilesPopup = false;
-        }
-
-        if(ImGui::BeginPopup("##shouldOverrideFiles"))
-        {
-            ImGui::Text("Do you want override %s?", m_ShouldOverrideFilesEvent->m_File.c_str());
-
-            if(ImGui::Button("Yes"))
-            {
-                m_ShouldOverrideFilesEvent->m_ShouldOverride = true;
-                m_ShouldOverrideFilesEvent->m_IsSet = true;
-
-                ImGui::CloseCurrentPopup();
-            }
-
-            ImGui::SameLine();
-
-            if(ImGui::Button("No"))
-            {
-                m_ShouldOverrideFilesEvent->m_ShouldOverride = false;
-                m_ShouldOverrideFilesEvent->m_IsSet = true;
-
-                ImGui::CloseCurrentPopup();
-            }
-
-            ImGui::SameLine();
-
-            if(ImGui::Button("Yes for all files"))
-            {
-                m_ShouldOverrideFilesEvent->m_ShouldOverrideForAll = true;
-                m_ShouldOverrideFilesEvent->m_IsSet = true;
-
-                ImGui::CloseCurrentPopup();
-            }
-
-            ImGui::EndPopup();
-        }
     }
 
     void NetworkManagerWindow::operator()(const LoadedProjectEvent& event)
@@ -209,16 +168,10 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         m_ProjectLoaded = true;
     }
 
-    void NetworkManagerWindow::OnRecompile(HotReload::IRuntimeObject* oldObject)
+    void NetworkManagerWindow::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
-        Window::OnRecompile(oldObject);
+        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
         ImGui::SetCurrentContext((ImGuiContext*)m_Context);
-    }
-
-    void NetworkManagerWindow::operator()(Network::ShouldOverrideEvent* event)
-    {
-        m_ShouldOverrideFilesEvent = event;
-        m_ShouldOverrideFilesPopup = true;
     }
 
 }}}

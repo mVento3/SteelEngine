@@ -48,7 +48,7 @@ namespace SteelEngine { namespace Event {
             iinfo->Add(tracker);
         }
 
-        IReflectionData* data = Reflection::GetType((HotReload::IRuntimeObject*)object);
+        IReflectionData* data = Reflection::GetType((HotReloader::IRuntimeObject*)object);
         IReflectionData* data2 = Reflection::GetType(eventTypeID);
         GlobalEventTracker* tracker_ = (GlobalEventTracker*)tracker;
 

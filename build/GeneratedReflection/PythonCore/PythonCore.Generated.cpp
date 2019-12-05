@@ -1,13 +1,13 @@
 #include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/PythonCore/PythonCore.Generated.h"
 #include "PythonCore/PythonCore.h"
-#include "RuntimeCompiler/IRuntimeObject.h"
-#include "RuntimeReflection/Reflection.h"
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
 
 namespace SteelEngine {
 namespace Script {
 REGISTER_REFLECTION
 {
-SteelEngine::Reflection::Register<PythonCore>("PythonCore",{
+SteelEngine::ReflectionRecorder::Register<PythonCore>("PythonCore",{
 "SteelEngine",
 "Script"
 }
@@ -17,17 +17,15 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(PythonCore))
 )
 .Inheritance<IPython>("IPython")
 .Constructor<>()
-(
-)
 ;
 }
 
-void PythonCore::Serialize(SteelEngine::HotReload::ISerializer* serializer)
+void PythonCore::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(void* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(PythonCore)
 {
