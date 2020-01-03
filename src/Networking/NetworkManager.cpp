@@ -18,9 +18,9 @@ namespace SteelEngine { namespace Network {
 
     void NetworkManager::Init()
     {
-        std::vector<IReflectionData*> types = Reflection::GetTypes();
+        IReflectionData** types = Reflection::GetTypes();
 
-        for(Type::uint32 i = 0; i < types.size(); i++)
+        for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
             IReflectionData* type = types[i];
 

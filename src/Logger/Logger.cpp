@@ -3,6 +3,8 @@
 #include "ctime"
 #include "chrono"
 
+#include "RuntimeReflection/Reflection.h"
+
 namespace SteelEngine {
 
     Logger::Logger(const char* file) :
@@ -16,7 +18,7 @@ namespace SteelEngine {
 
     }
 
-    void Logger::Log(const std::string& message, int verbosity, Type::uint32 line, const std::string& file, va_list args)
+    void Logger::Log(const std::string& message, int verbosity, Type::uint32 line, const std::filesystem::path& file, va_list args)
     {
         char mes[1024];
 
@@ -27,29 +29,37 @@ namespace SteelEngine {
         std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
         char* timeStr = std::ctime(&time);
+        std::string fileStr = file.string();
 
         if(verbosity == Verbosity::INFO)
         {
-            sprintf(res, "INFO at %s in %s:%lu: %s\n", timeStr, file.c_str(), line, mes);
+            sprintf(res, "INFO at %s in %s:%lu: %s\n", timeStr, fileStr.c_str(), line, mes);
         }
         else if(verbosity == Verbosity::WARNING)
         {
-            sprintf(res, "WARNING at %s in %s:%lu: %s\n", timeStr, file.c_str(), line, mes);
+            sprintf(res, "WARNING at %s in %s:%lu: %s\n", timeStr, fileStr.c_str(), line, mes);
         }
         else if(verbosity == Verbosity::ERROR)
         {
-            sprintf(res, "ERROR at %s in %s:%lu: %s\n", timeStr, file.c_str(), line, mes);
+            sprintf(res, "ERROR at %s in %s:%lu: %s\n", timeStr, fileStr.c_str(), line, mes);
         }
         else if(verbosity == Verbosity::FATAL)
         {
-            sprintf(res, "FATAL at %s in %s:%lu: %s\n", timeStr, file.c_str(), line, mes);
+            sprintf(res, "FATAL at %s in %s:%lu: %s\n", timeStr, fileStr.c_str(), line, mes);
         }
 
         printf("%s", res);
 
         if(m_LogToFile)
         {
-            m_PendingLogs.push_back(res);
+            LogData log;
+
+            log.m_Message = res;
+            log.m_File = file;
+            log.m_Line = line;
+            log.m_Verbosity = verbosity;
+
+            m_PendingLogs.push(log);
         }
     }
 
@@ -84,7 +94,14 @@ namespace SteelEngine {
 
         if(m_LogToFile)
         {
-            m_PendingLogs.push_back(res);
+            LogData log;
+
+            log.m_Message = res;
+            log.m_File = "";
+            log.m_Line = 0;
+            log.m_Verbosity = verbosity;
+
+            m_PendingLogs.push(log);
         }
     }
 
@@ -105,11 +122,18 @@ namespace SteelEngine {
     {
         while(!m_PendingLogs.empty())
         {
-            std::string log = m_PendingLogs.back();
+            LogData log = m_PendingLogs.front();
 
-            m_OutFile << log;
+            m_OutFile << log.m_Message;
 
-            m_PendingLogs.pop_back();
+            for(Type::uint32 i = 0; i < m_Dispatchers.size(); i++)
+            {
+                HotReloader::IRuntimeObject* obj = (*m_Dispatchers[i]);
+
+                Reflection::GetType(obj)->Invoke("Cast_LogDispatcher", obj).Convert<LogDispatcher*>()->Dispatch(log);
+            }
+
+            m_PendingLogs.pop();
         }
     }
 

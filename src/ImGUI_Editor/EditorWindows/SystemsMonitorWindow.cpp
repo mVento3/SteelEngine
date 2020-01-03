@@ -30,9 +30,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
             m_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
         }
 
-        std::vector<IReflectionData*> types = Reflection::GetTypes();
+        IReflectionData** types = Reflection::GetTypes();
 
-        for(Type::uint32 i = 0; i < types.size(); i++)
+        for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
             reflectionRes.push_back(types[i]->GetTypeName());
         }

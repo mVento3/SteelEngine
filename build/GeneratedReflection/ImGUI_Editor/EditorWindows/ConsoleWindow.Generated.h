@@ -6,5 +6,9 @@ EditorComponents::ImGUI::UserInterface* Cast_UserInterface()\
 {\
 return static_cast<ConsoleWindow*>(this);\
 }\
+LogDispatcher* Cast_LogDispatcher()\
+{\
+return static_cast<ConsoleWindow*>(this);\
+}\
 public:\
 virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer) override;

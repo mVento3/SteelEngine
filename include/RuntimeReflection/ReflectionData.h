@@ -23,19 +23,37 @@ namespace SteelEngine {
 	template <typename T>
 	struct ReflectionData : public IReflectionData
 	{
+		friend class ReflectionRecorder;
 	private:
+		std::string		m_TypeName;
+		size_t			m_TypeID;
+		CurrentBindFlag	m_CurrentBind;
+		std::string		m_CurrentBindName;
+
+		ConstructorsVector	m_Constructors;
+		PropertiesMap		m_Properties;
+		MethodsMap			m_Methods;
+		EnumsMap			m_Enums;
+		InheritancesVector	m_Inheritances;
+		NamespacesVector	m_Namespaces;
+		MetaDataInfoVector 	m_MetaData;
+
+		ConstructorsVector m_ConstructorsToClear;
+
 		void ProcessMetaData(
 			RuntimeDatabase* db,
 			MetaDataImplementation* main,
 			MetaDataInfoVector& infos)
 		{
+			MetaDataInfoVector* vec = GetMetaDataInfoVectorA(main);
+
 			if(!infos.empty())
 			{
 				std::vector<size_t> changed;
 
 				for(Type::uint32 i = 0; i < infos.size(); i++)
 				{
-					size_t c = infos[i].Setup(main->m_MetaDatas);
+					size_t c = infos[i].Setup(vec);
 
 					if(c != RuntimeDatabase::s_InvalidID)
 					{
@@ -45,7 +63,7 @@ namespace SteelEngine {
 
 				std::vector<int> new_;
 
-				for(Type::uint32 i = 0; i < main->m_MetaDatas.size(); i++)
+				for(Type::uint32 i = 0; i < vec->size(); i++)
 				{
 					new_.push_back(i);
 				}
@@ -65,11 +83,11 @@ namespace SteelEngine {
 
 					for(Type::uint32 i = 0; i < new_.size(); i++)
 					{
-						for(Type::uint32 j = 0; j < main->m_MetaDatas.size(); j++)
+						for(Type::uint32 j = 0; j < vec->size(); j++)
 						{
 							if(new_[i] == j)
 							{
-								DisableVariant(main->m_MetaDatas[j].m_Value);
+								DisableVariant(vec->at(i).m_Value);
 							}
 						}
 					}
@@ -77,7 +95,7 @@ namespace SteelEngine {
 			}
 			else
 			{
-				std::vector<MetaDataInfo>* a = &main->m_MetaDatas;
+				MetaDataInfoVector* a = GetMetaDataInfoVectorA(main);
 
 				for(Type::uint32 i = 0; i < a->size(); i++)
 				{
@@ -86,7 +104,57 @@ namespace SteelEngine {
 			}
 		}
 
+		const NamespacesVector& GetNamespacesVector() override
+		{
+			return m_Namespaces;
+		}
+
+		const MethodsMap& GetMethodsMap() override
+		{
+			return m_Methods;
+		}
+
+		const PropertiesMap& GetPropertiesMap() override
+		{
+			return m_Properties;
+		}
+
+		const EnumsMap& GetEnumsMap() override
+		{
+			return m_Enums;
+		}
+
+		const ConstructorsVector& GetConstructorsVector() override
+		{
+			return m_Constructors;
+		}
+
+		MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
+		}
+
 	public:
+		ReflectionData()
+		{
+
+		}
+
+		~ReflectionData()
+		{
+
+		}
+
+		const std::vector<IReflectionInheritance*>& GetInheritances() override
+		{
+			return m_Inheritances;
+		}
+
+		const std::vector<IReflectionInheritance*>& GetInheritances() const override
+		{
+			return m_Inheritances;
+		}
+
 		template <typename... Args>
 		ReflectionData& Constructor()
 		{
@@ -292,6 +360,16 @@ namespace SteelEngine {
 			}
 
 			return res;
+		}
+
+		const std::string& GetTypeName() override
+		{
+			return m_TypeName;
+		}
+
+		size_t GetTypeID() override
+		{
+			return m_TypeID;
 		}
 	};
 

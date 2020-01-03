@@ -71,7 +71,8 @@ namespace SteelEngine {
             DELTA_TIME,
             GLOBAL_EVENTS,
             MEMORY_TRACKER,
-            NETWORK_MANAGER
+            NETWORK_MANAGER,
+            PROFILER
         };
 
     private:

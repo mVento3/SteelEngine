@@ -20,6 +20,20 @@ namespace SteelEngine { namespace Memory {
 
     }
 
+    FixedVectorAllocator::FixedVectorAllocator(Allocator* allocator, size_t maxSizeInBytes, size_t elementSize, Type::uint8 alignment) :
+        Allocator(
+            maxSizeInBytes,
+            Memory::PointerMath::calculateForwardAddress(
+                (Type::uptr)PointerMath::add(allocator->Allocate(maxSizeInBytes + sizeof(FixedVectorAllocator), __alignof(FixedVectorAllocator)), sizeof(FixedVectorAllocator)),
+                alignment
+            )
+        ),
+        m_ElementSize(elementSize),
+        m_Alignment(alignment)
+    {
+
+    }
+
     FixedVectorAllocator::~FixedVectorAllocator()
     {
 

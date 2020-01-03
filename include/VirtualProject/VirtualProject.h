@@ -37,6 +37,7 @@ namespace SteelEngine {
     class VirtualProject : public IVirtualProject, public Script::Python::Scriptable
     {
         GENERATED_BODY
+        friend class VirtualProjectVisualizer;
     public:
         typedef IPythonProcess*(*PythonProcess_new)();
 
@@ -50,6 +51,8 @@ namespace SteelEngine {
         IPythonProcess*         m_Process;
         IRuntimeCompiler*       m_Compiler;
         void*                   m_ProjectDLL;
+
+        IVirtualProjectVisualizer** m_Visualizer;
 
         Utils::json m_ProjectConfig;
         Utils::json m_CompileConfig;
@@ -72,6 +75,11 @@ namespace SteelEngine {
 
         void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) override { m_ReflectionGenerator = reflectionGenerator; }
         Result IsProjectLoaded() override;
+
+        inline IVirtualProjectVisualizer** GetVisualizer() override
+        {
+            return m_Visualizer;
+        }
 
         void operator()(const LoadedProjectEvent& event);
         void operator()(LoadProjectEvent* event);

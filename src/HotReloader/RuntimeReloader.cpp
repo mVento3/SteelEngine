@@ -19,6 +19,8 @@
 
 #include "FileSystem/FileSystem.h"
 
+#include "Profiler/ScopeTimer.h"
+
 #ifdef SE_WINDOWS
 #include "crtdefs.h"
 #include "process.h"
@@ -57,7 +59,8 @@ namespace SteelEngine { namespace HotReloader {
 
     Result RuntimeReloader::Initalize()
     {
-        printf("Initializing Runtime Compiler!\n");
+        // printf("Initializing Runtime Compiler!\n");
+		SE_INFO("Initializing runtime hot-reloader!");
 
 		GetCompileConfigEvent event;
 
@@ -119,6 +122,7 @@ namespace SteelEngine { namespace HotReloader {
 							}
 						}
 
+						// TODO: Change/remove that!
 						Sleep(50);
 
 						CHECK_SPEED(
@@ -155,7 +159,7 @@ namespace SteelEngine { namespace HotReloader {
 								m_ReflectionGenerator->Clear();
 							},
 							{
-								printf("Reflection time: %f ms\n", delta * 1000.f);
+								SE_INFO("Reflection generation time %f ms", delta * 1000.f);
 							}
 						);
 
@@ -170,7 +174,7 @@ namespace SteelEngine { namespace HotReloader {
 									Compile(file.string());
 								},
 								{
-									printf("Compile time: %f ms\n", delta * 1000.f);
+									SE_INFO("Compile time: %f ms", delta * 1000.f);
 								}
 							)
 
@@ -187,7 +191,7 @@ namespace SteelEngine { namespace HotReloader {
 									SwapModule(m_BinaryLocation.string() + "/Runtime/Swap/" + m_ModuleName + ".dll");
 								},
 								{
-									printf("Swap time: %f\n", delta * 1000.f);
+									
 								}
 							);
 
@@ -225,7 +229,7 @@ namespace SteelEngine { namespace HotReloader {
 
     void RuntimeReloader::Cleanup()
     {
-		
+
     }
 
 	void RuntimeReloader::Update()
@@ -238,6 +242,8 @@ namespace SteelEngine { namespace HotReloader {
 
     void RuntimeReloader::Compile(const std::filesystem::path& file)
     {
+		SE_PROFILE_FUNC;
+
 #ifndef SE_WINDOWS
 		m_SourceFile = file.string();
 		replaceAll(m_SourceFile, "\\", "/");
@@ -394,6 +400,9 @@ namespace SteelEngine { namespace HotReloader {
 
     void RuntimeReloader::SwapModule(const std::string& moduleName)
     {
+		SE_INFO("Swapping %s module", moduleName.c_str());
+		SE_PROFILE_FUNC;
+
 		std::string moduleName_ = moduleName;
 		replaceAll(moduleName_, "/", "\\");
 
@@ -404,8 +413,6 @@ namespace SteelEngine { namespace HotReloader {
 
 		void* hotReloadedModule;
 		GetPerModule getPerModule;
-
-		printf("Swap module: %s\n", moduleName.c_str());
 
 		try
 		{
@@ -421,12 +428,14 @@ namespace SteelEngine { namespace HotReloader {
 		}
 		catch(const std::exception& e)
 		{
-			printf("%s\n", e.what());
+			// printf("%s\n", e.what());
+			SE_ERROR(e.what());
 		}
 
 		if(!getPerModule)
 		{
-			printf("GetPerModule is null!\n");
+			// printf("GetPerModule is null!\n");
+			SE_ERROR("GetPerModule in null!");
 
 			for(std::string f : m_ObjFilesToDelete)
 			{
@@ -439,14 +448,14 @@ namespace SteelEngine { namespace HotReloader {
 		}
 
 		TypeInfo* info = getPerModule(db->m_Objects);
-		size_t size = db->m_Objects->size();
+		size_t size = db->m_Objects->Size();
 		HotReloader::IRuntimeObject* old = 0;
 		HotReloader::IRuntimeObject* obj = 0;
 		bool found = false;
 
 		for(Type::uint32 i = 0; i < size; i++)
 		{
-			if (db->m_Objects->at(i)->m_TypeID != info->m_TypeID)
+			if (db->m_Objects->At(i).m_TypeID != info->m_TypeID)
 			{
 				continue;
 			}
@@ -455,7 +464,7 @@ namespace SteelEngine { namespace HotReloader {
 
 			Serializer serializer;
 
-			HotReloader::IRuntimeObject* currentObject = db->m_Objects->at(i)->m_Object;
+			HotReloader::IRuntimeObject* currentObject = db->m_Objects->At(i).m_Object;
 
 			obj = info->m_CreateObjectCallback(currentObject->m_ObjectID, currentObject->m_ConstructorID);
 			old = currentObject->m_Object;
@@ -476,7 +485,7 @@ namespace SteelEngine { namespace HotReloader {
 
 		if(!found)
 		{
-			size_t objectID = db->m_LastPerObjectID++;
+			size_t objectID = db->GetNextPerObjectID();
 			size_t constructorID = Reflection::GetType(info->m_TypeID)->GetConstructor()->m_ConstructorID;
 
 			obj = info->m_CreateObjectCallback(
@@ -489,7 +498,8 @@ namespace SteelEngine { namespace HotReloader {
 			obj->m_ObjectID = 		objectID;
 			obj->m_TypeID = 		info->m_TypeID;
 
-			db->m_Objects->push_back(new ConstrucedObject(obj->m_ObjectID, constructorID, m_TypeID, new Tuple(std::tuple()), obj));
+			// db->m_Objects->push_back(new ConstrucedObject(obj->m_ObjectID, constructorID, m_TypeID, new Tuple(std::tuple()), obj));
+			db->m_Objects->PushBack(ConstrucedObject(obj->m_ObjectID, constructorID, m_TypeID, new Tuple(std::tuple()), obj));
 		}
 
 		m_IsSwapComplete = true;

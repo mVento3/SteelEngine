@@ -15,21 +15,24 @@ SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::SCE
 SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW, true),
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData(SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW, true),
+SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ConsoleWindow))
 )
 .Inheritance<EditorComponents::ImGUI::UserInterface>("EditorComponents::ImGUI::UserInterface")
+.Inheritance<LogDispatcher>("LogDispatcher")
 .Constructor<>()
 .Method("Cast_UserInterface", &ConsoleWindow::Cast_UserInterface)
+.Method("Cast_LogDispatcher", &ConsoleWindow::Cast_LogDispatcher)
 ;
 }
 
 void ConsoleWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
-UserInterface::Serialize(serializer);
+SERIALIZE(ConsoleWindow::m_Logs)
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(ConsoleWindow)
 {

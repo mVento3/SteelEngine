@@ -24,20 +24,26 @@ namespace SteelEngine {
 			m_PendingKey(key, typeid(KeyType).hash_code()),
 			m_PendingValue(value, typeid(ValueType).hash_code())
 		{
-			
+			m_PendingKey.m_AutoDelete = false;
+			m_PendingValue.m_AutoDelete = false;
 		}
 
-		size_t Setup(std::vector<MetaDataInfo>& all)
+		~MetaDataInfo()
+		{
+
+		}
+
+		size_t Setup(std::vector<MetaDataInfo>* all)
 		{
 			size_t foundIndex = RuntimeDatabase::s_InvalidID;
 
-			if(!all.empty())
+			if(!all->empty())
 			{
 				bool found = false;
 
-				for(Type::uint32 i = 0; i < all.size(); i++)
+				for(Type::uint32 i = 0; i < all->size(); i++)
 				{
-					MetaDataInfo* md = &all[i];
+					MetaDataInfo* md = &all->at(i);
 
 					if(md->m_Key && md->m_Key->m_IsPointer &&
 						m_PendingKey.m_IsPointer)
@@ -83,7 +89,10 @@ namespace SteelEngine {
 					m_Key = new Variant(m_PendingKey);
 					m_Value = new Variant(m_PendingValue);
 
-					all.push_back(*this);
+					m_Key->m_AutoDelete = false;
+					m_Value->m_AutoDelete = false;
+
+					all->push_back(*this);
 				}
 			}
 			else
@@ -91,7 +100,10 @@ namespace SteelEngine {
 				m_Key = new Variant(m_PendingKey);
 				m_Value = new Variant(m_PendingValue);
 
-				all.push_back(*this);
+				m_Key->m_AutoDelete = false;
+				m_Value->m_AutoDelete = false;
+
+				all->push_back(*this);
 			}
 
 			return foundIndex;

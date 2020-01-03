@@ -9,6 +9,12 @@ namespace SteelEngine {
     private:
         std::string m_Name;
         size_t m_TypeID;
+        MetaDataInfoVector m_MetaData;
+
+        MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
+		}
 
     public:
         ReflectionInheritance(const std::string& name, size_t typeID) :

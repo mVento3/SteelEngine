@@ -18,6 +18,8 @@
 
 #include "ModuleManager/ModuleManager.h"
 
+#include "RuntimeReflection/Exceptions/TypeNotFoundException.h"
+
 #include "Core/Type.h"
 
 namespace SteelEngine {
@@ -37,7 +39,7 @@ namespace SteelEngine {
 			return db;
 		}
 
-		static inline const RuntimeDatabase* GetDB() { return ms_RuntimeDatabase; }
+		static inline RuntimeDatabase* GetDB() { return ms_RuntimeDatabase; }
 
 	public:
 		static void Init()
@@ -48,25 +50,25 @@ namespace SteelEngine {
 			}
 		}
 
-		static std::vector<IReflectionData*> GetTypes()
-		{
-			return *(ms_RuntimeDatabase->m_Types);
-		}
-
-		static const std::vector<IReflectionData*>* GetTypesPtr()
+		static IReflectionData** GetTypes()
 		{
 			return ms_RuntimeDatabase->m_Types;
+		}
+
+		static size_t GetTypesSize()
+		{
+			return ms_RuntimeDatabase->m_TypesSize;
 		}
 
 		template <typename MetaType>
 		static std::vector<IReflectionData*> GetTypesByMetaData(const MetaType& key, bool(*compareFunction)(Variant*))
 		{
 			std::vector<IReflectionData*> res;
-			std::vector<IReflectionData*>* types = ms_RuntimeDatabase->m_Types;
+			IReflectionData** types = ms_RuntimeDatabase->m_Types;
 
-			for(Type::uint32 i = 0; i < types->size(); i++)
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)types->at(i);
+				IReflectionData* type = (IReflectionData*)types[i];
 
 				if(compareFunction(type->GetMetaData(key)))
 				{
@@ -80,11 +82,11 @@ namespace SteelEngine {
 		static std::vector<IReflectionData*> GetTypesByCustom(bool(*compareFunction)(IReflectionData*))
 		{
 			std::vector<IReflectionData*> res;
-			std::vector<IReflectionData*>* types = ms_RuntimeDatabase->m_Types;
+			IReflectionData** types = ms_RuntimeDatabase->m_Types;
 
-			for(Type::uint32 i = 0; i < types->size(); i++)
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)types->at(i);
+				IReflectionData* type = (IReflectionData*)types[i];
 
 				if(compareFunction(type))
 				{
@@ -103,17 +105,18 @@ namespace SteelEngine {
 
 			std::vector<std::string> splitted = split(name_, ':');
 
-			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types[i];
+				const IReflectionData::NamespacesVector& namespaces = type->GetNamespacesVector();
 
-				if(type->m_Namespaces.size() == splitted.size() - 1)
+				if(namespaces.size() == splitted.size() - 1)
 				{
 					bool isEqual = true;
 
 					for(Type::uint32 i = 0; i < splitted.size() - 1; i++)
 					{
-						if(type->m_Namespaces[i] != splitted[i])
+						if(namespaces[i] != splitted[i])
 						{
 							isEqual = false;
 
@@ -121,42 +124,48 @@ namespace SteelEngine {
 						}
 					}
 
-					if(type->m_TypeName == splitted[splitted.size() - 1] && isEqual)
+					if(type->GetTypeName() == splitted[splitted.size() - 1] && isEqual)
 					{
 						return type;
 					}
 				}
 			}
 
+			// throw TypeNotFoundException(name);
+
 			return 0;
 		}
 
 		static IReflectionData* GetType(size_t typeID)
 		{
-			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types[i];
 
-				if(type->m_TypeID == typeID)
+				if(type->GetTypeID() == typeID)
 				{
 					return type;
 				}
 			}
+
+			// throw TypeNotFoundException();
 
 			return 0;
 		}
 
 		static IReflectionData* GetType(const HotReloader::IRuntimeObject* object)
 		{
-			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types[i];
 
-				if(type->m_TypeID == object->m_TypeID)
+				if(type->GetTypeID() == object->m_TypeID)
 				{
 					return type;
 				}
 			}
+
+			// throw TypeNotFoundException();
 
 			return 0;
 		}
@@ -166,15 +175,17 @@ namespace SteelEngine {
 		{
 			size_t typeID = typeid(T).hash_code();
 
-			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types[i];
 
-				if (type->m_TypeID == typeID)
+				if (type->GetTypeID() == typeID)
 				{
 					return type;
 				}
 			}
+
+			// throw TypeNotFoundException(SE_GET_TYPE_NAME(T));
 
 			return 0;
 		}
@@ -188,17 +199,18 @@ namespace SteelEngine {
 
 			std::vector<std::string> splitted = split(name_, ':');
 
-			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types[i];
+				const IReflectionData::NamespacesVector& namespaces = type->GetNamespacesVector();
 
-				if(type->m_Namespaces.size() == splitted.size() - 1)
+				if(namespaces.size() == splitted.size() - 1)
 				{
 					bool isEqual = true;
 
 					for(Type::uint32 i = 0; i < splitted.size() - 1; i++)
 					{
-						if(type->m_Namespaces[i] != splitted[i])
+						if(namespaces[i] != splitted[i])
 						{
 							isEqual = false;
 
@@ -206,14 +218,15 @@ namespace SteelEngine {
 						}
 					}
 
-					if(type->m_TypeName == splitted[splitted.size() - 1] && isEqual)
+					if(type->GetTypeName() == splitted[splitted.size() - 1] && isEqual)
 					{
 						return type->Create(args...);
 					}
 				}
 			}
 
-			// TODO: change to throw exception!
+			// throw TypeNotFoundException(name);
+
 			return 0;
 		}
 
@@ -222,30 +235,17 @@ namespace SteelEngine {
 		{
 			size_t typeID = typeid(T).hash_code();
 
-			for(Type::uint32 i = 0; i < ms_RuntimeDatabase->m_Types->size(); i++)
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
 			{
-				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_Types[i];
 
-				if(type->m_Namespaces.size() == splitted.size() - 1)
+				if(type->GetTypeID() == typeID)
 				{
-					bool isEqual = true;
-
-					for(Type::uint32 i = 0; i < splitted.size() - 1; i++)
-					{
-						if(type->m_Namespaces[i] != splitted[i])
-						{
-							isEqual = false;
-
-							break;
-						}
-					}
-
-					if(type->m_TypeID == typeID && isEqual)
-					{
-						return type->Create(args...);
-					}
+					return type->Create(args...);
 				}
 			}
+
+			// throw TypeNotFoundException(SE_GET_TYPE_NAME(T));
 
 			return 0;
 		}

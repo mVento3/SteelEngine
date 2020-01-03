@@ -16,6 +16,7 @@ namespace SteelEngine { namespace Memory {
     public:
         FixedQueueAllocator(size_t maxSizeInBytes, size_t elementSize, Type::uint8 alignment, void* start);
         FixedQueueAllocator(size_t maxSizeInBytes, size_t elementSize, Type::uint8 alignment);
+        FixedQueueAllocator(Allocator* allocator, size_t maxSizeInBytes, size_t elementSize, Type::uint8 alignment);
         ~FixedQueueAllocator();
 
         void* Allocate(size_t size, Type::uint8 alignment) override;

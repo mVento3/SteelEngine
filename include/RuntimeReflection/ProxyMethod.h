@@ -13,11 +13,17 @@ namespace SteelEngine {
 		typedef void(T::*FunctionCallback)(Args...);
 
 		FunctionCallback m_FunctionCallback;
+		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 
 		ProxyMethod(FunctionCallback func) :
 			m_FunctionCallback(func)
 		{
 
+		}
+
+		MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
 		}
 
 		void Call(T* obj, Args... args)
@@ -31,8 +37,7 @@ namespace SteelEngine {
 
 			Call(type, args...);
 
-			static Result noneRes(SE_FALSE, "NONE");
-			static Variant none(noneRes, typeid(noneRes).hash_code());
+			static Variant none;
 
 			return none;
 		}
@@ -52,11 +57,17 @@ namespace SteelEngine {
 		typedef R(T::*FunctionCallback)(Args...);
 
 		FunctionCallback m_FunctionCallback;
+		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 
 		ProxyMethod(FunctionCallback func) :
 			m_FunctionCallback(func)
 		{
 
+		}
+
+		MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
 		}
 
 		R Call(T* obj, Args... args)
@@ -87,11 +98,17 @@ namespace SteelEngine {
 		typedef void(*FunctionCallback)(Args...);
 
 		FunctionCallback m_FunctionCallback;
+		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 
 		ProxyMethod(FunctionCallback func) :
 			m_FunctionCallback(func)
 		{
 
+		}
+
+		MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
 		}
 
 		void Call(Args... args)
@@ -111,8 +128,10 @@ namespace SteelEngine {
 		{
 			Call(args...);
 
-			static Result noneRes(SE_FALSE, "NONE");
-			static Variant none(noneRes, typeid(noneRes).hash_code());
+			// static Result noneRes(SE_FALSE, "NONE");
+			// static Variant none(noneRes, typeid(noneRes).hash_code());
+
+			static Variant none;
 
 			return none;
 		}
@@ -124,11 +143,17 @@ namespace SteelEngine {
 		typedef R(*FunctionCallback)(Args...);
 
 		FunctionCallback m_FunctionCallback;
+		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 
 		ProxyMethod(FunctionCallback func) :
 			m_FunctionCallback(func)
 		{
 
+		}
+
+		MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
 		}
 
 		R Call(Args... args)

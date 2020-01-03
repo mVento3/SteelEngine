@@ -11,7 +11,7 @@ namespace SteelEngine { namespace Memory {
     }
 
     LinearAllocator::LinearAllocator(Allocator* allocator, size_t size) :
-        Allocator(size, allocator->Allocate(size, __alignof(LinearAllocator)))
+        Allocator(size, allocator->Allocate(size + sizeof(LinearAllocator), __alignof(LinearAllocator)))
     {
 
     }

@@ -20,6 +20,20 @@ namespace SteelEngine { namespace Memory {
 
     }
 
+    FixedStackAllocator::FixedStackAllocator(Allocator* allocator, size_t maxSizeInBytes, size_t elementSize, Type::uint8 alignment) :
+        Allocator(
+            maxSizeInBytes,
+            Memory::PointerMath::calculateForwardAddress(
+                (Type::uptr)PointerMath::add(allocator->Allocate(maxSizeInBytes + maxSizeInBytes, __alignof(FixedStackAllocator)), sizeof(FixedStackAllocator)),
+                alignment
+            )
+        ),
+        m_ElementSize(elementSize),
+        m_Alignment(alignment)
+    {
+
+    }
+
     FixedStackAllocator::~FixedStackAllocator()
     {
 

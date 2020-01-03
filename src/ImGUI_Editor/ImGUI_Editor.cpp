@@ -50,9 +50,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
         ImGui::SetCurrentContext(m_Context);
 
-        std::vector<IReflectionData*> types = Reflection::GetTypes();
+        IReflectionData** types = Reflection::GetTypes();
 
-        for(Type::uint32 i = 0; i < types.size(); i++)
+        for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
             IReflectionData* type = types[i];
             std::vector<IReflectionInheritance*> inhs = type->GetInheritances();
@@ -84,6 +84,8 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                 }
             }
         }
+
+        IEditor::Init(*m_VirtualProjectVisualizer, context);
 
         Event::GlobalEvent::Add<ChangeSceneEvent>(this);
 
@@ -124,6 +126,8 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
             return;
         }
+
+        Render(*m_VirtualProjectVisualizer);
 
         if(m_CurrentScene == SceneType::START_MENU_SCENE)
         {
@@ -235,9 +239,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     {
         m_CurrentScene = event.m_SceneType;
 
-        std::vector<IReflectionData*> types = Reflection::GetTypes();
+        IReflectionData** types = Reflection::GetTypes();
 
-        for(Type::uint32 i = 0; i < types.size(); i++)
+        for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
             IReflectionData* type = types[i];
 

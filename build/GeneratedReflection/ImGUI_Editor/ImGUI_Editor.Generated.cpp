@@ -30,13 +30,14 @@ void ImGUI_Editor::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 SERIALIZE(ImGUI_Editor::m_Context)
 SERIALIZE(ImGUI_Editor::m_CurrentScene)
 SERIALIZE(ImGUI_Editor::m_API_Context)
+SERIALIZE(ImGUI_Editor::m_VirtualProjectVisualizer)
 SERIALIZE(ImGUI_Editor::m_MainEditorWindows)
 SERIALIZE(ImGUI_Editor::m_StartMenuWindows)
 SERIALIZE(ImGUI_Editor::m_UIs)
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(ImGUI_Editor)
 {

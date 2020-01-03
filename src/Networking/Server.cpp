@@ -202,9 +202,9 @@ namespace SteelEngine {
         bind(m_ListeningSocket, (sockaddr*)&hint, sizeof(hint));
         listen(m_ListeningSocket, SOMAXCONN);
 
-        std::vector<IReflectionData*> types = Reflection::GetTypes();
+        IReflectionData** types = Reflection::GetTypes();
 
-        for(Type::uint32 i = 0; i < types.size(); i++)
+        for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
             IReflectionData* type = types[i];
 

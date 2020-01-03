@@ -22,6 +22,8 @@ namespace SteelEngine { namespace Memory {
 
     public:
         PoolAllocator(void* startAddress, size_t maxSize, size_t chunkSize);
+        PoolAllocator(size_t maxSize, size_t chunkSize);
+        PoolAllocator(size_t maxSize, size_t chunkSize, Allocator* allocator);
         ~PoolAllocator();
 
         void* Allocate(size_t size, Type::uint8 alignment) override;

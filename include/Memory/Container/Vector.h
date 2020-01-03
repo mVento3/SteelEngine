@@ -36,6 +36,7 @@ namespace SteelEngine { namespace Container {
             m_Allocator =
                 Memory::allocate<Memory::FixedVectorAllocator>(
                     *allocator,
+                    allocator,
                     maxElements * m_ElementSize,
                     m_ElementSize,
                     __alignof(A)
@@ -79,6 +80,13 @@ namespace SteelEngine { namespace Container {
             A* a = (A*)address;
 
             return *a;
+        }
+
+        A* AtPtr(size_t index)
+        {
+            Type::uptr address = (Type::uptr)m_Allocator->GetStart() + (m_ElementSize * index);
+
+            return (A*)address;
         }
 
         void Clear()

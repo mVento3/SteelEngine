@@ -14,6 +14,7 @@ namespace SteelEngine { namespace Memory {
     public:
         FixedStackAllocator(size_t maxSizeInBytes, size_t elementSize, Type::uint8 alignment, void* start);
         FixedStackAllocator(size_t maxSizeInBytes, size_t elementSize, Type::uint8 alignment);
+        FixedStackAllocator(Allocator* allocator, size_t maxSizeInBytes, size_t elementSize, Type::uint8 alignment);
         ~FixedStackAllocator();
 
         void* Allocate(size_t size, Type::uint8 alignment) override;

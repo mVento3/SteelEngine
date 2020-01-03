@@ -20,6 +20,8 @@ namespace SteelEngine { namespace Event {
         if(!var->IsValid())
         {
             Reflection::GetType("SteelEngine::Core")->SetMetaData(Core::GlobalSystems::GLOBAL_EVENTS, std::unordered_map<size_t, void*>());
+
+            var = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::GLOBAL_EVENTS);
         }
 
         std::unordered_map<size_t, void*>* map =
@@ -52,7 +54,7 @@ namespace SteelEngine { namespace Event {
         IReflectionData* data2 = Reflection::GetType(eventTypeID);
         GlobalEventTracker* tracker_ = (GlobalEventTracker*)tracker;
 
-        std::vector<IReflectionData*> types = Reflection::GetTypes();
+        // std::vector<IReflectionData*> types = Reflection::GetTypes();
 
         if(data && data2)
         {

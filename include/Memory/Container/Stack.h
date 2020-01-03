@@ -37,6 +37,7 @@ namespace SteelEngine { namespace Container {
             m_Allocator =
                 Memory::allocate<Memory::FixedStackAllocator>(
                     *allocator,
+                    allocator,
                     maxElements * m_ElementSize,
                     m_ElementSize,
                     __alignof(A)

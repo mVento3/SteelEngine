@@ -11,13 +11,12 @@
 
 #include "FileSystem/FileSystem.h"
 
-#include "fstream"
-
 #include "Utils/Options.h"
 
 #include "InformationTracker/InformationTracker.h"
 
 #include "stack"
+#include "fstream"
 
 enum Index
 {
@@ -35,41 +34,9 @@ std::vector<SteelEngine::Options::Descriptor> desc =
     { GAME_DEV, "gd" }
 };
 
-struct TEST
-{
-    TEST()
-    {
-
-    }
-
-    uint32_t a1;
-    uint64_t a2;
-};
-
-void testMemory()
-{
-    // unsigned char* hex = (unsigned char*)rootMemory;
-
-    // for(size_t i = 0; i < newSize;)
-    // {
-    //     printf("%x: ", hex);
-
-    //     for(size_t j = 0; j < 16; j++, i++)
-    //     {
-    //         printf("%02x ", hex[j]);
-
-    //         hex++;
-    //     }
-
-    //     printf("\n");
-    // }
-}
-
 int main(int argc, char* argv[])
 {
     SteelEngine::Options parser(argv, argc, desc);
-
-    // testMemory();
 
     SteelEngine::Reflection::Init();
 

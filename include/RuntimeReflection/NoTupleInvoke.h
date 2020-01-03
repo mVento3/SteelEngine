@@ -27,9 +27,9 @@ namespace SteelEngine {
 				db = (RuntimeDatabase*)get();
 			}
 
-			for (Type::uint32 i = 0; i < db->m_Types->size(); i++)
+			for (Type::uint32 i = 0; i < db->m_TypesSize; i++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types->at(i);
+				IReflectionData* type = (IReflectionData*)db->m_Types[i];
 
 				if (type->m_TypeID == m_TypeID)
 				{

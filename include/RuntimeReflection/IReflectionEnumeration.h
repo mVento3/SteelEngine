@@ -8,12 +8,18 @@ namespace SteelEngine {
 	{
 		std::string m_Name;
 		int m_Value;
+		MetaDataInfoVector m_MetaData;
 
 		ReflectionValue(const std::string& name, int value) :
 			m_Name(name),
 			m_Value(value)
 		{
 
+		}
+
+		MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
 		}
 
 		template <typename... Args>
@@ -31,6 +37,12 @@ namespace SteelEngine {
 
 		ValuesVector m_Values;
 		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
+		MetaDataInfoVector m_MetaData;
+
+		MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
+		}
 
 		int GetEnumValue(const std::string& name)
 		{

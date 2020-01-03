@@ -16,7 +16,7 @@ namespace SteelEngine {
 
     void WindowInheritance::ProcessInheritance(const std::vector<IReflectionInheritance*>& data, IReflectionData* type, HotReloader::IRuntimeObject* object)
     {
-        IReflectionData* type_ = Reflection::GetType("SteelEngine::Utils::Window");
+        // IReflectionData* type_ = Reflection::GetType("SteelEngine::Utils::Window");
 
         // for(Type::uint32 i = 0; i < data.size(); i++)
         // {

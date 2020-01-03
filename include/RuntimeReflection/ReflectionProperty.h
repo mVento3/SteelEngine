@@ -10,12 +10,18 @@ namespace SteelEngine {
 		A B::* m_Value;
 		size_t m_TypeID;
 		Variant m_Info;
+		MetaDataInfoVector m_MetaData;
 
 		ReflectionProperty(A B::* value, size_t typeID) :
 			m_Value(value),
 			m_TypeID(typeID)
 		{
 			Recheck<A>(m_Info);
+		}
+
+		MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
 		}
 
 		Variant GetInfo() override

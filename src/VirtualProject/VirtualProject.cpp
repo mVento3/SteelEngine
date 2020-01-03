@@ -15,6 +15,8 @@
 
 #include "FileSystem/FileSystem.h"
 
+#include "Profiler/ScopeTimer.h"
+
 namespace SteelEngine {
 
     void VirtualProject::ProcessFile(const std::filesystem::path& toRemove, const std::filesystem::path& filePath)
@@ -333,6 +335,8 @@ namespace SteelEngine {
             SE_ERROR("Something wrong with runtime compiler!");
         }
 
+        m_Visualizer = (IVirtualProjectVisualizer**)&Reflection::CreateInstance("SteelEngine::VirtualProjectVisualizer", (VirtualProject**)&m_Object)->m_Object;
+
         Event::GlobalEvent::Add_<LoadProjectEvent>(this);
         Event::GlobalEvent::Add_<CreateNewProjectEvent>(this);
         Event::GlobalEvent::Add<RecompiledEvent>(this);
@@ -381,7 +385,11 @@ namespace SteelEngine {
 
     void VirtualProject::LoadProject(const std::vector<std::string>& additionalFilesToCompile)
     {
+        SE_PROFILE_FUNC;
+
         m_ProjectName = m_LoadedProject.filename().string();
+
+        SE_INFO("Loading %s project!", m_ProjectName.c_str());
 
         if(Reflection::GetType("SteelEngine::Core")->GetMetaData(ReflectionAttribute::ENGINE_START_TYPE)->Convert<Core::EnginePathVariant>() == Core::EnginePathVariant::GAME_DEV)
         {
@@ -547,10 +555,12 @@ namespace SteelEngine {
 
     void VirtualProject::operator()(const LoadedProjectEvent& event)
     {
-        std::vector<IReflectionData*> types = Reflection::GetTypes();
+        IReflectionData** types = Reflection::GetTypes();
 
-        for(IReflectionData* data : types)
+        for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
+            IReflectionData* data = types[i];
+
             if(data->GetMetaData(ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
             {
                 m_ProjectScripts.push_back(&data->Create()->m_Object);
@@ -568,6 +578,8 @@ namespace SteelEngine {
         // Here might be some changes, so we need to compile them
         std::vector<std::string> toCompile = UpdateState(m_LoadedProject / "build/state.json", m_LoadedProject);
         LoadProject(toCompile);
+
+        (*m_Visualizer)->OnProjectLoad();
     }
 
     void VirtualProject::operator()(GetLoadedProjectPathEvent* event)
@@ -587,10 +599,12 @@ namespace SteelEngine {
 
     void VirtualProject::operator()(const RecompiledEvent& event)
     {
-        std::vector<IReflectionData*> types = Reflection::GetTypes();
+        IReflectionData** types = Reflection::GetTypes();
 
-        for(IReflectionData* data : types)
+        for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
+            IReflectionData* data = types[i];
+
             if(data->GetMetaData(ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
             {
                 m_ProjectScripts.push_back(&data->Create()->m_Object);

@@ -28,9 +28,9 @@ result->m_CreateObjectCallback = [=](size_t objectID, size_t constructorID)
 
 #define FIND_THE_RIGHT_OBJECT \
 SteelEngine::ConstrucedObject* obj = 0; \
-for(SteelEngine::Type::uint32 i = 0; i < typeInfo->size(); i++) \
+for(SteelEngine::Type::uint32 i = 0; i < typeInfo->Size(); i++) \
 { \
-	SteelEngine::ConstrucedObject* obj_ = typeInfo->at(i); \
+	SteelEngine::ConstrucedObject* obj_ = typeInfo->AtPtr(i); \
  \
 	if(obj_->m_ObjectID == objectID && obj_->m_ConstructorID == constructorID) \
 	{ \

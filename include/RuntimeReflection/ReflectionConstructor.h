@@ -16,11 +16,17 @@ namespace SteelEngine {
 		typedef void*(*Func)(Args...);
 
 		Func m_Function;
+		MetaDataInfoVector m_MetaData;
 
 		ReflectionConstructor(Func func) :
 			m_Function(func)
 		{
 
+		}
+
+		MetaDataInfoVector* GetMetaDataInfoVector() override
+		{
+			return &m_MetaData;
 		}
 
 		HotReloader::IRuntimeObject* Invoke(ITuple* args) override
@@ -29,9 +35,9 @@ namespace SteelEngine {
 
 			Tuple<Args...>* tuple = 0;
 
-			if (args->m_Tuple)
+			if(args->GetTuple())
 			{
-				tuple = (Tuple<Args...>*)args->m_Tuple;
+				tuple = (Tuple<Args...>*)args->GetTuple();
 			}
 			else
 			{
@@ -42,7 +48,7 @@ namespace SteelEngine {
 
 			object->m_Object = object;
 			object->m_ConstructorID = m_ConstructorID;
-			object->m_ObjectID = db->m_LastPerObjectID++;
+			object->m_ObjectID = db->GetNextPerObjectID();
 			object->m_TypeID = m_TypeID;
 
 			return object;

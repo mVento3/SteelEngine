@@ -36,14 +36,16 @@ namespace SteelEngine {
     private:
         MemoryEditor m_MemoryEditor;
 
-        void* m_RootMemory;
-        size_t m_RootMemorySize;
-        Memory::Allocator* m_RootPoolAllocator;
-        size_t m_RootChunkSize;
+        static RuntimeDatabase* m_DB;
 
-        Container::Stack<Memory::Allocator*>* m_AllocatorsHierarchy;
-        Container::Queue<int>* m_QueueTest;
-        Container::Vector<int>* m_Vector;
+        // void* m_RootMemory;
+        // size_t m_RootMemorySize;
+        // Memory::Allocator* m_RootPoolAllocator;
+        // size_t m_RootChunkSize;
+
+        // Container::Stack<Memory::Allocator*>* m_AllocatorsHierarchy;
+        // Container::Queue<int>* m_QueueTest;
+        // Container::Vector<int>* m_Vector;
 
     public:
         MemoryViewWindow();

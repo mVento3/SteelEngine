@@ -14,6 +14,9 @@
 
 #include "RuntimeReflection/ReflectionGenerator.h"
 
+#include "Profiler/ScopeTimer.h"
+#include "Profiler/Manager.h"
+
 namespace SteelEngine {
 
     void Core::Loop()
@@ -38,6 +41,12 @@ namespace SteelEngine {
 
     Result Core::Init()
     {
+        SE_PROFILE_FUNC;
+        // TODO: Delete this!!
+        Profiler::Manager a;
+
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::PROFILER, &Reflection::CreateInstance("SteelEngine::Profiler::Manager")->m_Object);
+
         std::string logPath = FileSystem::Get("se_init_log").string();
 
         m_Logger = (ILogger*)Reflection::CreateInstance("SteelEngine::Logger", logPath.c_str());
@@ -52,6 +61,10 @@ namespace SteelEngine {
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::LOGGER, &m_Logger->m_Object);
 
         SE_INFO("Initializing core!");
+
+        SE_WARNING("TEST!");
+        SE_ERROR("TEST!");
+        SE_FATAL("TEST!");
 
         std::ifstream configFile(getBinaryLocation() / "config.json");
 
@@ -210,6 +223,8 @@ namespace SteelEngine {
 
             SE_INFO("Editor API context initialization success!");
 
+            (*m_Editor)->SetVirtualProjectVisualizer((*m_VirtualProject)->GetVisualizer());
+
             if((*m_Editor)->Init(*m_Renderer, m_ImGUI_ContextAPI) == SE_FALSE)
             {
                 SE_FATAL("Editor initialization failed!");
@@ -226,7 +241,7 @@ namespace SteelEngine {
         {
             SE_FATAL("Problem with editor API context!");
         }
-        
+
     // ---------------------------------------------------------------------
 
         SE_INFO("Core initialized successful!");

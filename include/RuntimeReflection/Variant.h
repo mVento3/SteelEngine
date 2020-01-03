@@ -23,6 +23,8 @@ namespace SteelEngine {
 		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
 		ValuePointer* m_ValuePointer;
 		size_t m_VariantID = RuntimeDatabase::s_InvalidID;
+		bool m_AutoDelete;
+		bool m_ToDelete;
 
 		static RuntimeDatabase* ms_Database;
 
@@ -61,8 +63,15 @@ namespace SteelEngine {
 
 		Variant()
 		{
+			if(!ms_Database)
+			{
+				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			}
+
 			m_TypeID = RuntimeDatabase::s_InvalidID;
 			m_ValuePointer = 0;
+			m_AutoDelete = false;
+			m_ToDelete = false;
 
 			m_IsPointer			= false;
 			m_IsArray			= false;
@@ -77,19 +86,21 @@ namespace SteelEngine {
 			m_IsReference		= false;
 			m_IsEmpty			= false;
 
-			if(!ms_Database)
-			{
-				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
-			}
-
-			m_VariantID = ms_Database->m_LastPerVariantID++;
+			m_VariantID = ms_Database->GetNextPerVariantID();
 		}
 
 		template <typename T>
 		Variant(T& value, size_t typeID) :
 			m_TypeID(typeID)
 		{
-			m_ValuePointer = (ValuePointer*)(new T(value));
+			if(!ms_Database)
+			{
+				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			}
+
+			m_ValuePointer = (ValuePointer*)/*(new T(value))*/Memory::allocate<T>(*ms_Database->m_VariantsAllocator, value);
+			m_AutoDelete = true;
+			m_ToDelete = true;
 
 			m_IsPointer			= std::is_pointer<T>::value;
 			m_IsArray			= std::is_array<T>::value;
@@ -104,19 +115,20 @@ namespace SteelEngine {
 			m_IsReference		= std::is_reference<T>::value;
 			m_IsEmpty			= std::is_empty<T>::value;
 
-			if(!ms_Database)
-			{
-				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
-			}
-
-			m_VariantID = ms_Database->m_LastPerVariantID++;
+			m_VariantID = ms_Database->GetNextPerVariantID();
 		}
 
 		template <typename T>
 		Variant(T* value)
 		{
+			if(!ms_Database)
+			{
+				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			}
+
 			m_TypeID = typeid(T).hash_code();
 			m_ValuePointer = (ValuePointer*)value;
+			m_AutoDelete = true;
 
 			m_IsPointer			= std::is_pointer<T>::value;
 			m_IsArray			= std::is_array<T>::value;
@@ -131,17 +143,15 @@ namespace SteelEngine {
 			m_IsReference		= std::is_reference<T>::value;
 			m_IsEmpty			= std::is_empty<T>::value;
 
-			if(!ms_Database)
-			{
-				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
-			}
-
-			m_VariantID = ms_Database->m_LastPerVariantID++;
+			m_VariantID = ms_Database->GetNextPerVariantID();
 		}
 
 		~Variant()
 		{
-			
+			if(m_AutoDelete)
+			{
+				Clear();
+			}
 		}
 
 		void Change(const Variant& value)
@@ -185,7 +195,9 @@ namespace SteelEngine {
 				return *(Type*)&wrong;
 			}
 
-			return *(Type*)m_ValuePointer;
+			Type* res = (Type*)m_ValuePointer;
+
+			return *res;
 		}
 
 		template <typename T>
@@ -193,8 +205,9 @@ namespace SteelEngine {
 		{
 			ValuePointer* old = m_ValuePointer;
 
-			m_ValuePointer = (ValuePointer*)(new T(value));
+			m_ValuePointer = (ValuePointer*)/*(new T(value))*/Memory::allocate<T>(*ms_Database->m_VariantsAllocator, value);
 			m_TypeID = typeid(T).hash_code();
+			m_ToDelete = true;
 
 			return old;
 		}
@@ -220,8 +233,16 @@ namespace SteelEngine {
 
 		inline void Clear()
 		{
-			delete m_ValuePointer;
-			m_ValuePointer = 0;
+			m_TypeID = RuntimeDatabase::s_InvalidID;
+
+			if(m_ValuePointer && m_ToDelete)
+			{
+				// delete m_ValuePointer;
+				Memory::deallocate(*ms_Database->m_VariantsAllocator, m_ValuePointer);
+				m_ValuePointer = 0;
+			}
+
+			ms_Database->PushPerVariantID(m_VariantID);
 		}
 
 		inline size_t GetType()

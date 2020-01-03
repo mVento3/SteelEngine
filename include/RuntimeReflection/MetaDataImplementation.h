@@ -8,30 +8,51 @@ namespace SteelEngine {
 
 	struct MetaDataImplementation
 	{
+		friend struct IReflectionData;
+
 		typedef std::vector<MetaDataInfo> MetaDataInfoVector;
+		// typedef Container::Vector<MetaDataInfo> MetaDataInfoVector;
 	private:
 		template <typename KeyType>
-		Variant* IfNotExists(KeyType key)
+		Variant* IfNotExists(MetaDataInfoVector* vec, KeyType key)
 		{
-			Result wrong(SE_FALSE, "Wrong");
+			static Variant none;
 
-			MetaDataInfo meta = MetaDataInfo(key, wrong);
+			return &none;
 
-			meta.Setup(m_MetaDatas);
+			// Result wrong(SE_FALSE, "Wrong");
 
-			meta.m_Value->m_TypeID = RuntimeDatabase::s_InvalidID;
+			// MetaDataInfo meta = MetaDataInfo(key, wrong);
+			// size_t found = meta.Setup(vec);
 
-			return meta.m_Value;
+			// if(found != RuntimeDatabase::s_InvalidID)
+			// {
+			// 	MetaDataInfo* info = &vec->at(found);
+				
+			// 	info->m_Value->m_TypeID = RuntimeDatabase::s_InvalidID;
+
+			// 	return info->m_Value;
+			// }
+			// else
+			// {
+			// 	meta.m_Value->m_TypeID = RuntimeDatabase::s_InvalidID;
+
+			// 	return meta.m_Value;
+			// }
 		}
 
+	protected:
+		virtual MetaDataInfoVector* GetMetaDataInfoVector() = 0;
+
 	public:
-		MetaDataInfoVector m_MetaDatas;
+		// MetaDataInfoVector m_MetaData;
 
 		Variant* GetMetaData(const char* key)
 		{
 			size_t charPtrType = typeid(const char*).hash_code();
+			MetaDataInfoVector* vec = GetMetaDataInfoVector();
 
-			for(MetaDataInfoVector::iterator it = m_MetaDatas.begin(); it != m_MetaDatas.end(); ++it)
+			for(MetaDataInfoVector::iterator it = vec->begin(); it != vec->end(); ++it)
 			{
 				if(it->m_Key->GetType() == charPtrType)
 				{
@@ -44,13 +65,15 @@ namespace SteelEngine {
 				}
 			}
 
-			return IfNotExists(key);
+			return IfNotExists(vec, key);
 		}
 
 		template <typename KeyType>
 		Variant* GetMetaData(const KeyType& key)
 		{
-			for(MetaDataInfoVector::iterator it = m_MetaDatas.begin(); it != m_MetaDatas.end(); ++it)
+			MetaDataInfoVector* vec = GetMetaDataInfoVector();
+
+			for(MetaDataInfoVector::iterator it = vec->begin(); it != vec->end(); ++it)
 			{
 				if(it->m_Key->Compare(typeid(KeyType).hash_code()) &&
 					it->m_Key->Convert<KeyType>() == key)
@@ -59,7 +82,7 @@ namespace SteelEngine {
 				}
 			}
 
-			return IfNotExists(key);
+			return IfNotExists(vec, key);
 		}
 
 		template <typename KeyType, typename ValueType>
@@ -67,7 +90,7 @@ namespace SteelEngine {
 		{
 			MetaDataInfo meta(key, value);
 
-			meta.Setup(m_MetaDatas);
+			meta.Setup(GetMetaDataInfoVector());
 		}
 	};
 }

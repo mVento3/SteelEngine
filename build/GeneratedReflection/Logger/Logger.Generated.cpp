@@ -16,7 +16,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Logger))
 .Inheritance<ILogger>("ILogger")
 .Constructor<const char*>()
 .Method("Init", &Logger::Init)
-.Method<void, const std::string&, int, Type::uint32, const std::string&, va_list>("Log", &Logger::Log)
+.Method<void, const std::string&, int, Type::uint32, const std::filesystem::path&, va_list>("Log", &Logger::Log)
 .Method<void, const std::string&, int, va_list>("Log", &Logger::Log)
 ;
 }
@@ -26,7 +26,7 @@ void Logger::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(Logger)
 {

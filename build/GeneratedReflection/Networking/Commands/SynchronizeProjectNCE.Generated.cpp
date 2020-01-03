@@ -35,11 +35,10 @@ SERIALIZE(SynchronizeProjectNCE::m_ShouldOverrideEventData)
 SERIALIZE(SynchronizeProjectNCE::m_DrawShouldOverridePopup)
 SERIALIZE(SynchronizeProjectNCE::m_Buffer)
 SERIALIZE(SynchronizeProjectNCE::m_BufferSize)
-UserInterface::Serialize(serializer);
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(SynchronizeProjectNCE)
 {

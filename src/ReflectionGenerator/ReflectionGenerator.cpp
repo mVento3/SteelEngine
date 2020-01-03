@@ -16,6 +16,8 @@
 
 #include "InformationTracker/InformationTracker.h"
 
+#include "Memory/Container/Vector.h"
+
 enum Index
 {
     INCLUDE_FILE,
@@ -59,10 +61,9 @@ int main(int argc, char* argv[])
     SteelEngine::IReflectionGenerator* rg = new SteelEngine::ReflectionGenerator();
 
     std::vector<SteelEngine::HotReloader::IRuntimeObject*> modules;
-    std::vector<SteelEngine::IReflectionData*> types =
-        SteelEngine::Reflection::GetTypes();
+    SteelEngine::IReflectionData** types = SteelEngine::Reflection::GetTypes();
 
-    for(SteelEngine::Type::uint32 i = 0; i < types.size(); i++)
+    for(SteelEngine::Type::uint32 i = 0; i < SteelEngine::Reflection::GetTypesSize(); i++)
     {
         SteelEngine::IReflectionData* type = types[i];
 

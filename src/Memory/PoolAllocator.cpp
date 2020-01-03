@@ -11,6 +11,20 @@ namespace SteelEngine { namespace Memory {
         Reset();
     }
 
+    PoolAllocator::PoolAllocator(size_t maxSize, size_t chunkSize) :
+        Allocator(maxSize, PointerMath::add(this, sizeof(PoolAllocator))),
+        m_ChunkSize(chunkSize)
+    {
+        Reset();
+    }
+
+    PoolAllocator::PoolAllocator(size_t maxSize, size_t chunkSize, Allocator* allocator) :
+        Allocator(maxSize, PointerMath::add(allocator->Allocate(maxSize + sizeof(PoolAllocator), __alignof(PoolAllocator)), sizeof(PoolAllocator))),
+        m_ChunkSize(chunkSize)
+    {
+        Reset();
+    }
+
     PoolAllocator::~PoolAllocator()
     {
 

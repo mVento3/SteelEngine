@@ -11,7 +11,7 @@ namespace SteelEngine { namespace Memory {
     }
 
     StackAllocator::StackAllocator(Allocator* allocator, size_t size) :
-        Allocator(size, allocator->Allocate(size, __alignof(StackAllocator))),
+        Allocator(size, allocator->Allocate(size + sizeof(StackAllocator), __alignof(StackAllocator))),
         m_Allocator(allocator)
     {
 

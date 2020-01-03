@@ -23,6 +23,21 @@ namespace SteelEngine { namespace Memory {
         m_FrontPosition = ULLONG_MAX;
     }
 
+    FixedQueueAllocator::FixedQueueAllocator(Allocator* allocator, size_t maxSizeInBytes, size_t elementSize, Type::uint8 alignment) :
+        Allocator(
+            maxSizeInBytes,
+            Memory::PointerMath::calculateForwardAddress(
+                (Type::uptr)PointerMath::add(allocator->Allocate(maxSizeInBytes + sizeof(FixedQueueAllocator), __alignof(FixedQueueAllocator)), sizeof(FixedQueueAllocator)),
+                alignment
+            )
+        ),
+        m_ElementSize(elementSize),
+        m_Alignment(alignment)
+    {
+        m_RearPosition = ULLONG_MAX;
+        m_FrontPosition = ULLONG_MAX;
+    }
+
     FixedQueueAllocator::~FixedQueueAllocator()
     {
 

@@ -7,7 +7,8 @@
 		],
 		"definitions": [
 			"SE_WINDOWS",
-			"_WINSOCKAPI_"
+			"_WINSOCKAPI_",
+			"SE_PROFILE"
 		],
 		"dll": [
 			"/MT",
@@ -73,6 +74,10 @@
 		},
 		{
 			"name": "RuntimeReflection",
+			"type": "lib"
+		},
+		{
+			"name": "Profiler",
 			"type": "lib"
 		},
 		{

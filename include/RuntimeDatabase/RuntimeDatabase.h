@@ -7,10 +7,27 @@
 #include "unordered_map"
 #include "map"
 
+#include "Memory/Allocator.h"
+#include "Memory/LinearAllocator.h"
+#include "Memory/PoolAllocator.h"
+
+#include "Memory/Container/Vector.h"
+#include "Memory/Container/Stack.h"
+
+#include "stack"
+
 #ifdef SE_WINDOWS
 #undef max
 #undef min
 #endif
+
+#define SE_MAX_TYPES 100
+#define SE_MAX_TYPE_SIZE 512
+
+#define SE_MAX_OBJECTS 512
+
+#define SE_MAX_VARIANTS 1000
+#define SE_MAX_VARIANT_SIZE 512
 
 namespace SteelEngine {
 
@@ -24,14 +41,12 @@ namespace SteelEngine {
 
 	struct ITuple
 	{
-		ITuple* m_Tuple;
+		virtual ITuple* GetTuple() = 0;
 	};
 
 	template <typename... Args>
 	struct Tuple : public ITuple
 	{
-		std::tuple<Args...> m_Args;
-
 		Tuple(std::tuple<Args...> args) :
 			m_Args(args)
 		{
@@ -47,10 +62,21 @@ namespace SteelEngine {
 		{
 
 		}
+
+		std::tuple<Args...> m_Args;
+
+		ITuple* GetTuple()
+		{
+			return 0;
+		}
 	};
 
 	struct Tuple2 : public ITuple
 	{
+	private:
+		ITuple* m_Tuple;
+
+	public:
 		template <typename... Args>
 		Tuple2(Args... args)
 		{
@@ -60,6 +86,11 @@ namespace SteelEngine {
 		~Tuple2()
 		{
 
+		}
+
+		ITuple* GetTuple() override
+		{
+			return m_Tuple;
 		}
 	};
 
@@ -87,32 +118,35 @@ namespace SteelEngine {
 	{
   	public:
 		typedef void*(*GetStateCallback)();
-		typedef std::vector<IReflectionData*> TypesVector;
-		typedef std::vector<ConstrucedObject*> ConstructedObjectsVector;
+		typedef Container::Vector<ConstrucedObject> ConstructedObjectsVector;
 
 		static const size_t s_InvalidID = std::numeric_limits<size_t>::max();
     
   	private:
 
   	public:
-  		RuntimeDatabase()
-		{
-			m_Types = new TypesVector();
-			m_Objects = new ConstructedObjectsVector();
-			m_LastPerObjectID = 0;
-			m_LastPerVariantID = 0;
-		}
+  		RuntimeDatabase();
+		~RuntimeDatabase();
 
-		~RuntimeDatabase()
-		{
+		void* m_RootMemory;
+		size_t m_RootMemorySize;
+		Memory::Allocator* m_RootMemoryAllocator;
 
-		}
+		Container::Stack<size_t>* m_AvailablePerVariantIDs;
+		Container::Stack<size_t>* m_AvailablePerObjectIDs;
 
-		TypesVector* m_Types; // Only for reflection
-		ConstructedObjectsVector* m_Objects; // Created and running objects
+		Memory::Allocator* m_TypesAllocator;
+		IReflectionData** m_Types;
+		size_t m_TypesSize;
 
-		size_t m_LastPerObjectID;
-		size_t m_LastPerVariantID;
+		Memory::Allocator* m_VariantsAllocator;
+
+		Container::Vector<ConstrucedObject>* m_Objects;
+
+		size_t GetNextPerVariantID() override;
+		void PushPerVariantID(size_t id) override;
+		size_t GetNextPerObjectID() override;
+		void PushPerObjectID(size_t id) override;
   };
 
 }

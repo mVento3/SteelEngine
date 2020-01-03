@@ -11,6 +11,8 @@
 
 #include "Core/Result.h"
 
+#include "VirtualProject/IVirtualProjectVisualizer.h"
+
 namespace SteelEngine {
 
     struct IVirtualProject : public HotReloader::IRuntimeObject
@@ -22,6 +24,8 @@ namespace SteelEngine {
 
         virtual void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) { }
         virtual Result IsProjectLoaded() { return SE_NOT_IMPLEMENTED; }
+
+        virtual IVirtualProjectVisualizer** GetVisualizer() { return 0; }
     };
 
 }

@@ -31,13 +31,14 @@ SERIALIZE(VirtualProject::m_ReflectionGenerator)
 SERIALIZE(VirtualProject::m_Process)
 SERIALIZE(VirtualProject::m_Compiler)
 SERIALIZE(VirtualProject::m_ProjectDLL)
+SERIALIZE(VirtualProject::m_Visualizer)
 SERIALIZE(VirtualProject::m_ProjectConfig)
 SERIALIZE(VirtualProject::m_CompileConfig)
 SERIALIZE(VirtualProject::m_ProjectScripts)
 }
 
 #ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
 DECLARE_TYPE_INFO(VirtualProject)
 {

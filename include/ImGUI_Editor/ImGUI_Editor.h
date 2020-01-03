@@ -17,6 +17,8 @@
 
 #include "EditorComponents/ImGUI/UserInterface.h"
 
+#include "VirtualProject/IVirtualProjectVisualizer.h"
+
 #include "ImGUI_Editor/ImGUI_Editor.Generated.h"
 
 namespace SteelEngine { namespace Editor { namespace ImGUI {
@@ -37,6 +39,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         ImGuiContext* m_Context;
         SceneType m_CurrentScene;
         IContext* m_API_Context;
+        IVirtualProjectVisualizer** m_VirtualProjectVisualizer;
 
         std::vector<EditorComponents::ImGUI::UserInterface**> m_MainEditorWindows;
         std::vector<EditorComponents::ImGUI::UserInterface**> m_StartMenuWindows;
@@ -54,6 +57,11 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         void ProcessEvents(void* event) override;
 
         void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
+
+        inline void SetVirtualProjectVisualizer(IVirtualProjectVisualizer** visualizer) override
+        {
+            m_VirtualProjectVisualizer = visualizer;
+        }
 
         void operator()(const ChangeSceneEvent& event);
     };

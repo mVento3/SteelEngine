@@ -1287,7 +1287,7 @@ namespace SteelEngine {
 			if (data->m_Constructors.size() > 0)
 			{
 				sourceFile << "#ifdef RUNTIME_COMPILE\n";
-				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(RuntimeDatabase::ConstructedObjectsVector* typeInfo)\n";
+				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)\n";
 				sourceFile << "{\n";
 				{
 					sourceFile << "DECLARE_TYPE_INFO(" << data->m_ClassName << ")\n";
