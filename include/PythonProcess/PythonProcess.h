@@ -31,15 +31,19 @@ namespace SteelEngine {
         bool m_Stop;
         bool m_Error;
 
+        std::string m_ErrorMessage;
+
         PROCESS_INFORMATION m_CmdProcessInfo;
 
         void WriteInput(const std::string& input) override;
         bool Setup() override;
         void Release() override;
+        void Reset() override;
 
         const bool IsCompileComplete() override { return m_IsCompileComplete; }
         const bool WasError() override { return m_Error; }
         void SetError(bool error) { m_Error = error; }
+        const std::string& GetErrorMessage() const override { return m_ErrorMessage; }
     };
 
 }

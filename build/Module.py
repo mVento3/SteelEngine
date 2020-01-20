@@ -127,6 +127,10 @@ class Module:
                 whole_compile = True
                 self.process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + self.cwd + '/build/GeneratedReflection/' + src)
                 self.process.Wait()
+
+                if self.process.WasError():
+                    print("Error while compiling:", self.process.GetErrorMessage())
+
                 self.process.WriteInput('cd ' + self.cwd + '/' + self.working_directory)
                 self.process.Wait()
 
@@ -185,6 +189,10 @@ class Module:
                 whole_compile = True
                 self.process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + self.cwd + '/' + src)
                 self.process.Wait()
+
+                if self.process.WasError():
+                    print("Error while compiling:", self.process.GetErrorMessage())
+
                 self.process.WriteInput('cd ' + self.cwd + '/' + self.working_directory)
                 self.process.Wait()
 
@@ -203,6 +211,10 @@ class Module:
                 lib_updated = True
                 self.process.WriteInput('lib ' + obj_files + '/OUT:' + self.cwd + '/bin/' + self.name + '.lib')
                 self.process.Wait()
+
+                if self.process.WasError():
+                    print("Error while compiling:", self.process.GetErrorMessage())
+
             elif self.type == 'dll':
                 for key in self.compile_config['dll']:
                     flags += key + ' '
@@ -215,6 +227,9 @@ class Module:
                     obj_files + '/link ' + ' ' + libs
                 )
                 self.process.Wait()
+
+                if self.process.WasError():
+                    print("Error while compiling:", self.process.GetErrorMessage())
             elif self.type == 'exe':
                 self.process.WriteInput('cl ' +
                     flags + ' ' +
@@ -224,5 +239,8 @@ class Module:
                     obj_files + ' /link ' + ' ' + libs
                 )
                 self.process.Wait()
+
+                if self.process.WasError():
+                    print("Error while compiling:", self.process.GetErrorMessage())
 
         return lib_updated

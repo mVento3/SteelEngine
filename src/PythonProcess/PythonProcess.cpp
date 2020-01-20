@@ -15,7 +15,6 @@ extern "C"
     DLL void PythonProcess_delete(SteelEngine::IPythonProcess* obj)
     {
         obj->Release();
-        // Sleep(10);
 
         delete obj;
     }
@@ -43,6 +42,16 @@ extern "C"
         {
 
         }
+    }
+
+    DLL bool PythonProcess_WasError(SteelEngine::PythonProcess* obj)
+    {
+        return obj->WasError();
+    }
+
+    DLL const char* PythonProcess_GetErrorMessage(SteelEngine::PythonProcess* obj)
+    {
+        return obj->GetErrorMessage().c_str();
     }
 }
 
@@ -85,7 +94,6 @@ namespace SteelEngine {
                 {
                     //we've found the completion token, which means we quit
                     buffer = buffer.substr(0, found);
-                    //if (pImpl->m_pLogger) pImpl->m_pLogger->LogInfo("[RuntimeCompiler] Complete\n");
                     pImpl->m_IsCompileComplete = true;
                 }
 
@@ -96,17 +104,10 @@ namespace SteelEngine {
                         buffer[buffer.size() - 1] = '\0';
                     }
 
-                    size_t errorFound = buffer.find("error");
-                    size_t fatalErrorFound = buffer.find("fatal error");
-
-                    if((errorFound != std::string::npos) || (fatalErrorFound != std::string::npos))
+                    if((buffer.find("error") != std::string::npos) || (buffer.find("fatal error") != std::string::npos))
                     {
-                        printf("Runtime Compiler: %s\n", buffer.c_str());
+                        pImpl->m_ErrorMessage = buffer;
                         pImpl->m_Error = true;
-                    }
-                    else
-                    {
-                        // printf("Runtime Compiler: %s\n", buffer.c_str());
                     }
                 }
             }
@@ -137,11 +138,6 @@ namespace SteelEngine {
             &nBytesWritten,
             NULL
         );
-
-        if(input.find("cd") == std::string::npos)
-        {
-            printf("Compiler: %s\n", input.c_str());
-        }
     }
 
     bool PythonProcess::Setup()
@@ -178,7 +174,7 @@ namespace SteelEngine {
         // Create a duplicate of the output write handle for the std error
         // write handle. This is necessary in case the child application
         // closes one of its std output handles.
-        if (!DuplicateHandle(
+        if(!DuplicateHandle(
             GetCurrentProcess(),
             hOutputWrite,
             GetCurrentProcess(),
@@ -226,7 +222,7 @@ namespace SteelEngine {
         // are created.
         if(si.hStdOutput)
         {
-            if (!DuplicateHandle(
+            if(!DuplicateHandle(
                 GetCurrentProcess(),
                 hInputWriteTmp,
                 GetCurrentProcess(),
@@ -270,6 +266,13 @@ namespace SteelEngine {
     void PythonProcess::Release()
     {
         m_Stop = true;
+    }
+
+    void PythonProcess::Reset()
+    {
+        m_Stop = false;
+        m_Error = false;
+        m_IsCompileComplete = true;
     }
 
 }
