@@ -6,7 +6,7 @@
 
 #include "Core/ReflectionAttributes.h"
 
-#include "Input/Events/KeyDownEvent.Generated.h"
+#include "Window/Events/WindowRestoredEvent.Generated.h"
 
 namespace SteelEngine {
 
@@ -14,17 +14,9 @@ namespace SteelEngine {
         SteelEngine::ReflectionAttribute::NAIVE_EVENT,
         SteelEngine::ReflectionAttribute::NO_SERIALIZE
     )
-    struct KeyDownEvent : public Event::Naive
+    struct WindowRestoredEvent : public Event::Naive
     {
         GENERATED_BODY
-
-        KeyDownEvent(int keyCode) :
-            KeyDownEvent()
-        {
-            m_KeyCode = keyCode;
-        }
-
-        int m_KeyCode;
     };
 
 }

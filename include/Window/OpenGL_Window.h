@@ -10,7 +10,16 @@
 #include "SDL_opengl.h"
 
 #include "Event/GlobalEvent.h"
+#include "Event/IEventManager.h"
 
+#include "Window/Events/WindowResizedEvent.h"
+#include "Window/Events/WindowMinimizedEvent.h"
+#include "Window/Events/WindowMaximizedEvent.h"
+#include "Window/Events/WindowRestoredEvent.h"
+
+#include "Input/Events/KeyDownEvent.h"
+#include "Input/Events/KeyUpEvent.h"
+#include "Input/Events/MouseMotionEvent.h"
 #include "Input/Events/ChangeMousePositionEvent.h"
 
 namespace SteelEngine {
@@ -28,6 +37,8 @@ namespace SteelEngine {
         SDL_Window* m_Window;
         SDL_Event m_Event;
         SDL_GLContext m_Context;
+
+        IEventManager** m_EventManager;
 
     public:
         OpenGL_Window();

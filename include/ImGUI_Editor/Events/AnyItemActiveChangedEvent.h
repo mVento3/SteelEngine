@@ -6,7 +6,7 @@
 
 #include "Core/ReflectionAttributes.h"
 
-#include "Input/Events/KeyDownEvent.Generated.h"
+#include "ImGUI_Editor/Events/AnyItemActiveChangedEvent.Generated.h"
 
 namespace SteelEngine {
 
@@ -14,17 +14,17 @@ namespace SteelEngine {
         SteelEngine::ReflectionAttribute::NAIVE_EVENT,
         SteelEngine::ReflectionAttribute::NO_SERIALIZE
     )
-    struct KeyDownEvent : public Event::Naive
+    struct AnyItemActiveChangedEvent : public Event::Naive
     {
         GENERATED_BODY
 
-        KeyDownEvent(int keyCode) :
-            KeyDownEvent()
+        AnyItemActiveChangedEvent(bool state) :
+            AnyItemActiveChangedEvent()
         {
-            m_KeyCode = keyCode;
+            m_State = state;
         }
 
-        int m_KeyCode;
+        bool m_State;
     };
 
 }

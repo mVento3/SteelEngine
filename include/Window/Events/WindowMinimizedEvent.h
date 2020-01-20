@@ -2,11 +2,11 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Event/NaiveEvent.h"
-
 #include "Core/ReflectionAttributes.h"
 
-#include "Input/Events/KeyDownEvent.Generated.h"
+#include "Event/NaiveEvent.h"
+
+#include "Window/Events/WindowMinimizedEvent.Generated.h"
 
 namespace SteelEngine {
 
@@ -14,17 +14,9 @@ namespace SteelEngine {
         SteelEngine::ReflectionAttribute::NAIVE_EVENT,
         SteelEngine::ReflectionAttribute::NO_SERIALIZE
     )
-    struct KeyDownEvent : public Event::Naive
+    struct WindowMinimizedEvent : public Event::Naive
     {
         GENERATED_BODY
-
-        KeyDownEvent(int keyCode) :
-            KeyDownEvent()
-        {
-            m_KeyCode = keyCode;
-        }
-
-        int m_KeyCode;
     };
 
 }
