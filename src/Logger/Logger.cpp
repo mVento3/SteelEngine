@@ -2,8 +2,11 @@
 
 #include "ctime"
 #include "chrono"
+#include "Windows.h"
 
 #include "RuntimeReflection/Reflection.h"
+
+#undef ERROR
 
 namespace SteelEngine {
 
@@ -34,21 +37,29 @@ namespace SteelEngine {
         if(verbosity == Verbosity::INFO)
         {
             sprintf(res, "INFO at %s in %s:%lu: %s\n", timeStr, fileStr.c_str(), line, mes);
+            printf("%s", res);
         }
         else if(verbosity == Verbosity::WARNING)
         {
+            SetConsoleTextAttribute(m_Console, 14);
             sprintf(res, "WARNING at %s in %s:%lu: %s\n", timeStr, fileStr.c_str(), line, mes);
+            printf("%s", res);
+            SetConsoleTextAttribute(m_Console, 7);
         }
         else if(verbosity == Verbosity::ERROR)
         {
+            SetConsoleTextAttribute(m_Console, 4);
             sprintf(res, "ERROR at %s in %s:%lu: %s\n", timeStr, fileStr.c_str(), line, mes);
+            printf("%s", res);
+            SetConsoleTextAttribute(m_Console, 7);
         }
         else if(verbosity == Verbosity::FATAL)
         {
+            SetConsoleTextAttribute(m_Console, 12);
             sprintf(res, "FATAL at %s in %s:%lu: %s\n", timeStr, fileStr.c_str(), line, mes);
+            printf("%s", res);
+            SetConsoleTextAttribute(m_Console, 7);
         }
-
-        printf("%s", res);
 
         if(m_LogToFile)
         {
@@ -112,6 +123,8 @@ namespace SteelEngine {
             m_LogToFile = true;
             m_OutFile.open(m_LogFilePath, std::ios::trunc);
         }
+
+        m_Console = GetStdHandle(STD_OUTPUT_HANDLE);
 
         Info("Successful initiazlied logger!");
 

@@ -84,9 +84,9 @@ namespace SteelEngine {
             event.m_GeneratedBodyMacro->push_back("private:");
             event.m_GeneratedBodyMacro->push_back("char* Serialize(char* data, size_t& totalSize) override");
             event.m_GeneratedBodyMacro->push_back("{");
-            {          
+            {
                 event.m_GeneratedBodyMacro->push_back("char* out = SteelEngine::Network::INetworkCommand::Serialize(data, totalSize);");
-                    
+
                 for(Type::uint32 i = 0; i < m_Properties.size(); i++)
                 {
                     event.m_GeneratedBodyMacro->push_back("Serialization::SerializeType(totalSize, " + m_Properties[i].m_ArgumentInfo.m_Name + ", out, &out);");
@@ -100,7 +100,7 @@ namespace SteelEngine {
             event.m_GeneratedBodyMacro->push_back("{");
             {
                 event.m_GeneratedBodyMacro->push_back("char* out = SteelEngine::Network::INetworkCommand::Deserialize(data, totalSize);");
-                
+
                 for(Type::uint32 i = 0; i < m_Properties.size(); i++)
                 {
                     event.m_GeneratedBodyMacro->push_back("Serialization::DeserializeType(totalSize, " + m_Properties[i].m_ArgumentInfo.m_Name + ", out, &out);");

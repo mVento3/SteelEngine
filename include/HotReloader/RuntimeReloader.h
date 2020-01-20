@@ -62,7 +62,6 @@ namespace SteelEngine { namespace HotReloader {
 
         std::filesystem::path m_BinaryLocation;
         Utils::json m_CompileConfig;
-        bool m_Once;
         bool m_IsSwapComplete;
         bool m_Paused = false;
         bool m_Initialized = false;
@@ -73,7 +72,10 @@ namespace SteelEngine { namespace HotReloader {
 
         std::string m_ModuleName;
 
+        std::thread* m_WatchDogThread;
+
         void GenerateModuleName();
+        void Test(const std::filesystem::path& file, FileWatcher::FileStatus status);
 
     public:
         RuntimeReloader();

@@ -30,7 +30,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
             m_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
         }
 
-        IReflectionData** types = Reflection::GetTypes();
+        IReflectionData const* const* types = Reflection::GetTypes();
 
         for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
@@ -77,14 +77,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
         ImGui::Text("Loaded modules");
 
-        std::vector<const char*> rees;
-
-        for(Type::uint32 i = 0; i < reflectionRes.size(); i++)
-        {
-            rees.push_back(reflectionRes[i].c_str());
-        }
-
-        ImGui::ListBox("Reflection", &m_CurrentReflectionItem, rees.data(), rees.size());
+        ImGui::ListBox("Reflection", &m_CurrentReflectionItem, reflectionRes.data(), reflectionRes.size());
     }
 
     void SystemsMonitorWindow::OnRecompile(HotReloader::IRuntimeObject* oldObject)

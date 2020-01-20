@@ -6,15 +6,15 @@
 
 #include "imgui/imgui.h"
 
+#include "Profiler/ScopeTimer.h"
+
+#include "Logger/Logger.h"
+
 namespace SteelEngine {
 
     TimingsViewWindow::TimingsViewWindow()
     {
-        m_Headers =
-        {
-            { "LOL", 50.f },
-            { "LOL2", 50.f }
-        };
+
     }
 
     TimingsViewWindow::~TimingsViewWindow()
@@ -26,38 +26,59 @@ namespace SteelEngine {
     {
         m_Manager = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::PROFILER)->Convert<Profiler::IManager**>();
         m_Type = Reflection::GetType(*m_Manager);
+        m_GetTimeMethod = m_Type->GetMethod("GetTime");
+        m_Timings = m_Type->Invoke(m_GetTimeMethod, *m_Manager).Convert<std::vector<Profiler::Manager::TimeData>*>();
     }
 
     void TimingsViewWindow::Draw()
     {
-        std::vector<Profiler::Manager::TimeData>* timings = m_Type->Invoke("GetTime", *m_Manager).Convert<std::vector<Profiler::Manager::TimeData>*>();
-
-        ImGui::Columns(3, "mycolumns");
-        ImGui::Separator();
-        ImGui::Text("ID"); ImGui::NextColumn();
-        ImGui::Text("Name"); ImGui::NextColumn();
-        ImGui::Text("Time"); ImGui::NextColumn();
-        ImGui::Separator();
-
-        static int selected = -1;
-
-        for(Type::uint32 i = 0; i < timings->size(); i++)
         {
-            const Profiler::Manager::TimeData& time = timings->at(i);
-            char label[32];
+            SE_PROFILE_SCOPE("TimingsViewWindow::Draw");
 
-            sprintf(label, "%d", i);
+            ImGui::Columns(3, "mycolumns");
+            ImGui::Separator();
+            ImGui::SetColumnWidth(0, ImGui::CalcTextSize(" ID ").x); ImGui::Text("ID"); ImGui::NextColumn();
+            ImGui::Text("Name"); ImGui::NextColumn();
+            ImGui::Text("Time"); ImGui::NextColumn();
+            ImGui::Separator();
 
-            if(ImGui::Selectable(label, selected == i, ImGuiSelectableFlags_SpanAllColumns))
-                selected = i;
+            static int selected = -1;
 
-            ImGui::NextColumn();
-            ImGui::Text(time.m_Name.c_str()); ImGui::NextColumn();
-            ImGui::Text("%f ms", time.m_Time); ImGui::NextColumn();
+            for(Type::uint32 i = 0; i < m_Timings->size(); i++)
+            {
+                const Profiler::Manager::TimeData& time = m_Timings->at(i);
+                char label[32];
+
+                sprintf(label, "%d", i);
+
+                if(ImGui::Selectable(label, selected == i, ImGuiSelectableFlags_SpanAllColumns))
+                {
+                    selected = i;
+                }
+
+                ImGui::NextColumn();
+                ImGui::Text(time.m_Name.c_str()); ImGui::NextColumn();
+
+                if(ImGui::IsItemHovered())
+                {
+                    ImGui::BeginTooltip();
+                    {
+                        ImGui::Text(time.m_Name.c_str());
+                    }
+                    ImGui::EndTooltip();
+                }
+
+                if(ImGui::IsMouseDoubleClicked(0) && selected == i)
+                {
+                    system(std::string("code -g " + time.m_File.string() + ":" + std::to_string(time.m_Line)).c_str());
+                }
+
+                ImGui::Text("%f ms", time.m_Time); ImGui::NextColumn();
+            }
+
+            ImGui::Columns(1);
+            ImGui::Separator();
         }
-
-        ImGui::Columns(1);
-        ImGui::Separator();
     }
 
 }

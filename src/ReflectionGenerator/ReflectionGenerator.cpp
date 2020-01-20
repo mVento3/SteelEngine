@@ -36,6 +36,27 @@ int main(int argc, char* argv[])
 {
     SteelEngine::Options parser(argv, argc, desc);
 
+// Allocate main/root memory chunk
+    size_t rootMemorySize = 1024 * 1024LL;
+    void* rootMemory = malloc(rootMemorySize);
+	SteelEngine::Memory::Allocator* rootMemoryAllocator;
+
+// Setup root memory allocator
+    void* paddedAddress = SteelEngine::Memory::PointerMath::calculateForwardAddress((SteelEngine::Type::uptr)rootMemory, __alignof(SteelEngine::Memory::LinearAllocator));
+    rootMemoryAllocator = new(paddedAddress) SteelEngine::Memory::LinearAllocator(rootMemorySize - sizeof(SteelEngine::Memory::LinearAllocator));
+
+// Load the runtime database and set root memory arguments
+    SteelEngine::ModuleManager::Load(getBinaryLocation() / "RuntimeDatabase.dll");
+
+    SteelEngine::RuntimeDatabase* db = (SteelEngine::RuntimeDatabase*)SteelEngine::ModuleManager::GetModule("RuntimeDatabase");
+
+    db->m_RootMemory = rootMemory;
+    db->m_RootMemorySize = rootMemorySize;
+    db->m_RootMemoryAllocator = rootMemoryAllocator;
+
+// Initialize rest of allocators inside database
+    db->Init();
+
     SteelEngine::Reflection::Init();
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
@@ -61,11 +82,11 @@ int main(int argc, char* argv[])
     SteelEngine::IReflectionGenerator* rg = new SteelEngine::ReflectionGenerator();
 
     std::vector<SteelEngine::HotReloader::IRuntimeObject*> modules;
-    SteelEngine::IReflectionData** types = SteelEngine::Reflection::GetTypes();
+    SteelEngine::IReflectionData const* const* types = SteelEngine::Reflection::GetTypes();
 
     for(SteelEngine::Type::uint32 i = 0; i < SteelEngine::Reflection::GetTypesSize(); i++)
     {
-        SteelEngine::IReflectionData* type = types[i];
+        const SteelEngine::IReflectionData* type = types[i];
 
         if(type->GetMetaData(SteelEngine::ReflectionAttribute::REFLECTION_MODULE)->Convert<bool>())
         {

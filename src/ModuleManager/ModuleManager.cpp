@@ -70,101 +70,17 @@ namespace SteelEngine {
 
 	}
 
-	void ModuleManager::Load()
+	void ModuleManager::LoadAllImpl()
 	{
 		for(const auto& entry : std::filesystem::directory_iterator(getBinaryLocation()))
 		{
 			std::filesystem::path path = entry.path();
 
-#ifdef SE_WINDOWS
-			if (path.extension().string() == ".dll")
-#else
-			if (path.extension().string() == ".so")
-#endif
-			{
-				void* module;
-
-				Module::Load(path.string(), (void**)&module);
-
-				Module::Details* info;
-
-				Module::Get("exports", module, (void**)&info);
-
-				if(info)
-				{
-					for(ModuleInfo info_ : m_Modules)
-					{
-						if(info_.m_ModuleName == info->m_PluginName)
-						{
-							Module::Free((void**)&module);
-
-							return;
-						}
-					}
-
-					for(StaticModuleInfo info_ : m_StaticGlobalModules)
-					{
-						if(info_.m_ModuleName == info->m_PluginName)
-						{
-							Module::Free((void**)&module);
-
-							return;
-						}
-					}
-
-					if(info->m_PluginFlags == Module::Details::PluginFlag::ONCE)
-					{
-						StaticModuleInfo moduleInfo;
-
-						moduleInfo.m_Module = info->m_AllocateCallback(0, 0);
-						moduleInfo.m_ModuleName = info->m_PluginName;
-						moduleInfo.m_Raw = module;
-
-						m_StaticGlobalModules.push_back(moduleInfo);
-					}
-					else
-					{
-						ModuleInfo moduleInfo;
-
-						moduleInfo.m_ModuleName = info->m_PluginName;
-						moduleInfo.m_CreateCallback = info->m_AllocateCallback;
-						moduleInfo.m_Raw = module;
-
-						m_Modules.push_back(moduleInfo);
-					}
-				}
-				else
-				{
-					bool found = false;
-
-					for(ReflectionModuleInfo info_ : m_ReflectedModules)
-					{
-						if(info_.m_ModuleName == path)
-						{
-							found = true;
-							break;
-						}
-					}
-
-					if(!found)
-					{
-						ReflectionModuleInfo moduleInfo;
-
-						moduleInfo.m_ModuleName = path.string();
-						moduleInfo.m_Raw = module;
-
-						m_ReflectedModules.push_back(moduleInfo);
-					}
-					else
-					{
-						Module::Free((void**)&module);
-					}
-				}
-			}
+			Load(path);
 		}
 	}
 
-	void ModuleManager::Unload(const std::string& blackList, Mode mode)
+	void ModuleManager::UnloadImpl(const std::string& blackList, Mode mode)
 	{
 		std::vector<std::string> splitted = split(blackList, ' ');
 
@@ -189,6 +105,95 @@ namespace SteelEngine {
 			if(!FreeIf(splitted, info.m_ModuleName, mode))
 			{
 				Module::Free(&info.m_Raw);
+			}
+		}
+	}
+
+	void ModuleManager::LoadImpl(const std::filesystem::path& name)
+	{
+#ifdef SE_WINDOWS
+		if(name.extension().string() == ".dll")
+#else
+		if(name.extension().string() == ".so")
+#endif
+		{
+			void* module;
+
+			Module::Load(name.string(), (void**)&module);
+
+			Module::Details* info;
+
+			Module::Get("exports", module, (void**)&info);
+
+			if(info)
+			{
+				for(ModuleInfo info_ : m_Modules)
+				{
+					if(info_.m_ModuleName == info->m_PluginName)
+					{
+						Module::Free((void**)&module);
+
+						return;
+					}
+				}
+
+				for(StaticModuleInfo info_ : m_StaticGlobalModules)
+				{
+					if(info_.m_ModuleName == info->m_PluginName)
+					{
+						Module::Free((void**)&module);
+
+						return;
+					}
+				}
+
+				if(info->m_PluginFlags == Module::Details::PluginFlag::ONCE)
+				{
+					StaticModuleInfo moduleInfo;
+
+					moduleInfo.m_Module = info->m_AllocateCallback(0, 0);
+					moduleInfo.m_ModuleName = info->m_PluginName;
+					moduleInfo.m_Raw = module;
+
+					m_StaticGlobalModules.push_back(moduleInfo);
+				}
+				else
+				{
+					ModuleInfo moduleInfo;
+
+					moduleInfo.m_ModuleName = info->m_PluginName;
+					moduleInfo.m_CreateCallback = info->m_AllocateCallback;
+					moduleInfo.m_Raw = module;
+
+					m_Modules.push_back(moduleInfo);
+				}
+			}
+			else
+			{
+				bool found = false;
+
+				for(ReflectionModuleInfo info_ : m_ReflectedModules)
+				{
+					if(info_.m_ModuleName == name)
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if(!found)
+				{
+					ReflectionModuleInfo moduleInfo;
+
+					moduleInfo.m_ModuleName = name.string();
+					moduleInfo.m_Raw = module;
+
+					m_ReflectedModules.push_back(moduleInfo);
+				}
+				else
+				{
+					Module::Free((void**)&module);
+				}
 			}
 		}
 	}

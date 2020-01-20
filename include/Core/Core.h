@@ -20,9 +20,6 @@
 #include "Graphics/IContext.h"
 
 #include "Window/IWindow.h"
-#include "Window/ResizeEvent.h"
-#include "Window/MinimizedEvent.h"
-#include "Window/MaximizedEvent.h"
 
 #include "VirtualProject/IVirtualProject.h"
 #include "VirtualProject/LoadedProjectEvent.h"
@@ -31,14 +28,12 @@
 
 #include "nlohmann/json.hpp"
 
-#include "Input/Events/KeyDownEvent.h"
-#include "Input/Events/KeyUpEvent.h"
-#include "Input/Events/MouseMotionEvent.h"
-
 #include "Core/ICore.h"
 #include "Core/ReflectionAttributes.h"
 #include "Core/GetCompileConfigEvent.h"
 #include "Core/IDeltaTime.h"
+
+#include "Event/EventObserver.h"
 
 #include "Core/Core.Generated.h"
 
@@ -69,7 +64,8 @@ namespace SteelEngine {
             LOGGER,
             FILE_SYSTEM,
             DELTA_TIME,
-            GLOBAL_EVENTS,
+            GLOBAL_EVENTS, // This is for immediately events
+            EVENT_MANAGER, // This is for normal events
             MEMORY_TRACKER,
             NETWORK_MANAGER,
             PROFILER
@@ -86,12 +82,14 @@ namespace SteelEngine {
         Network::INetworkManager*   m_NetworkManager;
         Script::IPython*            m_Python;
         IContext*                   m_ImGUI_ContextAPI;
+        IEventManager**             m_EventManager;
 
         Variant* m_DeltaTimeVariant;
 
         json m_CompileConfig;
 
         bool m_Running;
+        float m_OneSecondTime;
 
         EnginePathVariant m_EnginePathVariant;
 

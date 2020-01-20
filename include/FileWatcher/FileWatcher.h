@@ -19,17 +19,19 @@ namespace SteelEngine {
             DELETED
         };
 
+        typedef std::function<void(const std::filesystem::path&, FileStatus)> ActionFunction;
+
     private:
         std::unordered_map<std::string, std::filesystem::file_time_type> m_Paths;
         bool m_Running;
-        std::function<void(const std::filesystem::path&, FileStatus)> m_Action;
+        ActionFunction m_Action;
 
         bool Contains(const std::string& key);
 
     public:
         FileWatcher(
             const std::filesystem::path& path,
-            const std::function<void(const std::filesystem::path&, FileStatus)>& action
+            ActionFunction action
         );
         ~FileWatcher();
 

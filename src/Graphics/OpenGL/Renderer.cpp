@@ -11,8 +11,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_QuadMesh = new QuadMesh();
 
         m_Mesh = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj");
-        m_Mesh2 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/cube.obj");
-        m_Mesh3 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj");
+        // m_Mesh2 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/cube.obj");
+        // m_Mesh3 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj");
         m_Texture = new Texture("D:/Projects/C++/SteelEngine/bin/Resources/Textures/bricks2.jpg");
         m_NormalMapTexture = new Texture("D:/Projects/C++/SteelEngine/bin/Resources/Textures/bricks2_normal.jpg");
         m_DispMapTexture = new Texture("D:/Projects/C++/SteelEngine/bin/Resources/Textures/bricks2_disp.jpg");
@@ -23,7 +23,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_ShadowTexture = new Texture(GL_R32F, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, false);
 
         m_G_Shader = new Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/gBuffer");
-        m_G_Buffer = new Framebuffer(1600, 900,
+        m_G_Buffer = new Framebuffer(1920, 1080,
         {
             new Framebuffer::Attachment(m_PositionTexture, GL_COLOR_ATTACHMENT0),
             new Framebuffer::Attachment(m_NormalTexture, GL_COLOR_ATTACHMENT1),
@@ -31,7 +31,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         });
 
         m_ShadowShader = new Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/shadowShader");
-        m_ShadowCamera = new Camera(Transform(), 1600 / 900);
+        m_ShadowCamera = new Camera(Transform(), 1920 / 1080);
 
         m_DirectionalLightTransform.SetRotation(
             glm::quat(glm::rotate(glm::radians(-45.f), glm::vec3(1, 0, 0))) *
@@ -39,7 +39,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         );
 
         m_Counter = 0;
-        m_Camera = new Camera(Transform(glm::vec3(0, 0, -10)), 1600 / 900);
+        m_Camera = new Camera(Transform(glm::vec3(0, 0, -10)), 1920 / 1080);
 
         m_SpotLight = new SpotLight(
             PointLight{ BaseLight{ glm::vec3(1, 0, 1), 100.f },
@@ -54,7 +54,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_Trans2.SetRotation(glm::quat(glm::rotate(glm::radians(45.f), glm::vec3(0, 1, 0))));
         m_Trans3.SetPosition(glm::vec3(1, 20, 0));
 
-        m_DirectionalLight = new DirectionalLight(BaseLight{ glm::vec3(1, 1, 1), 0.5f }, m_DirectionalLightTransform.GetRotation());
+        m_DirectionalLight = new DirectionalLight(BaseLight{ glm::vec3(1, 1, 1), 0.1f }, m_DirectionalLightTransform.GetRotation());
 
         m_Lights.push_back(m_DirectionalLight);
         m_Lights.push_back(m_SpotLight);
@@ -62,12 +62,26 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_Models.push_back(Model(
             m_Trans, m_Mesh, glm::vec3(1, 1, 1)
         ));
-        m_Models.push_back(Model(
-            m_Trans2, m_Mesh2, glm::vec3(1, 1, 1)
-        ));
-        m_Models.push_back(Model(
-            m_Trans3, m_Mesh3, glm::vec3(1, 1, 1)
-        ));
+
+        for(Type::uint32 i = 0; i < 50; i++)
+        {
+            m_Mesh2 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/cube.obj");
+
+            m_Models.push_back(Model(
+                Transform(glm::vec3(i * 2, 1, 0)), m_Mesh2, glm::vec3(1, 1, 1)
+            ));
+        }
+
+        for(Type::uint32 i = 0; i < 100; i++)
+        {
+            m_Mesh3 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj");
+
+            m_Models.push_back(Model(
+                Transform(glm::vec3(0, i * 2, 0)), m_Mesh3, glm::vec3(1, 1, 1)
+            ));
+        }
+
+        m_Controlls = false;
     }
 
     Renderer::~Renderer()
@@ -138,10 +152,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             light->Setup();
         }
 
-        Event::GlobalEvent::Add<KeyDownEvent>(this);
-        Event::GlobalEvent::Add<KeyUpEvent>(this);
-        Event::GlobalEvent::Add<MouseMotionEvent>(this);
-
         return SE_TRUE;
     }
 
@@ -151,29 +161,32 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         Transform& camTrans = m_Camera->GetTransform();
 
-        if(m_Keys[SDL_SCANCODE_W])
+        if(!m_Controlls)
         {
-            camTrans.SetPosition(camTrans.GetPosition() + camTrans.GetRotation().GetForward() * 0.5f);
-        }
+            if(m_Keys[SDL_SCANCODE_W])
+            {
+                camTrans.SetPosition(camTrans.GetPosition() + camTrans.GetRotation().GetForward() * 0.1f);
+            }
 
-        if(m_Keys[SDL_SCANCODE_S])
-        {
-            camTrans.SetPosition(camTrans.GetPosition() + camTrans.GetRotation().GetBackward() * 0.5f);
-        }
+            if(m_Keys[SDL_SCANCODE_S])
+            {
+                camTrans.SetPosition(camTrans.GetPosition() + camTrans.GetRotation().GetBackward() * 0.1f);
+            }
 
-        if(m_Keys[SDL_SCANCODE_A])
-        {
-            camTrans.SetPosition(camTrans.GetPosition() + camTrans.GetRotation().GetRight() * 0.5f);
-        }
+            if(m_Keys[SDL_SCANCODE_A])
+            {
+                camTrans.SetPosition(camTrans.GetPosition() + camTrans.GetRotation().GetRight() * 0.1f);
+            }
 
-        if(m_Keys[SDL_SCANCODE_D])
-        {
-            camTrans.SetPosition(camTrans.GetPosition() + camTrans.GetRotation().GetLeft() * 0.5f);
+            if(m_Keys[SDL_SCANCODE_D])
+            {
+                camTrans.SetPosition(camTrans.GetPosition() + camTrans.GetRotation().GetLeft() * 0.1f);
+            }
         }
 
         if(m_RotateCamera)
         {
-            Event::GlobalEvent::Broadcast(ChangeMousePositionEvent{ 1600 / 2, 900 / 2 });
+            Event::GlobalEvent::Broadcast(ChangeMousePositionEvent{ 1920 / 2, 1080 / 2 });
         }
     }
 
@@ -287,31 +300,48 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_Window->SwapBuffers();
     }
 
-    void Renderer::operator()(const KeyDownEvent& event)
+    void Renderer::OnEvent(Event::Naive* event)
     {
-        m_Keys[event.m_KeyCode] = true;
+        static size_t event1 = MouseMotionEvent::GetStaticType();
+        static size_t event2 = KeyDownEvent::GetStaticType();
+        static size_t event3 = KeyUpEvent::GetStaticType();
+        static size_t event4 = AnyItemActiveChangedEvent::GetStaticType();
 
-        if(event.m_KeyCode == SDL_SCANCODE_K)
+        if(event1 == event->GetType())
         {
-            m_RotateCamera = !m_RotateCamera;
+            MouseMotionEvent* eve = (MouseMotionEvent*)event;
+            glm::vec2 deltaPos = glm::vec2(eve->m_PositionX, eve->m_PositionY) - glm::vec2(1920 / 2, 1080 / 2);
+
+            if(m_RotateCamera && (deltaPos.x != 0 || deltaPos.y != 0))
+            {
+                Transform& camTrans = m_Camera->GetTransform();
+
+                camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.x * -0.001f, glm::vec3(0, 1, 0)) * camTrans.GetRotation()));
+                camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.y * 0.001f, camTrans.GetRotation().GetRight()) * camTrans.GetRotation()));
+            }
         }
-    }
-
-    void Renderer::operator()(const KeyUpEvent& event)
-    {
-        m_Keys[event.m_KeyCode] = false;
-    }
-
-    void Renderer::operator()(const MouseMotionEvent& event)
-    {
-        glm::vec2 deltaPos = glm::vec2(event.m_X, event.m_Y) - glm::vec2(1600 / 2, 900 / 2);
-
-        if(m_RotateCamera && (deltaPos.x != 0 || deltaPos.y != 0))
+        else if(event2 == event->GetType())
         {
-            Transform& camTrans = m_Camera->GetTransform();
+            KeyDownEvent* eve = (KeyDownEvent*)event;
 
-            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.x * -0.001f, glm::vec3(0, 1, 0)) * camTrans.GetRotation()));
-            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.y * 0.001f, camTrans.GetRotation().GetRight()) * camTrans.GetRotation()));
+            m_Keys[eve->m_KeyCode] = true;
+
+            if(eve->m_KeyCode == SDL_SCANCODE_K)
+            {
+                m_RotateCamera = !m_RotateCamera;
+            }
+        }
+        else if(event3 == event->GetType())
+        {
+            KeyUpEvent* eve = (KeyUpEvent*)event;
+
+            m_Keys[eve->m_KeyCode] = false;
+        }
+        else if(event4 == event->GetType())
+        {
+            AnyItemActiveChangedEvent* eve = (AnyItemActiveChangedEvent*)event;
+
+            m_Controlls = eve->m_State;
         }
     }
 

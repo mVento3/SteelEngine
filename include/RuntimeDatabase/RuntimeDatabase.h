@@ -11,6 +11,8 @@
 #include "Memory/LinearAllocator.h"
 #include "Memory/PoolAllocator.h"
 
+#include "Memory/Internal/PoolAllocator.h"
+
 #include "Memory/Container/Vector.h"
 #include "Memory/Container/Stack.h"
 
@@ -29,13 +31,20 @@
 #define SE_MAX_VARIANTS 1000
 #define SE_MAX_VARIANT_SIZE 512
 
+int main(int argc, char* argv[]);
+
 namespace SteelEngine {
 
 	struct IReflectionData;
+	class Reflection;
+	class RelfectionRecorder;
+	class Variant;
+	class MetaDataInfo;
 
 	namespace HotReloader {
 
 		struct IRuntimeObject;
+		struct RuntimeReloader;
 
 	}
 
@@ -71,19 +80,19 @@ namespace SteelEngine {
 		}
 	};
 
-	struct Tuple2 : public ITuple
+	struct TupleMaker : public ITuple
 	{
 	private:
 		ITuple* m_Tuple;
 
 	public:
 		template <typename... Args>
-		Tuple2(Args... args)
+		TupleMaker(Args... args)
 		{
 			m_Tuple = new Tuple<Args...>(args...);
 		}
 
-		~Tuple2()
+		~TupleMaker()
 		{
 
 		}
@@ -116,13 +125,57 @@ namespace SteelEngine {
 
 	class RuntimeDatabase : public IRuntimeDatabase
 	{
+		friend int ::main(int argc, char* argv[]);
   	public:
 		typedef void*(*GetStateCallback)();
 		typedef Container::Vector<ConstrucedObject> ConstructedObjectsVector;
 
 		static const size_t s_InvalidID = std::numeric_limits<size_t>::max();
-    
+
+		struct ISubDatabase
+		{
+			virtual void Init(Memory::Allocator* allocator) = 0;
+		};
+
+		struct Reflection : public ISubDatabase
+		{
+			friend class RuntimeDatabase;
+			friend struct IReflectionData;
+			friend class SteelEngine::Reflection;
+			friend class ReflectionRecorder;
+		private:
+			Memory::Allocator* m_TypesAllocator;
+			IReflectionData** m_Types;
+			size_t m_TypesSize;
+
+			void Init(Memory::Allocator* allocator) override;
+		};
+
+		struct HotReloader : public ISubDatabase
+		{
+			friend class RuntimeDatabase;
+			friend struct IReflectionData;
+			friend class SteelEngine::HotReloader::RuntimeReloader;
+		private:
+			Container::Vector<ConstrucedObject>* m_Objects;
+			Container::Stack<size_t>* m_AvailablePerObjectIDs;
+
+			void Init(Memory::Allocator* allocator) override;
+		};
+
+		struct Variant : public ISubDatabase
+		{
+			friend class RuntimeDatabase;
+			friend class SteelEngine::Variant;
+		private:
+			Memory::Allocator* m_VariantsAllocator;
+			Container::Stack<size_t>* m_AvailablePerVariantIDs;
+
+			void Init(Memory::Allocator* allocator) override;
+		};
+
   	private:
+		void Init() override;
 
   	public:
   		RuntimeDatabase();
@@ -132,16 +185,9 @@ namespace SteelEngine {
 		size_t m_RootMemorySize;
 		Memory::Allocator* m_RootMemoryAllocator;
 
-		Container::Stack<size_t>* m_AvailablePerVariantIDs;
-		Container::Stack<size_t>* m_AvailablePerObjectIDs;
-
-		Memory::Allocator* m_TypesAllocator;
-		IReflectionData** m_Types;
-		size_t m_TypesSize;
-
-		Memory::Allocator* m_VariantsAllocator;
-
-		Container::Vector<ConstrucedObject>* m_Objects;
+		RuntimeDatabase::Reflection* m_ReflectionDatabase;
+		RuntimeDatabase::HotReloader* m_HotReloaderDatabase;
+		RuntimeDatabase::Variant* m_VariantDatabase;
 
 		size_t GetNextPerVariantID() override;
 		void PushPerVariantID(size_t id) override;

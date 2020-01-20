@@ -17,6 +17,8 @@
 #include "Profiler/ScopeTimer.h"
 #include "Profiler/Manager.h"
 
+#include "Event/EventManager.h"
+
 namespace SteelEngine {
 
     void Core::Loop()
@@ -44,7 +46,11 @@ namespace SteelEngine {
         SE_PROFILE_FUNC;
         // TODO: Delete this!!
         Profiler::Manager a;
+        EventManager aa;
 
+        m_EventManager = (IEventManager**)&Reflection::CreateInstance("SteelEngine::EventManager")->m_Object;
+
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::EVENT_MANAGER, m_EventManager);
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::PROFILER, &Reflection::CreateInstance("SteelEngine::Profiler::Manager")->m_Object);
 
         std::string logPath = FileSystem::Get("se_init_log").string();
@@ -61,10 +67,6 @@ namespace SteelEngine {
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::LOGGER, &m_Logger->m_Object);
 
         SE_INFO("Initializing core!");
-
-        SE_WARNING("TEST!");
-        SE_ERROR("TEST!");
-        SE_FATAL("TEST!");
 
         std::ifstream configFile(getBinaryLocation() / "config.json");
 
@@ -91,7 +93,7 @@ namespace SteelEngine {
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::PYTHON, m_Python);
         Reflection::GetType("SteelEngine::Core")->SetMetaData(
             Graphics::IRenderer::SELECTED_RENDER_API,
-            Graphics::IRenderer::VULKAN_API
+            Graphics::IRenderer::OPENGL_API
         );
 
         std::vector<SteelEngine::IReflectionData*> types =
@@ -138,9 +140,15 @@ namespace SteelEngine {
         (*m_VirtualProject)->Init();
 
     // Graphics stuff
-        m_Window = (IWindow*)Reflection::CreateInstance("SteelEngine::VulkanWindow");
-        m_Renderer = (Graphics::IRenderer**)&Reflection::CreateInstance("SteelEngine::Graphics::Vulkan::Renderer", m_Window)->m_Object;
+        m_Window = (IWindow*)Reflection::CreateInstance("SteelEngine::OpenGL_Window");
+        m_Renderer = (Graphics::IRenderer**)&Reflection::CreateInstance("SteelEngine::Graphics::OpenGL::Renderer", m_Window)->m_Object;
         m_Editor = (Editor::IEditor**)&Reflection::CreateInstance("SteelEngine::Editor::ImGUI::ImGUI_Editor")->m_Object;
+
+        EventObserver* eve = Reflection::GetType("SteelEngine::Graphics::OpenGL::Renderer")->Invoke("Cast_EventObserver", *m_Renderer).Convert<EventObserver*>();
+        EventObserver* eve2 = Reflection::GetType("SteelEngine::Editor::ImGUI::ImGUI_Editor")->Invoke("Cast_EventObserver", *m_Editor).Convert<EventObserver*>();
+
+        (*m_EventManager)->AddEventObserver(eve);
+        (*m_EventManager)->AddEventObserver(eve2);
 
         m_Window->SetTitle("Test Window!");
         m_Window->SetWidth(1920);
@@ -151,51 +159,9 @@ namespace SteelEngine {
             SDL_Event* event = (SDL_Event*)event_;
 
             (*m_Editor)->ProcessEvents(event);
-
-            if(event->type == SDL_QUIT)
-            {
-
-            }
-            else if(event->type == SDL_WINDOWEVENT)
-            {
-                switch (event->window.event)
-                {
-                case SDL_WINDOWEVENT_RESIZED:
-                    Event::GlobalEvent::Broadcast(ResizeEvent
-                        {
-                            (Type::uint32)event->window.data1,
-                            (Type::uint32)event->window.data2
-                        }
-                    );
-                    break;
-                case SDL_WINDOWEVENT_MINIMIZED:
-                    Event::GlobalEvent::Broadcast(MinimizedEvent{});
-                    break;
-                case SDL_WINDOWEVENT_MAXIMIZED:
-                    Event::GlobalEvent::Broadcast(MaximizedEvent{});
-                    break;
-                case SDL_WINDOWEVENT_RESTORED:
-                    Event::GlobalEvent::Broadcast(MaximizedEvent{});
-                    break;
-                default:
-                    break;
-                }
-            }
-            else if(event->type == SDL_KEYDOWN)
-            {
-                Event::GlobalEvent::Broadcast(KeyDownEvent{ event->key.keysym.scancode });
-            }
-            else if(event->type == SDL_KEYUP)
-            {
-                Event::GlobalEvent::Broadcast(KeyUpEvent{ event->key.keysym.scancode });
-            }
-            else if(event->type == SDL_MOUSEMOTION)
-            {
-                Event::GlobalEvent::Broadcast(MouseMotionEvent{ event->motion.x, event->motion.y });
-            }
         };
 
-        Reflection::GetType("SteelEngine::VulkanWindow")->Invoke("SetProcessEventsCallback", m_Window, func);
+        Reflection::GetType("SteelEngine::OpenGL_Window")->Invoke("SetProcessEventsCallback", m_Window, func);
 
         if(m_Window->Create() == SE_FALSE)
         {
@@ -215,7 +181,7 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
-        m_ImGUI_ContextAPI = (IContext*)Reflection::CreateInstance("SteelEngine::VulkanContext");
+        m_ImGUI_ContextAPI = (IContext*)Reflection::CreateInstance("SteelEngine::OpenGL_Context");
 
         if(m_ImGUI_ContextAPI)
         {
@@ -235,7 +201,8 @@ namespace SteelEngine {
             {
                 SE_INFO("Editor initialization success!");
             }
-            
+
+            Reflection::GetType("SteelEngine::OpenGL_Context")->Invoke("MakeCurrent", m_ImGUI_ContextAPI);
         }
         else
         {
@@ -264,7 +231,15 @@ namespace SteelEngine {
 
     void Core::Update()
     {
-        (*m_DeltaTimeVariant->Convert<IDeltaTime**>())->Update();
+        IDeltaTime* time = (*m_DeltaTimeVariant->Convert<IDeltaTime**>());
+
+        time->Update();
+
+        {
+            SE_PROFILE_SCOPE("Naive Event Manager");
+
+            ProcessEvents(*m_EventManager);
+        }
 
         // The runtime compiler file watcher is not too perform
         if(m_RuntimeReloader)
@@ -272,16 +247,65 @@ namespace SteelEngine {
             m_RuntimeReloader->m_Object->Update();
         }
 
-        m_Logger->m_Object->Update();
-        m_ImGUI_ContextAPI->Update();
-        (*m_Editor)->Draw();
+        m_OneSecondTime += time->GetDeltaTime();
+
+        if(m_OneSecondTime >= 1)
+        {
+            // printf("FPS: %d\n", time->GetUPS());
+
+            m_OneSecondTime = 0;
+        }
+
+        {
+            SE_PROFILE_SCOPE("Logger");
+
+            m_Logger->m_Object->Update();
+        }
+
+        {
+            SE_PROFILE_SCOPE("Editor");
+
+            m_ImGUI_ContextAPI->Update();
+            (*m_Editor)->Draw();
+        }
+    
         m_Window->m_Object->Update();
-        (*m_Renderer)->Update();
-        (*m_Renderer)->PreRender();
-        (*m_Renderer)->Render();
-        m_ImGUI_ContextAPI->UploadDrawData();
-        (*m_Renderer)->PostRender();
-        (*m_VirtualProject)->Update();
+
+        {
+            SE_PROFILE_SCOPE("Graphics");
+
+            {
+                SE_PROFILE_SCOPE("Graphics::Update");
+
+                (*m_Renderer)->Update();
+            }
+
+            {
+                SE_PROFILE_SCOPE("Graphics::PreRender");
+
+                (*m_Renderer)->PreRender();
+            }
+
+            {
+                SE_PROFILE_SCOPE("Graphics::Render");
+
+                (*m_Renderer)->Render();
+            }
+
+            m_ImGUI_ContextAPI->UploadDrawData();
+
+            {
+                SE_PROFILE_SCOPE("Graphics::PostRender");
+
+                (*m_Renderer)->PostRender();
+            }
+        }
+
+        {
+            SE_PROFILE_SCOPE("Project");
+
+            (*m_VirtualProject)->Update();
+        }
     }
 
     void Core::Start()

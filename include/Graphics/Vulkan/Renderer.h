@@ -9,9 +9,6 @@
 #include "Vulkan/vulkan.h"
 
 #include "Window/IWindow.h"
-#include "Window/ResizeEvent.h"
-#include "Window/MinimizedEvent.h"
-#include "Window/MaximizedEvent.h"
 
 #include "Graphics/Vulkan/DeepLayer/Device.h"
 #include "Graphics/Vulkan/DeepLayer/Validation.h"
@@ -34,12 +31,18 @@
 
 #include "Graphics/Math/Camera.h"
 
-#include "Input/Events/KeyUpEvent.h"
-#include "Input/Events/KeyDownEvent.h"
-#include "Input/Events/MouseMotionEvent.h"
 #include "Input/Events/ChangeMousePositionEvent.h"
+#include "Input/Events/KeyDownEvent.h"
+#include "Input/Events/KeyUpEvent.h"
+#include "Input/Events/MouseMotionEvent.h"
 
 #include "RuntimeReflection/Variant.h"
+
+#include "Event/EventObserver.h"
+
+#include "Window/Events/WindowResizedEvent.h"
+#include "Window/Events/WindowMaximizedEvent.h"
+#include "Window/Events/WindowMinimizedEvent.h"
 
 #include "Graphics/Vulkan/Renderer.Generated.h"
 
@@ -51,7 +54,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
     SE_CLASS(
         SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
     )
-    class Renderer : public IRendererAPI<IRenderer::API::VULKAN_API>
+    class Renderer : public IRendererAPI<IRenderer::API::VULKAN_API>, public EventObserver
     {
         GENERATED_BODY
 
@@ -224,6 +227,8 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         void Update() override;
         void Cleanup() override;
 
+        void OnEvent(Event::Naive* event) override;
+
         SE_METHOD()
         void RecreateSwapChain();
 
@@ -233,13 +238,6 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
         void BindCommands(std::function<void(Vulkan::ICommandBuffer*)> func) override;
         void BindUpdateUniforms(std::function<void()> func) override;
-
-        void operator()(const ResizeEvent& event);
-        void operator()(const MinimizedEvent& event);
-        void operator()(const MaximizedEvent& event);
-        void operator()(const KeyDownEvent& event);
-        void operator()(const KeyUpEvent& event);
-        void operator()(const MouseMotionEvent& event);
     };
 
 }}}

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "RuntimeReflection/Macro.h"
+#include "RuntimeReflection/IReflectionMethod.h"
+
 #include "Core/ReflectionAttributes.h"
 
 #include "ImGUI_Editor/ReflectionAttribs.h"
@@ -11,6 +13,8 @@
 #include "EditorComponents/ImGUI/UserInterface.h"
 
 #include "Profiler/Manager.h"
+
+#include "Core/IDeltaTime.h"
 
 #include "ImGUI_Editor/EditorWindows/TimingsViewWindow.Generated.h"
 
@@ -28,8 +32,9 @@ namespace SteelEngine {
         GENERATED_BODY
     private:
         Profiler::IManager** m_Manager;
-        std::vector<ColumnHeader> m_Headers;
         IReflectionData* m_Type;
+        IReflectionMethod* m_GetTimeMethod;
+        std::vector<Profiler::Manager::TimeData>* m_Timings;
 
     public:
         TimingsViewWindow();

@@ -18,11 +18,11 @@ namespace SteelEngine { namespace Network {
 
     void NetworkManager::Init()
     {
-        IReflectionData** types = Reflection::GetTypes();
+        IReflectionData const* const* types = Reflection::GetTypes();
 
         for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
-            IReflectionData* type = types[i];
+            const IReflectionData* type = types[i];
 
             if(type->GetMetaData(ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
             {

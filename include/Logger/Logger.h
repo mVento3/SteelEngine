@@ -36,6 +36,8 @@ namespace SteelEngine {
         bool m_LogToFile;
         std::vector<HotReloader::IRuntimeObject**> m_Dispatchers;
 
+        void* m_Console;
+
     public:
         Logger(const char* file);
         ~Logger();

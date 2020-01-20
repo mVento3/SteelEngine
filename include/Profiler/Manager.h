@@ -17,6 +17,9 @@ namespace SteelEngine { namespace Profiler {
         {
             float m_Time;
             std::string m_Name;
+
+            std::filesystem::path m_File = 0;
+            size_t m_Line = 0;
         };
 
     private:

@@ -20,23 +20,29 @@
 #include "Graphics/OpenGL/Lights/SpotLight.h"
 #include "Graphics/OpenGL/Lights/DirectionalLight.h"
 
-#include "Graphics/OpenGL/Renderer.Generated.h"
-
+#include "Input/Events/ChangeMousePositionEvent.h"
 #include "Input/Events/KeyDownEvent.h"
 #include "Input/Events/KeyUpEvent.h"
 #include "Input/Events/MouseMotionEvent.h"
-#include "Input/Events/ChangeMousePositionEvent.h"
+
+#include "Window/Events/WindowResizedEvent.h"
 
 #include "Event/GlobalEvent.h"
+#include "Event/EventObserver.h"
+
+#include "ImGUI_Editor/Events/AnyItemActiveChangedEvent.h"
 
 #include "vector"
+
+#include "Graphics/OpenGL/Renderer.Generated.h"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
+        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
     )
-    class Renderer : public IRenderer
+    class Renderer : public IRenderer, public EventObserver
     {
         GENERATED_BODY
     private:
@@ -81,6 +87,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         bool m_Keys[256] = { false };
         bool m_RotateCamera;
 
+        bool m_Controlls;
+
     public:
         Renderer(IWindow* window);
         ~Renderer();
@@ -93,9 +101,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Render() override;
         void PostRender() override;
 
-        void operator()(const KeyDownEvent& event);
-        void operator()(const KeyUpEvent& event);
-        void operator()(const MouseMotionEvent& event);
+        void OnEvent(Event::Naive* event) override;
     };
 
 }}}

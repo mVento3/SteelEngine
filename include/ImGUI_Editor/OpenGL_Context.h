@@ -31,6 +31,9 @@ namespace SteelEngine {
 
         SE_METHOD()
         inline void* GetContext() { return m_Context; }
+
+        SE_METHOD()
+        inline void MakeCurrent() { ImGui::SetCurrentContext(m_Context); }
     };
 
 }

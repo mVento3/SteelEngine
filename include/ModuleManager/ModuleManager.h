@@ -65,21 +65,29 @@ namespace SteelEngine {
 		ModuleManager();
 		~ModuleManager();
 
-		void Load() override;
-		void Unload(const std::string& blackList, Mode mode) override;
+		void LoadAllImpl() override;
+		void UnloadImpl(const std::string& blackList, Mode mode) override;
+		void LoadImpl(const std::filesystem::path& name) override;
 
 		static void LoadAll()
 		{
 			static ModuleManager* mm = GetModuleManager();
 
-			mm->Load();
+			mm->LoadAllImpl();
+		}
+
+		static void Load(const std::filesystem::path& name)
+		{
+			static ModuleManager* mm = GetModuleManager();
+
+			mm->LoadImpl(name);
 		}
 
 		static void UnloadAll(const std::string& blackList, Mode mode)
 		{
 			static ModuleManager* mm = GetModuleManager();
 
-			mm->Unload(blackList, mode);
+			mm->UnloadImpl(blackList, mode);
 		}
 
 		static void* GetModule(const std::string& name)

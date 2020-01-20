@@ -13,11 +13,16 @@
 #include "ImGUI_Editor/SelectableProject.h"
 #include "ImGUI_Editor/ChangeSceneEvent.h"
 
+#include "ImGUI_Editor/Events/AnyItemActiveChangedEvent.h"
+
 #include "RuntimeReflection/Variant.h"
 
 #include "EditorComponents/ImGUI/UserInterface.h"
 
 #include "VirtualProject/IVirtualProjectVisualizer.h"
+
+#include "Event/EventObserver.h"
+#include "Event/EventManager.h"
 
 #include "ImGUI_Editor/ImGUI_Editor.Generated.h"
 
@@ -26,9 +31,10 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     SE_CLASS(
         SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
         SteelEngine::ReflectionAttribute::EDITOR,
-        SteelEngine::ReflectionAttribute::EDITOR_NAME = "ImGui"
+        SteelEngine::ReflectionAttribute::EDITOR_NAME = "ImGui",
+        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
     )
-    class ImGUI_Editor : public IEditor
+    class ImGUI_Editor : public IEditor, public EventObserver
     {
         GENERATED_BODY
         friend struct Window;
@@ -40,6 +46,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         SceneType m_CurrentScene;
         IContext* m_API_Context;
         IVirtualProjectVisualizer** m_VirtualProjectVisualizer;
+        IEventManager** m_NaiveManager;
+
+        IReflectionData const* const* m_Types;
 
         std::vector<EditorComponents::ImGUI::UserInterface**> m_MainEditorWindows;
         std::vector<EditorComponents::ImGUI::UserInterface**> m_StartMenuWindows;
@@ -55,6 +64,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         Result Init(Graphics::IRenderer* renderer, IContext* context) override;
         void Draw() override;
         void ProcessEvents(void* event) override;
+        void OnEvent(Event::Naive* event) override;
 
         void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
 

@@ -8,6 +8,8 @@
 
 #include "Core/Core.h"
 
+#include "Profiler/ScopeTimer.h"
+
 #undef min
 #undef max
 
@@ -46,15 +48,16 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     Result ImGUI_Editor::Init(Graphics::IRenderer* renderer, IContext* context)
     {
         m_API_Context = context;
-        m_Context = (ImGuiContext*)Reflection::GetType("SteelEngine::VulkanContext")->Invoke("GetContext", context).Convert<void*>();
+        m_Context = (ImGuiContext*)Reflection::GetType("SteelEngine::OpenGL_Context")->Invoke("GetContext", context).Convert<void*>();
+        m_NaiveManager = Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::EVENT_MANAGER)->Convert<IEventManager**>();
 
         ImGui::SetCurrentContext(m_Context);
 
-        IReflectionData** types = Reflection::GetTypes();
+        m_Types = Reflection::GetTypes();
 
         for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
-            IReflectionData* type = types[i];
+            const IReflectionData* type = m_Types[i];
             std::vector<IReflectionInheritance*> inhs = type->GetInheritances();
 
             for(Type::uint32 i = 0; i < inhs.size(); i++)
@@ -63,7 +66,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                 {
                     EditorComponents::ImGUI::UserInterface** window = (EditorComponents::ImGUI::UserInterface**)&type->Create()->m_Object;
 
-                    strcpy((*window)->m_Title, type->GetTypeName().c_str());
+                    strcpy((*window)->m_Title, type->GetTypeName());
                     (*window)->m_Context = m_Context;
                     (*window)->m_Editor = (ImGUI_Editor**)&m_Object;
 
@@ -134,15 +137,29 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
             for(Type::uint32 i = 0; i < m_StartMenuWindows.size(); i++)
             {
                 HotReloader::IRuntimeObject* uiObject = (*m_StartMenuWindows[i]);
-                EditorComponents::ImGUI::UserInterface* ui = Reflection::GetType(uiObject)->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
+                IReflectionData* type = Reflection::GetType(uiObject);
+                EditorComponents::ImGUI::UserInterface* ui = type->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
 
-                if(Reflection::GetType(uiObject)->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
+                if(type->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
                 {
-                    ImGui::Begin(ui->m_Title);
+                    Variant* flagsVariant = type->GetMetaData(EditorComponents::ImGUI::UserInterface::FLAGS);
+
+                    if(flagsVariant && flagsVariant->IsValid())
                     {
-                        ui->Draw();
+                        ImGui::Begin(ui->m_Title, 0, flagsVariant->Convert<ImGuiWindowFlags>());
+                        {
+                            ui->Draw();
+                        }
+                        ImGui::End();
                     }
-                    ImGui::End();
+                    else
+                    {
+                        ImGui::Begin(ui->m_Title);
+                        {
+                            ui->Draw();
+                        }
+                        ImGui::End();
+                    }
                 }
                 else
                 {
@@ -155,15 +172,29 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
             for(Type::uint32 i = 0; i < m_UIs.size(); i++)
             {
                 HotReloader::IRuntimeObject* uiObject = (*m_UIs[i]);
-                EditorComponents::ImGUI::UserInterface* ui = Reflection::GetType(uiObject)->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
+                IReflectionData* type = Reflection::GetType(uiObject);
+                EditorComponents::ImGUI::UserInterface* ui = type->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
 
-                if(Reflection::GetType(uiObject)->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
+                if(type->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
                 {
-                    ImGui::Begin(ui->m_Title);
+                    Variant* flagsVariant = type->GetMetaData(EditorComponents::ImGUI::UserInterface::FLAGS);
+
+                    if(flagsVariant && flagsVariant->IsValid())
                     {
-                        ui->Draw();
+                        ImGui::Begin(ui->m_Title, 0, flagsVariant->Convert<ImGuiWindowFlags>());
+                        {
+                            ui->Draw();
+                        }
+                        ImGui::End();
                     }
-                    ImGui::End();
+                    else
+                    {
+                        ImGui::Begin(ui->m_Title);
+                        {
+                            ui->Draw();
+                        }
+                        ImGui::End();
+                    }
                 }
                 else
                 {
@@ -174,41 +205,52 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
             for(Type::uint32 i = 0; i < m_MainEditorWindows.size(); i++)
             {
                 HotReloader::IRuntimeObject* uiObject = (*m_MainEditorWindows[i]);
-                EditorComponents::ImGUI::UserInterface* ui = Reflection::GetType(uiObject)->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
+                IReflectionData* type = Reflection::GetType(uiObject);
+                EditorComponents::ImGUI::UserInterface* ui = type->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
 
-                if(Reflection::GetType(uiObject)->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
+                if(type->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
                 {
-                    ImGui::Begin(ui->m_Title);
+                    Variant* flagsVariant = type->GetMetaData(EditorComponents::ImGUI::UserInterface::FLAGS);
+
+                    if(flagsVariant && flagsVariant->IsValid())
+                    {
+                        ImGui::Begin(ui->m_Title, 0, flagsVariant->Convert<ImGuiWindowFlags>());
+                    }
+                    else
+                    {
+                        ImGui::Begin(ui->m_Title);
+                    }
+
                     {
                         ui->Draw();
 
-                        const std::vector<IReflectionData::PropertyInfo> a = Reflection::GetType(uiObject)->GetProperties();
+                        const std::vector<IReflectionProperty*> a = type->GetProperties();
 
                         for(Type::uint32 i = 0; i < a.size(); i++)
                         {
-                            IReflectionData::PropertyInfo info = a[i];
-                            Variant prop = Reflection::GetType(uiObject)->GetProperty(info.m_Name, uiObject);
+                            // IReflectionData::PropertyInfo info = a[i];
+                            Variant prop = type->GetProperty(a[i]->GetName().c_str(), uiObject);
 
                             if(prop.GetType() == m_FloatTypeID)
                             {
-                                Variant* meta = info.m_Property->GetMetaData(ReflectionAttributes::RANGE);
+                                Variant* meta = a[i]->GetMetaData(ReflectionAttributes::RANGE);
 
                                 if(meta->IsValid())
                                 {
                                     Range range = meta->Convert<Range>();
 
-                                    ImGui::SliderFloat(info.m_Name.c_str(), (float*)prop.GetAddress(), range.m_Min, range.m_Max);
+                                    ImGui::SliderFloat(a[i]->GetName().c_str(), (float*)prop.GetAddress(), range.m_Min, range.m_Max);
                                 }
                             }
                             else if(prop.GetType() == m_IntTypeID)
                             {
-                                Variant* meta = info.m_Property->GetMetaData(ReflectionAttributes::RANGE);
+                                Variant* meta = a[i]->GetMetaData(ReflectionAttributes::RANGE);
 
                                 if(meta->IsValid())
                                 {
                                     Range range = meta->Convert<Range>();
 
-                                    ImGui::SliderInt(info.m_Name.c_str(), (int*)prop.GetAddress(), range.m_Min, range.m_Max);
+                                    ImGui::SliderInt(a[i]->GetName().c_str(), (int*)prop.GetAddress(), range.m_Min, range.m_Max);
                                 }
                             }
                         }
@@ -220,6 +262,15 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                     ui->Draw();
                 }
             }
+        }
+
+        static bool isAnyItemActive = false;
+
+        if(ImGui::IsAnyItemActive() != isAnyItemActive)
+        {
+            isAnyItemActive = ImGui::IsAnyItemActive();
+
+            (*m_NaiveManager)->DispatchEvent(new AnyItemActiveChangedEvent(isAnyItemActive));
         }
 
         ImGui::Render();
@@ -235,15 +286,18 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         ImGui::SetCurrentContext(m_Context);
     }
 
+    void ImGUI_Editor::OnEvent(Event::Naive* event)
+    {
+
+    }
+
     void ImGUI_Editor::operator()(const ChangeSceneEvent& event)
     {
         m_CurrentScene = event.m_SceneType;
 
-        IReflectionData** types = Reflection::GetTypes();
-
         for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
-            IReflectionData* type = types[i];
+            const IReflectionData* type = m_Types[i];
 
             bool found = false;
 
@@ -283,7 +337,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                                 {
                                     EditorComponents::ImGUI::UserInterface* ui = type->Invoke("Cast_UserInterface", cmd->m_Object).Convert<EditorComponents::ImGUI::UserInterface*>();
 
-                                    strcpy(ui->m_Title, type->GetTypeName().c_str());
+                                    strcpy(ui->m_Title, type->GetTypeName());
 
                                     ui->m_Context = m_Context;
 

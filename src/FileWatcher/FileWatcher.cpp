@@ -9,7 +9,7 @@ namespace SteelEngine {
 
     FileWatcher::FileWatcher(
         const std::filesystem::path& path,
-        const std::function<void(const std::filesystem::path&, FileStatus)>& action) :
+        ActionFunction action) :
         m_Path(path),
         m_Action(action)
     {
@@ -56,14 +56,11 @@ namespace SteelEngine {
 
                 m_Action(file_, FileStatus::CREATED);
             }
-            else
+            else if(m_Paths[file_] != currentFileLastWriteTime)
             {
-                if(m_Paths[file_] != currentFileLastWriteTime)
-                {
-                    m_Paths[file_] = currentFileLastWriteTime;
+                m_Paths[file_] = currentFileLastWriteTime;
 
-                    m_Action(file_, FileStatus::MODIFIED);
-                }
+                m_Action(file_, FileStatus::MODIFIED);
             }
         }
     }

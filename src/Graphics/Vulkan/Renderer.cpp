@@ -772,13 +772,6 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             return SE_FALSE;
         }
 
-        Event::GlobalEvent::Add<ResizeEvent>(this);
-        Event::GlobalEvent::Add<MinimizedEvent>(this);
-        Event::GlobalEvent::Add<MaximizedEvent>(this);
-        Event::GlobalEvent::Add<KeyDownEvent>(this);
-        Event::GlobalEvent::Add<KeyUpEvent>(this);
-        Event::GlobalEvent::Add<MouseMotionEvent>(this);
-
         for(uint32_t i = 0; i < 256; i++)
         {
             m_Keys[i] = false;
@@ -1102,53 +1095,65 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
         m_UpdateBuffers.push_back(func);
     }
 
-    void Renderer::operator()(const KeyDownEvent& event)
+    void Renderer::OnEvent(Event::Naive* event)
     {
-        m_Keys[event.m_KeyCode] = true;
+        static size_t event1 = MouseMotionEvent::GetStaticType();
+        static size_t event2 = KeyDownEvent::GetStaticType();
+        static size_t event3 = KeyUpEvent::GetStaticType();
+        static size_t event4 = WindowResizedEvent::GetStaticType();
+        static size_t event5 = WindowMinimizedEvent::GetStaticType();
+        static size_t event6 = WindowMaximizedEvent::GetStaticType();
 
-        if(event.m_KeyCode == SDL_SCANCODE_K)
+        if(event1 == event->GetType())
         {
-            m_RotateCamera = !m_RotateCamera;
+            MouseMotionEvent* eve = (MouseMotionEvent*)event;
+            glm::vec2 deltaPos = glm::vec2(eve->m_PositionX, eve->m_PositionY) - glm::vec2(1920 / 2, 1080 / 2);
+
+            if(m_RotateCamera && (deltaPos.x != 0 || deltaPos.y != 0))
+            {
+                Transform& camTrans = m_Camera.GetTransform();
+
+                camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.x * -0.001f, glm::vec3(0, 1, 0)) * camTrans.GetRotation()));
+                camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.y * 0.001f, camTrans.GetRotation().GetRight()) * camTrans.GetRotation()));
+            }
         }
-    }
-
-    void Renderer::operator()(const KeyUpEvent& event)
-    {
-        m_Keys[event.m_KeyCode] = false;
-    }
-
-    void Renderer::operator()(const MouseMotionEvent& event)
-    {
-        glm::vec2 deltaPos = glm::vec2(event.m_X, event.m_Y) - glm::vec2(m_Width / 2, m_Height / 2);
-        Transform& camTrans = m_Camera.GetTransform();
-        float delta = (*m_DeltaTimeVariant->Convert<IDeltaTime**>())->GetDeltaTime();
-
-        if(m_RotateCamera && (deltaPos.x != 0 || deltaPos.y != 0))
+        else if(event2 == event->GetType())
         {
-            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.x * delta * -0.5f, glm::vec3(0, 1, 0)) * camTrans.GetRotation()));
-            camTrans.SetRotation(glm::normalize(glm::angleAxis(deltaPos.y * delta * -0.5f, camTrans.GetRotation().GetRight()) * camTrans.GetRotation()));
+            KeyDownEvent* eve = (KeyDownEvent*)event;
+
+            m_Keys[eve->m_KeyCode] = true;
+
+            if(eve->m_KeyCode == SDL_SCANCODE_K)
+            {
+                m_RotateCamera = !m_RotateCamera;
+            }
         }
-    }
+        else if(event3 == event->GetType())
+        {
+            KeyUpEvent* eve = (KeyUpEvent*)event;
 
-    void Renderer::operator()(const ResizeEvent& event)
-    {
-        m_FramebufferResized = true;
+            m_Keys[eve->m_KeyCode] = false;
+        }
+        else if(event4 == event->GetType())
+        {
+            WindowResizedEvent* eve = (WindowResizedEvent*)event;
 
-        m_Width = event.m_Width;
-        m_Height = event.m_Height;
+            m_FramebufferResized = true;
 
-        // TODO: Update camera
-        m_Camera.SetProjection(glm::perspective(glm::radians(70.f), (float)m_Width / (float)m_Height, 0.1f, 1000.f));
-    }
+            m_Width = eve->m_Width;
+            m_Height = eve->m_Height;
 
-    void Renderer::operator()(const MinimizedEvent& event)
-    {
-        m_WindowMinimized = true;
-    }
-
-    void Renderer::operator()(const MaximizedEvent& event)
-    {
-        m_WindowMinimized = false;
+            // TODO: Update camera
+            m_Camera.SetProjection(glm::perspective(glm::radians(70.f), (float)m_Width / (float)m_Height, 0.1f, 1000.f));
+        }
+        else if(event5 == event->GetType())
+        {
+            m_WindowMinimized = true;
+        }
+        else if(event6 == event->GetType())
+        {
+            m_WindowMinimized = false;
+        }
     }
 
 }}}

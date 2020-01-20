@@ -67,7 +67,7 @@ namespace SteelEngine {
     {
         m_Context = context;
 
-        ImGui::SetCurrentContext(Reflection::GetType("SteelEngine::VulkanContext")->Invoke("GetContext", context).Convert<ImGuiContext*>());
+        ImGui::SetCurrentContext(Reflection::GetType("SteelEngine::OpenGL_Context")->Invoke("GetContext", context).Convert<ImGuiContext*>());
     }
 
     void VirtualProjectVisualizer::OnProjectLoad()
@@ -88,8 +88,8 @@ namespace SteelEngine {
                     EditorComponents::ImGUI::UserInterface* ui =
                         type->Invoke("Cast_UserInterface", obj).Convert<EditorComponents::ImGUI::UserInterface*>();
 
-                    strcpy(ui->m_Title, type->GetTypeName().c_str());
-                    ui->m_Context = Reflection::GetType("SteelEngine::VulkanContext")->Invoke("GetContext", m_Context).Convert<ImGuiContext*>();
+                    strcpy(ui->m_Title, type->GetTypeName());
+                    ui->m_Context = Reflection::GetType("SteelEngine::OpenGL_Context")->Invoke("GetContext", m_Context).Convert<ImGuiContext*>();
 
                     ui->Init();
 

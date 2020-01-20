@@ -8,8 +8,10 @@
 
 namespace SteelEngine { namespace Profiler {
 
-    ScopeTimer::ScopeTimer(const std::string& name) :
-        m_Name(name)
+    ScopeTimer::ScopeTimer(const std::string& name, const std::filesystem::path& file, size_t line) :
+        m_Name(name),
+        m_File(file),
+        m_Line(line)
     {
         m_Start = std::chrono::high_resolution_clock::now();
     }
@@ -18,10 +20,10 @@ namespace SteelEngine { namespace Profiler {
     {
         m_Stop = std::chrono::high_resolution_clock::now();
 
-        Manager** manager = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::PROFILER)->Convert<Manager**>();
+        static Manager** manager = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::PROFILER)->Convert<Manager**>();
         float time = std::chrono::duration<float, std::chrono::milliseconds::period>(m_Stop - m_Start).count();
 
-        Reflection::GetType((*manager))->Invoke("AddTime", (*manager), Manager::TimeData{ time, m_Name });
+        Reflection::GetType((*manager))->Invoke("AddTime", (*manager), Manager::TimeData{ time, m_Name, m_File, m_Line });
     }
 
 }}

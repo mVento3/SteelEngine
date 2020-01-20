@@ -24,7 +24,9 @@ namespace SteelEngine {
 
         ImGui::StyleColorsDark();
 
-        ImGui_ImplSDL2_InitForOpenGL((SDL_Window*)window->GetWindow(), Reflection::GetType("SteelEngine::OpenGL_Window")->Invoke("GetContext", window).Convert<void*>());
+        Variant cont = Reflection::GetType("SteelEngine::OpenGL_Window")->Invoke("GetContext", window);
+
+        ImGui_ImplSDL2_InitForOpenGL((SDL_Window*)window->GetWindow(), cont.Convert<void*>());
         ImGui_ImplOpenGL3_Init("#version 130");
 
         m_Context = ImGui::GetCurrentContext();

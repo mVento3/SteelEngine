@@ -34,7 +34,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         int m_CurrentItem;
         int m_CurrentReflectionItem;
 
-        std::vector<std::string> reflectionRes;
+        std::vector<const char*> reflectionRes;
 
         Variant* m_Info;
 
