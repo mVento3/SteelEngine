@@ -3,7 +3,7 @@
 namespace SteelEngine { namespace Memory {
 
     ProxyAllocator::ProxyAllocator(Allocator& allocator) :
-        Allocator(allocator.GetMemorySize(), allocator.GetStart()),
+        Allocator(allocator.GetMemorySize(), allocator.m_Start),
         m_Allocator(allocator)
     {
 

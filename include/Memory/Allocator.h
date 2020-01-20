@@ -17,6 +17,7 @@ namespace SteelEngine {
     class Allocator
     {
         friend class MemoryTracker;
+        friend class ProxyAllocator;
     public:
 		static const Type::uint8 DEFAULT_ALIGNMENT = 8;
 
@@ -27,10 +28,10 @@ namespace SteelEngine {
         size_t m_MemorySize;
         size_t m_UsedMemorySize;
         size_t m_AllocationsCount;
-        const void* m_Start;
+        void* m_Start;
 
     public:
-        Allocator(size_t size, const void* start);
+        Allocator(size_t size, void* start);
         virtual ~Allocator();
 
         virtual void* Allocate(size_t size, Type::uint8 alignment = DEFAULT_ALIGNMENT) = 0;

@@ -25,7 +25,7 @@ namespace SteelEngine {
 
         void* someMemory = Memory::allocateSize(*m_RootAllocator, 128 * 10);//m_RootAllocator->Allocate(128 * 10);
 
-        Memory::PoolAllocator* pool = new(someMemory) Memory::PoolAllocator(someMemory, 128 * 10, 128);
+        Memory::Internal::PoolAllocator* pool = new(someMemory) Memory::Internal::PoolAllocator(someMemory, 128 * 10, 128);
 
         m_Allocators = Memory::allocate<AllocatorMap>(*pool);
 

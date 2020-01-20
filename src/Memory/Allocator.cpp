@@ -4,7 +4,7 @@
 
 namespace SteelEngine { namespace Memory {
 
-    Allocator::Allocator(size_t size, const void* start) :
+    Allocator::Allocator(size_t size, void* start) :
         m_MemorySize(size),
         m_Start(start)
     {

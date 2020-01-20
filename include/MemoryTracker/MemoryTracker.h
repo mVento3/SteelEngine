@@ -4,7 +4,7 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Memory/PoolAllocator.h"
+#include "Memory/Internal/PoolAllocator.h"
 
 #include "MemoryTracker/MemoryTracker.Generated.h"
 
