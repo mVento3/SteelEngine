@@ -28,7 +28,8 @@ namespace SteelEngine {
         enum Attributes
         {
             // Draw separate window for class
-            SEPARATE_WINDOW
+            SEPARATE_WINDOW,
+            FLAGS
         };
 
     protected:
