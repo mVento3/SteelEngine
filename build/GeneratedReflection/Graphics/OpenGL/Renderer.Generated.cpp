@@ -16,10 +16,14 @@ SteelEngine::ReflectionRecorder::Register<Renderer>("Renderer",{
 )
 (
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 )
 .Inheritance<IRenderer>("IRenderer")
+.Inheritance<EventObserver>("EventObserver")
 .Constructor<IWindow*>()
+.Method("Cast_IRenderer", &Renderer::Cast_IRenderer)
+.Method("Cast_EventObserver", &Renderer::Cast_EventObserver)
 ;
 }
 
@@ -55,6 +59,7 @@ SERIALIZE(Renderer::m_DirectionalLightTransform)
 SERIALIZE(Renderer::m_Counter)
 SERIALIZE(Renderer::m_Keys)
 SERIALIZE(Renderer::m_RotateCamera)
+SERIALIZE(Renderer::m_Controlls)
 }
 
 #ifdef RUNTIME_COMPILE

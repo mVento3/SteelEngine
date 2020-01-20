@@ -16,6 +16,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(OpenGL_Context))
 .Inheritance<IContext>("IContext")
 .Constructor<>()
 .Method("GetContext", &OpenGL_Context::GetContext)
+.Method("MakeCurrent", &OpenGL_Context::MakeCurrent)
 ;
 }
 

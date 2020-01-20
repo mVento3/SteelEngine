@@ -18,10 +18,14 @@ SteelEngine::ReflectionRecorder::Register<ImGUI_Editor>("ImGUI_Editor",{
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::EDITOR, true),
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::EDITOR_NAME, "ImGui"),
+SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ImGUI_Editor))
 )
 .Inheritance<IEditor>("IEditor")
+.Inheritance<EventObserver>("EventObserver")
 .Constructor<>()
+.Method("Cast_IEditor", &ImGUI_Editor::Cast_IEditor)
+.Method("Cast_EventObserver", &ImGUI_Editor::Cast_EventObserver)
 ;
 }
 
@@ -31,6 +35,7 @@ SERIALIZE(ImGUI_Editor::m_Context)
 SERIALIZE(ImGUI_Editor::m_CurrentScene)
 SERIALIZE(ImGUI_Editor::m_API_Context)
 SERIALIZE(ImGUI_Editor::m_VirtualProjectVisualizer)
+SERIALIZE(ImGUI_Editor::m_NaiveManager)
 SERIALIZE(ImGUI_Editor::m_MainEditorWindows)
 SERIALIZE(ImGUI_Editor::m_StartMenuWindows)
 SERIALIZE(ImGUI_Editor::m_UIs)

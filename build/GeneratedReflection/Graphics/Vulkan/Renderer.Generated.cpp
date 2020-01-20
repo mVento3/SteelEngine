@@ -19,6 +19,7 @@ SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERI
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 )
 .Inheritance<IRendererAPI<IRenderer::API::VULKAN_API>>("IRendererAPI<IRenderer::API::VULKAN_API>")
+.Inheritance<EventObserver>("EventObserver")
 .Constructor<IWindow*>()
 .Method("RecreateSwapChain", &Renderer::RecreateSwapChain)
 ;

@@ -32,9 +32,9 @@ void SystemsMonitorWindow::Serialize(SteelEngine::HotReloader::ISerializer* seri
 {
 SERIALIZE(SystemsMonitorWindow::m_CurrentItem)
 SERIALIZE(SystemsMonitorWindow::m_CurrentReflectionItem)
-SERIALIZE(SystemsMonitorWindow::reflectionRes)
 SERIALIZE(SystemsMonitorWindow::m_Info)
 SERIALIZE(SystemsMonitorWindow::m_Database)
+UserInterface::Serialize(serializer);
 }
 
 #ifdef RUNTIME_COMPILE

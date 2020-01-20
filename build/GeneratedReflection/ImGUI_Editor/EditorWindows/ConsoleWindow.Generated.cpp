@@ -15,20 +15,28 @@ SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::SCE
 SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW, true),
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData(SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW, true),
+SteelEngine::Reflection::MetaData(SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::FLAGS, ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar),
 SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ConsoleWindow))
 )
 .Inheritance<EditorComponents::ImGUI::UserInterface>("EditorComponents::ImGUI::UserInterface")
 .Inheritance<LogDispatcher>("LogDispatcher")
+.Inheritance<EventObserver>("EventObserver")
 .Constructor<>()
 .Method("Cast_UserInterface", &ConsoleWindow::Cast_UserInterface)
 .Method("Cast_LogDispatcher", &ConsoleWindow::Cast_LogDispatcher)
+.Method("Cast_EventObserver", &ConsoleWindow::Cast_EventObserver)
 ;
 }
 
 void ConsoleWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(ConsoleWindow::m_Logs)
+SERIALIZE(ConsoleWindow::m_ScrollDown)
+SERIALIZE(ConsoleWindow::m_CommandBuffer)
+SERIALIZE(ConsoleWindow::m_Keys)
+SERIALIZE(ConsoleWindow::m_ConsoleSystem)
+UserInterface::Serialize(serializer);
 }
 
 #ifdef RUNTIME_COMPILE

@@ -27,8 +27,10 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(TimingsViewWindow))
 void TimingsViewWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(TimingsViewWindow::m_Manager)
-SERIALIZE(TimingsViewWindow::m_Headers)
 SERIALIZE(TimingsViewWindow::m_Type)
+SERIALIZE(TimingsViewWindow::m_GetTimeMethod)
+SERIALIZE(TimingsViewWindow::m_Timings)
+UserInterface::Serialize(serializer);
 }
 
 #ifdef RUNTIME_COMPILE

@@ -10,5 +10,9 @@ LogDispatcher* Cast_LogDispatcher()\
 {\
 return static_cast<ConsoleWindow*>(this);\
 }\
+EventObserver* Cast_EventObserver()\
+{\
+return static_cast<ConsoleWindow*>(this);\
+}\
 public:\
 virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer) override;

@@ -35,6 +35,7 @@ SERIALIZE(SynchronizeProjectNCE::m_ShouldOverrideEventData)
 SERIALIZE(SynchronizeProjectNCE::m_DrawShouldOverridePopup)
 SERIALIZE(SynchronizeProjectNCE::m_Buffer)
 SERIALIZE(SynchronizeProjectNCE::m_BufferSize)
+UserInterface::Serialize(serializer);
 }
 
 #ifdef RUNTIME_COMPILE

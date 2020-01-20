@@ -14,7 +14,7 @@
             "files": [
                 {
                     "filename": "FileWatcher.cpp",
-                    "hash": "5230d9ab17bc2e50036814e6e5d96a23aa43f3812c1837afbd48882766b160919d1c4d591f775902eeb716dd434f269557500a25925b603c8250a157902c32b6"
+                    "hash": "60ccacbbec2311f4ad17b737e6ffe2c8a03c7e965ab2a7ca20e61ddbfa4b59dd3d1afffd5c88504795516e3b68611b7437e4e9809e199c0d0dc508beb6dce8af"
                 }
             ]
         },
@@ -158,6 +158,30 @@
                 {
                     "filename": "LocalEvent.Generated.cpp",
                     "hash": "94a5d01aab3b61800221d15199d39312aa4ccff46f8b3fe310d90c5b2d21f2fc9de38c4ee520708aa13e0331ef0e388254bc5655a95b6e0000a3e3624d9c7a1d"
+                },
+                {
+                    "filename": "Event.Generated.cpp",
+                    "hash": "3c54f964e082b2c2f3f9c6c1db3dbd472ce8320acae3ef699259c1309d73a13a2d75ab960dc85ec08df75af3b830fd3c1defab6dc20306deb76f0e948c0fcdb1"
+                },
+                {
+                    "filename": "EventDispatcher.Generated.cpp",
+                    "hash": "70d46aa386ebaabd38a844285c31ff2d526c257fcc1af9945adaa748c7e6caded1503129025b14d7343c301095001cc4782496ff3f7dbb911d230428ae5c07ae"
+                },
+                {
+                    "filename": "EventManager.Generated.cpp",
+                    "hash": "c8df35ea94531749d3c09170d6649adeedabd1efa0a921588a6e345d1797145c834ea08d77253bc42eca02d6519e87afb55ce8d6e2765a8b30eb686c0ef337ea"
+                },
+                {
+                    "filename": "EventObserver.Generated.cpp",
+                    "hash": "7f2a387527823081ef7aef850ec3d9a4b6344fbe8deb260aa089ab46d18d4f610e7786c0af26c57cae991fdd8056901debd67efd3f60360de3f2defae5d0341d"
+                },
+                {
+                    "filename": "IEventManager.Generated.cpp",
+                    "hash": "9f09b40eefea02bff09454cb5b15bf94498c66917c69809868fc95a9a160c66cfbace900696b6dc954418b5bd4526c892bd68b22a2f01a31779d4f88b1ae5f51"
+                },
+                {
+                    "filename": "NaiveEvent.Generated.cpp",
+                    "hash": "d8552df8618482239fb388f6745c2dcb7611817b4fd29f5e8cff9f0ea48e11b751ede7efb90148bd2c0540c6455f80dfd9c6c6e7965004a4ffc19a651c4ff2db"
                 }
             ]
         },
@@ -171,6 +195,10 @@
                 {
                     "filename": "GlobalEventTracker.cpp",
                     "hash": "78ddb3f64112e09903ee007acf095d9923609b7a599e443d3acf7872ae2873d3005a03d97ca9704d029ad0cf21d837bc12c28e00dac6d5b175d475005e368eb5"
+                },
+                {
+                    "filename": "EventManager.cpp",
+                    "hash": "9cc2b65cf1dd824a6c152202d1c37d84f3f5019dc7e226b7f046b218d88b5947a1fa12a2ba9f365081addc167bb132f2569d57bd369edf6fdad8afc9efe15a1b"
                 }
             ]
         },
@@ -179,7 +207,7 @@
             "files": [
                 {
                     "filename": "Core.Generated.cpp",
-                    "hash": "b3e716a15aee55502849a1a0981d2352e98b3209b3908edc6ae3667fda31965c1a1d5d24521d4b8e96fde47df17aa63b41d5fdfbeea4b479447480e610336353"
+                    "hash": "3bdb5505d41ec53f404b434e0b1d44305d407d9123970093891b43a1f5219f12821e737d8340fa581b6ed83d8987c77c2a06ed780e97d205ec06acf9b658ff0a"
                 },
                 {
                     "filename": "DeltaTime.Generated.cpp",
@@ -240,7 +268,7 @@
             "files": [
                 {
                     "filename": "Core.cpp",
-                    "hash": "1b31c9aa34ae9cdc1967fb7db919162ce59b1206427f9701f1a46696643da7c0689e81cbfe00c4fc3fa9a4b90a1eaab5485f6492a426ca6fdfa4770757dc6735"
+                    "hash": "9aacb376398a4670ea35420c8efd1908b45a8ce60571b41507baa2a2ab859c8089d283fc034ec88c3776f0cebd72095c3637c0c0e1f9f7179158a7e179485a47"
                 },
                 {
                     "filename": "DeltaTime.cpp",
@@ -295,7 +323,7 @@
             "files": [
                 {
                     "filename": "ReflectionGenerator.cpp",
-                    "hash": "783f1e287eb819faf3b0bcde4514d14a75934197a7420221b3ec0893a83eb681763d27b6ec4fe9781260474bea07af563276f02b3d2be68c9415f4df396a628e"
+                    "hash": "4b077fe0cdf343eb6b41e7216fb6faf979eff1cd460177c7b5c853b461862095422acfa6cb3bb0617b910fe44706a1a786c6642a05643b3f2dd8ce74ef64466e"
                 }
             ]
         },
@@ -366,7 +394,7 @@
                 },
                 {
                     "filename": "Renderer.Generated.cpp",
-                    "hash": "8a64dbac99af230dae7bb64305e688108adfef08fa73ba93ca1eb751ade07188e6276ed1585b2aa0fcd7235f77fbbb2591f863c89d3326e1f3b6dd39397fae02"
+                    "hash": "68017d8099f12bd2c47c3bdcab3cd83e6ae885994bd4e6e029ec6c93de572aaa7f1ea8b0ead1fbb4a1a23f9eeb23e0f68d75a122aabfc83e73c78a04b93a9f08"
                 },
                 {
                     "filename": "Shader.Generated.cpp",
@@ -448,7 +476,7 @@
                 },
                 {
                     "filename": "Renderer.Generated.cpp",
-                    "hash": "9cf222d842869d653198318319693788662d751cfaf51e3abc995552eab9ed9921f54fdb310ff271b3c88004f132923d47f2c6d3663fa6ce0cb7ac1e1f95fc1a"
+                    "hash": "9fa8affb7de0ceb5bd8be2baa1cfcf1b832e117de1bf348ee5c4370fce7f8a6d6706c0e2b5088ead0e5ca29fc68de733b2d67eba5260b3004335da183701bd56"
                 },
                 {
                     "filename": "Shader.Generated.cpp",
@@ -557,7 +585,7 @@
                 },
                 {
                     "filename": "Renderer.cpp",
-                    "hash": "6479684065eb32896ec64733370aec960b7f85f787d7841af5e9a414dccfcc5064fb1dcdf4f8f3a726f375ffdbf9307e48713fe0c1b6f788d00f3076669c16c4"
+                    "hash": "50597d5017977a25bd570d76eb19a71b060f48f2834f6521fe6be05d0501dd0a5e5c8d5b6daca523e4ed8b3346bb549321da206a7b41ce31c1d006adb8af5f29"
                 },
                 {
                     "filename": "Shader.cpp",
@@ -611,7 +639,7 @@
                 },
                 {
                     "filename": "Renderer.cpp",
-                    "hash": "dd650fefabc8a8febab0474f30fb6df977711db93bc34b8091c064b1791c3b1cd99b874c86fafae7cf42043dbe3cc40b942d22d74db3271dcb50eca9dd7ab974"
+                    "hash": "18289af16ac6218cfbb5611982933a3a673e32d75414dbd6e40017659afa06f7b76e5f5665fece7d113d5cc848a245e0c8a59eff8e34743e5ea393d16ac89e88"
                 },
                 {
                     "filename": "Shader.cpp",
@@ -670,11 +698,11 @@
                 },
                 {
                     "filename": "ImGUI_Editor.Generated.cpp",
-                    "hash": "9f431194825bcdcac9f9177a97d804812a99ba67f3e8d23ee43dddea82c4f4e42a84d68e2fe38b96ee7faad3699e1b467beab90120b1d641bd81233bb0b46090"
+                    "hash": "42f14368850b0402044b7a43e96e86006559ca45cf27e415ec37338146af4fee0ae0338eadd83fbc2968744d803e911b26fad0a31e169f21040372a89799351e"
                 },
                 {
                     "filename": "OpenGL_Context.Generated.cpp",
-                    "hash": "897c036a7999664b757261e1c06d7c193cb82e989e968194895a8dfbd66a2054789a7bc1ab8294803ce5fb15444073a65ec75c45fd21138e14d9f7e83570a7cc"
+                    "hash": "82f956ab921c5e6fb8e34f957e1bfaa523900f927c5dc8d4470821edee33de7e07f093289552a67650d15e24fb01a8320ace94cafa86e06bacf7d7b73e69f415"
                 },
                 {
                     "filename": "ProjectInfo.Generated.cpp",
@@ -707,27 +735,27 @@
             "files": [
                 {
                     "filename": "ConsoleWindow.Generated.cpp",
-                    "hash": "9b7c819abcd9794e94cacf8d1acbf54b2965c89f171908d4c2217e2fdefe8fc7ff1b9351a46803d8110e4b019688a3f7e49755627ce7a664a2b385022ce0f7d2"
+                    "hash": "a38bc5af9c9fa7775cf33b8bafdfe6dc40fde608a6daed557a317f8737e6be6246b2f9a332a2010ec9c8461323222b69b27399d044a6cd8dcf28a4a2614bb79b"
                 },
                 {
                     "filename": "NetworkManagerWindow.Generated.cpp",
-                    "hash": "ae2edf9212e5ac5ac36f73987623e5b996e6f01832188eeabca85c8203a5a85649a464d5ff78a1fd4e2a8a9b97187a24dd165fe1f76994ec3b8b4fafb2911408"
+                    "hash": "ef0ecf893bcccdce833ef260f70cc83e1ac78b838a9a7ebbf05ad4d5344d5f290ca084a61fb46cb57feef060c25e70eab25cda04dc964f6f81418fb40897fcca"
                 },
                 {
                     "filename": "StartMenuWindow.Generated.cpp",
-                    "hash": "191030cc4ca3f038c607c68604a534aa5596a2a2f1f6fb8cce76ee8cfc281053e2670d627e98ecb4f7ae49302df1b3b23bd00fb3f7198b3ab60b0d1c217f62d9"
+                    "hash": "e552c4e6f0da0d3ee08e026c5a5865a4ab9118fe43946d3cf4595be561c0292e642f807256376b278f89e761196eaeeb8f465694722f13e0256d0052ac9368df"
                 },
                 {
                     "filename": "SystemsMonitorWindow.Generated.cpp",
-                    "hash": "09ed3785e4497ef92dde316144ad7fac54a432e64a5c33bbf5d1f6fadcd995298fc29d7b9fffcdf7d107a4a24b87d3aac18af9f883b5ccebc8b58b30820097e7"
+                    "hash": "ba9e204f1ee33bce6255500db8c855e4ca2bc05a3d5e30bcf98804f0d5f19c5dfd703ce91a6a562a0c16f5d0799d6b41291131e78d7bce193df595d269827557"
                 },
                 {
                     "filename": "MemoryViewWindow.Generated.cpp",
-                    "hash": "ad2806f2921e4fe9d4345d5477b680eb9b3da494e1bd205a8fab0e8790ed185c6d67b613555aee3a5781451556be2d664c2fdef6170f2878bd19141589c4b2bf"
+                    "hash": "b34484c194cc1bb947b694131914db71b4d2aa6e207dfe6b0acd8bc6f867232fb8a2024f045d165d1e2500a6e8278a46b91daf90fdde0e85ad7bd007a94ac1f7"
                 },
                 {
                     "filename": "TimingsViewWindow.Generated.cpp",
-                    "hash": "a0d0fa75a1e4883c675987816802d08e8c364d8aaa49a585b9c50500a64aec10b82d435ab27cbadaf798a66b593756debe7854e99297db74a187ae753c757fd6"
+                    "hash": "314785b12ef4879b520fc626eafa4df6370d04a1e56dc455e8bbdb26a9715ba1f83504275f1909cc27d3e80bfa506a3dcbefb9946216b39866245cf5e1e698bf"
                 },
                 {
                     "filename": "ColumnHeader.Generated.cpp",
@@ -740,11 +768,11 @@
             "files": [
                 {
                     "filename": "ImGUI_Editor.cpp",
-                    "hash": "2abc37a46fda92b9408da558110fc6384f9d32953394475aa2065dfb62b65d0104460edc46f4ecfa97c9b5126b57495ac7d76e9229e9b33ce9ad207753d36d10"
+                    "hash": "a6f2840b103159104837f1c9e3b721d296b95e7cf4dfd52ffbe6037177d2028c7f867bfefde14f497d780d7d233d8668a5451476d5e07108a9447c5219898381"
                 },
                 {
                     "filename": "OpenGL_Context.cpp",
-                    "hash": "f3e49a42225c2c87ecc534d6099ef062aa23cea6aeb4257c571a69286ec31b03043d288246b5286747435bfa3a3cfade38c1fa332edd44b349d4f83f275987df"
+                    "hash": "71b798a87429cd52b8ea929cd57fe736cfe842cef9ad491de00ea2d52e328febc217933d4f00d4ae9f6e08d2fdc6073c456e7b8159af8b5c3ecffba08d8006e8"
                 },
                 {
                     "filename": "VulkanContext.cpp",
@@ -761,7 +789,7 @@
             "files": [
                 {
                     "filename": "ConsoleWindow.cpp",
-                    "hash": "4900fe5acd5664700066e5fb217936120ac54108849bc9c38a4292da74cd90b8e00e8f8ca1ccc5aacf21af1665e49358d219174f8e6170e6a56c222e5a6e2350"
+                    "hash": "565269b29471d38419fab77e5ed3ed2faba0cf725ca9acfc0afe51c6ff01eb5f90aad1f8b397e3d90500c0b5c36c62bbcec5f67e8644ca024034e499d5da88ee"
                 },
                 {
                     "filename": "NetworkManagerWindow.cpp",
@@ -769,11 +797,11 @@
                 },
                 {
                     "filename": "StartMenuWindow.cpp",
-                    "hash": "248cb20f694d41d289ff8b1dfa08164cf85fac0f9466dfc0a00a541872935497a0acd1aba76d32588f51586e1eeeeb4277c1eac0fdeaebd417a224420dcc9897"
+                    "hash": "c7eb293c9da51d752d327ac330bb430bd7b3d07bf09a50a5b90324123fb67a0ba6d5e43989e995c5296e58c03fc37a3468eb1820d18a97eb7a712a67883e1772"
                 },
                 {
                     "filename": "SystemsMonitorWindow.cpp",
-                    "hash": "c8d9d8e73fa8c78aa6e7465359f576979eaf1b134683b9d6483422f5b812e6ef93f3bb089f1a5f3160a795d8eac006e41c6982005c3d7cd6aa0eef7d6a160073"
+                    "hash": "53f7bf20b9446c32a36ea8728625f1c607a0acb79add54d8e629bcffd4d583bedb8071d734bd753bbf486dbb53f7ca1f654e9380dc57d0aa36688d26e47dc6f3"
                 },
                 {
                     "filename": "MemoryViewWindow.cpp",
@@ -781,7 +809,7 @@
                 },
                 {
                     "filename": "TimingsViewWindow.cpp",
-                    "hash": "1bc162fd0c355fa0c28ba24e729b15df66fd346060962db21460c10b6876e63c773b6933ea78dfa24bdaccf97aafee12eeb8c56857fbe9202276d179180fbcf2"
+                    "hash": "331bd39bba6179db0f3a91a781acb32d177a504974c73d7ffd084e831b30e2e6721e703c45182e7fedd656851274a532ebaa93d1d9e3ce50befb9352d69e77c6"
                 }
             ]
         },
@@ -810,7 +838,7 @@
                 },
                 {
                     "filename": "VirtualProject.Generated.cpp",
-                    "hash": "bb9b1747136d4822cd0f95fa0159360616ba5bbaa2d25a588ad823153e5693acda107eb281d3cabf9e593f1f9ff83caeba7a83989843218ca9729f3faddf5756"
+                    "hash": "18a566548f6f635762e6fb139733197313774366547f8f7783fec00b546fcf12d7b97c030abb756a5c307f7bf0a45f28ad4c9793ca38b688460d1787e973cc72"
                 },
                 {
                     "filename": "CreateNewProjectEvent.Generated.cpp",
@@ -835,7 +863,7 @@
             "files": [
                 {
                     "filename": "VirtualProject.cpp",
-                    "hash": "5943983d51c1b2f8964c9175e541aa5b8dc469ab3110c3a3fd8ef043d3c60ad811ada6c7a8a80f6c68ed713709cc49e06140abe255a953a68dd559962c07f9f3"
+                    "hash": "4602a85581e67c361d3ee0b6683248b989780255e68decdc0e0363c9f77d8c987784b697502ddaa7b311a593b1bfe40ac655ee031fdce273f24cebeecf00c4a2"
                 },
                 {
                     "filename": "FileTemplateCreator.cpp",
@@ -843,7 +871,7 @@
                 },
                 {
                     "filename": "VirtualProjectVisualizer.cpp",
-                    "hash": "53a0e6fae6b3da97937f4ed3bd13ba8602059f8c147965c9a326f0f64e701ce39b8dc61cf59fc314b1024c928a69944d883c472c8a7556945c5bfe66e7697438"
+                    "hash": "1fc20132e1b2d03f99529bac6786892a75915b418ebc03042c7a32af988b1925a304094cde36dbb02a6d63d57261dd4152d85e81b7b0f75e267a747ab8122b87"
                 }
             ]
         },
@@ -881,7 +909,7 @@
             "files": [
                 {
                     "filename": "OpenGL_Window.cpp",
-                    "hash": "158df3ab7d60d13a9039f093e5e740d9a5772b395c5284d12377b5fa6a5188ba0e2fdfc6f15eb7a4ec33513a883c96f161385f36277e93096ca18d0a09111a5d"
+                    "hash": "95a038d7dcdce0bb0e845e4dc03db334ff8e568700aa78c169242c828f1950ef8a78ef453fbec67985891967ab0c401c91066f57c8dae084c4dd1870442cdfc3"
                 },
                 {
                     "filename": "VulkanWindow.cpp",
@@ -907,7 +935,7 @@
             "files": [
                 {
                     "filename": "ModuleManager.cpp",
-                    "hash": "16bb8ea975817ec373a5ab43929170cd5416815055500131aef6155c062b5a7ea894e287d7895097987f417c7a11110b1d9943591b005bcd2a7fcf8c0c298411"
+                    "hash": "dbe1b794029cdc17a65b112523c7521bae62b610068501ffe5b838c5f010f1bf98783bbdf74aeefe975f27f7975d0702755bb47df1d20733e6b5c819927cd773"
                 }
             ]
         },
@@ -920,7 +948,7 @@
                 },
                 {
                     "filename": "IReflectionConstructor.Generated.cpp",
-                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+                    "hash": "e35c50f3d40c978d7da96b264cc4e6989ee285139c3250ae2176c3f311bbcb88d67ef39a9795ddbc130fbfcc0616c693411e69f9a3cd33bcb40a761b73902463"
                 },
                 {
                     "filename": "IReflectionData.Generated.cpp",
@@ -976,7 +1004,7 @@
                 },
                 {
                     "filename": "ReflectionConstructor.Generated.cpp",
-                    "hash": "0ac6225a4971559784ab48b41fcef6090ffab1b915b5abb7eb272c682e551fc678d2b35ac484c5276c5cd401f1e88cf02a36059926fbbc3286c3e4bd69565d73"
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
                 },
                 {
                     "filename": "ReflectionData.Generated.cpp",
@@ -984,7 +1012,7 @@
                 },
                 {
                     "filename": "ReflectionEnumeration.Generated.cpp",
-                    "hash": "1800d591e2eb6a8b57cab57609dae3126d1bfe3d2beb3d851ba1061f191f11c767d8b1e8f791c16475c5c791eab2f9fd3fe34ae5ec889a8c2b6429b29b14577b"
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
                 },
                 {
                     "filename": "ReflectionGenerator.Generated.cpp",
@@ -996,11 +1024,11 @@
                 },
                 {
                     "filename": "ReflectionInheritance.Generated.cpp",
-                    "hash": "ef00bc53967ddf9a866ca29d4d68bf022ca2730930aa99b53918c9e208da37d730a7f1112b796f3a83a366c0a38b8e4bfd32f973fadbd0fe8388ae75d7d1173a"
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
                 },
                 {
                     "filename": "ReflectionProperty.Generated.cpp",
-                    "hash": "ba94900d97168227a48d4f31c35a73fb608fd4c7995a8918086e289429c17aa374404c7150a07dfd31b07cb033dd190a49afdd071fdacc080fd9ff7b77d25b5e"
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
                 },
                 {
                     "filename": "Variant.Generated.cpp",
@@ -1017,7 +1045,7 @@
             "files": [
                 {
                     "filename": "ReflectionGenerator.cpp",
-                    "hash": "fffb99f64a810b764fab3319b08c4e43cf560dc71c003c38be8638032eaf8f76859f15be0e8a59321201ba887a9d178787b333654a8f78167a2233d07b103b48"
+                    "hash": "3f2e769ec58bbba3d82edfca184d7cf63403a162825d76b6ad00dfcbc920f18e8383935bea89584c4110fd5067cd12fc6c4e6afc1645b4e0d7a88f1413f727b6"
                 },
                 {
                     "filename": "Reflection.cpp",
@@ -1051,7 +1079,7 @@
             "files": [
                 {
                     "filename": "RuntimeDatabase.cpp",
-                    "hash": "48c8a12bdc22eb59f705e8fb7116570321d4dc49a47837a7387eff5991306cc72b7b812d01db6911ffa71f8a1a96c78234082dc517549828553ede9e990254c0"
+                    "hash": "14288cf47c616b9a7ab1efaff17174e7cc987dfffea6216c2e17888980f9062b70a4aa56b47ead413ad5bf66c740e7f56aaac2cee63d33b16d0c2aed3bd0ff6e"
                 }
             ]
         },
@@ -1109,7 +1137,7 @@
                 },
                 {
                     "filename": "SynchronizeProjectNCE.Generated.cpp",
-                    "hash": "3956a0d0fabac82d7b874a8580e32d127f67475254181aefc8dea1179f4265749184737c75907931fa972ec830135fb5b76bb0a424d03f196ba7e14bd84b70d7"
+                    "hash": "b3731e92e45bb73dea91d28bcc51f0706036f69eebada370f1bc39f37ac5b5a745f1acbb1f06a62fcbf5410218c3fd7fd331ed3b22b0874262a1bcede2a04a49"
                 }
             ]
         },
@@ -1151,11 +1179,11 @@
                 },
                 {
                     "filename": "NetworkManager.cpp",
-                    "hash": "ef871864178bcde90412b93edf91cc556fa000d6820decd583db6fe2bc5de438615c7b490f2b5ba868f40fe985d744b9bd1cd52bd5879249c0e21a8ce9e18e93"
+                    "hash": "c9e46c379997a58e85cd52f7fc412c11e69a5cf5573c1e75017abc7b90268d9e4500924e7d2e0be3a6a22081cc738edbc1b659ec101cba40c7e303e09a41505d"
                 },
                 {
                     "filename": "Server.cpp",
-                    "hash": "66cdbe17e16c783cf8bc1a968f047613e3245c759ed55b836baac11d9cf7b9ef033da7060f5d6f036fddf3aa769dabcbf826095458212559583960fc24809a0c"
+                    "hash": "743225bfe2d24ebcb91444ef09660e8e0eae49e39a8b5e59b143f73cc1d5c131e09d563a5ee67ba7546ac2085e7c5407f85d934b27d71d33fb793208e1859def"
                 }
             ]
         },
@@ -1198,7 +1226,7 @@
             "files": [
                 {
                     "filename": "Logger.cpp",
-                    "hash": "236f6123526f9167647dae34b60eda4d295947ede96a180040687f3115e716a31762e3d797aa4ba65d4bed87ecb2700fc90dd3d69dc8e991d56b8ec1507e8356"
+                    "hash": "28bc7876ef428012bc9f56929b62c0f7ab489de6c2fd78c42fd4140fd9422f129de4a52ca2f8bd2023fe49bef5b71343f78260038d12cfe9ca84f3a03caa22e0"
                 }
             ]
         },
@@ -1242,15 +1270,15 @@
                 },
                 {
                     "filename": "KeyDownEvent.Generated.cpp",
-                    "hash": "f5ce5444c2ff16fafdb9155e0a5fbb96eeb9c05b32edd874649ff274916db8e6cefaedbf84ddeb388809bad4a69e2fc73e3408f0c10f239756d517819639b104"
+                    "hash": "5e021a9bddca56cebc4f89899b3a296865af9ddc1ca6800ff85ca76d488ba9d4da11f21a735de58e6158ce04cf8931c20486b4a6e4c90c811274ee2ef7937828"
                 },
                 {
                     "filename": "KeyUpEvent.Generated.cpp",
-                    "hash": "66b0fe02c459a397056ee586dc18c63f008bcb09a51b0f6ec629e3a03239452485bf761618030a9642e7b8c1587b32ce31361796c39494e944d2f3872bbbf101"
+                    "hash": "d285b39a4318ce33dd31fab0457f51f9fceb38863db4368002d83fc29b7bc928011bfe41a203c3f007043757551a54fae4d92531a7c7b0f1efe48a87aca47824"
                 },
                 {
                     "filename": "MouseMotionEvent.Generated.cpp",
-                    "hash": "08be0d2da15b2942a09c03a28e1c7ffb7e1ff9b47c037a0faec2d8ee857a0b7da6f4247967544b67bccd74cb3f13a01fc72095862105759990096b8cc080679e"
+                    "hash": "31599089a3449b74d5fc3278cd30bfb128ebfa120eda6c72f380356b3d7c8cf4036b14a80ecf2445231d4c8d8c2c5540fd1f2968538a3b664a9c379411445b22"
                 }
             ]
         },
@@ -1313,7 +1341,7 @@
             "files": [
                 {
                     "filename": "Engine.cpp",
-                    "hash": "fa82e9f3f2c2165176d6d5eeace35464606d43def42d556ee2cdcd1cbc005d47ded952293e96c2122c6936fb2f276a720a0971ee97d35db13a35ece2b1d84f25"
+                    "hash": "43b699071373adaafecefe178b7785b4f5aecff21830d694acd1e24e8853fd6ec4e22a418eacbceb9c66dffe66424a5e251b2ced750f287fb681b80b678a1cfd"
                 }
             ]
         },
@@ -1322,7 +1350,7 @@
             "files": [
                 {
                     "filename": "Allocator.cpp",
-                    "hash": "7e181270daf2e53aff9e04560e11fdbf4549e53f358889db0da873b560cf7b05efe1003a68b495e8ef8b9810e75847e44168715671960c1da8c7c7a0e36bf0e7"
+                    "hash": "de29d7dd813966409af9dacd3caa95345e45ada2e7ce2fd25520a0efa96650819d868c4d2ac34f21af5022b43de2962804c0a644eb3c9fad4211f043ba77da33"
                 },
                 {
                     "filename": "BlockAllocator.cpp",
@@ -1350,7 +1378,7 @@
                 },
                 {
                     "filename": "ProxyAllocator.cpp",
-                    "hash": "b0cf8d42e33898cf93147d823f3538be6457def101de2a9210099ea83739f491e7c3f93b24f1f20a4f3b04b17abd391abd807e8c3307dd09d989f86027c46f00"
+                    "hash": "9afa75e2a919bf78885288f91588facc266df6f531b3b098974f06f76b89aeb33636ffc66c5b3af7f2b7bc8f5547bfcafa5ec7aea5e86fde320bfece59b2a964"
                 },
                 {
                     "filename": "SmallBlockAllocator.cpp",
@@ -1366,7 +1394,7 @@
                 },
                 {
                     "filename": "PoolAllocator.cpp",
-                    "hash": "85dbffe3efe11f47c81ff7a902693045e5564f9ea852eb511282130115bb3628cf24924fe8a3bd4191e694c0126c01efd8ca8afee3eff374ef5da5ce1683ca7a"
+                    "hash": "ced914cf8d5c8c616017bc19ed4d0ea8480183f45e9c8c3ad384c9a893feb7bba153c608500de42af5e509bd8a7ee9bd35473f8e40e931b5b23d02a9767b2499"
                 },
                 {
                     "filename": "StackLinkedList.cpp",
@@ -1447,7 +1475,7 @@
                 },
                 {
                     "filename": "PoolAllocator.Generated.cpp",
-                    "hash": "2c830ec48cca50c82258430d74b246701da10daad73c75cea6cf7cd54c0a0489d23fa33b002b846fd51851f798c313f01a414186f687b3f7a0adb7d03320eccb"
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
                 },
                 {
                     "filename": "StackLinkedList.Generated.cpp",
@@ -1464,6 +1492,10 @@
                 {
                     "filename": "FixedVectorAllocator.Generated.cpp",
                     "hash": "7136ca7d7abdb960a37fe5cfeb1e3c8e9b02a35e84528b1a80e3c6507aa00bab7ec286d3e4a9cb58195107ff8fc915fdfd50086761e7c0870503ad104a61f501"
+                },
+                {
+                    "filename": "Iterator.Generated.cpp",
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
                 }
             ]
         },
@@ -1519,7 +1551,7 @@
             "files": [
                 {
                     "filename": "MemoryTracker.cpp",
-                    "hash": "2eddedc2f0652f20004a04cbfe45e33e6293c604b6d9e8b561a8beee519564f02508023a5d444c256c9ad6beb3e8a3311b227b620bc2feb556727feca854dc88"
+                    "hash": "ae3c0ef5d16ee8ea13a055dd24b9c61096bee5af343ca74d81ee301256a98d1ba019400041aca6d0e3eb5481ab5959779ba04c5c3f475b078438425f43f8b56c"
                 }
             ]
         },
@@ -1602,7 +1634,7 @@
                 },
                 {
                     "filename": "RuntimeReloader.cpp",
-                    "hash": "48662b94d38ffa0fa5f646b80c7fa4210b1d9c836aaee29144003c50a4579f12e35da944495cb44834d1c71eff551481ce52b5d2cac4376c2af14a6619225c40"
+                    "hash": "11c4aa593ec06b60de0045c976da72a03b9e77b30cb42ec2a216da7f1dd80f1c3d2ff283d5c5a83e360e8812708600f782d027b3c301256aebd24a521a0f3a2f"
                 }
             ]
         },
@@ -1624,7 +1656,7 @@
             "files": [
                 {
                     "filename": "RuntimeCompiler.cpp",
-                    "hash": "9ab5bfe479af84057b9acf1fa20fcad5913049d06b7e89d0cf15fe0114592788d51426517d79b1937f7d8a7baa40e588eb5cedf0063b21332294ad76adac9c81"
+                    "hash": "ccd5807cd5f86dd525633b501a8157be1b0459516564a6cf53536cd415f33cbe080299d29a691af82c093b92b34cfb68c35921e144f9f991fe1d7be6715344aa"
                 }
             ]
         },
@@ -1637,7 +1669,7 @@
                 },
                 {
                     "filename": "PythonProcess.Generated.cpp",
-                    "hash": "96b645ee64ce4b48068a0613a0a2e8383aadc5df01e442429a8cdb04a2ba8d5a400be30e0784a876d79bf9dc6dc3d5a02e0c8b0db6537bc961f8dc3caf4b23dc"
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
                 }
             ]
         },
@@ -1646,7 +1678,7 @@
             "files": [
                 {
                     "filename": "PythonProcess.cpp",
-                    "hash": "1efec43c30839c269c081492b38c216a64cc1d986d0f9f279bb746d8ba951946de2dca30a5f47667d4704fe128551d944b403b4e7c9c2ba31744763bd366a439"
+                    "hash": "1a26eb97fb42a48c7910ef98b03132bef4c273626032dfbce8235f232904742d2aaf13b2384af7a96c6d5ce2d41b29f88b7a9137e26d5df7df3906c74a571049"
                 }
             ]
         },
@@ -1700,6 +1732,10 @@
                 {
                     "filename": "RCS_ReflectionModule.Generated.cpp",
                     "hash": "8772c925f06335c6830f51bc787fe8572c986bd4e6fe3a3dacdd2907c4da1d334e128250422ddfc20c3d90643402f0696e40d7a68d12fe232bda50ef71de9153"
+                },
+                {
+                    "filename": "NaiveEventReflectionModule.Generated.cpp",
+                    "hash": "46f17786296824a64f3c28f612738fcd4d24dbd2eaa34e7c3159e7092bae7826e1ef8f4c696c842693722969e2a669bd06352fca2b4969f0c1d206d07b362a7f"
                 }
             ]
         },
@@ -1712,11 +1748,15 @@
                 },
                 {
                     "filename": "NCE_ReflectionModule.cpp",
-                    "hash": "caec57fe7e981e50dcb7e84e2dadf8a1e2324cee981aa61921b3d4faf144c09e03fb75c67d068816c1db54f95068a920193d019cfdafe380e3dc6571bc793844"
+                    "hash": "be7fc2682fe0caf98bcf73244ed9c95697445a405f6654cf818ceb4b77ea22a02d94f6694ef1d583c53eec097dd7815b7934b4f04a9b15acc96a26b0f8e831dd"
                 },
                 {
                     "filename": "RCS_ReflectionModule.cpp",
                     "hash": "cb9a2d2a6be99c12d2abfbe4326a5f0d3df2dcc3f5f0213d61959de5c0e435b2e96ba8c71a6965098b905580c878ed9a383d5e8118630d7de696951f95464cab"
+                },
+                {
+                    "filename": "NaiveEventReflectionModule.cpp",
+                    "hash": "9f79c02b7d58177653ea8dae072c13989166e86f76275ee5d2e13d71cee2953c5db6d72388a61f1baf8821aaf6f8963eb3c2169bca933b6c3dd36c2a1d60fe6d"
                 }
             ]
         },
@@ -1743,6 +1783,10 @@
                 {
                     "filename": "IManager.Generated.cpp",
                     "hash": "0da857b1c0d730d92376ff143a473541e39c03450ca01db1bee5b72788fcf5a035a45c95a2b54ee50f76bdb94420486b4a35b19546a9f631aa59b0c524b9372b"
+                },
+                {
+                    "filename": "SimpleProfiler.Generated.cpp",
+                    "hash": "593fc970b4b422da2c8e46f9b6966c90ed5428501f589ce9eef07d59718bf5a3ae5ddccaf9497ff7d37431ea94fd187eff626c03cc5661457447822fd607b74d"
                 }
             ]
         },
@@ -1751,11 +1795,186 @@
             "files": [
                 {
                     "filename": "Manager.cpp",
-                    "hash": "c1e469ae78627bd93f522e4b704b1796ca65eaa3d12433b029e2bd465d0edb504cdd6a37cffbd50cb8583b35f397999ad308469bf7e26fc48ebd9d67bf113317"
+                    "hash": "7bf8f72bbb1006a74385cb270b619436633d6e946abea20058d0d3dd1b2b6728c6264eb413d5dbe866627bc464914623301d5b7891e451c3c7d0dbb0edc6cd9f"
                 },
                 {
                     "filename": "ScopeTimer.cpp",
-                    "hash": "92ee8526f8af60b42632dc5c218ac44bf5bbb6d92e192e6734e46eb36db082decf03394dd36a21105a5d7bcaa9fdbd3ec55213963289913dbe30d6d7967fbce8"
+                    "hash": "aeffb6ecf68248ad8afeb0642db739d34b49d07e8579075f5bb840df5c35d0e3d359bf2a929763ba7b6c7d6a9b734951ca9640aa1caefba945adaa2a0adaacd2"
+                },
+                {
+                    "filename": "SimpleProfiler.cpp",
+                    "hash": "b3212a3661800dab17807c8db13cf3f2209c570f18cd8f8672b98954da15409b848f50e52675bed90cce606d2be6cc477ef221a83662ccfeb8e42495fdb9910b"
+                }
+            ]
+        },
+        {
+            "folder": "src/ECS",
+            "files": [
+                {
+                    "filename": "ECS.cpp",
+                    "hash": "95b79e1f9955f8c85603a3724b8699aecbcd714c3aaea70a7a515c5c7d9c28c64934f710aed990ac9944e049d8770275d487556faf99efcf77556bfea31eec8f"
+                }
+            ]
+        },
+        {
+            "folder": "src/Memory/Internal",
+            "files": [
+                {
+                    "filename": "PoolAllocator.cpp",
+                    "hash": "e57ce9ac4ba4a01a8cfd8dc4f0a945963ea9df0acf707a1003b7f5761427ba3d944e641717f2ac2ca66d6b91f99482b38f23fb0748bfd84cca17edea8feb620e"
+                }
+            ]
+        },
+        {
+            "folder": "Memory/Internal",
+            "files": [
+                {
+                    "filename": "PoolAllocator.Generated.cpp",
+                    "hash": "226a19ca32b0afd84d8d3c6cb97df063f2caeba301535e785790ddb2b2d29fbb9f0d31e59136e80ba0c3278f07e34b5b12346efee1fecd6f2d9cd1e81c27fedc"
+                }
+            ]
+        },
+        {
+            "folder": "ECS",
+            "files": [
+                {
+                    "filename": "ComponentArray.Generated.cpp",
+                    "hash": "d85039015ca9a8f2f0de1f4058e14487ebc7e24f4a491efea91dd33acf5f0d739582f581a6a1cc9516736e6104c688a64a87fe4459b1ca58ff9615a8c0b49e9e"
+                },
+                {
+                    "filename": "ComponentManager.Generated.cpp",
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+                },
+                {
+                    "filename": "ECS.Generated.cpp",
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+                },
+                {
+                    "filename": "EntityManager.Generated.cpp",
+                    "hash": "3739fa68325179295b8f9b31c306788e172f641732829ef75fcc96c3b0e6c01d8334d1cbe60e90695fbacf4560d06615e674bfd01535e1fff154d08ec452fa93"
+                },
+                {
+                    "filename": "System.Generated.cpp",
+                    "hash": "ae39a2fb85572a906df6ffc910efc268623c82b859dce42b39999eabbb980b4b9759f2fd3e4deec9e226c7190ec8c69716f43f512d2c9850da893ef3951ae9cf"
+                },
+                {
+                    "filename": "SystemManager.Generated.cpp",
+                    "hash": "c13cfebfd9277b1062120ec1e2ceb6ae23b5e58e8e7da3038860a8dbdc545eba81bda4e5ef802342500d8f1be48d0083d6fb6431cf4d5f8c0bae7e01ec3225f9"
+                }
+            ]
+        },
+        {
+            "folder": "Window/Events",
+            "files": [
+                {
+                    "filename": "WindowResizedEvent.Generated.cpp",
+                    "hash": "7e29b8d4864dccfbdfb2f3dd202225b660ede8c16113d9dbb03bb5b30210372aa5f89fbe4119e0fa32c76578c12cc180bef1f0d1033604d3da90d8d73b2de1ee"
+                },
+                {
+                    "filename": "WindowMinimizedEvent.Generated.cpp",
+                    "hash": "edef1d1370795c7d37e2adbdb55a9ea2be535456bb2f4e117363daade93ccfe7ad8734313b808f30642164582b8c1cba7beb9ff217fafdd9b95e561403ee4b73"
+                },
+                {
+                    "filename": "WindowMaximizedEvent.Generated.cpp",
+                    "hash": "8bcdc12ee7342cd24aac0ca3720cc5e542119a5435013ba0127015bed34ac700ab58d6bb546a37ed839d1c0e7e6f2ef5aac8d002271858fb4e57a9bb0f259679"
+                },
+                {
+                    "filename": "WindowRestoredEvent.Generated.cpp",
+                    "hash": "fa5884f937768d7e70fe6d1be2047acdca8cd2d9033dc66e44c57e132911c1067c17760891eb5cd3442cb7219932b6620dabd23cf353297541ee03a5ef191ffa"
+                },
+                {
+                    "filename": "KeyDownEvent.Generated.cpp",
+                    "hash": "e5fff156fa89273554272dda87db110a220ca218ba38488899782a19a2ccffed2707f5515706bf0f2a11b58d2efd6417617a83c51bed8022e3a9e6c18311f530"
+                },
+                {
+                    "filename": "InputKeyDownEvent.Generated.cpp",
+                    "hash": "ddb75c3168934c79faf05844feef2bcf001d41d500d82da1968b972474b9a3107274b30b668d8c64bf5236621d50039657582e69254011ecdb14dd55e3a14637"
+                },
+                {
+                    "filename": "InputKeyUpEvent.Generated.cpp",
+                    "hash": "525107acd64b85b833deacf19eede8aefd2f233311b6e5ac38f06e9991e117ea604f2c652b69425a2ffc97fbbb8a1dbb0e1daa53649db3eec4bf7e925b93eac6"
+                },
+                {
+                    "filename": "MouseMotionEvent.Generated.cpp",
+                    "hash": "f392d1b1dbd1bee94e93e8cd1016f6dca432c471a7cbff430222507f69203ab36d31be1c13d63d79e10cf5bc24e17c5f40fe48c94a3c826774ba736e286c9b1a"
+                },
+                {
+                    "filename": "InputMouseMotionEvent.Generated.cpp",
+                    "hash": "a6a868c170378e38c003f3979c5835a085a2024dd853136295ba20e0ad02fbd6821df851177dab60354a1646a49a42d49a51e6081e03b31f7c6351e32bb8a5d3"
+                },
+                {
+                    "filename": "ProcessEventsEvent.Generated.cpp",
+                    "hash": "110e0c56e5f399e1c91c65ea9a7005ed2c09c981e21553b217c2ff863c19362cfa505b14cd6d6c99ebeb974b9b8e059b441114dfd111c5ad41ea9c3a29afb774"
+                }
+            ]
+        },
+        {
+            "folder": "ImGUI_Editor/Events",
+            "files": [
+                {
+                    "filename": "AnyItemActiveChangedEvent.Generated.cpp",
+                    "hash": "2cdcc5dc0b3d68c7974ca8cd94c19a56956638da66101b70fd336298192feb06f92b02f6efe73da7ccd4f04e449819e368304b3dda061c4859a9368da7e90f61"
+                }
+            ]
+        },
+        {
+            "folder": "ConsoleSystem",
+            "files": [
+                {
+                    "filename": "ConsoleSystem.Generated.cpp",
+                    "hash": "bb3f894d8ce387396eda2a0a170ef36cc6996b294e88b65e89b7373d41e734e702d8398ea6826a8cd25157968a3252ce51e9860d9e1ec64ab4cc180308e0b9b5"
+                },
+                {
+                    "filename": "ICommand.Generated.cpp",
+                    "hash": "7bd5f08fcc369b1d280478ef6ade540f2966ddb81662873d783bed81e5a5f80cf80c7867a286f5dd957e4ab4e5d7ce2737ed11659b4da691d0e7e4f5b8219bb6"
+                },
+                {
+                    "filename": "IConsoleSystem.Generated.cpp",
+                    "hash": "6240af82675877ec12fea44d0d962142da81331761cb1c2a8808a329f77e56414f3ea5cc8ce1a5862e43281002eb2dab1cc30e1d56a9fde99ee2d77b946434e7"
+                }
+            ]
+        },
+        {
+            "folder": "ConsoleSystem/Commands",
+            "files": [
+                {
+                    "filename": "TestCommand.Generated.cpp",
+                    "hash": "535353ca9df87f63beea7a23c404e04264a7ffa1594942b73b1b2cd9b46ef14fce3710c1aba7d30f32b26e31d6f890e9da3521aa9349f4db8872ecb20350245a"
+                },
+                {
+                    "filename": "TestCommand2.Generated.cpp",
+                    "hash": "4d8b36e5208f3a237e677402c8fb756fce1066bf0bf15ece2d7aac33dba8149a26e3193f06ff737d6791a7a1c52bae6e9a1f0fe06a9cc9426c714a024ad85cdf"
+                }
+            ]
+        },
+        {
+            "folder": "src/ConsoleSystem",
+            "files": [
+                {
+                    "filename": "ConsoleSystem.cpp",
+                    "hash": "7c0e364c8e7d89b7ffdad4764c5440c088614a588c0cd753744dd4e1807d5c53871ca0fd3e61f12d19fccb5c31a10671aed2c90323df8bc59dd0ad2ec4fc6214"
+                }
+            ]
+        },
+        {
+            "folder": "src/ConsoleSystem/Commands",
+            "files": [
+                {
+                    "filename": "TestCommand.cpp",
+                    "hash": "d4a7375fd72856781302a4829e73ef4cfacd5b2b5f30dfb0ae5121bbf65622a422d1e719b5817a9f2718abec869cae215a0e1d1382834ffb108250adbe8835aa"
+                },
+                {
+                    "filename": "TestCommand2.cpp",
+                    "hash": "67d50d155e7160eb3f70896bad93700c24a620fd2923c654e0392ae499232041cf81a3a003c54686afbc3d2bba74fd77d0c804e4ba1e23ab70c4c7ba1494a6c1"
+                }
+            ]
+        },
+        {
+            "folder": "ImGUI_Editor/CustomWidgets",
+            "files": [
+                {
+                    "filename": "TextInputComboBox.Generated.cpp",
+                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
                 }
             ]
         }

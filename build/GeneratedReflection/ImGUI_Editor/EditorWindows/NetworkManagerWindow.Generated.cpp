@@ -30,6 +30,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(NetworkManagerWindow))
 
 void NetworkManagerWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
+UserInterface::Serialize(serializer);
 }
 
 #ifdef RUNTIME_COMPILE

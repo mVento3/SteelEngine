@@ -1,3 +1,5 @@
 #include "RuntimeReflection/ReflectionGeneratorMacros.h"
 
-#define GENERATED_BODY
+#define GENERATED_BODY \
+public:\
+SE_EVENT(MouseMotionEvent)

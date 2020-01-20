@@ -25,6 +25,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(MemoryViewWindow))
 
 void MemoryViewWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
+UserInterface::Serialize(serializer);
 }
 
 #ifdef RUNTIME_COMPILE

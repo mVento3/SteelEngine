@@ -57,3 +57,4 @@ external/json-develop/**
 !external/json-develop/.gitkeep
 external/Python/**
 !external/Python/.gitkeep
+build/GeneratedReflection/imgui/**

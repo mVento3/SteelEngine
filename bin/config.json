@@ -145,6 +145,10 @@
 			"type": "dll"
 		},
 		{
+			"name": "ConsoleSystem",
+			"type": "dll"
+		},
+		{
 			"name": "Input",
 			"type": "dll"
 		},
