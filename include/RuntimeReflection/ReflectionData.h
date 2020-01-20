@@ -25,15 +25,16 @@ namespace SteelEngine {
 	{
 		friend class ReflectionRecorder;
 	private:
-		std::string		m_TypeName;
+		// std::string		m_TypeName;
+		char			m_TypeName[30];
 		size_t			m_TypeID;
 		CurrentBindFlag	m_CurrentBind;
 		std::string		m_CurrentBindName;
 
 		ConstructorsVector	m_Constructors;
-		PropertiesMap		m_Properties;
-		MethodsMap			m_Methods;
-		EnumsMap			m_Enums;
+		PropertiesVector	m_Properties;
+		MethodsVector		m_Methods;
+		EnumsVector			m_Enums;
 		InheritancesVector	m_Inheritances;
 		NamespacesVector	m_Namespaces;
 		MetaDataInfoVector 	m_MetaData;
@@ -109,24 +110,29 @@ namespace SteelEngine {
 			return m_Namespaces;
 		}
 
-		const MethodsMap& GetMethodsMap() override
+		const MethodsVector& GetMethodsVector() const override
 		{
 			return m_Methods;
 		}
 
-		const PropertiesMap& GetPropertiesMap() override
+		const PropertiesVector& GetPropertiesVector() override
 		{
 			return m_Properties;
 		}
 
-		const EnumsMap& GetEnumsMap() override
+		const EnumsVector& GetEnumsVector() override
 		{
 			return m_Enums;
 		}
 
-		const ConstructorsVector& GetConstructorsVector() override
+		const ConstructorsVector& GetConstructorsVector() const override
 		{
 			return m_Constructors;
+		}
+
+		const MetaDataInfoVector* GetMetaDataInfoVector() const override
+		{
+			return &m_MetaData;
 		}
 
 		MetaDataInfoVector* GetMetaDataInfoVector() override
@@ -171,20 +177,32 @@ namespace SteelEngine {
 		}
 
 		template <typename A, typename B>
-		ReflectionData& Property(const std::string& name, A B::* arg)
+		ReflectionData& Property(const char* name, A B::* arg)
 		{
 			m_CurrentBind = CurrentBindFlag::PROPERTY_BIND;
 			m_CurrentBindName = name;
 
-			if(!m_Properties[name])
+			IReflectionProperty* res = 0;
+
+			for(Type::uint32 i = 0; i < m_Properties.size(); i++)
 			{
-				m_Properties[name] =
-					new ReflectionProperty<A, B>(arg, typeid(A).hash_code());
+				IReflectionProperty* curr = m_Properties[i];
+
+				if(strcmp(curr->GetName().c_str(), name) == 0)
+				{
+					res = curr;
+
+					break;
+				}
+			}
+
+			if(!res)
+			{
+				m_Properties.push_back(new ReflectionProperty<A, B>(arg, typeid(A).hash_code(), name));
 			}
 			else
 			{
-				ReflectionProperty<A, B>* a =
-					(ReflectionProperty<A, B>*)m_Properties[name];
+				ReflectionProperty<A, B>* a = (ReflectionProperty<A, B>*)res;
 
 				a->m_Value = arg;
 			}
@@ -196,15 +214,28 @@ namespace SteelEngine {
 		ReflectionData& Method(const std::string& name, B(T::*func)(Args...))
 		{
 			m_CurrentBind = CurrentBindFlag::METHOD_BIND;
+			IReflectionMethod* res = 0;
 
-			if(!m_Methods[name])
+			for(Type::uint32 i = 0; i < m_Methods.size(); i++)
 			{
-				m_Methods[name] = new ProxyMethod<B(T::*)(Args...)>(func);
+				IReflectionMethod* meth = m_Methods[i];
+
+				if(meth->GetName() == name)
+				{
+					res = meth;
+
+					break;
+				}
+			}
+
+			if(!res)
+			{
+				m_Methods.push_back(new ProxyMethod<B(T::*)(Args...)>(func, name));
 			}
 			else
 			{
 				ProxyMethod<B(T::*)(Args...)>* meth =
-					(ProxyMethod<B(T::*)(Args...)>*)m_Methods[name];
+					(ProxyMethod<B(T::*)(Args...)>*)res;
 
 				meth->m_FunctionCallback = func;
 			}
@@ -216,15 +247,28 @@ namespace SteelEngine {
 		ReflectionData& Method(const std::string& name, B(*func)(Args...))
 		{
 			m_CurrentBind = CurrentBindFlag::METHOD_BIND;
+			IReflectionMethod* res = 0;
 
-			if(!m_Methods[name])
+			for(Type::uint32 i = 0; i < m_Methods.size(); i++)
 			{
-				m_Methods[name] = new ProxyMethod<B(*)(Args...)>(func);
+				IReflectionMethod* meth = m_Methods[i];
+
+				if(meth->GetName() == name)
+				{
+					res = meth;
+
+					break;
+				}
+			}
+
+			if(!res)
+			{
+				m_Methods.push_back(new ProxyMethod<B(*)(Args...)>(func, name));
 			}
 			else
 			{
 				ProxyMethod<B(*)(Args...)>* meth =
-					(ProxyMethod<B(*)(Args...)>*)m_Methods[name];
+					(ProxyMethod<B(*)(Args...)>*)res;
 
 				meth->m_FunctionCallback = func;
 			}
@@ -237,16 +281,24 @@ namespace SteelEngine {
 		{
 			ReflectionEnumeration<T, A>* enum_ = 0;
 
-			if(!m_Enums[name])
+			for(Type::uint32 i = 0; i < m_Enums.size(); i++)
 			{
-				enum_ = new ReflectionEnumeration<T, A>(*this);
+				IReflectionEnumeration* en = m_Enums[i];
 
-				m_Enums[name] = enum_;
+				if(en->GetName() == name)
+				{
+					enum_ = (ReflectionEnumeration<T, A>*)en;
+
+					break;
+				}
+			}
+
+			if(!enum_)
+			{
+				m_Enums.push_back(new ReflectionEnumeration<T, A>(*this));
 			}
 			else
 			{
-				enum_ = (ReflectionEnumeration<T, A>*)m_Enums[name];
-
 				enum_->m_Data = this;
 			}
 
@@ -280,26 +332,31 @@ namespace SteelEngine {
 				break;
 			case CurrentBindFlag::METHOD_BIND:
 			{
-				MethodsMap::iterator it = m_Methods.begin();
+				// MethodsMap::iterator it = m_Methods.begin();
 
-				for(Type::uint32 i = 0; i < m_Methods.size() - 1; i++, it++);
+				// for(Type::uint32 i = 0; i < m_Methods.size() - 1; i++, it++);
 
-				ProcessMetaData(db, it->second, infos);
+				ProcessMetaData(db, m_Methods[m_Methods.size() - 1], infos);
 			}
 				break;
 			case CurrentBindFlag::PROPERTY_BIND:
 			{
-				PropertiesMap::iterator it = m_Properties.begin();
+				// PropertiesVector::iterator it = m_Properties.begin();
 
-				for(; it != m_Properties.end(); ++it)
-				{
-					if(it->first == m_CurrentBindName)
-					{
-						break;
-					}
-				}
+				// for(; it != m_Properties.end(); ++it)
+				// {
+				// 	// if(it->first == m_CurrentBindName)
+				// 	// {
+				// 	// 	break;
+				// 	// }
 
-				ProcessMetaData(db, it->second, infos);
+				// 	if(strcmp(it->GetName(), m_CurrentBindName) == 0)
+				// 	{
+				// 		break;
+				// 	}
+				// }
+
+				ProcessMetaData(db, m_Properties[m_Properties.size() - 1], infos);
 			}
 				break;
 			case CurrentBindFlag::TYPE_BIND:
@@ -319,9 +376,21 @@ namespace SteelEngine {
 			return *this;
 		}
 
-		Variant GetProperty(const std::string& name, void* object) override
+		Variant GetProperty(const char* name, void* object) override
 		{
-			ReflectionProperty<Variant, T>* te = (ReflectionProperty<Variant, T>*)m_Properties.find(name)->second;
+			ReflectionProperty<Variant, T>* te = 0;
+
+			for(Type::uint32 i = 0; i < m_Properties.size(); i++)
+			{
+				IReflectionProperty* prop = m_Properties[i];
+
+				if(strcmp(prop->GetName().c_str(), name) == 0)
+				{
+					te = (ReflectionProperty<Variant, T>*)prop;
+
+					break;
+				}
+			}
 
 			if(!te)
 			{
@@ -338,36 +407,66 @@ namespace SteelEngine {
 			return res;
 		}
 
-		IReflectionProperty* GetProperty(const std::string& name) override
+		IReflectionProperty* GetProperty(const char* name) override
 		{
-			return (ReflectionProperty<Variant, T>*)m_Properties.find(name)->second;
+			for(Type::uint32 i = 0; i < m_Properties.size(); i++)
+			{
+				IReflectionProperty* prop = m_Properties[i];
+
+				if(strcmp(prop->GetName().c_str(), name) == 0)
+				{
+					return prop;
+				}
+			}
+
+			return 0;
 		}
 
 		IReflectionMethod* GetMethod(const std::string& name) override
 		{
-			return m_Methods[name];
+			for(Type::uint32 i = 0; i < m_Methods.size(); i++)
+			{
+				IReflectionMethod* meth = m_Methods[i];
+
+				if(meth->GetName() == name)
+				{
+					return meth;
+				}
+			}
+
+			return 0;
 		}
 
 		IReflectionEnumeration* GetEnum(const std::string& name) override
 		{
-			IReflectionEnumeration* res = (IReflectionEnumeration*)m_Enums.find(name)->second;
-
-			if(!res)
+			for(Type::uint32 i = 0; i < m_Enums.size(); i++)
 			{
-				IReflectionEnumeration a;
+				IReflectionEnumeration* enum_ = m_Enums[i];
 
-				res = &a;
+				if(enum_->GetName() == name)
+				{
+					return enum_;
+				}
 			}
 
-			return res;
+			// IReflectionEnumeration* res = (IReflectionEnumeration*)m_Enums.find(name)->second;
+
+			// if(!res)
+			// {
+			// 	IReflectionEnumeration a;
+
+			// 	res = &a;
+			// }
+
+			return 0;
 		}
 
-		const std::string& GetTypeName() override
+		const char* GetTypeName() const override
 		{
 			return m_TypeName;
 		}
 
-		size_t GetTypeID() override
+		size_t GetTypeID() const override
 		{
 			return m_TypeID;
 		}

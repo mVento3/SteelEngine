@@ -489,6 +489,8 @@ namespace SteelEngine {
 					}
 				}
 
+				Event::GlobalEvent::Broadcast(SE_ConstructorMacroEvent{ cons.m_Arguments });
+
 				currentData->m_Constructors.push_back(cons);
 			}
 			else if(lexer.GetToken() == "SE_CLASS" ||
@@ -1284,7 +1286,7 @@ namespace SteelEngine {
 
 			// Here we are generating info for the runtime compilator
 
-			if (data->m_Constructors.size() > 0)
+			if(data->m_Constructors.size() > 0)
 			{
 				sourceFile << "#ifdef RUNTIME_COMPILE\n";
 				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)\n";

@@ -18,10 +18,18 @@ namespace SteelEngine {
 		Func m_Function;
 		MetaDataInfoVector m_MetaData;
 
+		size_t m_ConstructorID = RuntimeDatabase::s_InvalidID;
+		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
+
 		ReflectionConstructor(Func func) :
 			m_Function(func)
 		{
 
+		}
+
+		const MetaDataInfoVector* GetMetaDataInfoVector() const override
+		{
+			return &m_MetaData;
 		}
 
 		MetaDataInfoVector* GetMetaDataInfoVector() override
@@ -52,6 +60,16 @@ namespace SteelEngine {
 			object->m_TypeID = m_TypeID;
 
 			return object;
+		}
+
+		size_t GetConstructorID() override
+		{
+			return m_ConstructorID;
+		}
+
+		size_t GetTypeID() override
+		{
+			return m_TypeID;
 		}
 	};
 

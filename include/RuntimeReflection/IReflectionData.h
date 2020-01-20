@@ -39,18 +39,13 @@ namespace SteelEngine {
 		}
 
 	public:
-		typedef std::unordered_map<std::string, IReflectionProperty*> PropertiesMap;
-		typedef std::unordered_map<std::string, IReflectionMethod*> MethodsMap;
-		typedef std::unordered_map<std::string, IReflectionEnumeration*> EnumsMap;
+		// typedef std::unordered_map<std::string, IReflectionProperty*> PropertiesMap;
+		typedef std::vector<IReflectionProperty*> PropertiesVector;
+		typedef std::vector<IReflectionMethod*> MethodsVector;
+		typedef std::vector<IReflectionEnumeration*> EnumsVector;
 		typedef std::vector<IReflectionConstructor*> ConstructorsVector;
 		typedef std::vector<IReflectionInheritance*> InheritancesVector;
 		typedef std::vector<std::string> NamespacesVector;
-
-		struct PropertyInfo
-		{
-			IReflectionProperty*	m_Property;
-			std::string				m_Name;
-		};
 
 		enum CurrentBindFlag
 		{
@@ -69,9 +64,9 @@ namespace SteelEngine {
 
 		HotReloader::IRuntimeObject* CreateObject(RuntimeDatabase* db, const std::string& typeName)
 		{
-			for(Type::uint32 j = 0; j < db->m_TypesSize; j++)
+			for(Type::uint32 j = 0; j < db->m_ReflectionDatabase->m_TypesSize; j++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types[j];
+				IReflectionData* type = (IReflectionData*)db->m_ReflectionDatabase->m_Types[j];
 				std::string name = typeName;
 
 				replaceAll(name, "::", ":");
@@ -93,7 +88,7 @@ namespace SteelEngine {
 						}
 					}
 
-					if(type->GetTypeName() == splitted[splitted.size() - 1] && isEqual)
+					if(strcmp(type->GetTypeName(), splitted[splitted.size() - 1].c_str()) == 0 && isEqual)
 					{
 						return type->Create();
 					}
@@ -103,9 +98,9 @@ namespace SteelEngine {
 
 		IReflectionData* GetType(RuntimeDatabase* db, const std::string& typeName)
 		{
-			for(Type::uint32 j = 0; j < db->m_TypesSize; j++)
+			for(Type::uint32 j = 0; j < db->m_ReflectionDatabase->m_TypesSize; j++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types[j];
+				IReflectionData* type = (IReflectionData*)db->m_ReflectionDatabase->m_Types[j];
 				std::string name = typeName;
 
 				replaceAll(name, "::", ":");
@@ -127,7 +122,7 @@ namespace SteelEngine {
 						}
 					}
 
-					if(type->GetTypeName() == splitted[splitted.size() - 1] && isEqual)
+					if(strcmp(type->GetTypeName(), splitted[splitted.size() - 1].c_str()) == 0 && isEqual)
 					{
 						return type;
 					}
@@ -136,10 +131,15 @@ namespace SteelEngine {
 		}
 
 		virtual const NamespacesVector& GetNamespacesVector() = 0;
-		virtual const MethodsMap& GetMethodsMap() = 0;
-		virtual const PropertiesMap& GetPropertiesMap() = 0;
-		virtual const EnumsMap& GetEnumsMap() = 0;
-		virtual const ConstructorsVector& GetConstructorsVector() = 0;
+		virtual const MethodsVector& GetMethodsVector() const = 0;
+		virtual const PropertiesVector& GetPropertiesVector() = 0;
+		virtual const EnumsVector& GetEnumsVector() = 0;
+		virtual const ConstructorsVector& GetConstructorsVector() const = 0;
+
+		const MetaDataInfoVector* GetMetaDataInfoVectorA(MetaDataImplementation* meta) const
+		{
+			return meta->GetMetaDataInfoVector();
+		}
 
 		MetaDataInfoVector* GetMetaDataInfoVectorA(MetaDataImplementation* meta)
 		{
@@ -147,31 +147,16 @@ namespace SteelEngine {
 		}
 
 	public:
-		virtual Variant GetProperty(const std::string& name, void* object) = 0;
-		virtual IReflectionProperty* GetProperty(const std::string& name) = 0;
+		virtual Variant GetProperty(const char* name, void* object) = 0;
+		virtual IReflectionProperty* GetProperty(const char* name) = 0;
 		virtual IReflectionMethod* GetMethod(const std::string& name) = 0;
 		virtual IReflectionEnumeration* GetEnum(const std::string& name) = 0;
 
 		virtual const std::vector<IReflectionInheritance*>& GetInheritances() = 0;
-		// {
-		// 	std::vector<IReflectionInheritance*> res;
-
-		// 	res.insert(res.begin(), m_Inheritances.begin(), m_Inheritances.end());
-
-		// 	return res;
-		// }
-
 		virtual const std::vector<IReflectionInheritance*>& GetInheritances() const = 0;
-		// {
-		// 	std::vector<IReflectionInheritance*> res;
-
-		// 	res.insert(res.begin(), m_Inheritances.begin(), m_Inheritances.end());
-
-		// 	return res;
-		// }
 
 		template <typename... Args>
-		HotReloader::IRuntimeObject* Create(Args... args)
+		HotReloader::IRuntimeObject* Create(Args... args) const
 		{
 			static RuntimeDatabase* db;
 
@@ -182,24 +167,23 @@ namespace SteelEngine {
 
 			for(IReflectionConstructor* cons : GetConstructorsVector())
 			{
-				if(cons->m_ConstructorID == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
+				if(cons->GetConstructorID() == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
 				{
 					ReflectionConstructor<Args...>* con_ = (ReflectionConstructor<Args...>*)cons;
 					HotReloader::IRuntimeObject* createdObject = (HotReloader::IRuntimeObject*)con_->m_Function(args...);
 
 					createdObject->m_Object = 			createdObject;
-					createdObject->m_ConstructorID = 	cons->m_ConstructorID;
+					createdObject->m_ConstructorID = 	cons->GetConstructorID();
 					createdObject->m_ObjectID = 		db->GetNextPerObjectID();
 					createdObject->m_TypeID = 			GetTypeID();
 
-					// db->m_Objects->push_back(new ConstrucedObject(createdObject->m_ObjectID, cons->m_ConstructorID, GetTypeID(), new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
-					db->m_Objects->PushBack(ConstrucedObject(createdObject->m_ObjectID, cons->m_ConstructorID, GetTypeID(), new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
+					db->m_HotReloaderDatabase->m_Objects->PushBack(ConstrucedObject(createdObject->m_ObjectID, cons->GetConstructorID(), GetTypeID(), new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
 
 					std::vector<IReflectionData*> res;
 
-					for(Type::uint32 i = 0; i < db->m_TypesSize; i++)
+					for(Type::uint32 i = 0; i < db->m_ReflectionDatabase->m_TypesSize; i++)
 					{
-						res.push_back((IReflectionData*)db->m_Types[i]);
+						res.push_back((IReflectionData*)db->m_ReflectionDatabase->m_Types[i]);
 					}
 
 					for(Type::uint32 i = 0; i < res.size(); i++)
@@ -222,28 +206,12 @@ namespace SteelEngine {
 
 		const std::vector<IReflectionEnumeration*> GetEnums()
 		{
-			std::vector<IReflectionEnumeration*> res;
-			const EnumsMap& enums = GetEnumsMap();
-
-			for(EnumsMap::const_iterator it = enums.begin(); it != enums.end(); ++it)
-			{
-				res.push_back(it->second);
-			}
-
-			return res;
+			return GetEnumsVector();
 		}
 
-		const std::vector<PropertyInfo> GetProperties()
+		const PropertiesVector& GetProperties()
 		{
-			std::vector<PropertyInfo> res;
-			const PropertiesMap& props = GetPropertiesMap();
-
-			for(PropertiesMap::const_iterator it = props.begin(); it != props.end(); ++it)
-			{
-				res.push_back(PropertyInfo{ it->second, it->first });
-			}
-
-			return res;
+			return GetPropertiesVector();
 		}
 
 		template <typename... Args>
@@ -251,7 +219,7 @@ namespace SteelEngine {
 		{
 			for(IReflectionConstructor* cons : GetConstructorsVector())
 			{
-				if (cons->m_ConstructorID == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
+				if (cons->GetConstructorID() == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
 				{
 					return cons;
 				}
@@ -259,9 +227,30 @@ namespace SteelEngine {
 		}
 
 		template <typename... Args>
-		Variant Invoke(const std::string& name, void* object, Args... args)
+		Variant Invoke(IReflectionMethod* method, void* object, Args... args)
 		{
-			IProxyMethod<Args...>* res = (IProxyMethod<Args...>*)GetMethodsMap().find(name.c_str())->second;
+			IProxyMethod<Args...>* meth = (IProxyMethod<Args...>*)method;
+
+			return meth->Invoke(object, args...);
+		}
+
+		template <typename... Args>
+		Variant Invoke(const std::string& name, void* object, Args... args) const
+		{
+			const MethodsVector& vec = GetMethodsVector();
+			IProxyMethod<Args...>* res = 0;
+
+			for(Type::uint32 i = 0; i < vec.size(); i++)
+			{
+				IReflectionMethod* meth = vec[i];
+
+				if(meth->GetName() == name)
+				{
+					res = (IProxyMethod<Args...>*)meth;
+
+					break;
+				}
+			}
 
 			if(!res)
 			{
@@ -277,7 +266,20 @@ namespace SteelEngine {
 		template <typename... Args>
 		Variant InvokeStatic(const std::string& name, Args... args)
 		{
-			IProxyMethod<Args...>* res = (IProxyMethod<Args...>*)GetMethodsMap().find(name.c_str())->second;
+			const MethodsVector& vec = GetMethodsVector();
+			IProxyMethod<Args...>* res = 0;
+
+			for(Type::uint32 i = 0; i < vec.size(); i++)
+			{
+				IReflectionMethod* meth = vec[i];
+
+				if(meth->GetName() == name)
+				{
+					res = (IProxyMethod<Args...>*)meth;
+
+					break;
+				}
+			}
 
 			if(!res)
 			{
@@ -295,8 +297,8 @@ namespace SteelEngine {
 			return prop->GetInfo();
 		}
 
-		virtual const std::string& GetTypeName() = 0;
-		virtual size_t GetTypeID() = 0;
+		virtual const char* GetTypeName() const = 0;
+		virtual size_t GetTypeID() const = 0;
 	};
 
 }

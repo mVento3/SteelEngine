@@ -27,9 +27,9 @@ namespace SteelEngine {
 				db = (RuntimeDatabase*)get();
 			}
 
-			for (Type::uint32 i = 0; i < db->m_TypesSize; i++)
+			for (Type::uint32 i = 0; i < db->m_ReflectionDatabase->m_TypesSize; i++)
 			{
-				IReflectionData* type = (IReflectionData*)db->m_Types[i];
+				IReflectionData* type = (IReflectionData*)db->m_ReflectionDatabase->m_Types[i];
 
 				if (type->m_TypeID == m_TypeID)
 				{
@@ -39,7 +39,7 @@ namespace SteelEngine {
 
 						if (cons->m_ConstructorID == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
 						{
-							Tuple2 result(args...);
+							TupleMaker result(args...);
 
 							return cons->Invoke(&result);
 						}

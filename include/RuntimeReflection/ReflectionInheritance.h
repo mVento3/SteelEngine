@@ -11,6 +11,11 @@ namespace SteelEngine {
         size_t m_TypeID;
         MetaDataInfoVector m_MetaData;
 
+        const MetaDataInfoVector* GetMetaDataInfoVector() const override
+		{
+			return &m_MetaData;
+		}
+
         MetaDataInfoVector* GetMetaDataInfoVector() override
 		{
 			return &m_MetaData;

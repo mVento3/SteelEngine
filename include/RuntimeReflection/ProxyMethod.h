@@ -14,11 +14,18 @@ namespace SteelEngine {
 
 		FunctionCallback m_FunctionCallback;
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
+		std::string m_Name;
 
-		ProxyMethod(FunctionCallback func) :
-			m_FunctionCallback(func)
+		ProxyMethod(FunctionCallback func, const std::string& name) :
+			m_FunctionCallback(func),
+			m_Name(name)
 		{
 
+		}
+
+		const MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() const override
+		{
+			return &m_MetaData;
 		}
 
 		MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() override
@@ -49,6 +56,11 @@ namespace SteelEngine {
 
 			return none;
 		}
+
+		const std::string& GetName() const override
+		{
+			return m_Name;
+		}
 	};
 
 	template <typename T, typename R, typename ...Args>
@@ -58,11 +70,18 @@ namespace SteelEngine {
 
 		FunctionCallback m_FunctionCallback;
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
+		std::string m_Name;
 
-		ProxyMethod(FunctionCallback func) :
-			m_FunctionCallback(func)
+		ProxyMethod(FunctionCallback func, const std::string& name) :
+			m_FunctionCallback(func),
+			m_Name(name)
 		{
 
+		}
+
+		const MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() const override
+		{
+			return &m_MetaData;
 		}
 
 		MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() override
@@ -90,6 +109,11 @@ namespace SteelEngine {
 
 			return none;
 		}
+
+		const std::string& GetName() const override
+		{
+			return m_Name;
+		}
 	};
 
 	template <typename ...Args>
@@ -99,11 +123,18 @@ namespace SteelEngine {
 
 		FunctionCallback m_FunctionCallback;
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
+		std::string m_Name;
 
-		ProxyMethod(FunctionCallback func) :
-			m_FunctionCallback(func)
+		ProxyMethod(FunctionCallback func, const std::string& name) :
+			m_FunctionCallback(func),
+			m_Name(name)
 		{
 
+		}
+
+		const MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() const override
+		{
+			return &m_MetaData;
 		}
 
 		MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() override
@@ -135,6 +166,11 @@ namespace SteelEngine {
 
 			return none;
 		}
+
+		const std::string& GetName() const override
+		{
+			return m_Name;
+		}
 	};
 
 	template <typename R, typename ...Args>
@@ -144,11 +180,18 @@ namespace SteelEngine {
 
 		FunctionCallback m_FunctionCallback;
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
+		std::string m_Name;
 
-		ProxyMethod(FunctionCallback func) :
-			m_FunctionCallback(func)
+		ProxyMethod(FunctionCallback func, const std::string& name) :
+			m_FunctionCallback(func),
+			m_Name(name)
 		{
 
+		}
+
+		const MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() const override
+		{
+			return &m_MetaData;
 		}
 
 		MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() override
@@ -174,6 +217,11 @@ namespace SteelEngine {
 			R r(Call(args...));
 
 			return Variant(r, typeid(r).hash_code());
+		}
+
+		const std::string& GetName() const override
+		{
+			return m_Name;
 		}
 	};
 

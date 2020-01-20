@@ -98,7 +98,7 @@ namespace SteelEngine {
 				ms_Database = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
 			}
 
-			m_ValuePointer = (ValuePointer*)/*(new T(value))*/Memory::allocate<T>(*ms_Database->m_VariantsAllocator, value);
+			m_ValuePointer = (ValuePointer*)/*(new T(value))*/Memory::allocate<T>(*ms_Database->m_VariantDatabase->m_VariantsAllocator, value);
 			m_AutoDelete = true;
 			m_ToDelete = true;
 
@@ -205,7 +205,7 @@ namespace SteelEngine {
 		{
 			ValuePointer* old = m_ValuePointer;
 
-			m_ValuePointer = (ValuePointer*)/*(new T(value))*/Memory::allocate<T>(*ms_Database->m_VariantsAllocator, value);
+			m_ValuePointer = (ValuePointer*)/*(new T(value))*/Memory::allocate<T>(*ms_Database->m_VariantDatabase->m_VariantsAllocator, value);
 			m_TypeID = typeid(T).hash_code();
 			m_ToDelete = true;
 
@@ -238,7 +238,7 @@ namespace SteelEngine {
 			if(m_ValuePointer && m_ToDelete)
 			{
 				// delete m_ValuePointer;
-				Memory::deallocate(*ms_Database->m_VariantsAllocator, m_ValuePointer);
+				Memory::deallocate(*ms_Database->m_VariantDatabase->m_VariantsAllocator, m_ValuePointer);
 				m_ValuePointer = 0;
 			}
 

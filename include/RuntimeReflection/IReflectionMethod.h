@@ -6,7 +6,7 @@ namespace SteelEngine {
 
 	struct IReflectionMethod : public MetaDataImplementation
 	{
-
+		virtual const std::string& GetName() const = 0;
 	};
 
 }

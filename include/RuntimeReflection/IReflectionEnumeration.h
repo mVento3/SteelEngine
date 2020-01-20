@@ -17,6 +17,11 @@ namespace SteelEngine {
 
 		}
 
+		const MetaDataInfoVector* GetMetaDataInfoVector() const override
+		{
+			return &m_MetaData;
+		}
+
 		MetaDataInfoVector* GetMetaDataInfoVector() override
 		{
 			return &m_MetaData;
@@ -35,42 +40,13 @@ namespace SteelEngine {
 	{
 		typedef std::vector<ReflectionValue> ValuesVector;
 
-		ValuesVector m_Values;
-		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
-		MetaDataInfoVector m_MetaData;
+		virtual const MetaDataInfoVector* GetMetaDataInfoVector() const override = 0;
+		virtual MetaDataInfoVector* GetMetaDataInfoVector() override = 0;
 
-		MetaDataInfoVector* GetMetaDataInfoVector() override
-		{
-			return &m_MetaData;
-		}
+		virtual int GetEnumValue(const std::string& name) = 0;
+		virtual ReflectionValue GetEnum(const std::string& name) = 0;
 
-		int GetEnumValue(const std::string& name)
-		{
-			for (ValuesVector::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
-			{
-				if (it->m_Name == name)
-				{
-					return it->m_Value;
-				}
-			}
-
-			return 0;
-		}
-
-		ReflectionValue GetEnum(const std::string& name)
-		{
-			for (ValuesVector::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
-			{
-				if (it->m_Name == name)
-				{
-					return *it;
-				}
-			}
-
-			static ReflectionValue wrong("Wrong", 0);
-
-			return wrong;
-		}
+		virtual const std::string& GetName() const = 0;
 	};
 
 }

@@ -18,7 +18,7 @@ namespace SteelEngine {
 
 			for(SteelEngine::Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
 			{
-				IReflectionData* data = (IReflectionData*)Reflection::GetDB()->m_Types[i];
+				IReflectionData* data = (IReflectionData*)Reflection::GetDB()->m_ReflectionDatabase->m_Types[i];
 				std::string dataTypeName = "";
 
 				for(std::string name : data->GetNamespacesVector())
@@ -47,19 +47,13 @@ namespace SteelEngine {
 
 			if(!type)
 			{
-				type = Memory::allocate<ReflectionData<Type>>(*Reflection::GetDB()->m_TypesAllocator);
+				type = Memory::allocate<ReflectionData<Type>>(*Reflection::GetDB()->m_ReflectionDatabase->m_TypesAllocator);
 
-				// type = new ReflectionData<Type>();
-
-				type->m_TypeName = name;
+				strcpy(type->m_TypeName, name.c_str());
 				type->m_TypeID = typeid(Type).hash_code();
 
-				// Reflection::GetDB()->m_Types->push_back(type);
-
-				Reflection::GetDB()->m_Types[Reflection::GetDB()->m_TypesSize] = type;
-				Reflection::GetDB()->m_TypesSize++;
-
-				// std::sort(Reflection::GetDB()->m_Types->begin(), Reflection::GetDB()->m_Types->end());
+				Reflection::GetDB()->m_ReflectionDatabase->m_Types[Reflection::GetDB()->m_ReflectionDatabase->m_TypesSize] = type;
+				Reflection::GetDB()->m_ReflectionDatabase->m_TypesSize++;
 
 				type->m_Namespaces.insert(type->m_Namespaces.begin(), namespaces.begin(), namespaces.end());
 			}
@@ -102,9 +96,9 @@ namespace SteelEngine {
 
 			for(SteelEngine::Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
 			{
-				IReflectionData* data = (IReflectionData*)Reflection::GetDB()->m_Types[i];
+				IReflectionData* data = (IReflectionData*)Reflection::GetDB()->m_ReflectionDatabase->m_Types[i];
 
-				if(data->GetTypeName() == name)
+				if(strcmp(type->GetTypeName(), name.c_str()) == 0)
 				{
 					type = (ReflectionData<Type>*)data;
 
@@ -114,19 +108,13 @@ namespace SteelEngine {
 
 			if(!type)
 			{
-				type = Memory::allocate<ReflectionData<Type>>(*Reflection::GetDB()->m_TypesAllocator);
+				type = Memory::allocate<ReflectionData<Type>>(*Reflection::GetDB()->m_ReflectionDatabase->m_TypesAllocator);
 
-				// type = new ReflectionData<Type>();
-
-				type->m_TypeName = name;
+				strcpy(type->m_TypeName, name.c_str());
 				type->m_TypeID = typeid(Type).hash_code();
 
-				// Reflection::GetDB()->m_Types->push_back(type);
-
-				Reflection::GetDB()->m_Types[Reflection::GetDB()->m_TypesSize] = type;
-				Reflection::GetDB()->m_TypesSize++;
-
-				// std::sort(Reflection::GetDB()->m_Types->begin(), Reflection::GetDB()->m_Types->end());
+				Reflection::GetDB()->m_ReflectionDatabase->m_Types[Reflection::GetDB()->m_ReflectionDatabase->m_TypesSize] = type;
+				Reflection::GetDB()->m_ReflectionDatabase->m_TypesSize++;
 			}
 			else
 			{

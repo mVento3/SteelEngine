@@ -137,6 +137,11 @@ namespace SteelEngine {
 			std::vector<InheritanceInfo>* m_Inheritances;
 		};
 
+		struct SE_ConstructorMacroEvent
+		{
+			std::vector<ArgumentInfo> m_Args;
+		};
+
 		struct ClearValuesEvent
 		{
 

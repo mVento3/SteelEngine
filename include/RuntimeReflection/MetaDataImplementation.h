@@ -14,7 +14,7 @@ namespace SteelEngine {
 		// typedef Container::Vector<MetaDataInfo> MetaDataInfoVector;
 	private:
 		template <typename KeyType>
-		Variant* IfNotExists(MetaDataInfoVector* vec, KeyType key)
+		Variant* IfNotExists(KeyType key) const
 		{
 			static Variant none;
 
@@ -42,17 +42,16 @@ namespace SteelEngine {
 		}
 
 	protected:
+		virtual const MetaDataInfoVector* GetMetaDataInfoVector() const = 0;
 		virtual MetaDataInfoVector* GetMetaDataInfoVector() = 0;
 
 	public:
-		// MetaDataInfoVector m_MetaData;
-
-		Variant* GetMetaData(const char* key)
+		Variant* GetMetaData(const char* key) const
 		{
 			size_t charPtrType = typeid(const char*).hash_code();
-			MetaDataInfoVector* vec = GetMetaDataInfoVector();
+			const MetaDataInfoVector* vec = GetMetaDataInfoVector();
 
-			for(MetaDataInfoVector::iterator it = vec->begin(); it != vec->end(); ++it)
+			for(MetaDataInfoVector::const_iterator it = vec->begin(); it != vec->end(); ++it)
 			{
 				if(it->m_Key->GetType() == charPtrType)
 				{
@@ -65,15 +64,15 @@ namespace SteelEngine {
 				}
 			}
 
-			return IfNotExists(vec, key);
+			return IfNotExists(key);
 		}
 
 		template <typename KeyType>
-		Variant* GetMetaData(const KeyType& key)
+		Variant* GetMetaData(const KeyType& key) const
 		{
-			MetaDataInfoVector* vec = GetMetaDataInfoVector();
+			const MetaDataInfoVector* vec = GetMetaDataInfoVector();
 
-			for(MetaDataInfoVector::iterator it = vec->begin(); it != vec->end(); ++it)
+			for(MetaDataInfoVector::const_iterator it = vec->begin(); it != vec->end(); ++it)
 			{
 				if(it->m_Key->Compare(typeid(KeyType).hash_code()) &&
 					it->m_Key->Convert<KeyType>() == key)
@@ -82,7 +81,7 @@ namespace SteelEngine {
 				}
 			}
 
-			return IfNotExists(vec, key);
+			return IfNotExists(key);
 		}
 
 		template <typename KeyType, typename ValueType>
