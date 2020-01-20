@@ -46,10 +46,13 @@ namespace SteelEngine {
 
         void WaitUntilComplete() const override;
 
-        inline const bool IsCompileComplete() const override
+        inline bool IsCompileComplete() const override
         {
             return m_Process->IsCompileComplete();
         }
+
+        inline bool WasError() const { return m_Process->WasError(); }
+        inline const std::string& GetErrorMessage() const { return m_Process->GetErrorMessage(); }
     };
 
 }

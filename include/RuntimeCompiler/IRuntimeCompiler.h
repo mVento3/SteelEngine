@@ -42,8 +42,9 @@ namespace SteelEngine {
         ) = 0;
 
         virtual void WaitUntilComplete() const = 0;
-
-        virtual const bool IsCompileComplete() const = 0;
+        virtual bool IsCompileComplete() const = 0;
+        virtual bool WasError() const = 0;
+        virtual const std::string& GetErrorMessage() const = 0;
     };
 
 }

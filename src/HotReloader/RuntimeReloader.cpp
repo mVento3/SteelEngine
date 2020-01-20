@@ -46,10 +46,14 @@ namespace SteelEngine { namespace HotReloader {
 #endif
 	}
 
+	void RuntimeReloader::Test(const std::filesystem::path& file, FileWatcher::FileStatus status)
+	{
+		
+	}
+
     RuntimeReloader::RuntimeReloader()
     {
 		m_IsSwapComplete = true;
-		m_Once = true;
     }
 
     RuntimeReloader::~RuntimeReloader()
@@ -59,7 +63,6 @@ namespace SteelEngine { namespace HotReloader {
 
     Result RuntimeReloader::Initalize()
     {
-        // printf("Initializing Runtime Compiler!\n");
 		SE_INFO("Initializing runtime hot-reloader!");
 
 		GetCompileConfigEvent event;
@@ -90,13 +93,12 @@ namespace SteelEngine { namespace HotReloader {
 			ppp / "src",
 			[this](const std::filesystem::path& file, FileWatcher::FileStatus status)
 			{
-				if(std::filesystem::is_regular_file(file) && m_Process->IsCompileComplete() && m_IsSwapComplete && m_Once)
+				if(std::filesystem::is_regular_file(file) && m_Process->IsCompileComplete() && m_IsSwapComplete)
 				{
-					m_Once = false;
-
 					switch(status)
 					{
 					case FileWatcher::FileStatus::CREATED:
+						// SE_INFO("File created: %s", file.string().c_str());
 						break;
 					case FileWatcher::FileStatus::DELETED:
 						break;
@@ -121,9 +123,6 @@ namespace SteelEngine { namespace HotReloader {
 								m_Threads.pop_back();
 							}
 						}
-
-						// TODO: Change/remove that!
-						Sleep(50);
 
 						CHECK_SPEED(
 							{
@@ -183,6 +182,8 @@ namespace SteelEngine { namespace HotReloader {
 								thread->m_Done = true;
 								m_Process->SetError(false);
 
+								SE_ERROR("Error while compiling: %s", m_Process->GetErrorMessage().c_str());
+
 								return;
 							}
 
@@ -209,8 +210,8 @@ namespace SteelEngine { namespace HotReloader {
 						});
 			
 						m_Threads.push_back(thread);
-					}
 						break;
+					}
 					}
 				}
 			}
@@ -224,6 +225,20 @@ namespace SteelEngine { namespace HotReloader {
 
 		m_Initialized = true;
 
+		m_WatchDogThread = new std::thread([&]()
+		{
+			// Change to some state variable
+			while(1)
+			{
+				Sleep(100);
+
+				if(!m_Paused && m_Initialized)
+				{
+					m_SourceFileWatcher->Update();
+				}
+			}
+		});
+
         return SE_TRUE;
     }
 
@@ -234,10 +249,7 @@ namespace SteelEngine { namespace HotReloader {
 
 	void RuntimeReloader::Update()
 	{
-		if(!m_Paused && m_Initialized)
-		{
-			m_SourceFileWatcher->Update();
-		}
+
 	}
 
     void RuntimeReloader::Compile(const std::filesystem::path& file)
@@ -407,7 +419,6 @@ namespace SteelEngine { namespace HotReloader {
 		replaceAll(moduleName_, "/", "\\");
 
 		m_IsSwapComplete = false;
-		m_Once = true;
 
 		static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
 
@@ -428,13 +439,11 @@ namespace SteelEngine { namespace HotReloader {
 		}
 		catch(const std::exception& e)
 		{
-			// printf("%s\n", e.what());
 			SE_ERROR(e.what());
 		}
 
 		if(!getPerModule)
 		{
-			// printf("GetPerModule is null!\n");
 			SE_ERROR("GetPerModule in null!");
 
 			for(std::string f : m_ObjFilesToDelete)
@@ -447,15 +456,15 @@ namespace SteelEngine { namespace HotReloader {
 			return;
 		}
 
-		TypeInfo* info = getPerModule(db->m_Objects);
-		size_t size = db->m_Objects->Size();
+		TypeInfo* info = getPerModule(db->m_HotReloaderDatabase->m_Objects);
+		size_t size = db->m_HotReloaderDatabase->m_Objects->Size();
 		HotReloader::IRuntimeObject* old = 0;
 		HotReloader::IRuntimeObject* obj = 0;
 		bool found = false;
 
 		for(Type::uint32 i = 0; i < size; i++)
 		{
-			if (db->m_Objects->At(i).m_TypeID != info->m_TypeID)
+			if (db->m_HotReloaderDatabase->m_Objects->At(i).m_TypeID != info->m_TypeID)
 			{
 				continue;
 			}
@@ -464,7 +473,7 @@ namespace SteelEngine { namespace HotReloader {
 
 			Serializer serializer;
 
-			HotReloader::IRuntimeObject* currentObject = db->m_Objects->At(i).m_Object;
+			HotReloader::IRuntimeObject* currentObject = db->m_HotReloaderDatabase->m_Objects->At(i).m_Object;
 
 			obj = info->m_CreateObjectCallback(currentObject->m_ObjectID, currentObject->m_ConstructorID);
 			old = currentObject->m_Object;
@@ -481,12 +490,14 @@ namespace SteelEngine { namespace HotReloader {
 			serializer.Serialize(obj);
 
 			currentObject->m_Object = obj;
+
+			break;
 		}
 
 		if(!found)
 		{
 			size_t objectID = db->GetNextPerObjectID();
-			size_t constructorID = Reflection::GetType(info->m_TypeID)->GetConstructor()->m_ConstructorID;
+			size_t constructorID = Reflection::GetType(info->m_TypeID)->GetConstructor()->GetConstructorID();
 
 			obj = info->m_CreateObjectCallback(
 				objectID,
@@ -498,8 +509,7 @@ namespace SteelEngine { namespace HotReloader {
 			obj->m_ObjectID = 		objectID;
 			obj->m_TypeID = 		info->m_TypeID;
 
-			// db->m_Objects->push_back(new ConstrucedObject(obj->m_ObjectID, constructorID, m_TypeID, new Tuple(std::tuple()), obj));
-			db->m_Objects->PushBack(ConstrucedObject(obj->m_ObjectID, constructorID, m_TypeID, new Tuple(std::tuple()), obj));
+			db->m_HotReloaderDatabase->m_Objects->PushBack(ConstrucedObject(obj->m_ObjectID, constructorID, m_TypeID, new Tuple(std::tuple()), obj));
 		}
 
 		m_IsSwapComplete = true;
