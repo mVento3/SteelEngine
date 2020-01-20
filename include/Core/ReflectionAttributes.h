@@ -29,7 +29,9 @@ namespace SteelEngine {
         DO_NOT_GENERATE_CAST_FUNCTIONS,
         SYSTEMS_INFORMATION_TRACKER,
         NO_RECOMPILE,
-        INHERITANCE_MODULE
+        INHERITANCE_MODULE,
+        NAIVE_EVENT,
+        CONSOLE_COMMAND
     };
 
 }
