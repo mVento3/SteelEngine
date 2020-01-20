@@ -54,6 +54,8 @@ namespace SteelEngine {
 
         IVirtualProjectVisualizer** m_Visualizer;
 
+        bool m_ErrorWhileCompilingOBJs;
+
         Utils::json m_ProjectConfig;
         Utils::json m_CompileConfig;
 
@@ -80,6 +82,8 @@ namespace SteelEngine {
         {
             return m_Visualizer;
         }
+
+        Result IsProjectLoadedSuccessful() const override;
 
         void operator()(const LoadedProjectEvent& event);
         void operator()(LoadProjectEvent* event);

@@ -1,5 +1,7 @@
 #include "RuntimeCompiler/RuntimeCompiler.h"
 
+#include "Windows.h"
+
 namespace SteelEngine {
 
     const std::string RuntimeCompiler::mcs_CompletionToken = "_COMPLETION_TOKEN_";
@@ -150,7 +152,7 @@ namespace SteelEngine {
     {
         while(!IsCompileComplete())
         {
-            
+            Sleep(10);
         }
     }
 

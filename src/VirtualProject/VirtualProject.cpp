@@ -97,6 +97,14 @@ namespace SteelEngine {
         m_Compiler->Compile(filePath.string(), flagVector, definitionVector, includeVector, libPathVector, libVector);
         m_Compiler->WaitUntilComplete();
 
+        if(m_Compiler->WasError())
+        {
+            m_Process->SetError(false);
+            m_ErrorWhileCompilingOBJs = true;
+
+            SE_ERROR("Error while compiling obj: %s", m_Compiler->GetErrorMessage().c_str());
+        }
+
         m_Process->WriteInput("cd " + (m_LoadedProject / "build/Windows").string() + "\n__COMPLETION_TOKEN_\n");
     }
 
@@ -303,6 +311,8 @@ namespace SteelEngine {
     VirtualProject::VirtualProject()
     {
         m_Process = 0;
+        m_ProjectDLL = 0;
+        m_ErrorWhileCompilingOBJs = false;
     }
 
     VirtualProject::~VirtualProject()
@@ -399,6 +409,8 @@ namespace SteelEngine {
         bool compile = false;
         std::string dllFilename = (m_LoadedProject / "bin/").string() + m_ProjectName + ".dll";
 
+        m_ErrorWhileCompilingOBJs = false;
+
         if(!std::filesystem::exists(dllFilename))
         {
             for(auto& p : std::filesystem::recursive_directory_iterator(m_LoadedProject / "src"))
@@ -459,7 +471,10 @@ namespace SteelEngine {
             }
         }
 
-        if(compile)
+        // TODO: Idk why...
+        Sleep(1000);
+
+        if(compile && !m_ErrorWhileCompilingOBJs)
         {
             std::string source = "";
 
@@ -519,11 +534,21 @@ namespace SteelEngine {
             m_Compiler->Compile(source, flagVector, definitionVector, includeVector, libPathVector, libVector);
             m_Compiler->WaitUntilComplete();
 
-            m_Process->Release();
+            Sleep(500);
+
+            if(m_Compiler->WasError())
+            {
+                m_Process->SetError(false);
+                SE_ERROR("Error while compiling project: %s", m_Compiler->GetErrorMessage().c_str());
+
+                m_Process->Reset();
+
+                return;
+            }
 
             FILE* file = 0;
 
-            while(!file && !m_Process->WasError())
+            while(!file)
             {
                 file = fopen(dllFilename.c_str(), "r");
             }
@@ -532,6 +557,16 @@ namespace SteelEngine {
             {
                 fclose(file);
             }
+
+            Sleep(500);
+
+            m_Process->Release();
+        }
+        else if(m_ErrorWhileCompilingOBJs)
+        {
+            SE_ERROR("Some errors while compiling object files!");
+
+            return;
         }
 
         Module::Load(dllFilename, &m_ProjectDLL);
@@ -553,13 +588,25 @@ namespace SteelEngine {
         }
     }
 
+    Result VirtualProject::IsProjectLoadedSuccessful() const
+    {
+        if(m_Compiler->WasError())
+        {
+            return SE_FALSE;
+        }
+        else
+        {
+            return SE_TRUE;
+        }
+    }
+
     void VirtualProject::operator()(const LoadedProjectEvent& event)
     {
-        IReflectionData** types = Reflection::GetTypes();
+        IReflectionData const* const* types = Reflection::GetTypes();
 
         for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
-            IReflectionData* data = types[i];
+            const IReflectionData* data = types[i];
 
             if(data->GetMetaData(ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
             {
@@ -572,7 +619,7 @@ namespace SteelEngine {
 
     void VirtualProject::operator()(LoadProjectEvent* event)
     {
-        event->m_VirtualProject = (IVirtualProject**)&m_Object;
+        event->m_VirtualProject = (IVirtualProject**)&m_Object; 
         m_LoadedProject = event->m_Path;
 
         // Here might be some changes, so we need to compile them
@@ -599,15 +646,32 @@ namespace SteelEngine {
 
     void VirtualProject::operator()(const RecompiledEvent& event)
     {
-        IReflectionData** types = Reflection::GetTypes();
+        IReflectionData const* const* types = Reflection::GetTypes();
 
         for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
-            IReflectionData* data = types[i];
+            const IReflectionData* data = types[i];
 
             if(data->GetMetaData(ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
             {
-                m_ProjectScripts.push_back(&data->Create()->m_Object);
+                bool found = false;
+
+                for(Type::uint32 i = 0; i < m_ProjectScripts.size(); i++)
+                {
+                    HotReloader::IRuntimeObject* obj = *m_ProjectScripts[i];
+
+                    if(obj->m_TypeID == data->GetTypeID())
+                    {
+                        found = true;
+
+                        break;
+                    }
+                }
+
+                if(!found)
+                {
+                    m_ProjectScripts.push_back(&data->Create()->m_Object);
+                }
             }
         }
     }

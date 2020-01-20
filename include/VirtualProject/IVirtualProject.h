@@ -24,6 +24,7 @@ namespace SteelEngine {
 
         virtual void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) { }
         virtual Result IsProjectLoaded() { return SE_NOT_IMPLEMENTED; }
+        virtual Result IsProjectLoadedSuccessful() const { return SE_NOT_IMPLEMENTED; }
 
         virtual IVirtualProjectVisualizer** GetVisualizer() { return 0; }
     };
