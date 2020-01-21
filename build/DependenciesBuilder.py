@@ -69,6 +69,9 @@ for subdir, dirs, files in os.walk(external_path + '/' + folder_path):
             process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + file_to_compile)
             process.Wait()
 
+            if process.WasError():
+                print("Error while compiling:", process.GetErrorMessage())
+
             file_to_compile = cwd + '/' + working_directory + '/' + folder_path + '/' + os.path.splitext(os.path.basename(file_to_compile))[0] + '.obj '
 
             if os.path.isfile(file_to_compile):
@@ -77,3 +80,6 @@ for subdir, dirs, files in os.walk(external_path + '/' + folder_path):
         if obj_files != '':
             process.WriteInput('lib ' + obj_files + '/OUT:' + cwd + '/bin/' + folder_path + '.lib')
             process.Wait()
+
+            if process.WasError():
+                print("Error while compiling:", process.GetErrorMessage())
