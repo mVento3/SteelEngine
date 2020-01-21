@@ -13,9 +13,11 @@
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 
+#include "Graphics/IMesh.h"
+
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
-    class Mesh
+    class Mesh : public IMesh
     {
     public:
         enum Buffer
@@ -50,6 +52,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Cleanup();
 
         void Draw() const;
+
+        inline GLuint GetVAO() const { return m_VAO; }
+        inline GLuint GetDrawCount() const { return m_DrawCount; }
     };
 
 }}}

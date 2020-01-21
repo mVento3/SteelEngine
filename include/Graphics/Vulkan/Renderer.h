@@ -29,7 +29,7 @@
 
 #include "vector"
 
-#include "Graphics/Math/Camera.h"
+#include "Math/Camera.h"
 
 #include "Input/Events/ChangeMousePositionEvent.h"
 #include "Input/Events/KeyDownEvent.h"

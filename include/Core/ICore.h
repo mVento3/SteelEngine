@@ -4,6 +4,8 @@
 
 #include "Event/IEventManager.h"
 
+#include "Graphics/IRenderer.h"
+
 namespace SteelEngine {
 
     struct ICore : public HotReloader::IRuntimeObject
@@ -12,8 +14,8 @@ namespace SteelEngine {
         void ProcessEvents(IEventManager* manager) { manager->ProcessEvents(); }
 
     public:
-        virtual void Start() { }
-        virtual void Stop() { }
+        virtual void Start() = 0;
+        virtual void Stop() = 0;
     };
 
 }

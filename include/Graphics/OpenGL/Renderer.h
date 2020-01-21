@@ -14,8 +14,8 @@
 #include "Graphics/OpenGL/ShadowInfo.h"
 #include "Graphics/OpenGL/Model.h"
 
-#include "Graphics/Math/Transform.h"
-#include "Graphics/Math/Camera.h"
+#include "Math/Transform.h"
+#include "Math/Camera.h"
 
 #include "Graphics/OpenGL/Lights/SpotLight.h"
 #include "Graphics/OpenGL/Lights/DirectionalLight.h"
@@ -33,6 +33,8 @@
 #include "ImGUI_Editor/Events/AnyItemActiveChangedEvent.h"
 
 #include "vector"
+
+#include "Graphics/OpenGL/ECS_Components/RenderableComponent.h"
 
 #include "Graphics/OpenGL/Renderer.Generated.h"
 
@@ -89,6 +91,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         bool m_Controlls;
 
+        entt::entity AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform) override;
+
     public:
         Renderer(IWindow* window);
         ~Renderer();
@@ -98,7 +102,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Cleanup() override;
 
         void PreRender() override;
-        void Render() override;
+        void Render(entt::registry* scene) override;
         void PostRender() override;
 
         void OnEvent(Event::Naive* event) override;

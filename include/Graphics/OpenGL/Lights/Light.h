@@ -4,7 +4,7 @@
 #include "Graphics/OpenGL/Framebuffer.h"
 #include "Graphics/OpenGL/Shader.h"
 
-#include "Graphics/Math/Transform.h"
+#include "Math/Transform.h"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 

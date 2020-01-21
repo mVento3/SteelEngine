@@ -35,6 +35,8 @@
 
 #include "Event/EventObserver.h"
 
+#include "SceneSystem/ISceneManager.h"
+
 #include "Core/Core.Generated.h"
 
 // 1. Fix problem with properties in proper class, especially while nesting
@@ -83,6 +85,7 @@ namespace SteelEngine {
         Script::IPython*            m_Python;
         IContext*                   m_ImGUI_ContextAPI;
         IEventManager**             m_EventManager;
+        ISceneManager**             m_SceneManager;
 
         Variant* m_DeltaTimeVariant;
 
@@ -94,6 +97,8 @@ namespace SteelEngine {
         EnginePathVariant m_EnginePathVariant;
 
         std::vector<HotReloader::IRuntimeObject*> m_ReflectionModules;
+
+        entt::entity ent;
 
         void Loop();
         Result Init();

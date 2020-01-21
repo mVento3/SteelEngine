@@ -123,7 +123,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
             ImGui::EndMainMenuBar();
         }
 
-        if(!GImGui || !GImGui->FrameScopeActive)
+        if(!GImGui/* || !GImGui->FrameScopeActive*/)
         {
             printf("Skipping frame!\n");
 

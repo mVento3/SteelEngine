@@ -2,12 +2,28 @@
 
 #include "HotReloader/IRuntimeObject.h"
 
+#include "SceneSystem/ISceneManager.h"
+
 #include "Core/Result.h"
+
+#include "entt/entt.hpp"
+
+#include "Graphics/IModel.h"
+
+#include "Math/Transform.h"
+
+#include "Event/LocalEvent.h"
+
+#include "Graphics/Events/AddModelEvent.h"
 
 namespace SteelEngine { namespace Graphics {
 
     struct IRenderer : public HotReloader::IRuntimeObject
     {
+    protected:
+        virtual entt::entity AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform) { return scene->create(); }
+
+    public:
         enum API
         {
             OPENGL_API,
@@ -21,8 +37,18 @@ namespace SteelEngine { namespace Graphics {
         virtual void Cleanup() { }
 
         virtual void PreRender() { }
-        virtual void Render() { }
+        virtual void Render(entt::registry* scene) { }
         virtual void PostRender() { }
+
+        entt::entity AddModel(IModel* model, entt::registry* scene, const Transform& transform)
+        {
+            auto res = AddModel(model->Setup(), scene, transform);
+
+            delete model;
+            model = 0;
+
+            return res;
+        }
     };
 
 }}

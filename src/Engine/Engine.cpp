@@ -36,62 +36,6 @@ std::vector<SteelEngine::Options::Descriptor> desc =
     { GAME_DEV, "gd" }
 };
 
-// struct TestComponent : SteelEngine::EntityComponentSystem::ECS::Component
-// {
-//     int x;
-//     int y;
-
-//     TestComponent(int x, int y) :
-//         x(x),
-//         y(y)
-//     {
-
-//     }
-// };
-
-// struct TestComponent2 : SteelEngine::EntityComponentSystem::ECS::Component
-// {
-//     int posX;
-//     int posY;
-
-//     TestComponent2(int x, int y) :
-//         posX(x),
-//         posY(y)
-//     {
-
-//     }
-// };
-
-// void a(SteelEngine::EntityComponentSystem::ECS::Component* components[32], size_t count)
-// {
-//     using Component = SteelEngine::EntityComponentSystem::ECS::Component;
-
-//     for(size_t i = 0; i < count; i++)
-//     {
-//         Component* component = components[i];
-
-//         if(component->m_ComponentTypeID == SteelEngine::EntityComponentSystem::ECS::GetComponentTypeID<TestComponent2>())
-//         {
-//             TestComponent2* com = (TestComponent2*)component;
-
-//             com->posX += 1;
-//             com->posY += 1;
-
-//             // printf("AA\n");
-//         }
-
-//         if(component->m_ComponentTypeID == SteelEngine::EntityComponentSystem::ECS::GetComponentTypeID<TestComponent>())
-//         {
-//             TestComponent* com = (TestComponent*)component;
-
-//             com->x -= 1;
-//             com->y -= 1;
-
-//             // printf("AA\n");
-//         }
-//     }
-// }
-
 int main(int argc, char* argv[])
 {
 // Get additional application arguments/options
@@ -104,16 +48,8 @@ int main(int argc, char* argv[])
 
 // Setup root memory allocator
     void* paddedAddress = SteelEngine::Memory::PointerMath::calculateForwardAddress((SteelEngine::Type::uptr)rootMemory, __alignof(SteelEngine::Memory::LinearAllocator));
+
     rootMemoryAllocator = new(paddedAddress) SteelEngine::Memory::LinearAllocator(rootMemorySize - sizeof(SteelEngine::Memory::LinearAllocator));
-
-    // SteelEngine::EntityComponentSystem::ECS ecs(rootMemoryAllocator);
-
-    // auto entity = ecs.Create();
-
-    // ecs.Assign<TestComponent2>(entity, 22, 33);
-    // ecs.Assign<TestComponent>(entity, 10, 20);
-
-    // ecs.Each<TestComponent, TestComponent2>(&a);
 
 // Load the  database and set root memory arguments
     SteelEngine::ModuleManager::Load(getBinaryLocation() / "RuntimeDatabase.dll");

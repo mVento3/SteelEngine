@@ -2,7 +2,25 @@
 
 #include "SDL_events.h"
 
+#include "RuntimeReflection/Reflection.h"
+
+#include "Graphics/ECS_Components/TransformComponent.h"
+
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
+
+    entt::entity Renderer::AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform)
+    {
+        Mesh* casted = (Mesh*)mesh;
+
+        casted->Setup();
+
+        auto model = scene->create();
+
+        scene->assign<RenderableComponent>(model, RenderableComponent(casted->GetVAO(), casted->GetDrawCount(), m_G_Shader->GetShaderID()));
+        scene->assign<TransformComponent>(model, TransformComponent(transform));
+
+        return model;
+    }
 
     Renderer::Renderer(IWindow* window) :
         m_Window(window)
@@ -209,7 +227,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void Renderer::Render()
+    void Renderer::Render(entt::registry* scene)
     {
     // Shadows
         m_ShadowShader->Bind();
@@ -232,6 +250,14 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
                 m_ShadowShader->Update(model.m_Transform, *m_ShadowCamera, 0, 0);
                 model.m_Mesh->Draw();
             }
+
+            scene->view<RenderableComponent, TransformComponent>().each([&](RenderableComponent& model, TransformComponent& trans)
+            {
+                m_ShadowShader->Update(trans.m_Transform, *m_ShadowCamera, 0, 0);
+
+                glBindVertexArray(model.m_VAO);
+                glDrawElements(GL_TRIANGLES, model.m_DrawCount, GL_UNSIGNED_INT, 0);
+            });
         }
 
     // Objects data
@@ -282,6 +308,15 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             m_G_Shader->Update(model.m_Transform, *m_Camera, m_SpotLight->GetShadowInfo(), m_DirectionalLight->GetShadowInfo());
             model.m_Mesh->Draw();
         }
+
+        scene->view<RenderableComponent, TransformComponent>().each([&](RenderableComponent& model, TransformComponent& trans)
+        {
+            m_G_Shader->SetVec3("baseColor", glm::vec3(1, 1, 1));
+            m_G_Shader->Update(trans.m_Transform, *m_Camera, m_SpotLight->GetShadowInfo(), m_DirectionalLight->GetShadowInfo());
+
+            glBindVertexArray(model.m_VAO);
+            glDrawElements(GL_TRIANGLES, model.m_DrawCount, GL_UNSIGNED_INT, 0);
+        });
 
     // Render quad
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

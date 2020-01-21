@@ -3,6 +3,7 @@
 #include "Logger/ILogger.h"
 
 #include "RuntimeReflection/Macro.h"
+#include "RuntimeReflection/Reflection.h"
 
 #include "Logger/Logger.Generated.h"
 

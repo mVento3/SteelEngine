@@ -7,8 +7,8 @@
 
 #include "Core/Type.h"
 
-#include "Graphics/Math/Transform.h"
-#include "Graphics/Math/Camera.h"
+#include "Math/Transform.h"
+#include "Math/Camera.h"
 
 #include "Graphics/OpenGL/ShadowInfo.h"
 
@@ -58,6 +58,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void SetVec3(const std::string& name, const glm::vec3& value) const;
         void SetVec2(const std::string& name, const glm::vec2& value) const;
         void SetMat4(const std::string& name, const glm::mat4& value) const;
+
+        inline GLuint GetShaderID() const { return m_Program; }
     };
 
 }}}

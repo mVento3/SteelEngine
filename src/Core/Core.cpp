@@ -19,6 +19,12 @@
 
 #include "Event/EventManager.h"
 
+#include "entt/entt.hpp"
+
+#include "Graphics/Model.h"
+
+#include "Graphics/ECS_Components/TransformComponent.h"
+
 namespace SteelEngine {
 
     void Core::Loop()
@@ -144,6 +150,14 @@ namespace SteelEngine {
         m_Renderer = (Graphics::IRenderer**)&Reflection::CreateInstance("SteelEngine::Graphics::OpenGL::Renderer", m_Window)->m_Object;
         m_Editor = (Editor::IEditor**)&Reflection::CreateInstance("SteelEngine::Editor::ImGUI::ImGUI_Editor")->m_Object;
 
+        m_SceneManager = (ISceneManager**)&Reflection::CreateInstance("SteelEngine::SceneManager")->m_Object;
+
+        // entt::registry* reg = (*m_SceneManager)->GetCurrentScene();
+
+        // auto ent = reg->create();
+
+        (*m_SceneManager)->Init();
+
         EventObserver* eve = Reflection::GetType("SteelEngine::Graphics::OpenGL::Renderer")->Invoke("Cast_EventObserver", *m_Renderer).Convert<EventObserver*>();
         EventObserver* eve2 = Reflection::GetType("SteelEngine::Editor::ImGUI::ImGUI_Editor")->Invoke("Cast_EventObserver", *m_Editor).Convert<EventObserver*>();
 
@@ -215,6 +229,12 @@ namespace SteelEngine {
 
         Event::GlobalEvent::Add<LoadedProjectEvent>(this);
 
+        ent = (*m_Renderer)->AddModel
+            (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj"),
+            (*m_SceneManager)->GetCurrentScene(),
+            Transform(glm::vec3(10, 20, 0))
+        );
+
         return SE_TRUE;
     }
 
@@ -240,6 +260,16 @@ namespace SteelEngine {
 
             ProcessEvents(*m_EventManager);
         }
+
+        static float counter = 0;
+
+        counter += time->GetDeltaTime();
+
+        entt::registry* reg = (*m_SceneManager)->GetCurrentScene();
+
+        auto& trans = reg->get<TransformComponent>(ent);
+
+        trans.m_Transform.SetRotation(glm::angleAxis(counter, glm::vec3(1, 0, 0)));
 
         // The runtime compiler file watcher is not too perform
         if(m_RuntimeReloader)
@@ -289,7 +319,7 @@ namespace SteelEngine {
             {
                 SE_PROFILE_SCOPE("Graphics::Render");
 
-                (*m_Renderer)->Render();
+                (*m_Renderer)->Render((*m_SceneManager)->GetCurrentScene());
             }
 
             m_ImGUI_ContextAPI->UploadDrawData();
