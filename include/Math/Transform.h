@@ -4,7 +4,7 @@
 #include "glm\gtx\transform.hpp"
 #include "glm\gtx\quaternion.hpp"
 
-#include "Graphics/Math/Quaternion.h"
+#include "Math/Quaternion.h"
 
 namespace SteelEngine {
 

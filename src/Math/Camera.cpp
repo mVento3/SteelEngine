@@ -1,4 +1,4 @@
-#include "Graphics/Math/Camera.h"
+#include "Math/Camera.h"
 
 namespace SteelEngine {
 
