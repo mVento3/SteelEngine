@@ -26,7 +26,8 @@
 			"external/Python/include",
 			"external/glew-2.1.0/include",
 			"external/assimp/include",
-			"external/assimp/build/include"
+			"external/assimp/build/include",
+			"external/entt/src"
 		],
 		"lib_paths": [
 			"bin",
@@ -62,6 +63,10 @@
 		},
 		{
 			"name": "Module",
+			"type": "lib"
+		},
+		{
+			"name": "Math",
 			"type": "lib"
 		},
 		{
@@ -158,6 +163,10 @@
 		},
 		{
 			"name": "PythonProcess",
+			"type": "dll"
+		},
+		{
+			"name": "SceneSystem",
 			"type": "dll"
 		},
 		{
