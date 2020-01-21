@@ -35,12 +35,14 @@ SERIALIZE(Core::m_NetworkManager)
 SERIALIZE(Core::m_Python)
 SERIALIZE(Core::m_ImGUI_ContextAPI)
 SERIALIZE(Core::m_EventManager)
+SERIALIZE(Core::m_SceneManager)
 SERIALIZE(Core::m_DeltaTimeVariant)
 SERIALIZE(Core::m_CompileConfig)
 SERIALIZE(Core::m_Running)
 SERIALIZE(Core::m_OneSecondTime)
 SERIALIZE(Core::m_EnginePathVariant)
 SERIALIZE(Core::m_ReflectionModules)
+SERIALIZE(Core::ent)
 }
 
 #ifdef RUNTIME_COMPILE
