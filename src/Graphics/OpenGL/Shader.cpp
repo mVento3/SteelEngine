@@ -108,6 +108,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_Uniforms[VIEW_U] = glGetUniformLocation(m_Program, "view");
         m_Uniforms[LIGHT_MATRIX_U] = glGetUniformLocation(m_Program, "lightMatrix");
         m_Uniforms[LIGHT_MATRIX2_U] = glGetUniformLocation(m_Program, "lightMatrix2");
+
+        InitCustom();
     }
 
     void Shader::Cleanup()
@@ -141,6 +143,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
             glUniformMatrix4fv(m_Uniforms[LIGHT_MATRIX2_U], 1, GL_FALSE, &lightMatrix[0][0]);
         }
+
+        UpdateCustom(transform, camera, shadow, shadow2);
     }
 
     void Shader::Bind() const
@@ -171,6 +175,36 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     void Shader::SetMat4(const std::string& name, const glm::mat4& value) const
     {
         glUniformMatrix4fv(glGetUniformLocation(m_Program, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    }
+
+    void Shader::SetInt(GLuint id, int value) const
+    {
+        glUniform1i(id, value);
+    }
+
+    void Shader::SetFloat(GLuint id, float value) const
+    {
+        glUniform1f(id, value);
+    }
+
+    void Shader::SetVec3(GLuint id, const glm::vec3& value) const
+    {
+        glUniform3f(id, value.x, value.y, value.z);
+    }
+
+    void Shader::SetVec2(GLuint id, const glm::vec2& value) const
+    {
+        glUniform2f(id, value.x, value.y);
+    }
+
+    void Shader::SetMat4(GLuint id, const glm::mat4& value) const
+    {
+        glUniformMatrix4fv(id, 1, GL_FALSE, &value[0][0]);
+    }
+
+    GLuint Shader::GetUniformLocation(const char* name) const
+    {
+        return glGetUniformLocation(m_Program, name);
     }
 
 }}}

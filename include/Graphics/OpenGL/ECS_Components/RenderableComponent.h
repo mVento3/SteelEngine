@@ -4,16 +4,18 @@
 
 #include "Math/Transform.h"
 
+#include "Graphics/OpenGL/Mesh.h"
+#include "Graphics/OpenGL/Shader.h"
+
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     struct RenderableComponent
     {
-        RenderableComponent(Type::uint32 vao, Type::uint32 drawCount, Type::uint32 shaderID) :
-            m_VAO(vao),
-            m_DrawCount(drawCount),
-            m_ShaderID(shaderID)
+        RenderableComponent(const Mesh* mesh, const Shader* shader)
         {
-
+            m_VAO = mesh->GetVAO();
+            m_DrawCount = mesh->GetDrawCount();
+            m_ShaderID = shader->GetShaderID();
         }
 
         Type::uint32 m_VAO;

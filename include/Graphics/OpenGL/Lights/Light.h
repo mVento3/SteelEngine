@@ -15,11 +15,13 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         Framebuffer* m_ShadowFramebuffer;
         Texture* m_ShadowMapTexture;
 
+        virtual void Init(const Shader& shader) { }
+
     public:
         Light();
         ~Light();
 
-        void Setup();
+        void Setup(const Shader& shader);
 
         virtual void Update(Transform& transform) { }
         virtual void Update(const Shader& shader) { }

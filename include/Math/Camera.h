@@ -20,6 +20,7 @@ namespace SteelEngine {
         inline void SetProjection(const glm::mat4& projection) { m_Projection = projection; }
 
         inline Transform& GetTransform() { return m_Transform; }
+        inline const Transform& GetTransform() const { return m_Transform; }
     };
 
 }

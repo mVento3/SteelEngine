@@ -10,9 +10,22 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     class DirectionalLight : public Light
     {
+    public:
+        enum Uniforms
+        {
+            BASE_LIGHT = BaseLight::SIZE,
+            ROTATION,
+
+            SIZE
+        };
+
     private:
         BaseLight m_BaseLight;
         Quaternion m_Rotation;
+
+        GLuint m_Uniforms[Uniforms::SIZE];
+
+        void Init(const Shader& shader) override;
 
     public:
         DirectionalLight(const BaseLight& baseLight, const Quaternion& rotation);

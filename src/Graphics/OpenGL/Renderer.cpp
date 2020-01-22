@@ -6,6 +6,8 @@
 
 #include "Graphics/ECS_Components/TransformComponent.h"
 
+#include "Profiler/ScopeTimer.h"
+
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     entt::entity Renderer::AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform)
@@ -16,7 +18,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         auto model = scene->create();
 
-        scene->assign<RenderableComponent>(model, RenderableComponent(casted->GetVAO(), casted->GetDrawCount(), m_G_Shader->GetShaderID()));
+        scene->assign<RenderableComponent>(model, RenderableComponent(casted, m_G_Shader));
         scene->assign<TransformComponent>(model, TransformComponent(transform));
 
         return model;
@@ -28,9 +30,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_QuadShader = new Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/quadShader");
         m_QuadMesh = new QuadMesh();
 
-        m_Mesh = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj");
-        // m_Mesh2 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/cube.obj");
-        // m_Mesh3 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj");
         m_Texture = new Texture("D:/Projects/C++/SteelEngine/bin/Resources/Textures/bricks2.jpg");
         m_NormalMapTexture = new Texture("D:/Projects/C++/SteelEngine/bin/Resources/Textures/bricks2_normal.jpg");
         m_DispMapTexture = new Texture("D:/Projects/C++/SteelEngine/bin/Resources/Textures/bricks2_disp.jpg");
@@ -40,7 +39,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_AlbedoTexture = new Texture(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, false);
         m_ShadowTexture = new Texture(GL_R32F, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, false);
 
-        m_G_Shader = new Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/gBuffer");
+        m_G_Shader = new TestShader();
         m_G_Buffer = new Framebuffer(1920, 1080,
         {
             new Framebuffer::Attachment(m_PositionTexture, GL_COLOR_ATTACHMENT0),
@@ -56,7 +55,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             glm::quat(glm::rotate(glm::radians(45.f), glm::vec3(0, 1, 0)))
         );
 
-        m_Counter = 0;
         m_Camera = new Camera(Transform(glm::vec3(0, 0, -10)), 1920 / 1080);
 
         m_SpotLight = new SpotLight(
@@ -67,37 +65,10 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_SpotRotation = glm::quat(glm::rotate(glm::radians(180.f), glm::vec3(0, 1, 0)));
         m_SpotLight->SetRotation(m_SpotRotation);
 
-        m_Trans.SetScale(glm::vec3(100, 100, 100));
-        m_Trans2.SetPosition(glm::vec3(0, 1, 0));
-        m_Trans2.SetRotation(glm::quat(glm::rotate(glm::radians(45.f), glm::vec3(0, 1, 0))));
-        m_Trans3.SetPosition(glm::vec3(1, 20, 0));
-
         m_DirectionalLight = new DirectionalLight(BaseLight{ glm::vec3(1, 1, 1), 0.1f }, m_DirectionalLightTransform.GetRotation());
 
         m_Lights.push_back(m_DirectionalLight);
         m_Lights.push_back(m_SpotLight);
-
-        m_Models.push_back(Model(
-            m_Trans, m_Mesh, glm::vec3(1, 1, 1)
-        ));
-
-        for(Type::uint32 i = 0; i < 50; i++)
-        {
-            m_Mesh2 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/cube.obj");
-
-            m_Models.push_back(Model(
-                Transform(glm::vec3(i * 2, 1, 0)), m_Mesh2, glm::vec3(1, 1, 1)
-            ));
-        }
-
-        for(Type::uint32 i = 0; i < 100; i++)
-        {
-            m_Mesh3 = new Mesh("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj");
-
-            m_Models.push_back(Model(
-                Transform(glm::vec3(0, i * 2, 0)), m_Mesh3, glm::vec3(1, 1, 1)
-            ));
-        }
 
         m_Controlls = false;
     }
@@ -128,11 +99,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     // Models in scene -------------------
         m_Texture->Setup();
-
-        for(Type::uint32 i = 0; i < m_Models.size(); i++)
-        {
-            m_Models[i].m_Mesh->Setup();
-        }
 
         m_NormalMapTexture->Setup();
         m_DispMapTexture->Setup();
@@ -167,7 +133,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         for(Light* light : m_Lights)
         {
-            light->Setup();
+            light->Setup(*m_G_Shader);
         }
 
         return SE_TRUE;
@@ -175,8 +141,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     void Renderer::Update()
     {
-        m_Counter += 0.01f;
-
         Transform& camTrans = m_Camera->GetTransform();
 
         if(!m_Controlls)
@@ -243,14 +207,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             light->Update(m_ShadowCamera->GetTransform());
             light->GetShadowInfo()->m_LightMatrix = m_ShadowCamera->GetProjection() * m_ShadowCamera->GetView();
 
-            for(Type::uint32 i = 0; i < m_Models.size(); i++)
-            {
-                Model model = m_Models[i];
-
-                m_ShadowShader->Update(model.m_Transform, *m_ShadowCamera, 0, 0);
-                model.m_Mesh->Draw();
-            }
-
             scene->view<RenderableComponent, TransformComponent>().each([&](RenderableComponent& model, TransformComponent& trans)
             {
                 m_ShadowShader->Update(trans.m_Transform, *m_ShadowCamera, 0, 0);
@@ -271,28 +227,23 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_DirectionalLight->GetShadowMapTexture()->Bind(GL_TEXTURE3);
         m_SpotLight->GetShadowMapTexture()->Bind(GL_TEXTURE4);
 
-        m_G_Shader->SetVec3("ambientLight", glm::vec3(0.1f, 0.1f, 0.1f));
-        m_G_Shader->SetVec3("baseColor", glm::vec3(1, 1, 1));
-
-        m_G_Shader->SetVec3("eyePosition", m_Camera->GetTransform().GetPosition());
-
-        m_G_Shader->SetFloat("specularIntensity", 2.f);
-        m_G_Shader->SetFloat("specularPower", 32.f);
-
         float dispMapScale = 0.05f;
         float dispMapOffset = -1.f;
         float dispMapBias = dispMapScale / 2.0f;
 
-        m_G_Shader->SetFloat("dispMapScale", dispMapScale);
-        m_G_Shader->SetFloat("dispMapOffset", -dispMapBias + dispMapBias * dispMapOffset);
+        m_G_Shader->m_AmbientLight = glm::vec3(0.1f, 0.1f, 0.1f);
+        m_G_Shader->m_SpecularIntensity = 2.f;
+        m_G_Shader->m_SpecularPower = 32.f;
+        m_G_Shader->m_DispMapScale = dispMapScale;
+        m_G_Shader->m_DispMapOffset = -dispMapBias + dispMapBias * dispMapOffset;
 
     // Point light ---------------------------------------
-        m_G_Shader->SetVec3("pointLight.base.color", glm::vec3(1, 1, 1));
-        m_G_Shader->SetFloat("pointLight.base.intensity", 100.f);
-        m_G_Shader->SetFloat("pointLight.attenuation.constant", 0.f);
-        m_G_Shader->SetFloat("pointLight.attenuation.linear", 0.f);
-        m_G_Shader->SetFloat("pointLight.attenuation.exponent", 1.f);
-        m_G_Shader->SetVec3("pointLight.position", glm::vec3(0, 10, 0));
+        // m_G_Shader->SetVec3("pointLight.base.color", glm::vec3(1, 1, 1));
+        // m_G_Shader->SetFloat("pointLight.base.intensity", 100.f);
+        // m_G_Shader->SetFloat("pointLight.attenuation.constant", 0.f);
+        // m_G_Shader->SetFloat("pointLight.attenuation.linear", 0.f);
+        // m_G_Shader->SetFloat("pointLight.attenuation.exponent", 1.f);
+        // m_G_Shader->SetVec3("pointLight.position", glm::vec3(0, 10, 0));
     //
 
         for(Light* light : m_Lights)
@@ -300,18 +251,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             light->Update(*m_G_Shader);
         }
 
-        for(Type::uint32 i = 0; i < m_Models.size(); i++)
-        {
-            Model model = m_Models[i];
-
-            m_G_Shader->SetVec3("baseColor", model.m_Color);
-            m_G_Shader->Update(model.m_Transform, *m_Camera, m_SpotLight->GetShadowInfo(), m_DirectionalLight->GetShadowInfo());
-            model.m_Mesh->Draw();
-        }
-
         scene->view<RenderableComponent, TransformComponent>().each([&](RenderableComponent& model, TransformComponent& trans)
         {
-            m_G_Shader->SetVec3("baseColor", glm::vec3(1, 1, 1));
+            m_G_Shader->m_BaseColor = glm::vec3(1, 1, 1);
             m_G_Shader->Update(trans.m_Transform, *m_Camera, m_SpotLight->GetShadowInfo(), m_DirectionalLight->GetShadowInfo());
 
             glBindVertexArray(model.m_VAO);

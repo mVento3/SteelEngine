@@ -43,6 +43,10 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         static void CheckShaderError(GLuint shader, GLuint flag, bool isProgram, const std::string& errorMessage);
         static GLuint CreateShader(const std::string& data, GLenum shaderType);
 
+    protected:
+        virtual void InitCustom() { }
+        virtual void UpdateCustom(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2) { }
+
     public:
         Shader(const std::string& filename);
         ~Shader();
@@ -58,6 +62,14 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void SetVec3(const std::string& name, const glm::vec3& value) const;
         void SetVec2(const std::string& name, const glm::vec2& value) const;
         void SetMat4(const std::string& name, const glm::mat4& value) const;
+
+        void SetInt(GLuint id, int value) const;
+        void SetFloat(GLuint id, float value) const;
+        void SetVec3(GLuint id, const glm::vec3& value) const;
+        void SetVec2(GLuint id, const glm::vec2& value) const;
+        void SetMat4(GLuint id, const glm::mat4& value) const;
+
+        GLuint GetUniformLocation(const char* name) const;
 
         inline GLuint GetShaderID() const { return m_Program; }
     };

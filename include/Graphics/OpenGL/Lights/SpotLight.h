@@ -10,6 +10,15 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     struct Attenuation
     {
+        enum Uniforms
+        {
+            CONSTANT = BaseLight::Uniforms::SIZE,
+            LINEAR,
+            EXPONENT,
+
+            SIZE
+        };
+
         float m_Constant;
         float m_Linear;
         float m_Exponent;
@@ -17,6 +26,14 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     struct PointLight
     {
+        enum Uniforms
+        {
+            POSITION = Attenuation::Uniforms::SIZE,
+            RANGE,
+
+            SIZE
+        };
+
         PointLight(const BaseLight& baseLight, const Attenuation& attenuation, const glm::vec3& position, float range = 0) :
             m_Base(baseLight),
             m_Attenuation(attenuation),
@@ -41,10 +58,23 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     class SpotLight : public Light
     {
+    public:
+        enum Uniforms
+        {
+            DIRECTION = PointLight::Uniforms::SIZE,
+            CUTOFF,
+
+            SIZE
+        };
+
     private:
         PointLight m_PointLight;
         Quaternion m_Rotation;
         float m_Cutoff;
+
+        GLuint m_Uniforms[Uniforms::SIZE];
+
+        void Init(const Shader& shader) override;
 
     public:
         SpotLight(const PointLight& pointLight, const Quaternion& rotation, float viewAngle);

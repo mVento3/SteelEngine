@@ -235,6 +235,34 @@ namespace SteelEngine {
             Transform(glm::vec3(10, 20, 0))
         );
 
+        for(Type::uint32 i = 0; i < 50; i++)
+        {
+            (*m_Renderer)->AddModel
+                (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/cube.obj"),
+                (*m_SceneManager)->GetCurrentScene(),
+                Transform(glm::vec3(i * 2, 1, 0))
+            );
+        }
+
+        for(Type::uint32 i = 0; i < 100; i++)
+        {
+            (*m_Renderer)->AddModel
+                (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj"),
+                (*m_SceneManager)->GetCurrentScene(),
+                Transform(glm::vec3(0, i * 2, 0))
+            );
+        }
+
+        Transform trans;
+
+        trans.SetScale(glm::vec3(100, 100, 100));
+
+        (*m_Renderer)->AddModel
+            (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj"),
+            (*m_SceneManager)->GetCurrentScene(),
+            trans
+        );
+
         return SE_TRUE;
     }
 
@@ -260,16 +288,6 @@ namespace SteelEngine {
 
             ProcessEvents(*m_EventManager);
         }
-
-        static float counter = 0;
-
-        counter += time->GetDeltaTime();
-
-        entt::registry* reg = (*m_SceneManager)->GetCurrentScene();
-
-        auto& trans = reg->get<TransformComponent>(ent);
-
-        trans.m_Transform.SetRotation(glm::angleAxis(counter, glm::vec3(1, 0, 0)));
 
         // The runtime compiler file watcher is not too perform
         if(m_RuntimeReloader)

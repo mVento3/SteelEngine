@@ -13,6 +13,7 @@
 #include "Graphics/OpenGL/QuadMesh.h"
 #include "Graphics/OpenGL/ShadowInfo.h"
 #include "Graphics/OpenGL/Model.h"
+#include "Graphics/OpenGL/TestShader.h"
 
 #include "Math/Transform.h"
 #include "Math/Camera.h"
@@ -55,20 +56,13 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         Shader* m_QuadShader;
         QuadMesh* m_QuadMesh;
 
-        std::vector<Model> m_Models;
         std::vector<Light*> m_Lights;
 
-        Mesh* m_Mesh;
-        Mesh* m_Mesh2;
-        Mesh* m_Mesh3;
         Texture* m_Texture;
         Texture* m_NormalMapTexture;
         Texture* m_DispMapTexture;
-        Transform m_Trans;
-        Transform m_Trans2;
-        Transform m_Trans3;
 
-        Shader* m_G_Shader;
+        TestShader* m_G_Shader;
         Texture* m_PositionTexture;
         Texture* m_NormalTexture;
         Texture* m_AlbedoTexture;
@@ -83,8 +77,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         DirectionalLight* m_DirectionalLight;
 
         Transform m_DirectionalLightTransform;
-
-        float m_Counter;
 
         bool m_Keys[256] = { false };
         bool m_RotateCamera;
