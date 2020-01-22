@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stack"
+#include "queue"
 #include "vector"
 
 #include "Event/EventObserver.h"
@@ -19,7 +19,7 @@ namespace SteelEngine {
     {
         GENERATED_BODY
     private:
-        std::stack<Event::Naive*> m_Events;
+        std::queue<Event::Naive*> m_Events;
         std::vector<EventObserver*> m_Observers;
 
         void ProcessEvents() override;

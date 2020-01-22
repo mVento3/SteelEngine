@@ -6,7 +6,7 @@ namespace SteelEngine {
     {
         while(!m_Events.empty())
         {
-            Event::Naive* event = m_Events.top();
+            Event::Naive* event = m_Events.front();
 
             for(Type::uint32 i = 0; i < m_Observers.size(); i++)
             {
