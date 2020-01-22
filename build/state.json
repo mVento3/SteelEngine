@@ -198,7 +198,7 @@
                 },
                 {
                     "filename": "EventManager.cpp",
-                    "hash": "9cc2b65cf1dd824a6c152202d1c37d84f3f5019dc7e226b7f046b218d88b5947a1fa12a2ba9f365081addc167bb132f2569d57bd369edf6fdad8afc9efe15a1b"
+                    "hash": "88ae626ade900354f1d43318696fd79ef33970804de87aae1e8905404828b024352d75415fcee39a46c18657da5b71d9c5c9f36a69f0f88299ea31711cd32514"
                 }
             ]
         },
@@ -268,7 +268,7 @@
             "files": [
                 {
                     "filename": "Core.cpp",
-                    "hash": "ec3cbc4d1b4e2978b630198b557adfe3bf800737683db00eb77fb5917bb216182b6986af50fb5d13864ca4ce643fd8aa78e7cfaa05ea6fe98ff100c279195fef"
+                    "hash": "caa5f3fdec0c6d4a1957b1eb54171eaed52b51ecd3c301625ea328aeb0aeb813021c58eda4dd914d0e342867ee91eed1b1cedada61dcb1d128fd522bea5e952f"
                 },
                 {
                     "filename": "DeltaTime.cpp",
@@ -410,7 +410,7 @@
                 },
                 {
                     "filename": "Renderer.Generated.cpp",
-                    "hash": "68017d8099f12bd2c47c3bdcab3cd83e6ae885994bd4e6e029ec6c93de572aaa7f1ea8b0ead1fbb4a1a23f9eeb23e0f68d75a122aabfc83e73c78a04b93a9f08"
+                    "hash": "d11aa518e6cc922128ef80a15dab08b00aaaaf28555f7ab8818cedbd7589b02cd1701518c26a4867374facc8ad51839d9174dd60a7865d48dd34dcca1f89e20e"
                 },
                 {
                     "filename": "Shader.Generated.cpp",
@@ -431,6 +431,10 @@
                 {
                     "filename": "Vertex.Generated.cpp",
                     "hash": "9a150f105ededdd9cbc15a850f2aae49ebe3319ec222bb2b1985d8ad7358eea45f1306225bc2d6724f64e4347acaf2b8498421779767776098b088af0525439e"
+                },
+                {
+                    "filename": "TestShader.Generated.cpp",
+                    "hash": "08b05363dbca5d3e31118726497073394f487b7331062369c7331b576adbbf0fd14496c209c7075585cc0af95af67f6c345ec4b8989dedf90335db79fe65564f"
                 }
             ]
         },
@@ -605,11 +609,11 @@
                 },
                 {
                     "filename": "Renderer.cpp",
-                    "hash": "3a057405d64721ca6c169655c66b3d1f6da4afb5f6000cc1d8ebfda22163d01e2cf4b51a6cb1af2432a3117c753831cf4ef9de59020c7d7d3279370e57620e44"
+                    "hash": "bc0040e74ab16568a069877e0e4f297ef2ab7844d73a6397c11849657b2292198c4c82dec16715a809c0c4b29454a0f41271bd9dae742708f9527eadb0bce0d2"
                 },
                 {
                     "filename": "Shader.cpp",
-                    "hash": "9f769914abc159880dbdaafe75e896d3a82392705fa0d3da7480f1014590dad652c357eb79f7647c7217aed167b189f0602c2d6b2e2f4b36664c18622a80fc37"
+                    "hash": "5ca73107527f8d79e024015cd4924a894e0fab1b73b62d78a71be0721f89f40273e357bda76f435a8c2178f7b46915caa6146c796bced0ef8a60727b4134d7ed"
                 },
                 {
                     "filename": "ShadowInfo.cpp",
@@ -618,6 +622,10 @@
                 {
                     "filename": "Texture.cpp",
                     "hash": "ac0a584d1ed10c7cbe04a56c245127bf123b2321df9e0ff62c303ce2e67815aeac2735c8f47d24a15c6d4f84bf135334656e803ca06d0d8de3c1fca04df9ed26"
+                },
+                {
+                    "filename": "TestShader.cpp",
+                    "hash": "866dce2c3b2dd7e330f57658862df6d942dd90f82c5d53c62e8899373605610ddc01906ecd350fb52060df7238d268c2daf25dff3d77fcb784438fa4f232d1ab"
                 }
             ]
         },
@@ -626,15 +634,15 @@
             "files": [
                 {
                     "filename": "DirectionalLight.cpp",
-                    "hash": "08d1b8373a35c9b306179eab9a5804183351829b1ee0b6f3cd34b4180abd6187777355b80a8d28c1eccc6c1cce079612997322dd24fb7b407e84d6626934aa6b"
+                    "hash": "73385e120c2879eb3246e50cb458d2feba62bcf869116dfdc8489c64d3ca4a5093bf46a647b72bf9dd1b4cfa0d61ff76bf2edb785a084a0b22dd9e7d154c4f92"
                 },
                 {
                     "filename": "Light.cpp",
-                    "hash": "2e43cfaf25b693640f31d23dad23ee171e4e48ce56c2692453945b43afda00570881faa3c2987db5d2f30187da135ba80e059ce447b202e862500edadb973567"
+                    "hash": "22ad3fc7c6f0fae807633793362d2960de0de7519b610287274b2b2690a456429b2adaec6cb37f9e266b3027e98951f456443bfc6355f704060ab46b61dc57d7"
                 },
                 {
                     "filename": "SpotLight.cpp",
-                    "hash": "6ce11393878ce4efec10548dde3e293af1445fa16cc18b3868b0174d997984bfb78046c94b5e15a36bc75cbe83cccf0ece59c114c35fc39f9ee3146d35ea619a"
+                    "hash": "e89a93856622b1b6620687ea9e3cb2b319ba762787c24557562a0aab0f548588e8d74aa1479e3bc846c2962fda959591573300bf6c44b65e9ef84ae85cd2d051"
                 }
             ]
         },
@@ -2060,7 +2068,7 @@
             "files": [
                 {
                     "filename": "Camera.Generated.cpp",
-                    "hash": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+                    "hash": "e82be319e7385ebfdd2e7b16b929e869b4068c0c2750afaa89286e4ce523420ac251d5cf2adaecf2bcbb8e335c23fe045042ebea130a3c45bfc095362983238c"
                 },
                 {
                     "filename": "Quaternion.Generated.cpp",
