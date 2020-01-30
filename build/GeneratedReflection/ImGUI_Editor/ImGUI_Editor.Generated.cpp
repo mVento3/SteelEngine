@@ -15,10 +15,10 @@ SteelEngine::ReflectionRecorder::Register<ImGUI_Editor>("ImGUI_Editor",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::EDITOR, true),
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::EDITOR_NAME, "ImGui"),
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::EDITOR, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::EDITOR_NAME, "ImGui"),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ImGUI_Editor))
 )
 .Inheritance<IEditor>("IEditor")

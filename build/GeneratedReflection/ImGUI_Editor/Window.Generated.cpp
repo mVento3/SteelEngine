@@ -13,7 +13,7 @@ SteelEngine::ReflectionRecorder::Register<Window>("Window",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Window))
 )
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")

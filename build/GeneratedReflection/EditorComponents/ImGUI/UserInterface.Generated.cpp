@@ -15,7 +15,7 @@ SteelEngine::ReflectionRecorder::Register<UserInterface>("UserInterface",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(UserInterface))
 )
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")

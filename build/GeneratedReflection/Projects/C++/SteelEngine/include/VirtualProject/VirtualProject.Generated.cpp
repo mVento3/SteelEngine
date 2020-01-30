@@ -1,6 +1,6 @@
 #include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Projects/C++/SteelEngine/include/VirtualProject/VirtualProject.Generated.h"
 #include "Projects/C++/SteelEngine/include/VirtualProject/VirtualProject.h"
-#include "HotReloader/IRuntimeObject.h"
+#include "HotReloader/RuntimeObject.h"
 #include "RuntimeReflection/Reflection.h"
 
 REGISTER_REFLECTION

@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<NaiveEventReflectionModule>("NaiveEven
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::REFLECTION_MODULE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NaiveEventReflectionModule))
 )
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")

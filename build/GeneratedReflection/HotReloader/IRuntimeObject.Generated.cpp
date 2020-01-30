@@ -13,7 +13,7 @@ SteelEngine::ReflectionRecorder::Register<IRuntimeObject>("IRuntimeObject",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(IRuntimeObject))
 )
 .Property("m_ObjectID", &IRuntimeObject::m_ObjectID)

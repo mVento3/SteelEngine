@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<WindowInheritance>("WindowInheritance"
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::INHERITANCE_MODULE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(WindowInheritance))
 )
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")

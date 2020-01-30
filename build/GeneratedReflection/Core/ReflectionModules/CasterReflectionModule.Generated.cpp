@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<CasterReflectionModule>("CasterReflect
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::REFLECTION_MODULE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(CasterReflectionModule))
 )
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")

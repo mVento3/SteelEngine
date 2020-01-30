@@ -11,8 +11,8 @@ SteelEngine::ReflectionRecorder::Register<AnyItemActiveChangedEvent>("AnyItemAct
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NAIVE_EVENT, true),
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NAIVE_EVENT, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(AnyItemActiveChangedEvent))
 )
 .Inheritance<Event::Naive>("Event::Naive")

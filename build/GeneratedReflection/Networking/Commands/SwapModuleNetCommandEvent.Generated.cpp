@@ -13,8 +13,8 @@ SteelEngine::ReflectionRecorder::Register<SwapModuleNetCommandEvent>("SwapModule
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NETWORK_COMMAND, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NETWORK_COMMAND, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SwapModuleNetCommandEvent))
 )
 .Inheritance<INetworkCommand>("INetworkCommand")
@@ -22,7 +22,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SwapModuleNetCommandEvent))
 .Constructor<const char*>()
 .Property("m_ModuleName", &SwapModuleNetCommandEvent::m_ModuleName)
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NET_VALUE, true)
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NET_VALUE, true)
 )
 .Property("m_Buffer", &SwapModuleNetCommandEvent::m_Buffer)
 .Method("ServerSide", &SwapModuleNetCommandEvent::ServerSide)

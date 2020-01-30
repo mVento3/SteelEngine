@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<Core>("Core",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Core))
 )
 .Inheritance<ICore>("ICore")

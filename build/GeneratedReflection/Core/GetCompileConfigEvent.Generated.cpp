@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<GetCompileConfigEvent>("GetCompileConf
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(GetCompileConfigEvent))
 )
 .Property("m_Config", &GetCompileConfigEvent::m_Config)

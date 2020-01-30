@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<OpenGL_Window>("OpenGL_Window",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(OpenGL_Window))
 )
 .Inheritance<IWindow>("IWindow")

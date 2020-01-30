@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<NCE_ReflectionModule>("NCE_ReflectionM
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::REFLECTION_MODULE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NCE_ReflectionModule))
 )
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")

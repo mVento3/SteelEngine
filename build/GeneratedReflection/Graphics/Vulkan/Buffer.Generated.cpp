@@ -15,7 +15,7 @@ SteelEngine::ReflectionRecorder::Register<Buffer>("Buffer",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Buffer))
 )
 .Inheritance<IBuffer>("IBuffer")

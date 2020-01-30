@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<ChangeMousePositionEvent>("ChangeMouse
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ChangeMousePositionEvent))
 )
 .Property("m_X", &ChangeMousePositionEvent::m_X)

@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<UserInterfaceInheritance>("UserInterfa
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::INHERITANCE_MODULE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(UserInterfaceInheritance))
 )
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")

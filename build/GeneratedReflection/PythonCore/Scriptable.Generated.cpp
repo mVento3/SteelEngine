@@ -15,14 +15,28 @@ SteelEngine::ReflectionRecorder::Register<Scriptable>("Scriptable",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::NO_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Scriptable))
 )
+.Constructor<const std::string&>()
 .Method("SetPython", &Scriptable::SetPython)
 .Method("GetScriptName", &Scriptable::GetScriptName)
 ;
 }
 
+#ifdef RUNTIME_COMPILE
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
+{
+DECLARE_TYPE_INFO(Scriptable)
+{
+FIND_THE_RIGHT_OBJECT
+
+COMPARE_CONSTRUCTOR(const std::string&)
+};
+
+return result;
+}
+#endif
 }
 }
 }

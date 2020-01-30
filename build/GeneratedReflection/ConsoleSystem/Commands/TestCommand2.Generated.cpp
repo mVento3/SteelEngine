@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<TestCommand2>("TestCommand2",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::ReflectionAttribute::CONSOLE_COMMAND, true),
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CONSOLE_COMMAND, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(TestCommand2))
 )
 .Inheritance<ICommand>("ICommand")
