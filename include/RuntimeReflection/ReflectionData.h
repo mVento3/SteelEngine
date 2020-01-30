@@ -295,7 +295,9 @@ namespace SteelEngine {
 
 			if(!enum_)
 			{
-				m_Enums.push_back(new ReflectionEnumeration<T, A>(*this));
+				enum_ = new ReflectionEnumeration<T, A>(*this, name);
+
+				m_Enums.push_back(enum_);
 			}
 			else
 			{
@@ -324,50 +326,19 @@ namespace SteelEngine {
 			switch(m_CurrentBind)
 			{
 			case CurrentBindFlag::CONSTRUCTOR_BIND:
-			{
-				IReflectionConstructor* cons = m_Constructors[m_Constructors.size() - 1];
-
-				ProcessMetaData(db, cons, infos);
-			}
+				ProcessMetaData(db, m_Constructors[m_Constructors.size() - 1], infos);
 				break;
 			case CurrentBindFlag::METHOD_BIND:
-			{
-				// MethodsMap::iterator it = m_Methods.begin();
-
-				// for(Type::uint32 i = 0; i < m_Methods.size() - 1; i++, it++);
-
 				ProcessMetaData(db, m_Methods[m_Methods.size() - 1], infos);
-			}
 				break;
 			case CurrentBindFlag::PROPERTY_BIND:
-			{
-				// PropertiesVector::iterator it = m_Properties.begin();
-
-				// for(; it != m_Properties.end(); ++it)
-				// {
-				// 	// if(it->first == m_CurrentBindName)
-				// 	// {
-				// 	// 	break;
-				// 	// }
-
-				// 	if(strcmp(it->GetName(), m_CurrentBindName) == 0)
-				// 	{
-				// 		break;
-				// 	}
-				// }
-
 				ProcessMetaData(db, m_Properties[m_Properties.size() - 1], infos);
-			}
 				break;
 			case CurrentBindFlag::TYPE_BIND:
 				ProcessMetaData(db, this, infos);
 				break;
 			case CurrentBindFlag::INHERITANCE_BIND:
-			{
-				IReflectionInheritance* inherit = m_Inheritances[m_Inheritances.size() - 1];
-
-				ProcessMetaData(db, inherit, infos);
-			}
+				ProcessMetaData(db, m_Inheritances[m_Inheritances.size() - 1], infos);
 				break;
 			default:
 				break;

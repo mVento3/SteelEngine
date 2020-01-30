@@ -5,7 +5,6 @@
 
 #include "Core/Type.h"
 #include "Core/Result.h"
-#include "Core/ReflectionAttributes.h"
 
 #include "Vulkan/vulkan.h"
 
@@ -16,7 +15,7 @@
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
     )
     class Shader : public IShader
     {

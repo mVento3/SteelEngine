@@ -4,8 +4,6 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Vulkan/vulkan.h"
 
 #include "Window/IWindow.h"
@@ -52,7 +50,7 @@
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
     )
     class Renderer : public IRendererAPI<IRenderer::API::VULKAN_API>, public EventObserver
     {

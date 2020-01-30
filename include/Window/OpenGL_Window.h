@@ -2,8 +2,6 @@
 
 #include "Window/IWindow.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "RuntimeReflection/Macro.h"
 
 #include "SDL.h"
@@ -25,7 +23,7 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
     )
     class OpenGL_Window : public IWindow
     {

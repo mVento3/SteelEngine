@@ -40,10 +40,25 @@ namespace SteelEngine {
         void Release() override;
         void Reset() override;
 
-        const bool IsCompileComplete() override { return m_IsCompileComplete; }
-        const bool WasError() override { return m_Error; }
-        void SetError(bool error) { m_Error = error; }
-        const std::string& GetErrorMessage() const override { return m_ErrorMessage; }
+        const bool IsCompileComplete() override
+        {
+            return m_IsCompileComplete;
+        }
+
+        const bool WasError() override
+        {
+            return m_Error;
+        }
+
+        void SetError(bool error)
+        {
+            m_Error = error;
+        }
+
+        const std::string& GetErrorMessage() const override
+        {
+            return m_ErrorMessage;
+        }
     };
 
 }

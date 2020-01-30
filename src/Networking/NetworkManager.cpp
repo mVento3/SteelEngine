@@ -24,7 +24,7 @@ namespace SteelEngine { namespace Network {
         {
             const IReflectionData* type = types[i];
 
-            if(type->GetMetaData(ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
+            if(type->GetMetaData(Reflection::ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
             {
                 Network::INetworkCommand* comm = (Network::INetworkCommand*)type->Create();
 

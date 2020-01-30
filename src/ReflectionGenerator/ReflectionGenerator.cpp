@@ -1,8 +1,6 @@
 #include "RuntimeReflection/ReflectionGenerator.h"
 #include "RuntimeReflection/Reflection.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Module/Module.h"
 #include "Module/ModuleDetails.h"
 
@@ -57,10 +55,14 @@ int main(int argc, char* argv[])
 // Initialize rest of allocators inside database
     db->Init();
 
+    SteelEngine::Reflection a;
+
+    a.Init2();
+
     SteelEngine::Reflection::Init();
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
-        SteelEngine::ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER,
+        SteelEngine::Reflection::ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER,
         new SteelEngine::InformationTracker()
     );
 
@@ -88,7 +90,7 @@ int main(int argc, char* argv[])
     {
         const SteelEngine::IReflectionData* type = types[i];
 
-        if(type->GetMetaData(SteelEngine::ReflectionAttribute::REFLECTION_MODULE)->Convert<bool>())
+        if(type->GetMetaData(SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE)->Convert<bool>())
         {
             modules.push_back(type->Create());
         }

@@ -126,12 +126,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     void Shader::Update(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2)
     {
         glm::mat4 model = transform.GetModel();
-        glm::mat4 projection = camera.GetProjection();
-        glm::mat4 view = camera.GetView();
 
-        glUniformMatrix4fv(m_Uniforms[MODEL_U], 1, GL_FALSE, &model[0][0]);
-        glUniformMatrix4fv(m_Uniforms[PROJECTION_U], 1, GL_FALSE, &projection[0][0]);
-        glUniformMatrix4fv(m_Uniforms[VIEW_U], 1, GL_FALSE, &view[0][0]);
+        Update(transform, camera);
 
         if(shadow && shadow2)
         {
@@ -145,6 +141,19 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         }
 
         UpdateCustom(transform, camera, shadow, shadow2);
+    }
+
+    void Shader::Update(const Transform& transform, const Camera& camera)
+    {
+        glm::mat4 model = transform.GetModel();
+        glm::mat4 projection = camera.GetProjection();
+        glm::mat4 view = camera.GetView();
+
+        glUniformMatrix4fv(m_Uniforms[MODEL_U], 1, GL_FALSE, &model[0][0]);
+        glUniformMatrix4fv(m_Uniforms[PROJECTION_U], 1, GL_FALSE, &projection[0][0]);
+        glUniformMatrix4fv(m_Uniforms[VIEW_U], 1, GL_FALSE, &view[0][0]);
+
+        UpdateCustom(transform, camera, 0, 0);
     }
 
     void Shader::Bind() const

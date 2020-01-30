@@ -21,7 +21,7 @@ namespace SteelEngine { namespace Graphics {
     struct IRenderer : public HotReloader::IRuntimeObject
     {
     protected:
-        virtual entt::entity AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform) { return scene->create(); }
+        virtual entt::entity AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform, bool castShadow = true) { return scene->create(); }
 
     public:
         enum API
@@ -40,9 +40,9 @@ namespace SteelEngine { namespace Graphics {
         virtual void Render(entt::registry* scene) { }
         virtual void PostRender() { }
 
-        entt::entity AddModel(IModel* model, entt::registry* scene, const Transform& transform)
+        entt::entity AddModel(IModel* model, entt::registry* scene, const Transform& transform, bool castShadow = true)
         {
-            auto res = AddModel(model->Setup(), scene, transform);
+            auto res = AddModel(model->Setup(), scene, transform, castShadow);
 
             delete model;
             model = 0;

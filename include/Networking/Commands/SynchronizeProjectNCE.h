@@ -16,14 +16,14 @@
 namespace SteelEngine { namespace Network {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::NETWORK_COMMAND,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        SteelEngine::Reflection::ReflectionAttribute::NETWORK_COMMAND,
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE,
         // SteelEngine::EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW,
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
     )
     class SynchronizeProjectNCE :
-        // SE_INHERITANCE(SteelEngine::ReflectionAttribute::DO_NOT_GENERATE_CAST_FUNCTIONS)
+        // SE_INHERITANCE(SteelEngine::Reflection::ReflectionAttribute::DO_NOT_GENERATE_CAST_FUNCTIONS)
         public INetworkCommand,
         public Script::Python::Scriptable,
         public EditorComponents::ImGUI::UserInterface
@@ -39,10 +39,9 @@ namespace SteelEngine { namespace Network {
 
     private:
         SE_VALUE(
-            SteelEngine::ReflectionAttribute::NO_SERIALIZE
+            SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
         )
         Event::LocalEvent<ShouldOverrideEvent> m_ShouldOverrideEvent;
-        // SE_VALUE(SteelEngine::ReflectionAttribute::NO_SERIALIZE)
         ShouldOverrideEvent* m_ShouldOverrideEventData;
         bool m_DrawShouldOverridePopup;
 

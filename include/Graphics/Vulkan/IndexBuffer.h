@@ -5,7 +5,7 @@
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
     )
     class IndexBuffer : public Buffer
     {

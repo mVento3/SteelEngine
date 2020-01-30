@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
     }
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
-        SteelEngine::ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER,
+        SteelEngine::Reflection::ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER,
         new SteelEngine::InformationTracker()
     );
 

@@ -6,15 +6,15 @@
 #include "RuntimeReflection/ReflectionGenerator.h"
 #include "RuntimeReflection/IReflectionInheritance.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Event/GlobalEvent.h"
 
 #include "Core/ReflectionModules/CasterReflectionModule.Generated.h"
 
 namespace SteelEngine {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::REFLECTION_MODULE)
+    SE_CLASS(
+        SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE
+    )
     class CasterReflectionModule : public HotReloader::IRuntimeObject
     {
         GENERATED_BODY

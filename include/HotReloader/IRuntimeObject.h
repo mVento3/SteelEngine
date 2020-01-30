@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Type.h"
-#include "Core/ReflectionAttributes.h"
 
 #include "RuntimeDatabase/RuntimeDatabase.h"
 
@@ -16,7 +15,7 @@
 namespace SteelEngine { namespace HotReloader {
 
 	SE_STRUCT(
-		SteelEngine::ReflectionAttribute::NO_SERIALIZE
+		SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
 	)
 	struct IRuntimeObject
 	{

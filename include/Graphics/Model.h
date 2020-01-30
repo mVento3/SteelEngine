@@ -7,12 +7,10 @@
 #include "RuntimeReflection/Macro.h"
 #include "RuntimeReflection/Reflection.h"
 
-#include "Core/ReflectionAttributes.h"
-
 namespace SteelEngine { namespace Graphics {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
     )
     class Model : public IModel
     {

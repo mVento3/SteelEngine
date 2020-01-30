@@ -6,7 +6,6 @@
 
 #include "InformationTracker/InformationTracker.h"
 
-#include "Core/ReflectionAttributes.h"
 #include "Core/Core.h"
 
 namespace SteelEngine { namespace Event {
@@ -40,7 +39,7 @@ namespace SteelEngine { namespace Event {
     void GlobalEvent::TraceInfo(void* object, const std::string& name, size_t typeID, const std::string& name2, size_t eventTypeID)
     {
         IReflectionData* coreData = Reflection::GetType("SteelEngine::Core");
-        IInformationTracker* iinfo = coreData->GetMetaData(ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER)->Convert<IInformationTracker*>();
+        IInformationTracker* iinfo = coreData->GetMetaData(Reflection::ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER)->Convert<IInformationTracker*>();
 
         ISystemTracker* tracker = iinfo->Get(typeid(GlobalEvent).hash_code());
 

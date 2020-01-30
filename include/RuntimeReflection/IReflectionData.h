@@ -19,8 +19,6 @@
 
 #include "Utils/Utils.h"
 
-#include "Core/ReflectionAttributes.h"
-
 namespace SteelEngine {
 
 	struct IReflectionData : public MetaDataImplementation
@@ -37,6 +35,8 @@ namespace SteelEngine {
 
 			return db;
 		}
+
+		void ProcessInheritance(std::vector<IReflectionData*>& res, HotReloader::IRuntimeObject* createdObject) const;
 
 	public:
 		// typedef std::unordered_map<std::string, IReflectionProperty*> PropertiesMap;
@@ -186,16 +186,7 @@ namespace SteelEngine {
 						res.push_back((IReflectionData*)db->m_ReflectionDatabase->m_Types[i]);
 					}
 
-					for(Type::uint32 i = 0; i < res.size(); i++)
-					{
-						IReflectionData* data = res[i];
-						Variant* res = data->GetMetaData(ReflectionAttribute::INHERITANCE_MODULE);
-
-						if(res->IsValid() && res->Convert<bool>())
-						{
-							data->InvokeStatic("ProcessInheritance", GetInheritances(), this, createdObject);
-						}
-					}
+					ProcessInheritance(res, createdObject);
 
 					return createdObject;
 				}

@@ -4,13 +4,11 @@
 
 #include "RuntimeReflection/Reflection.h"
 
-#include "Graphics/ECS_Components/TransformComponent.h"
-
 #include "Profiler/ScopeTimer.h"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
-    entt::entity Renderer::AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform)
+    entt::entity Renderer::AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform, bool castShadow)
     {
         Mesh* casted = (Mesh*)mesh;
 
@@ -18,7 +16,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         auto model = scene->create();
 
-        scene->assign<RenderableComponent>(model, RenderableComponent(casted, m_G_Shader));
+        scene->assign<RenderableComponent>(model, RenderableComponent(casted, m_G_Shader, castShadow));
         scene->assign<TransformComponent>(model, TransformComponent(transform));
 
         return model;
@@ -58,8 +56,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_Camera = new Camera(Transform(glm::vec3(0, 0, -10)), 1920 / 1080);
 
         m_SpotLight = new SpotLight(
-            PointLight{ BaseLight{ glm::vec3(1, 0, 1), 100.f },
-            Attenuation{ 0, 0, 1 }, glm::vec3(0, 0, 0) }, Quaternion(glm::rotate(glm::radians(90.f), glm::vec3(0, 1, 0))), glm::radians(91.f));
+            PointLight{ BaseLight{ glm::vec3(1, 1, 1), 100.f },
+            Attenuation{ 0, 0, 1 }, glm::vec3(0, 0, 0) }, Quaternion(glm::rotate(glm::radians(90.f), glm::vec3(0, 1, 0))), glm::radians(70.f));
 
         m_SpotLight->GetPointLight().m_Position = glm::vec3(0, 1, 6);
         m_SpotRotation = glm::quat(glm::rotate(glm::radians(180.f), glm::vec3(0, 1, 0)));
@@ -209,10 +207,13 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
             scene->view<RenderableComponent, TransformComponent>().each([&](RenderableComponent& model, TransformComponent& trans)
             {
-                m_ShadowShader->Update(trans.m_Transform, *m_ShadowCamera, 0, 0);
+                if(model.m_CastShadow)
+                {
+                    m_ShadowShader->Update(trans.m_Transform, *m_ShadowCamera);
 
-                glBindVertexArray(model.m_VAO);
-                glDrawElements(GL_TRIANGLES, model.m_DrawCount, GL_UNSIGNED_INT, 0);
+                    glBindVertexArray(model.m_VAO);
+                    glDrawElements(GL_TRIANGLES, model.m_DrawCount, GL_UNSIGNED_INT, 0);
+                }
             });
         }
 

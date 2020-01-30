@@ -4,14 +4,12 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "ConsoleSystem/Commands/TestCommand.Generated.h"
 
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::CONSOLE_COMMAND
+        SteelEngine::Reflection::ReflectionAttribute::CONSOLE_COMMAND
     )
     class TestCommand : public ICommand
     {

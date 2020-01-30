@@ -3,6 +3,7 @@
 #include "Utils/Utils.h"
 
 #include "RuntimeReflection/ReflectionData.h"
+#include "RuntimeReflection/Reflection.h"
 
 namespace SteelEngine {
 
@@ -25,6 +26,8 @@ namespace SteelEngine {
     {
         if(m_GenerateCastFunctions)
         {
+            IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+
             event.m_GeneratedBodyMacro->push_back("public:");
 
             for(Type::uint32 i = 0; i < m_Inheritance.size(); i++)
@@ -34,16 +37,11 @@ namespace SteelEngine {
 
                 for(ReflectionGenerator::MetaDataInfo meta : info.m_MetaData)
                 {
-                    if(meta.m_Key == SE_GET_TYPE_NAME(SteelEngine::ReflectionAttribute::DO_NOT_GENERATE_CAST_FUNCTIONS))
+                    if(enum_->Compare(Reflection::ReflectionAttribute::DO_NOT_GENERATE_CAST_FUNCTIONS, meta.m_Key))
                     {
                         generate = false;
                     }
                 }
-
-                // if(/*info->GetMetaData(ReflectionAttribute::DO_NOT_GENERATE_CAST_FUNCTIONS)->Convert<bool>()*/ info.m_MetaData.)
-                // {
-                //     generate = false;
-                // }
 
                 if(generate)
                 {
@@ -80,22 +78,55 @@ namespace SteelEngine {
 
     void CasterReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)
     {
-        for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
+        if(event.m_Data)
         {
-            ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
+            Variant* meta = event.m_Data->GetMetaData(Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS);
 
-            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::GENERATE_CAST_FUNCTIONS)) != std::string::npos)
+            if(meta && (meta->IsValid() || meta->Convert<bool>()))
             {
                 m_GenerateCastFunctions = true;
                 m_ClassName = event.m_ClassName;
 
                 m_Inheritance.insert(m_Inheritance.begin(), event.m_Inheritance->begin(), event.m_Inheritance->end());
-
-                // m_Inheritance = event.m_Data->GetInheritances();
-
-                break;
             }
         }
+        else
+        {
+            IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+
+            for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
+            {
+                ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
+
+                if(enum_->Compare(Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, meta.m_Key))
+                {
+                    m_GenerateCastFunctions = true;
+                    m_ClassName = event.m_ClassName;
+
+                    m_Inheritance.insert(m_Inheritance.begin(), event.m_Inheritance->begin(), event.m_Inheritance->end());
+
+                    break;
+                }
+            }
+        }
+
+        // for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
+        // {
+        //     ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
+
+        //     // I do not want to operate on strings here
+        //     if(enums[meta.m_Key] == Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS)
+        //     {
+        //         m_GenerateCastFunctions = true;
+        //         m_ClassName = event.m_ClassName;
+
+        //         m_Inheritance.insert(m_Inheritance.begin(), event.m_Inheritance->begin(), event.m_Inheritance->end());
+
+        //         // m_Inheritance = event.m_Data->GetInheritances();
+
+        //         break;
+        //     }
+        // }
     }
 
     void CasterReflectionModule::operator()(const ReflectionGenerator::ClearValuesEvent& event)

@@ -2,7 +2,8 @@
 
 #include "RuntimeReflection/MetaDataInfo.h"
 
-#include "cstring"
+#include "string"
+#include "vector"
 
 namespace SteelEngine {
 
@@ -11,7 +12,6 @@ namespace SteelEngine {
 		friend struct IReflectionData;
 
 		typedef std::vector<MetaDataInfo> MetaDataInfoVector;
-		// typedef Container::Vector<MetaDataInfo> MetaDataInfoVector;
 	private:
 		template <typename KeyType>
 		Variant* IfNotExists(KeyType key) const
@@ -19,26 +19,6 @@ namespace SteelEngine {
 			static Variant none;
 
 			return &none;
-
-			// Result wrong(SE_FALSE, "Wrong");
-
-			// MetaDataInfo meta = MetaDataInfo(key, wrong);
-			// size_t found = meta.Setup(vec);
-
-			// if(found != RuntimeDatabase::s_InvalidID)
-			// {
-			// 	MetaDataInfo* info = &vec->at(found);
-				
-			// 	info->m_Value->m_TypeID = RuntimeDatabase::s_InvalidID;
-
-			// 	return info->m_Value;
-			// }
-			// else
-			// {
-			// 	meta.m_Value->m_TypeID = RuntimeDatabase::s_InvalidID;
-
-			// 	return meta.m_Value;
-			// }
 		}
 
 	protected:

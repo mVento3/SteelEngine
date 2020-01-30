@@ -4,8 +4,6 @@
 
 #include "HotReloader/IRuntimeObject.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "EditorComponents/ImGUI/UserInterface.Generated.h"
 
 namespace SteelEngine {
@@ -19,7 +17,7 @@ namespace SteelEngine {
     namespace EditorComponents { namespace ImGUI {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
     )
     class UserInterface : public HotReloader::IRuntimeObject
     {

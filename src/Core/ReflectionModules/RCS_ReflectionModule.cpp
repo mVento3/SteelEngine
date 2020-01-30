@@ -26,13 +26,15 @@ namespace SteelEngine {
     {
         if(event.m_Data)
         {
-            Variant* meta = event.m_Data->GetMetaData(ReflectionAttribute::RUNTIME_SERIALIZE);
+            Variant* meta = event.m_Data->GetMetaData(Reflection::ReflectionAttribute::RUNTIME_SERIALIZE);
+            Variant* meta2 = event.m_Data->GetMetaData(Reflection::ReflectionAttribute::NO_SERIALIZE);
 
-            if(meta && meta->Convert<bool>())
+            if(meta && (meta->IsValid() || meta->Convert<bool>()))
             {
                 m_SerializeAll = true;
             }
-            else if((meta = event.m_Data->GetMetaData(ReflectionAttribute::NO_SERIALIZE)) && meta->Convert<bool>())
+
+            if(meta2 && (meta2->IsValid() || meta2->Convert<bool>()))
             {
                 m_GenerateSerializeFunction = false;
             }
@@ -46,28 +48,30 @@ namespace SteelEngine {
         }
         else
         {
+            IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+
             for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
             {
                 ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
 
-                if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::RUNTIME_SERIALIZE)) != std::string::npos)
+                if(enum_->Compare(Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, meta.m_Key))
                 {
                     m_SerializeAll = true;
                 }
-                else if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::NO_SERIALIZE)) != std::string::npos)
+                else if(enum_->Compare(Reflection::ReflectionAttribute::NO_SERIALIZE, meta.m_Key))
                 {
                     m_GenerateSerializeFunction = false;
                 }
             }
+        }
 
-            for(Type::uint32 i = 0; i < event.m_Inheritance->size(); i++)
+        for(Type::uint32 i = 0; i < event.m_Inheritance->size(); i++)
+        {
+            IReflectionData* type = Reflection::GetType(event.m_Inheritance->at(i).m_Name);
+
+            if(type)
             {
-                IReflectionData* type = Reflection::GetType(event.m_Inheritance->at(i).m_Name);
-
-                if(type)
-                {
-                    m_Inheritance.push_back(type->GetTypeID());
-                }
+                m_Inheritance.push_back(type->GetTypeID());
             }
         }
     }
@@ -83,6 +87,8 @@ namespace SteelEngine {
 
     void RCS_ReflectionModule::operator()(const ReflectionGenerator::SE_ValueMacroEvent& event)
     {
+        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+
         if(m_SerializeAll)
         {
             // m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
@@ -93,7 +99,7 @@ namespace SteelEngine {
                 {
                     ReflectionGenerator::MetaDataInfo meta = event.m_Info->m_MetaData[i];
 
-                    if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::NO_SERIALIZE)) == std::string::npos)
+                    if(!enum_->Compare(Reflection::ReflectionAttribute::NO_SERIALIZE, meta.m_Key))
                     {
                         m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
                     }
@@ -110,7 +116,7 @@ namespace SteelEngine {
             {
                 ReflectionGenerator::MetaDataInfo meta = event.m_Info->m_MetaData[i];
 
-                if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::RUNTIME_SERIALIZE)) != std::string::npos)
+                if(enum_->Compare(Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, meta.m_Key))
                 {
                     m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
                 }
@@ -138,7 +144,7 @@ namespace SteelEngine {
 
                     if(data)
                     {
-                        Variant* meta = data->GetMetaData(ReflectionAttribute::NO_SERIALIZE);
+                        Variant* meta = data->GetMetaData(Reflection::ReflectionAttribute::NO_SERIALIZE);
 
                         if(meta && !meta->IsValid())
                         {

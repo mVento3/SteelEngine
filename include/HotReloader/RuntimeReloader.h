@@ -93,10 +93,20 @@ namespace SteelEngine { namespace HotReloader {
         void operator()(const StopRecompilingEvent& event);
         void operator()(const StartRecompilingEvent& event);
 
-        inline Result IsCompileComplete() override { return m_Process->IsCompileComplete(); }
-        inline Result IsSwapComplete() override { return m_IsSwapComplete; }
+        inline Result IsCompileComplete() override
+        {
+            return m_Process->IsCompileComplete();
+        }
 
-        void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) override { m_ReflectionGenerator = reflectionGenerator; }
+        inline Result IsSwapComplete() override
+        {
+            return m_IsSwapComplete;
+        }
+
+        void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) override
+        {
+            m_ReflectionGenerator = reflectionGenerator;
+        }
     };
 
 }}

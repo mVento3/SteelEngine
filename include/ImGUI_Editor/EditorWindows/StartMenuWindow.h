@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core/ReflectionAttributes.h"
-
 #include "RuntimeReflection/Macro.h"
 
 #include "ImGUI_Editor/ReflectionAttribs.h"
@@ -23,8 +21,8 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     SE_CLASS(
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::START_MENU_SCENE,
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW
     )
     class StartMenuWindow : public SteelEngine::EditorComponents::ImGUI::UserInterface

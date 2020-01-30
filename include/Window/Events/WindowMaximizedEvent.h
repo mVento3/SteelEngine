@@ -4,15 +4,13 @@
 
 #include "Event/NaiveEvent.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Window/Events/WindowMaximizedEvent.Generated.h"
 
 namespace SteelEngine {
 
     SE_STRUCT(
-        SteelEngine::ReflectionAttribute::NAIVE_EVENT,
-        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::NAIVE_EVENT,
+        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
     )
     struct WindowMaximizedEvent : public Event::Naive
     {

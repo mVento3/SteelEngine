@@ -29,7 +29,10 @@ namespace SteelEngine {
 
         }
 
-        inline size_t GetTypeID() override { return m_TypeID; }
+        inline size_t GetTypeID() override
+        {
+            return m_TypeID;
+        }
     };
 
 }

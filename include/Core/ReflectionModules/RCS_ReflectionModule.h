@@ -5,8 +5,6 @@
 
 #include "HotReloader/IRuntimeObject.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Event/GlobalEvent.h"
 
 #include "Utils/Utils.h"
@@ -16,7 +14,7 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::REFLECTION_MODULE
+        SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE
     )
     class RCS_ReflectionModule : public HotReloader::IRuntimeObject
     {

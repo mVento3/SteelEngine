@@ -3,13 +3,12 @@
 #include "string"
 
 #include "RuntimeReflection/Macro.h"
-
-#include "Core/ReflectionAttributes.h"
+#include "RuntimeReflection/Reflection.h"
 
 namespace SteelEngine { namespace Network {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
     )
     struct ShouldOverrideEvent
     {

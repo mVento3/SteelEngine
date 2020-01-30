@@ -325,7 +325,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                 {
                     if(inhs[i]->GetTypeID() == Reflection::GetType(SE_GET_TYPE_NAME(SteelEngine::EditorComponents::ImGUI::UserInterface))->GetTypeID())
                     {
-                        if(type->GetMetaData(ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
+                        if(type->GetMetaData(Reflection::ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
                         {
                             Network::INetworkManager** manager =
                                 Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager**>();
@@ -353,7 +353,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
             // if(!found && type->GetMetaData(Utils::Editor::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
             // {
-            //     if(type->GetMetaData(ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
+            //     if(type->GetMetaData(Reflection::ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
             //     {
             //         Network::INetworkManager** manager =
             //             Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager**>();

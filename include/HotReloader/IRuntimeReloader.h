@@ -12,17 +12,45 @@ namespace SteelEngine { namespace HotReloader {
 
     struct IRuntimeReloader : public IRuntimeObject
     {
-        virtual Result Initalize() { return SE_NOT_IMPLEMENTED; }
-        virtual void Cleanup() { }
+        virtual Result Initalize()
+        {
+            return SE_NOT_IMPLEMENTED;
+        }
 
-        virtual void Update() { }
-        virtual void Compile(const std::filesystem::path& file) { }
-        virtual void SwapModule(const std::string& moduleName) { }
+        virtual void Cleanup()
+        {
 
-        virtual inline Result IsCompileComplete() { return SE_NOT_IMPLEMENTED; }
-        virtual inline Result IsSwapComplete() { return SE_NOT_IMPLEMENTED; }
+        }
 
-        virtual void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) { }
+        virtual void Update()
+        {
+
+        }
+
+        virtual void Compile(const std::filesystem::path& file)
+        {
+
+        }
+
+        virtual void SwapModule(const std::string& moduleName)
+        {
+
+        }
+
+        virtual inline Result IsCompileComplete()
+        {
+            return SE_NOT_IMPLEMENTED;
+        }
+
+        virtual inline Result IsSwapComplete()
+        {
+            return SE_NOT_IMPLEMENTED;
+        }
+
+        virtual void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator)
+        {
+
+        }
     };
 
 }}

@@ -7,13 +7,11 @@
 #include "fstream"
 #include "queue"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Networking/Commands/SwapModuleNetCommandEvent.Generated.h"
 
 namespace SteelEngine { namespace Network {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::NO_SERIALIZE, SteelEngine::ReflectionAttribute::NETWORK_COMMAND)
+    SE_CLASS(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, SteelEngine::Reflection::ReflectionAttribute::NETWORK_COMMAND)
     class SwapModuleNetCommandEvent : public INetworkCommand
     {
         GENERATED_BODY
@@ -21,7 +19,7 @@ namespace SteelEngine { namespace Network {
         SwapModuleNetCommandEvent();
         SwapModuleNetCommandEvent(const char* moduleName);
 
-        SE_VALUE(SteelEngine::ReflectionAttribute::NET_VALUE)
+        SE_VALUE(SteelEngine::Reflection::ReflectionAttribute::NET_VALUE)
         std::string m_ModuleName = "";
 
         char* m_Buffer;

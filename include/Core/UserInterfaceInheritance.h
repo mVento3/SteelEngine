@@ -5,14 +5,12 @@
 #include "RuntimeReflection/Macro.h"
 #include "RuntimeReflection/IReflectionData.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Core/UserInterfaceInheritance.Generated.h"
 
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::INHERITANCE_MODULE
+        SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE
     )
     class UserInterfaceInheritance : public HotReloader::IRuntimeObject
     {

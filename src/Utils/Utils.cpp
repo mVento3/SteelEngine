@@ -2,7 +2,7 @@
 
 #include "Windows.h"
 
-void split(const std::string & s, char delim, std::back_insert_iterator<std::vector<std::string>> result)
+void split(const std::string& s, char delim, std::back_insert_iterator<std::vector<std::string>> result)
 {
 	std::stringstream ss(s);
 	std::string item;
@@ -13,7 +13,7 @@ void split(const std::string & s, char delim, std::back_insert_iterator<std::vec
 	}
 }
 
-std::vector<std::string> split(const std::string & s, char delim)
+std::vector<std::string> split(const std::string& s, char delim)
 {
 	std::vector<std::string> elems;
 	split(s, delim, std::back_inserter(elems));
@@ -21,7 +21,7 @@ std::vector<std::string> split(const std::string & s, char delim)
 	return elems;
 }
 
-void replaceAll(std::string & str, const std::string & from, const std::string & to)
+void replaceAll(std::string& str, const std::string& from, const std::string& to)
 {
 	if (from.empty())
 		return;

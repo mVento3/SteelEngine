@@ -4,12 +4,10 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Core/ReflectionAttributes.h"
-
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
     )
     class DeltaTime : public IDeltaTime
     {
@@ -25,8 +23,15 @@ namespace SteelEngine {
 
         void Update() override;
 
-        inline float GetDeltaTime() const override { return m_DeltaTime; }
-        inline Type::uint32 GetUPS() const override { return m_UPS; }
+        inline float GetDeltaTime() const override
+        {
+            return m_DeltaTime;
+        }
+
+        inline Type::uint32 GetUPS() const override
+        {
+            return m_UPS;
+        }
     };
 
 }

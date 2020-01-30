@@ -21,7 +21,7 @@ namespace SteelEngine {
         for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
             const IReflectionData* type = types[i];
-            Variant* consoleCommandVariant = type->GetMetaData(ReflectionAttribute::CONSOLE_COMMAND);
+            Variant* consoleCommandVariant = type->GetMetaData(Reflection::ReflectionAttribute::CONSOLE_COMMAND);
 
             if(consoleCommandVariant->IsValid() && consoleCommandVariant->Convert<bool>())
             {

@@ -37,13 +37,15 @@
 
 #include "Graphics/OpenGL/ECS_Components/RenderableComponent.h"
 
+#include "Graphics/ECS_Components/TransformComponent.h"
+
 #include "Graphics/OpenGL/Renderer.Generated.h"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
     )
     class Renderer : public IRenderer, public EventObserver
     {
@@ -83,7 +85,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         bool m_Controlls;
 
-        entt::entity AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform) override;
+        entt::entity AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform, bool castShadow = true) override;
 
     public:
         Renderer(IWindow* window);

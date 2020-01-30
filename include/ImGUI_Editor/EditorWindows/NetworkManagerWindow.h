@@ -20,7 +20,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     SE_CLASS(
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW
     )
     class NetworkManagerWindow : public EditorComponents::ImGUI::UserInterface, public Script::Python::Scriptable

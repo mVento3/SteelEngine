@@ -29,7 +29,6 @@
 #include "nlohmann/json.hpp"
 
 #include "Core/ICore.h"
-#include "Core/ReflectionAttributes.h"
 #include "Core/GetCompileConfigEvent.h"
 #include "Core/IDeltaTime.h"
 
@@ -47,7 +46,7 @@ namespace SteelEngine {
     using json = nlohmann::json;
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
     )
     class Core : public ICore
     {

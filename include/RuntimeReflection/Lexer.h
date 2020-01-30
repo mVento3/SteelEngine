@@ -189,7 +189,7 @@ namespace SteelEngine {
                 return;
             }
 
-            m_CurrentLine = m_Lines->at(m_LineIndex);
+            m_CurrentLine = m_Lines->at(m_LineIndex - 1);
             m_CharacterIndex = 0;
             m_CurrentLineSize = m_CurrentLine.size();
         }

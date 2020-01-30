@@ -15,8 +15,6 @@
 
 #include "vector"
 
-#include "Core/ReflectionAttributes.h"
-
 #define HEADER_SIZE 50
 
 namespace SteelEngine { namespace Network {
@@ -27,13 +25,13 @@ namespace SteelEngine { namespace Network {
         CLIENT_TO_SERVER
     };
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::NO_SERIALIZE)
+    SE_CLASS(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE)
     struct INetworkCommand : public HotReloader::IRuntimeObject
     {
-        SE_VALUE(SteelEngine::ReflectionAttribute::NET_VALUE)
+        SE_VALUE(SteelEngine::Reflection::ReflectionAttribute::NET_VALUE)
         CommunicationFlow m_Flow;
 
-        SE_VALUE(SteelEngine::ReflectionAttribute::NET_VALUE)
+        SE_VALUE(SteelEngine::Reflection::ReflectionAttribute::NET_VALUE)
         std::string m_Header;
 
         bool m_Deserialized = false;

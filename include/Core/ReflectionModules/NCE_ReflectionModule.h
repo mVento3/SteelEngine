@@ -7,13 +7,11 @@
 
 #include "Event/GlobalEvent.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Core/ReflectionModules/NCE_ReflectionModule.Generated.h"
 
 namespace SteelEngine {
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::REFLECTION_MODULE)
+    SE_CLASS(SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE)
     class NCE_ReflectionModule : public HotReloader::IRuntimeObject
     {
         GENERATED_BODY

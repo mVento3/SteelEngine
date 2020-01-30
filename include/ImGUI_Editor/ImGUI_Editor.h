@@ -6,8 +6,6 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "ImGUI_Editor/ReflectionAttribs.h"
 #include "ImGUI_Editor/Window.h"
 #include "ImGUI_Editor/SelectableProject.h"
@@ -29,10 +27,10 @@
 namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
-        SteelEngine::ReflectionAttribute::EDITOR,
-        SteelEngine::ReflectionAttribute::EDITOR_NAME = "ImGui",
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        SteelEngine::Reflection::ReflectionAttribute::EDITOR,
+        SteelEngine::Reflection::ReflectionAttribute::EDITOR_NAME = "ImGui",
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
     )
     class ImGUI_Editor : public IEditor, public EventObserver
     {

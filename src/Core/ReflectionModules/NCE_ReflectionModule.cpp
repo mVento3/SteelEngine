@@ -2,6 +2,8 @@
 
 #include "Utils/Utils.h"
 
+#include "RuntimeReflection/Reflection.h"
+
 namespace SteelEngine {
 
     NCE_ReflectionModule::NCE_ReflectionModule()
@@ -21,11 +23,13 @@ namespace SteelEngine {
 
     void NCE_ReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)
     {
+        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+
         for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
         {
             ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
 
-            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::NETWORK_COMMAND)) != std::string::npos)
+            if(enum_->Compare(Reflection::ReflectionAttribute::NETWORK_COMMAND, meta.m_Key))
             {
                 m_NetCommand = true;
 
@@ -55,12 +59,13 @@ namespace SteelEngine {
     void NCE_ReflectionModule::operator()(const ReflectionGenerator::SE_ValueMacroEvent& event)
     {
         ReflectionGenerator::ClassProperty prop = *event.m_Info;
+        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
         for(Type::uint32 i = 0; i < prop.m_MetaData.size(); i++)
         {
             ReflectionGenerator::MetaDataInfo meta = prop.m_MetaData[i];
 
-            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::NET_VALUE)) != std::string::npos)
+            if(enum_->Compare(Reflection::ReflectionAttribute::NET_VALUE, meta.m_Key))
             {
                 m_Properties.push_back(prop);
             }

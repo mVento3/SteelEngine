@@ -27,6 +27,77 @@ namespace SteelEngine {
 			STRUCT_TYPE
 		};
 
+		struct IMetaDataPiece
+		{
+			virtual size_t GetTypeID() const = 0;
+		};
+
+		template <typename A>
+		struct MetaDataPiece : public IMetaDataPiece
+		{
+			MetaDataPiece(const A& value) :
+				m_Value(value)
+			{
+				m_TypeID = typeid(A).hash_code();
+			}
+
+			size_t m_TypeID = RuntimeDatabase::s_InvalidID;
+			A m_Value;
+
+			size_t GetTypeID() const override
+			{
+				return m_TypeID;
+			}
+		};
+
+		struct MetaDataInfoOther
+		{
+			IMetaDataPiece* m_Key;
+			IMetaDataPiece* m_Value;
+
+			template <typename KeyType, typename ValueType>
+			MetaDataInfoOther(const KeyType& key, const ValueType& value)
+			{
+				m_Key = new MetaDataPiece<KeyType>(key);
+				m_Value = new MetaDataPiece<ValueType>(value);
+			}
+
+			template <typename A>
+			bool Compare(const A& key)
+			{
+				size_t keyTypeID = typeid(A).hash_code();
+
+				if(keyTypeID == m_Key->GetTypeID())
+				{
+					MetaDataPiece<A>* value = (MetaDataPiece<A>*)m_Value;
+
+					if(value->m_Value == key)
+					{
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+			bool Compare(const char* key)
+			{
+				size_t keyTypeID = typeid(const char*).hash_code();
+
+				if(keyTypeID == m_Key->GetTypeID())
+				{
+					MetaDataPiece<const char*>* value = (MetaDataPiece<const char*>*)m_Value;
+
+					if(strcmp(key, value->m_Value) == 0)
+					{
+						return true;
+					}
+				}
+
+				return false;
+			}
+		};
+
 		struct MetaDataInfo
 		{
 			std::string m_Key;
@@ -69,6 +140,13 @@ namespace SteelEngine {
 
 		struct EnumElement
 		{
+			EnumElement(const std::string& name, const std::vector<MetaDataInfo>& meta = {}) :
+				m_ElementName(name),
+				m_MetaData(meta)
+			{
+
+			}
+
 			std::string					m_ElementName;
 			std::vector<MetaDataInfo>	m_MetaData;
 		};

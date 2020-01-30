@@ -53,6 +53,9 @@ namespace SteelEngine {
         // TODO: Delete this!!
         Profiler::Manager a;
         EventManager aa;
+        Reflection aaa;
+
+        aaa.Init2();
 
         m_EventManager = (IEventManager**)&Reflection::CreateInstance("SteelEngine::EventManager")->m_Object;
 
@@ -77,7 +80,7 @@ namespace SteelEngine {
         std::ifstream configFile(getBinaryLocation() / "config.json");
 
         configFile >> m_CompileConfig;
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(ReflectionAttribute::PROJECTS_PATH, (std::string)m_CompileConfig["projects_path"]);
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(Reflection::ReflectionAttribute::PROJECTS_PATH, (std::string)m_CompileConfig["projects_path"]);
 
         m_CompileConfig = m_CompileConfig["compiler"];
 
@@ -103,7 +106,7 @@ namespace SteelEngine {
         );
 
         std::vector<SteelEngine::IReflectionData*> types =
-            Reflection::GetTypesByMetaData(ReflectionAttribute::REFLECTION_MODULE, [](Variant* key) -> bool
+            Reflection::GetTypesByMetaData(Reflection::ReflectionAttribute::REFLECTION_MODULE, [](Variant* key) -> bool
             {
                 return key->Convert<bool>();
             });
@@ -232,7 +235,7 @@ namespace SteelEngine {
         ent = (*m_Renderer)->AddModel
             (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj"),
             (*m_SceneManager)->GetCurrentScene(),
-            Transform(glm::vec3(10, 20, 0))
+            Transform(glm::vec3(0, 20, 10))
         );
 
         for(Type::uint32 i = 0; i < 50; i++)
@@ -244,13 +247,16 @@ namespace SteelEngine {
             );
         }
 
-        for(Type::uint32 i = 0; i < 100; i++)
+        for(Type::uint32 i = 0; i < 10; i++)
         {
-            (*m_Renderer)->AddModel
-                (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj"),
-                (*m_SceneManager)->GetCurrentScene(),
-                Transform(glm::vec3(0, i * 2, 0))
-            );
+            for(Type::uint32 j = 0; j < 30; j++)
+            {
+                (*m_Renderer)->AddModel
+                    (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj"),
+                    (*m_SceneManager)->GetCurrentScene(),
+                    Transform(glm::vec3(j * 2, (i * 2) + 5, 0))
+                );
+            }
         }
 
         Transform trans;
@@ -387,7 +393,7 @@ namespace SteelEngine {
     {
         m_EnginePathVariant = variant;
 
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(ReflectionAttribute::ENGINE_START_TYPE, variant);
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(Reflection::ReflectionAttribute::ENGINE_START_TYPE, variant);
     }
 
     void Core::OnRecompile(HotReloader::IRuntimeObject* oldObject)

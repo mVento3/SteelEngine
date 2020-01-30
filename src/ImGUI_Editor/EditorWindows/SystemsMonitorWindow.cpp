@@ -23,7 +23,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     
     void SystemsMonitorWindow::Init()
     {
-        m_Info = Reflection::GetType("SteelEngine::Core")->GetMetaData(ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER);
+        m_Info = Reflection::GetType("SteelEngine::Core")->GetMetaData(Reflection::ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER);
 
         if(!m_Database)
         {

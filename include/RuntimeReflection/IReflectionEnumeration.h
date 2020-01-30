@@ -1,52 +1,55 @@
 #pragma once
 
-#include "RuntimeReflection/MetaDataImplementation.h"
+#include "RuntimeReflection/ReflectionEnumElement.h"
 
 namespace SteelEngine {
 
-	struct ReflectionValue : public MetaDataImplementation
-	{
-		std::string m_Name;
-		int m_Value;
-		MetaDataInfoVector m_MetaData;
-
-		ReflectionValue(const std::string& name, int value) :
-			m_Name(name),
-			m_Value(value)
-		{
-
-		}
-
-		const MetaDataInfoVector* GetMetaDataInfoVector() const override
-		{
-			return &m_MetaData;
-		}
-
-		MetaDataInfoVector* GetMetaDataInfoVector() override
-		{
-			return &m_MetaData;
-		}
-
-		template <typename... Args>
-		ReflectionValue& operator()(Args... args)
-		{
-			m_MetaDatas.insert(m_MetaDatas.begin(), { args... });
-
-			return *this;
-		}
-	};
-
 	struct IReflectionEnumeration : public MetaDataImplementation
 	{
-		typedef std::vector<ReflectionValue> ValuesVector;
+		typedef std::vector<ReflectionEnumElement> EnumElementVector;
+
+		template <typename Type>
+		bool Compare(const Type& enum_, const char* name)
+		{
+			if(typeid(Type).hash_code() != GetTypeID())
+			{
+				return false;
+			}
+
+			const EnumElementVector* values = GetEnumElements();
+			std::string name_ = name;
+
+			replaceAll(name_, "::", " ");
+
+			std::vector<std::string> splitted = split(name_, ' ');
+
+			for(EnumElementVector::const_iterator it = values->begin(); it != values->end(); ++it)
+			{
+				if(strcmp(it->m_Name, splitted[splitted.size() - 1].c_str()) == 0)
+				{
+					return enum_ == it->m_Value;
+				}
+			}
+
+			return false;
+		}
+
+		template <typename Type>
+		bool Compare(const Type& enum_, const std::string& name)
+		{
+			return Compare(enum_, name.c_str());
+		}
 
 		virtual const MetaDataInfoVector* GetMetaDataInfoVector() const override = 0;
 		virtual MetaDataInfoVector* GetMetaDataInfoVector() override = 0;
 
+		virtual const EnumElementVector* GetEnumElements() const = 0;
+
 		virtual int GetEnumValue(const std::string& name) = 0;
-		virtual ReflectionValue GetEnum(const std::string& name) = 0;
+		virtual ReflectionEnumElement GetEnum(const std::string& name) = 0;
 
 		virtual const std::string& GetName() const = 0;
+		virtual size_t GetTypeID() const = 0;
 	};
 
 }

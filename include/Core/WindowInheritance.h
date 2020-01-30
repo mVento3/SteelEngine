@@ -4,8 +4,6 @@
 #include "RuntimeReflection/IReflectionInheritance.h"
 #include "RuntimeReflection/IReflectionData.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "HotReloader/IRuntimeObject.h"
 
 #include "Core/WindowInheritance.Generated.h"
@@ -13,7 +11,7 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::INHERITANCE_MODULE
+        SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE
     )
     class WindowInheritance : public HotReloader::IRuntimeObject
     {

@@ -4,8 +4,6 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "ImGUI_Editor/Window.Generated.h"
 
 #include "imgui/imgui.h"
@@ -18,7 +16,7 @@ namespace SteelEngine { namespace Editor {
 
     }
 
-    SE_STRUCT(SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE)
+    SE_STRUCT(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE)
     struct Window : public HotReloader::IRuntimeObject
     {
         GENERATED_BODY

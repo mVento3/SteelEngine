@@ -11,7 +11,7 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::REFLECTION_MODULE
+        SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE
     )
     class NaiveEventReflectionModule : public HotReloader::IRuntimeObject
     {

@@ -22,10 +22,10 @@ namespace SteelEngine {
     SE_CLASS(
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE,
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW,
         SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::FLAGS = ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar,
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
     )
     class ConsoleWindow : public EditorComponents::ImGUI::UserInterface, public LogDispatcher, public EventObserver
     {

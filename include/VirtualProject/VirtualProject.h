@@ -18,7 +18,6 @@
 #include "RuntimeCompiler/IRuntimeCompiler.h"
 
 #include "Core/Type.h"
-#include "Core/ReflectionAttributes.h"
 
 #include "Utils/Json.h"
 
@@ -31,8 +30,8 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
     )
     class VirtualProject : public IVirtualProject, public Script::Python::Scriptable
     {

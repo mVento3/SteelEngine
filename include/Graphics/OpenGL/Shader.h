@@ -55,6 +55,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Cleanup();
 
         void Update(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2);
+        void Update(const Transform& transform, const Camera& camera);
         void Bind() const;
 
         void SetInt(const std::string& name, int value) const;

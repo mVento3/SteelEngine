@@ -28,7 +28,7 @@ namespace SteelEngine {
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::START_MENU_SCENE,
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
         SteelEngine::EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
     )
     class MemoryViewWindow : public EditorComponents::ImGUI::UserInterface
     {

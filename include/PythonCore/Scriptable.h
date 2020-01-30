@@ -7,8 +7,6 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "vector"
 #include "initializer_list"
 #include "stack"
@@ -32,7 +30,7 @@ namespace SteelEngine { namespace Script { namespace Python {
         return unpack(script, arr, t) + unpack(script, arr, rest...);
     }
 
-    SE_CLASS(SteelEngine::ReflectionAttribute::NO_SERIALIZE)
+    SE_CLASS(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE)
     class Scriptable
     {
         friend struct IReflectionData;

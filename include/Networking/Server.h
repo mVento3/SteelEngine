@@ -20,8 +20,6 @@
 #include "RuntimeReflection/Reflection.h"
 #include "RuntimeReflection/Macro.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Event/LocalEvent.h"
 
 namespace SteelEngine {

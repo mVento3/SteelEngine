@@ -401,7 +401,7 @@ namespace SteelEngine {
 
         SE_INFO("Loading %s project!", m_ProjectName.c_str());
 
-        if(Reflection::GetType("SteelEngine::Core")->GetMetaData(ReflectionAttribute::ENGINE_START_TYPE)->Convert<Core::EnginePathVariant>() == Core::EnginePathVariant::GAME_DEV)
+        if(Reflection::GetType("SteelEngine::Core")->GetMetaData(Reflection::ReflectionAttribute::ENGINE_START_TYPE)->Convert<Core::EnginePathVariant>() == Core::EnginePathVariant::GAME_DEV)
         {
             FileSystem::Map("fileWatcherPath", m_LoadedProject);
         }
@@ -608,7 +608,7 @@ namespace SteelEngine {
         {
             const IReflectionData* data = types[i];
 
-            if(data->GetMetaData(ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
+            if(data->GetMetaData(Reflection::ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
             {
                 m_ProjectScripts.push_back(&data->Create()->m_Object);
             }
@@ -652,7 +652,7 @@ namespace SteelEngine {
         {
             const IReflectionData* data = types[i];
 
-            if(data->GetMetaData(ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
+            if(data->GetMetaData(Reflection::ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
             {
                 bool found = false;
 

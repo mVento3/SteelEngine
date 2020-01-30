@@ -4,8 +4,6 @@
 
 #include "RuntimeReflection/Reflection.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "Utils/Utils.h"
 
 #include "FileSystem/FileSystem.h"
@@ -532,6 +530,45 @@ namespace SteelEngine {
 
 				ProcessMetaData(lexer, prop.m_MetaData, word);
 			}
+			else if(lexer.GetToken() == "SE_ENUM")
+			{
+				lexer++;
+
+				if(!currentData)
+				{
+					// Generate enum map
+
+					currentData = new ClassData();
+
+					classStack.push(currentData);
+				}
+
+				std::vector<MetaDataInfo> meta;
+				std::string word = "";
+				EnumInfo enum_;
+
+				ProcessMetaData(lexer, currentData->m_ClassMetaDataInfo, word);
+
+				lexer++; // enum
+
+				// std::string enumName = lexer++.GetToken();
+				enum_.m_EnumName = lexer++.GetToken();
+
+				lexer++;
+
+				while(lexer++.GetToken() != "}")
+				{
+					if(lexer.GetToken() != ",")
+					{
+						// printf("%s\n", lexer.GetToken().c_str());
+						enum_.m_Elements.push_back(EnumElement(lexer.GetToken(), {}));
+					}
+				}
+
+				lexer++;
+
+				currentData->m_Enums.push_back(enum_);
+			}
 			else if(lexer.GetToken() == "SE_METHOD")
 			{
 				seMethod = true;
@@ -581,59 +618,119 @@ namespace SteelEngine {
 				meth.m_MethodInfo.m_ReturnType = word;
 				meth.m_MethodInfo.m_Name = lexer.GetToken();
 
-				lexer++;
-
-				bool openRoundBracket = false;
+				// bool openRoundBracket = false;
 				std::string argumentWord = "";
 				std::vector<ArgumentInfo> argTypes;
 				bool wasComma = false;
+				int bracketsSize = 0;
 
 				while(1)
 				{
+					lexer++;
+
 					if(lexer.GetToken() == "(")
 					{
-						openRoundBracket = true;
+						if(bracketsSize > 0)
+						{
+							argumentWord += lexer.GetToken();
+						}
+
+						bracketsSize++;
 					}
 					else if(lexer.GetToken() == ")")
 					{
-						openRoundBracket = false;
-					}
-					else if(openRoundBracket)
-					{
-						if(lexer.GetToken() == ",")
-						{
-							wasComma = true;
+						bracketsSize--;
 
+						if(bracketsSize == 0)
+						{
 							size_t found = argumentWord.find_last_of(" ");
 
-							argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
-							argumentWord.clear();
+							if(found != RuntimeDatabase::s_InvalidID)
+							{
+								argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
+								argumentWord.clear();
+							}
+
+							break;
 						}
 						else
 						{
 							argumentWord += lexer.GetToken();
+						}
+					}
+					else if(lexer.GetToken() == ",")
+					{
+						if(bracketsSize > 1)
+						{
+							argumentWord += lexer.GetToken();
+						}
+						else
+						{
+							size_t found = argumentWord.find_last_of(" ");
 
-							if(lexer.Space())
+							if(found != RuntimeDatabase::s_InvalidID)
 							{
-								argumentWord += " ";
+								argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
+								argumentWord.clear();
 							}
 						}
 					}
-					else if(!openRoundBracket)
+					else
 					{
-						if(wasComma)
+						argumentWord += lexer.GetToken();
+
+						if(lexer.Space())
 						{
-							wasComma = false;
-
-							size_t found = argumentWord.find_last_of(" ");
-
-							argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
+							argumentWord += " ";
 						}
-
-						break;
 					}
 
-					lexer++;
+					// if(lexer.GetToken() == "(")
+					// {
+					// 	openRoundBracket = true;
+					// 	brackets++;
+					// }
+					// else if(lexer.GetToken() == ")")
+					// {
+					// 	openRoundBracket = false;
+					// 	brackets--;
+					// }
+					// else if(openRoundBracket)
+					// {
+					// 	if(lexer.GetToken() == ",")
+					// 	{
+					// 		wasComma = true;
+
+					// 		size_t found = argumentWord.find_last_of(" ");
+
+					// 		argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
+					// 		argumentWord.clear();
+					// 	}
+					// 	else
+					// 	{
+					// 		argumentWord += lexer.GetToken();
+
+					// 		if(lexer.Space())
+					// 		{
+					// 			argumentWord += " ";
+					// 		}
+					// 	}
+					// }
+					// else if(!openRoundBracket)
+					// {
+					// 	if(wasComma)
+					// 	{
+					// 		wasComma = false;
+
+					// 		size_t found = argumentWord.find_last_of(" ");
+
+					// 		argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
+					// 	}
+
+					// 	break;
+					// }
+
+					// lexer++;
 				}
 
 				meth.m_MethodInfo.m_Arguments.insert(meth.m_MethodInfo.m_Arguments.begin(), argTypes.begin(), argTypes.end());
@@ -988,6 +1085,13 @@ namespace SteelEngine {
 			}
 		}
 
+		if(!data)
+		{
+			printf("No reflection needed or parser error!\n");
+
+			return SE_FALSE;
+		}
+
 		std::filesystem::path path(m_PathHeader);
 
 		std::string p_ = path.string();
@@ -1073,6 +1177,12 @@ namespace SteelEngine {
 		namespacedClassName = namespace_ + "::" + data->m_ClassName;
 
 		data->m_ClassMetaDataInfo.push_back(MetaDataInfo{ "\"sizeof\"", "sizeof(" + data->m_ClassName + ")" });
+
+		// We do not want to have serialization in reflectinon class
+		if(data->m_ClassName == "Reflection")
+		{
+			data->m_ClassMetaDataInfo.push_back(MetaDataInfo{ "SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE", "true" });
+		}
 
 		path.replace_extension(".h");
 
@@ -1253,14 +1363,14 @@ namespace SteelEngine {
 					if (enum_.m_Elements.size() > 0)
 					{
 						sourceFile << ".Values\n";
-						sourceFile << "(\n";
+						sourceFile << "({\n";
 
 						for (Type::uint32 i = 0; i < enum_.m_Elements.size(); i++)
 						{
 							EnumElement ele = enum_.m_Elements[i];
 
-							sourceFile << "SteelEngine::ReflectionValue(\"" << ele.m_ElementName;
-							sourceFile << "\", " << data->m_ClassName << "::" << enum_.m_EnumName << "::" << ele.m_ElementName << ")\n";
+							sourceFile << "SteelEngine::ReflectionEnumElement(\"" << ele.m_ElementName;
+							sourceFile << "\", " << data->m_ClassName << "::" << enum_.m_EnumName << "::" << ele.m_ElementName << ")";
 
 							GenerateMetaDataInfo(sourceFile, ele.m_MetaData);
 
@@ -1274,7 +1384,7 @@ namespace SteelEngine {
 							}
 						}
 
-						sourceFile << ")\n";
+						sourceFile << "})\n";
 					}
 				}
 

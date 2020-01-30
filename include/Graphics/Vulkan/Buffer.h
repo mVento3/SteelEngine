@@ -10,12 +10,10 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Core/ReflectionAttributes.h"
-
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     SE_CLASS(
-        SteelEngine::ReflectionAttribute::NO_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
     )
     class Buffer : public IBuffer
     {
@@ -74,10 +72,25 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
             const IDevice* device
         ) override;
 
-        inline const VkBuffer& GetBuffer() const override { return m_Buffer; }
-        inline const Type::uint32 GetCount() const override { return m_Count; }
-        inline const VkDeviceMemory& GetMemory() const override { return m_BufferMemory; }
-        inline const void* GetMapped() const { return m_Mapped; }
+        inline const VkBuffer& GetBuffer() const override
+        {
+            return m_Buffer;
+        }
+
+        inline const Type::uint32 GetCount() const override
+        {
+            return m_Count;
+        }
+
+        inline const VkDeviceMemory& GetMemory() const override
+        {
+            return m_BufferMemory;
+        }
+
+        inline const void* GetMapped() const
+        {
+            return m_Mapped;
+        }
     };
 
 }}}

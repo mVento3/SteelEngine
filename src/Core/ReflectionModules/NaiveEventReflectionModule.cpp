@@ -4,6 +4,8 @@
 
 #include "Utils/Utils.h"
 
+#include "RuntimeReflection/Reflection.h"
+
 namespace SteelEngine {
 
     NaiveEventReflectionModule::NaiveEventReflectionModule()
@@ -21,11 +23,13 @@ namespace SteelEngine {
 
     void NaiveEventReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)
     {
+        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+
         for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
         {
             ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
 
-            if(meta.m_Key.find(SE_GET_TYPE_NAME(ReflectionAttribute::NAIVE_EVENT)) != std::string::npos)
+            if(enum_->Compare(Reflection::ReflectionAttribute::NAIVE_EVENT, meta.m_Key))
             {
                 m_NaiveEvent = true;
                 m_EventName = event.m_ClassName;

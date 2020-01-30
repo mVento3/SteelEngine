@@ -7,8 +7,6 @@
 
 #include "ImGUI_Editor/EditorWindows/SystemsMonitorWindow.Generated.h"
 
-#include "Core/ReflectionAttributes.h"
-
 #include "RuntimeReflection/Reflection.h"
 
 #include "RuntimeDatabase/RuntimeDatabase.h"
@@ -23,8 +21,8 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     SE_CLASS(
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::START_MENU_SCENE | SteelEngine::Editor::SceneType::EDITOR_SCENE,
-        SteelEngine::ReflectionAttribute::RUNTIME_SERIALIZE,
-        SteelEngine::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW
     )
     class SystemsMonitorWindow : public EditorComponents::ImGUI::UserInterface

@@ -37,10 +37,25 @@ namespace SteelEngine {
         virtual void* Allocate(size_t size, Type::uint8 alignment = DEFAULT_ALIGNMENT) = 0;
         virtual void Deallocate(void* ptr = 0) = 0;
 
-        inline size_t GetMemorySize() const { return m_MemorySize; }
-        inline size_t GetUsedMemorySize() const { return m_UsedMemorySize; }
-        inline const void* GetStart() const { return m_Start; }
-        inline size_t GetAllocationsNumber() const { return m_AllocationsCount; }
+        inline size_t GetMemorySize() const
+        {
+            return m_MemorySize;
+        }
+
+        inline size_t GetUsedMemorySize() const
+        {
+            return m_UsedMemorySize;
+        }
+
+        inline const void* GetStart() const
+        {
+            return m_Start;
+        }
+
+        inline size_t GetAllocationsNumber() const
+        {
+            return m_AllocationsCount;
+        }
     };
 
     template <typename A, typename... Args>

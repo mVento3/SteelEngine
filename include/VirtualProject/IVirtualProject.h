@@ -19,14 +19,35 @@ namespace SteelEngine {
     {
         virtual Result Init() { return SE_NOT_IMPLEMENTED; }
 
-        virtual void CreateProject(const std::filesystem::path& projectName, const ProjectStructure& proj) { }
-        virtual void LoadProject(const std::vector<std::string>& additionalFilesToCompile) { }
+        virtual void CreateProject(const std::filesystem::path& projectName, const ProjectStructure& proj)
+        {
 
-        virtual void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator) { }
-        virtual Result IsProjectLoaded() { return SE_NOT_IMPLEMENTED; }
-        virtual Result IsProjectLoadedSuccessful() const { return SE_NOT_IMPLEMENTED; }
+        }
 
-        virtual IVirtualProjectVisualizer** GetVisualizer() { return 0; }
+        virtual void LoadProject(const std::vector<std::string>& additionalFilesToCompile)
+        {
+
+        }
+
+        virtual void SetReflectionGenerator(IReflectionGenerator* reflectionGenerator)
+        {
+
+        }
+
+        virtual Result IsProjectLoaded()
+        {
+            return SE_NOT_IMPLEMENTED;
+        }
+
+        virtual Result IsProjectLoadedSuccessful() const
+        {
+            return SE_NOT_IMPLEMENTED;
+        }
+
+        virtual IVirtualProjectVisualizer** GetVisualizer()
+        {
+            return 0;
+        }
     };
 
 }

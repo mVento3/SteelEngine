@@ -1,9 +1,6 @@
 #pragma once
 
-#include "RuntimeReflection/MetaDataInfo.h"
 #include "RuntimeReflection/IReflectionEnumeration.h"
-
-#include "vector"
 
 namespace SteelEngine {
 
@@ -15,7 +12,7 @@ namespace SteelEngine {
 	{
 		ReflectionData<T>* m_Data;
 		MetaDataInfoVector m_MetaData;
-		ValuesVector m_Values;
+		EnumElementVector m_Values;
 		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
 		std::string m_Name;
 
@@ -24,6 +21,8 @@ namespace SteelEngine {
 			m_Name(name)
 		{
 			m_TypeID = typeid(A).hash_code();
+
+			m_Values.reserve(100);
 		}
 
 		const MetaDataInfoVector* GetMetaDataInfoVector() const override
@@ -38,7 +37,7 @@ namespace SteelEngine {
 
 		int GetEnumValue(const std::string& name) override
 		{
-			for(ValuesVector::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
+			for(EnumElementVector::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
 			{
 				if(it->m_Name == name)
 				{
@@ -49,9 +48,9 @@ namespace SteelEngine {
 			return 0;
 		}
 
-		ReflectionValue GetEnum(const std::string& name) override
+		ReflectionEnumElement GetEnum(const std::string& name) override
 		{
-			for(ValuesVector::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
+			for(EnumElementVector::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
 			{
 				if(it->m_Name == name)
 				{
@@ -59,25 +58,34 @@ namespace SteelEngine {
 				}
 			}
 
-			static ReflectionValue wrong("Wrong", 0);
+			static ReflectionEnumElement wrong("Wrong", 0);
 
 			return wrong;
 		}
 
-		template <typename... Args>
-		ReflectionData<T>& Values(Args... args)
+		ReflectionData<T>& Values(const EnumElementVector& args)
 		{
-			m_Values.insert(m_Values.begin(), { args... });
+			for(ReflectionEnumElement v : args)
+			{
+				m_Values.push_back(v);
+			}
 
 			return *m_Data;
 		}
 
-		template <typename... Args>
-		ReflectionEnumeration& operator()(Args... args)
+		const EnumElementVector* GetEnumElements() const override
 		{
-			m_MetaDatas.insert(m_MetaDatas.begin(), { args... });
+			return &m_Values;
+		}
 
-			return *this;
+		const std::string& GetName() const override
+		{
+			return m_Name;
+		}
+
+		size_t GetTypeID() const override
+		{
+			return m_TypeID;
 		}
 	};
 
