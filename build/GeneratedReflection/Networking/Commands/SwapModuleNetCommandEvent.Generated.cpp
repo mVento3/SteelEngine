@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Commands/SwapModuleNetCommandEvent.Generated.h"
-#include "Networking/Commands/SwapModuleNetCommandEvent.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Networking/Commands/SwapModuleNetCommandEvent.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Commands/SwapModuleNetCommandEvent.Generated.h"
 
 namespace SteelEngine {
 namespace Network {
@@ -17,19 +17,17 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NETWORK_COMMAND, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SwapModuleNetCommandEvent))
 )
-.Inheritance<INetworkCommand>("INetworkCommand")
 .Constructor<>()
 .Constructor<const char*>()
+.Inheritance<INetworkCommand>("INetworkCommand")
 .Property("m_ModuleName", &SwapModuleNetCommandEvent::m_ModuleName)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NET_VALUE, true)
 )
-.Property("m_Buffer", &SwapModuleNetCommandEvent::m_Buffer)
 .Method("ServerSide", &SwapModuleNetCommandEvent::ServerSide)
 .Method("ClientSide", &SwapModuleNetCommandEvent::ClientSide)
 ;
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/UserInterfaceInheritance.Generated.h"
-#include "Core/UserInterfaceInheritance.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Core/UserInterfaceInheritance.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/UserInterfaceInheritance.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -14,16 +14,14 @@ SteelEngine::ReflectionRecorder::Register<UserInterfaceInheritance>("UserInterfa
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(UserInterfaceInheritance))
 )
-.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Constructor<>()
+.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Method("ProcessInheritance", &UserInterfaceInheritance::ProcessInheritance)
 ;
 }
-
 void UserInterfaceInheritance::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

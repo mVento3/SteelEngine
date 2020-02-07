@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Vulkan/Shader.Generated.h"
-#include "Graphics/Vulkan/Shader.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Graphics/Vulkan/Shader.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Vulkan/Shader.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
@@ -18,11 +18,10 @@ SteelEngine::ReflectionRecorder::Register<Shader>("Shader",{
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Shader))
 )
-.Inheritance<IShader>("IShader")
 .Constructor<>()
+.Inheritance<IShader>("IShader")
 ;
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

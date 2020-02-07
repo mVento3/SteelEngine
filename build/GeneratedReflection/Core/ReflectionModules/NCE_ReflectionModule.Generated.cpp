@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/ReflectionModules/NCE_ReflectionModule.Generated.h"
-#include "Core/ReflectionModules/NCE_ReflectionModule.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Core/ReflectionModules/NCE_ReflectionModule.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/ReflectionModules/NCE_ReflectionModule.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -11,18 +11,16 @@ SteelEngine::ReflectionRecorder::Register<NCE_ReflectionModule>("NCE_ReflectionM
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::REFLECTION_MODULE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NCE_ReflectionModule))
 )
-.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Constructor<>()
+.Inheritance<IReflectionModule>("IReflectionModule")
 ;
 }
-
 void NCE_ReflectionModule::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

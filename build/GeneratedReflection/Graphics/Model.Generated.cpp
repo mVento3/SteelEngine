@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Model.Generated.h"
-#include "Graphics/Model.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Graphics/Model.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Model.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
@@ -16,11 +16,10 @@ SteelEngine::ReflectionRecorder::Register<Model>("Model",{
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Model))
 )
-.Inheritance<IModel>("IModel")
 .Constructor<const char*>()
+.Inheritance<IModel>("IModel")
 ;
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

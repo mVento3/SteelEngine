@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/EditorComponents/ImGUI/UserInterface.Generated.h"
-#include "EditorComponents/ImGUI/UserInterface.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "EditorComponents/ImGUI/UserInterface.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/EditorComponents/ImGUI/UserInterface.Generated.h"
 
 namespace SteelEngine {
 namespace EditorComponents {
@@ -18,21 +18,16 @@ SteelEngine::ReflectionRecorder::Register<UserInterface>("UserInterface",{
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(UserInterface))
 )
-.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Constructor<>()
-.Property("m_Context", &UserInterface::m_Context)
-.Property("m_Title", &UserInterface::m_Title)
-.Property("m_Editor", &UserInterface::m_Editor)
+.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 ;
 }
-
 void UserInterface::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(UserInterface::m_Context)
 SERIALIZE(UserInterface::m_Title)
 SERIALIZE(UserInterface::m_Editor)
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
@@ -46,6 +41,10 @@ COMPARE_CONSTRUCTOR_()
 return result;
 }
 #endif
+}
+}
+namespace Editor {
+namespace ImGUI {
 }
 }
 }

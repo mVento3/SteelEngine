@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/VirtualProject/VirtualProject.Generated.h"
-#include "VirtualProject/VirtualProject.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "VirtualProject/VirtualProject.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/VirtualProject/VirtualProject.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -15,14 +15,13 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(VirtualProject))
 )
+.Constructor<>()
 .Inheritance<IVirtualProject>("IVirtualProject")
 .Inheritance<Script::Python::Scriptable>("Script::Python::Scriptable")
-.Constructor<>()
 .Method("Cast_IVirtualProject", &VirtualProject::Cast_IVirtualProject)
 .Method("Cast_Scriptable", &VirtualProject::Cast_Scriptable)
 ;
 }
-
 void VirtualProject::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(VirtualProject::m_LoadedProject)
@@ -37,7 +36,6 @@ SERIALIZE(VirtualProject::m_ProjectConfig)
 SERIALIZE(VirtualProject::m_CompileConfig)
 SERIALIZE(VirtualProject::m_ProjectScripts)
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

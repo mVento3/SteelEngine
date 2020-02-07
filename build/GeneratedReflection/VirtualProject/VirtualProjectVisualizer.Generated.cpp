@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/VirtualProject/VirtualProjectVisualizer.Generated.h"
-#include "VirtualProject/VirtualProjectVisualizer.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "VirtualProject/VirtualProjectVisualizer.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/VirtualProject/VirtualProjectVisualizer.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -13,15 +13,13 @@ SteelEngine::ReflectionRecorder::Register<VirtualProjectVisualizer>("VirtualProj
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(VirtualProjectVisualizer))
 )
-.Inheritance<IVirtualProjectVisualizer>("IVirtualProjectVisualizer")
 .Constructor<VirtualProject**>()
+.Inheritance<IVirtualProjectVisualizer>("IVirtualProjectVisualizer")
 ;
 }
-
 void VirtualProjectVisualizer::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

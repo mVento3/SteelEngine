@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/OpenGL/Renderer.Generated.h"
-#include "Graphics/OpenGL/Renderer.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Graphics/OpenGL/Renderer.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/OpenGL/Renderer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
@@ -19,14 +19,13 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 )
+.Constructor<IWindow*>()
 .Inheritance<IRenderer>("IRenderer")
 .Inheritance<EventObserver>("EventObserver")
-.Constructor<IWindow*>()
 .Method("Cast_IRenderer", &Renderer::Cast_IRenderer)
 .Method("Cast_EventObserver", &Renderer::Cast_EventObserver)
 ;
 }
-
 void Renderer::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(Renderer::m_Window)
@@ -53,7 +52,6 @@ SERIALIZE(Renderer::m_Keys)
 SERIALIZE(Renderer::m_RotateCamera)
 SERIALIZE(Renderer::m_Controlls)
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

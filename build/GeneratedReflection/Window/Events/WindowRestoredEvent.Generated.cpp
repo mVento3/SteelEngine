@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Window/Events/WindowRestoredEvent.Generated.h"
-#include "Window/Events/WindowRestoredEvent.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Window/Events/WindowRestoredEvent.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Window/Events/WindowRestoredEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -18,5 +18,4 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(WindowRestoredEvent))
 .Inheritance<Event::Naive>("Event::Naive")
 ;
 }
-
 }

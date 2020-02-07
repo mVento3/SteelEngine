@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Input/Events/KeyDownEvent.Generated.h"
-#include "Input/Events/KeyDownEvent.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Input/Events/KeyDownEvent.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Input/Events/KeyDownEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -15,13 +15,10 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(KeyDownEvent))
 )
+.Constructor<int>()
 .Inheritance<Event::Naive>("Event::Naive")
-.Constructor<int>()
-.Constructor<int>()
-.Property("m_KeyCode", &KeyDownEvent::m_KeyCode)
 ;
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
@@ -29,7 +26,6 @@ DECLARE_TYPE_INFO(KeyDownEvent)
 {
 FIND_THE_RIGHT_OBJECT
 
-COMPARE_CONSTRUCTOR(int)
 COMPARE_CONSTRUCTOR(int)
 };
 

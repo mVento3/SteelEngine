@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Client.Generated.h"
-#include "Networking/Client.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Networking/Client.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Client.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -13,8 +13,8 @@ SteelEngine::ReflectionRecorder::Register<Client>("Client",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Client))
 )
-.Inheritance<Network::INetwork>("Network::INetwork")
 .Constructor<>()
+.Inheritance<Network::INetwork>("Network::INetwork")
 .Method("Connect", &Client::Connect)
 .Method("Process", &Client::Process)
 .Method("Send", &Client::Send)
@@ -22,11 +22,9 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Client))
 .Method("GetCommands", &Client::GetCommands)
 ;
 }
-
 void Client::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

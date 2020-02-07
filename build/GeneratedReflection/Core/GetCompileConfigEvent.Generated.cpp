@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/GetCompileConfigEvent.Generated.h"
-#include "Core/GetCompileConfigEvent.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Core/GetCompileConfigEvent.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/GetCompileConfigEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -14,8 +14,6 @@ SteelEngine::ReflectionRecorder::Register<GetCompileConfigEvent>("GetCompileConf
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(GetCompileConfigEvent))
 )
-.Property("m_Config", &GetCompileConfigEvent::m_Config)
 ;
 }
-
 }

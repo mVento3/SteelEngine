@@ -14,7 +14,7 @@ SteelEngine::ReflectionRecorder::Register<Reflection>("Reflection",{
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Reflection)),
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true)
 )
-.Constructor<>()
+.Inheritance<StaticHelper>("StaticHelper")
 .Enum<Reflection::ReflectionAttribute>("ReflectionAttribute")
 .Values
 ({
@@ -41,17 +41,4 @@ SteelEngine::ReflectionEnumElement("CONSOLE_COMMAND", Reflection::ReflectionAttr
 ;
 }
 
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(Reflection)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR_()
-};
-
-return result;
-}
-#endif
 }

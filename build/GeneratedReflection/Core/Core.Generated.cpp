@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/Core.Generated.h"
-#include "Core/Core.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Core/Core.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/Core.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -14,14 +14,13 @@ SteelEngine::ReflectionRecorder::Register<Core>("Core",{
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Core))
 )
-.Inheritance<ICore>("ICore")
 .Constructor<>()
+.Inheritance<ICore>("ICore")
 .Method("Start", &Core::Start)
 .Method("Stop", &Core::Stop)
 .Method("SetPathVariant", &Core::SetPathVariant)
 ;
 }
-
 void Core::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(Core::m_RuntimeReloader)
@@ -44,7 +43,6 @@ SERIALIZE(Core::m_EnginePathVariant)
 SERIALIZE(Core::m_ReflectionModules)
 SERIALIZE(Core::ent)
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

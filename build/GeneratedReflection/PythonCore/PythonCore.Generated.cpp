@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/PythonCore/PythonCore.Generated.h"
-#include "PythonCore/PythonCore.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "PythonCore/PythonCore.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/PythonCore/PythonCore.Generated.h"
 
 namespace SteelEngine {
 namespace Script {
@@ -15,15 +15,13 @@ SteelEngine::ReflectionRecorder::Register<PythonCore>("PythonCore",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(PythonCore))
 )
-.Inheritance<IPython>("IPython")
 .Constructor<>()
+.Inheritance<IPython>("IPython")
 ;
 }
-
 void PythonCore::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

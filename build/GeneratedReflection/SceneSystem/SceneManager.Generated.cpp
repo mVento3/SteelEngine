@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/SceneSystem/SceneManager.Generated.h"
-#include "SceneSystem/SceneManager.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "SceneSystem/SceneManager.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/SceneSystem/SceneManager.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -13,15 +13,13 @@ SteelEngine::ReflectionRecorder::Register<SceneManager>("SceneManager",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SceneManager))
 )
-.Inheritance<ISceneManager>("ISceneManager")
 .Constructor<>()
+.Inheritance<ISceneManager>("ISceneManager")
 ;
 }
-
 void SceneManager::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

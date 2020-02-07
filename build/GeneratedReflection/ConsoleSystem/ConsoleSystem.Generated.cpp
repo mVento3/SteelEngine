@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/ConsoleSystem/ConsoleSystem.Generated.h"
-#include "ConsoleSystem/ConsoleSystem.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "ConsoleSystem/ConsoleSystem.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/ConsoleSystem/ConsoleSystem.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -13,15 +13,13 @@ SteelEngine::ReflectionRecorder::Register<ConsoleSystem>("ConsoleSystem",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ConsoleSystem))
 )
-.Inheritance<IConsoleSystem>("IConsoleSystem")
 .Constructor<>()
+.Inheritance<IConsoleSystem>("IConsoleSystem")
 ;
 }
-
 void ConsoleSystem::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {
