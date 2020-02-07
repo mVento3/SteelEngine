@@ -1,274 +1,279 @@
 #pragma once
 
-#include "RuntimeReflection/IReflectionGenerator.h"
+#include "RuntimeReflection/Macro.h"
+#include "RuntimeReflection/Reflection.h"
 #include "RuntimeReflection/Lexer.h"
 
-#include "fstream"
-#include "sstream"
+#include "RuntimeReflection/IReflectionGenerator.h"
+
+#include "vector"
 
 namespace SteelEngine {
 
-	struct IReflectionData;
+    struct IReflectionModule;
 
-	class ReflectionGenerator : public IReflectionGenerator
-	{
-	public:
-		enum ProtectionFlag
-		{
-			PUBLIC,
-			PROTECTED,
-			PRIVATE,
-			NOT_SPECIFIED
-		};
+    SE_CLASS(
+        Reflection::NO_SERIALIZE
+    )
+    class ReflectionGenerator : public IReflectionGenerator
+    {
+    public:
+        enum ScopeType
+        {
+            CLASS,
+            STRUCT,
+            ENUM,
+            FUNCTION,
+            NAMESPACE,
+            CONSTRUCTOR,
+            PROPERTY,
+            ENUM_ELEMENT,
+            INHERITANCE
+        };
 
-		enum ClassType
-		{
-			CLASS_TYPE,
-			STRUCT_TYPE
-		};
+        enum ProtectionLevel
+        {
+            PRIVATE,
+            PROTECTED,
+            PUBLIC,
+            NONE
+        };
 
-		struct IMetaDataPiece
-		{
-			virtual size_t GetTypeID() const = 0;
-		};
+        struct MetaData
+        {
+            std::string m_Key;
+            std::string m_Value;
+        };
 
-		template <typename A>
-		struct MetaDataPiece : public IMetaDataPiece
-		{
-			MetaDataPiece(const A& value) :
-				m_Value(value)
-			{
-				m_TypeID = typeid(A).hash_code();
-			}
+        struct ScopeInfo
+        {
+            ScopeInfo(ScopeType type) :
+                m_ScopeType(type)
+            {
+                m_Parent = 0;
+                m_Protection = ProtectionLevel::NONE;
+                m_IsReflectionLabelSet = false;
+            }
 
-			size_t m_TypeID = RuntimeDatabase::s_InvalidID;
-			A m_Value;
+            ScopeInfo(ScopeType type, const std::string& name) :
+                ScopeInfo(type)
+            {
+                m_Name = name;
+            }
 
-			size_t GetTypeID() const override
-			{
-				return m_TypeID;
-			}
-		};
+            ScopeType m_ScopeType;
+            std::string m_Name;
+            std::stack<ScopeInfo*> m_Scopes;
+            std::vector<ScopeInfo*> m_Structure;
+            ScopeInfo* m_Parent;
+            ProtectionLevel m_Protection;
+            std::vector<MetaData> m_MetaData;
+            bool m_IsReflectionLabelSet;
+        };
 
-		struct MetaDataInfoOther
-		{
-			IMetaDataPiece* m_Key;
-			IMetaDataPiece* m_Value;
+        struct Argument
+        {
+            std::string m_Type;
+            std::string m_Name;
+        };
 
-			template <typename KeyType, typename ValueType>
-			MetaDataInfoOther(const KeyType& key, const ValueType& value)
-			{
-				m_Key = new MetaDataPiece<KeyType>(key);
-				m_Value = new MetaDataPiece<ValueType>(value);
-			}
+        struct EnumElementScope : public ScopeInfo
+        {
+            EnumElementScope() :
+                ScopeInfo(ScopeType::ENUM_ELEMENT)
+            {
 
-			template <typename A>
-			bool Compare(const A& key)
-			{
-				size_t keyTypeID = typeid(A).hash_code();
+            }
 
-				if(keyTypeID == m_Key->GetTypeID())
-				{
-					MetaDataPiece<A>* value = (MetaDataPiece<A>*)m_Value;
+            EnumElementScope(const std::string& name) :
+                ScopeInfo(ScopeType::ENUM_ELEMENT, name)
+            {
 
-					if(value->m_Value == key)
-					{
-						return true;
-					}
-				}
+            }
+        };
 
-				return false;
-			}
+        struct EnumScope : public ScopeInfo
+        {
+            EnumScope() :
+                ScopeInfo(ScopeType::ENUM)
+            {
 
-			bool Compare(const char* key)
-			{
-				size_t keyTypeID = typeid(const char*).hash_code();
+            }
 
-				if(keyTypeID == m_Key->GetTypeID())
-				{
-					MetaDataPiece<const char*>* value = (MetaDataPiece<const char*>*)m_Value;
+            EnumScope(const std::string& name) :
+                ScopeInfo(ScopeType::ENUM, name)
+            {
 
-					if(strcmp(key, value->m_Value) == 0)
-					{
-						return true;
-					}
-				}
+            }
 
-				return false;
-			}
-		};
+            std::vector<EnumElementScope*> m_Elements;
+        };
 
-		struct MetaDataInfo
-		{
-			std::string m_Key;
-			std::string m_Value;
-		};
+        struct FunctionScope : public ScopeInfo
+        {
+            FunctionScope() :
+                ScopeInfo(ScopeType::FUNCTION)
+            {
 
-		struct ArgumentInfo
-		{
-			std::string m_Type;
-			std::string m_Name;
-		};
+            }
 
-		struct MethodInfo
-		{
-			std::string m_ReturnType;
-			std::string m_Name;
-			// Eventually add the arguments
-			std::vector<ArgumentInfo> m_Arguments;
-		};
+            FunctionScope(const std::string& name) :
+                ScopeInfo(ScopeType::FUNCTION, name)
+            {
 
-		struct ClassProperty
-		{
-			std::vector<MetaDataInfo>	m_MetaData;
-			ArgumentInfo				m_ArgumentInfo;
-			ProtectionFlag				m_ProtectionFlag;
-		};
+            }
 
-		struct ClassMethod
-		{
-			std::vector<MetaDataInfo>	m_MetaData;
-			MethodInfo					m_MethodInfo;
-			ProtectionFlag				m_ProtectionFlag;
-		};
+            std::vector<Argument> m_Arguments;
+            std::string m_ReturnType;
+        };
 
-		struct ConstructorInfo
-		{
-			std::vector<MetaDataInfo> m_MetaData;
-			std::vector<ArgumentInfo> m_Arguments;
-		};
+        struct PropertyScope : public ScopeInfo
+        {
+            PropertyScope() :
+                ScopeInfo(ScopeType::PROPERTY)
+            {
 
-		struct EnumElement
-		{
-			EnumElement(const std::string& name, const std::vector<MetaDataInfo>& meta = {}) :
-				m_ElementName(name),
-				m_MetaData(meta)
-			{
+            }
 
-			}
+            PropertyScope(const std::string& name) :
+                ScopeInfo(ScopeType::PROPERTY, name)
+            {
 
-			std::string					m_ElementName;
-			std::vector<MetaDataInfo>	m_MetaData;
-		};
+            }
 
-		struct EnumInfo
-		{
-			std::string					m_EnumName;
-			std::vector<MetaDataInfo>	m_MetaData;
-			std::vector<EnumElement>	m_Elements;
-		};
+            std::string m_Type;
+        };
 
-		struct InheritanceInfo
-		{
-			std::vector<MetaDataInfo> m_MetaData;
-			std::string m_Name;
-			ProtectionFlag m_Protection;
-		};
+        struct ConstructorScope : public ScopeInfo
+        {
+            ConstructorScope() :
+                ScopeInfo(ScopeType::CONSTRUCTOR)
+            {
 
-		struct ClassData
-		{
-			std::string m_ClassName;
-			ClassType m_Type;
+            }
 
-			std::vector<InheritanceInfo> 	m_Inheritance;
-			std::vector<MetaDataInfo>		m_ClassMetaDataInfo;
-			std::vector<ConstructorInfo>	m_Constructors;
-			std::vector<ClassProperty>		m_Properties;
-			std::vector<ClassMethod>		m_Methods;
-			std::vector<EnumInfo>			m_Enums;
-			std::vector<std::string> 		m_Hierarchy;
-			IReflectionData*				m_Data;
-			bool m_Reflect;
+            ConstructorScope(const std::string& name) :
+                ScopeInfo(ScopeType::CONSTRUCTOR, name)
+            {
 
-			std::vector<ClassData*> m_Others;
-		};
+            }
 
-	// Header Parsing Events:
-		struct PreHeaderProcessEvent
-		{
-			const std::vector<std::string>* m_HeaderLines;
-		};
+            std::vector<Argument> m_Arguments;
+        };
 
-		struct SE_ClassMacroEvent
-		{
-			const std::vector<ReflectionGenerator::MetaDataInfo>* m_MetaData;
-			const std::string m_ClassName;
-			const std::vector<InheritanceInfo>* m_Inheritance;
-			IReflectionData* m_Data;
-		};
+        struct NamespaceScope : public ScopeInfo
+        {
+            NamespaceScope() :
+                ScopeInfo(ScopeType::NAMESPACE)
+            {
 
-		struct SE_ValueMacroEvent
-		{
-			const ReflectionGenerator::ClassProperty* m_Info;
-			std::vector<ClassProperty>* m_Properties;
-		};
+            }
 
-		struct SE_MethodMacroEvent
-		{
-			const ReflectionGenerator::ClassMethod* m_Info;
-			std::vector<ClassMethod>* m_Methods;
-		};
+            NamespaceScope(const std::string& name) :
+                ScopeInfo(ScopeType::NAMESPACE, name)
+            {
 
-		struct SE_InheritanceMacroEvent
-		{
-			const ReflectionGenerator::InheritanceInfo* m_Info;
-			std::vector<InheritanceInfo>* m_Inheritances;
-		};
+            }
+        };
 
-		struct SE_ConstructorMacroEvent
-		{
-			std::vector<ArgumentInfo> m_Args;
-		};
+        struct InheritanceScope : public ScopeInfo
+        {
+            InheritanceScope() :
+                ScopeInfo(ScopeType::INHERITANCE)
+            {
 
-		struct ClearValuesEvent
-		{
+            }
 
-		};
+            InheritanceScope(const std::string& name) :
+                ScopeInfo(ScopeType::INHERITANCE, name)
+            {
 
-		struct GenerateMethodReflection
-		{
-			std::vector<ClassMethod> m_Methods;
-		};
+            }
+        };
 
-	// Source Parsing Events
+        struct StructScope : public ScopeInfo
+        {
+            StructScope() :
+                ScopeInfo(ScopeType::STRUCT)
+            {
 
-	// Header Generate Events
-		struct GenerateHeaderEvent
-		{
-			std::ofstream* m_Out;
-			std::vector<std::string>* m_GeneratedBodyMacro;
-		};
+            }
 
-	// Source Generate Events
-		struct GenerateSourceEvent
-		{
-			std::ofstream* m_Out;
-			const std::string m_ClassName;
-		};
+            StructScope(ScopeType type) :
+                ScopeInfo(type)
+            {
 
-	private:
-		std::vector<std::string> m_HeaderLines;
+            }
 
-		std::filesystem::path m_PathHeader;
+            StructScope(ScopeType type, const std::string& name) :
+                ScopeInfo(type, name)
+            {
 
-		ProtectionFlag m_LastProtectionFlag;
+            }
 
-		std::vector<std::string>	m_GeneratedBodyMacro;
-		std::vector<ClassData*> 	m_Classes;
+            StructScope(const std::string& name) :
+                StructScope(ScopeType::STRUCT, name)
+            {
 
-		void ParseHeader();
-		std::vector<MetaDataInfo> ParseMeta(const std::string& line);
-		void GenerateMetaDataInfo(std::ofstream& out, std::vector<MetaDataInfo> meta);
-		void ProcessMetaData(Lexer& lexer, std::vector<MetaDataInfo>& res, std::string& word, ProtectionFlag* flag = 0);
+            }
 
-	public:
-		ReflectionGenerator();
-		~ReflectionGenerator();
+            std::vector<PropertyScope*>     m_Properties;
+            std::vector<FunctionScope*>     m_Functions;
+            std::vector<ConstructorScope*>  m_Constructors;
+            std::vector<NamespaceScope*>    m_Namespaces;
+            std::vector<EnumScope*>         m_Enums;
+            std::vector<InheritanceScope*>  m_Inheritance;
+            std::vector<IReflectionModule*> m_ReflectionModules;
+        };
 
-		Result Load(const std::filesystem::path& fileH) override;
-		Result Parse() override;
-		Result Generate(const std::filesystem::path& cwd, const std::filesystem::path& generatePath) override;
-		void Clear() override;
-	};
+        struct ClassScope : public StructScope
+        {
+            ClassScope() :
+                StructScope(ScopeType::CLASS)
+            {
+
+            }
+
+            ClassScope(const std::string& name) :
+                StructScope(ScopeType::CLASS, name)
+            {
+
+            }
+        };
+
+    private:
+        std::vector<std::string> m_LoadedLines;
+        Lexer m_Lexer;
+
+        std::filesystem::path m_Filename;
+
+        std::stack<ScopeInfo*> m_Scopes;
+        ScopeInfo* m_CurrentScopeToAdd;
+        ScopeInfo* m_CurrentWorkingScope;
+        ScopeInfo* m_CurrentScopeToAddByMeta;
+        ProtectionLevel m_CurrentProtectionLevel;
+
+        bool m_BeginRecordingOnce;
+        bool m_EndRecordingOnce;
+
+        // std::vector<std::string> m_GeneratedSourceLinesByModules;
+        std::vector<std::string> m_GeneratedHeaderLinesByModules;
+
+        void ProcessArguments(std::vector<Argument>& args);
+        void ProcessMetaData(std::vector<MetaData>& meta);
+        std::string WriteArguments(const std::vector<Argument>& args, ScopeInfo* info);
+        std::string WriteMetaData(const ScopeInfo* info);
+
+        void Process(ScopeInfo* info, std::ofstream& file);
+
+    public:
+        ReflectionGenerator();
+        ~ReflectionGenerator();
+
+        Result Load(const std::filesystem::path& filename) override;
+        Result Parse() override;
+        Result Generate(const std::filesystem::path& cwd, const std::filesystem::path& generatePath) override;
+        void Clear() override;
+    };
 
 }

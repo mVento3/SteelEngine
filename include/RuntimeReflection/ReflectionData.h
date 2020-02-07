@@ -44,7 +44,7 @@ namespace SteelEngine {
 		void ProcessMetaData(
 			RuntimeDatabase* db,
 			MetaDataImplementation* main,
-			MetaDataInfoVector& infos)
+			MetaDataInfoVector& infos) override
 		{
 			MetaDataInfoVector* vec = GetMetaDataInfoVectorA(main);
 

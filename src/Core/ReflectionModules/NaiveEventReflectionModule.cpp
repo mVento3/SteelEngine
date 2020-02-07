@@ -10,9 +10,6 @@ namespace SteelEngine {
 
     NaiveEventReflectionModule::NaiveEventReflectionModule()
     {
-        Event::GlobalEvent::Add<ReflectionGenerator::SE_ClassMacroEvent>(this);
-        Event::GlobalEvent::Add<ReflectionGenerator::GenerateHeaderEvent>(this);
-
         m_NaiveEvent = false;
     }
 
@@ -21,48 +18,61 @@ namespace SteelEngine {
 
     }
 
-    void NaiveEventReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)
-    {
-        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
-
-        for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
-        {
-            ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
-
-            if(enum_->Compare(Reflection::ReflectionAttribute::NAIVE_EVENT, meta.m_Key))
-            {
-                m_NaiveEvent = true;
-                m_EventName = event.m_ClassName;
-            }
-        }
-    }
-
-    void NaiveEventReflectionModule::operator()(const ReflectionGenerator::GenerateHeaderEvent& event)
+    void NaiveEventReflectionModule::GenerateHeader(std::vector<std::string>& out)
     {
         if(m_NaiveEvent)
         {
-            event.m_GeneratedBodyMacro->push_back("public:");
+            out.push_back("public:");
 
             if(m_Args == "")
             {
-                event.m_GeneratedBodyMacro->push_back("SE_EVENT(" + m_EventName + ")");
+                out.push_back("SE_EVENT(" + m_EventName + ")");
             }
             else
             {
-                event.m_GeneratedBodyMacro->push_back("SE_EVENT(" + m_EventName + ", " + m_Args + ")");
+                out.push_back("SE_EVENT(" + m_EventName + ", " + m_Args + ")");
             }
         }
     }
 
-    void NaiveEventReflectionModule::operator()(const ReflectionGenerator::SE_ConstructorMacroEvent& event)
+    void NaiveEventReflectionModule::GenerateSource(std::ofstream& out)
     {
-        for(Type::uint32 i = 0; i < event.m_Args.size(); i++)
+
+    }
+
+    void NaiveEventReflectionModule::ProcessStructure(ReflectionGenerator::StructScope* info)
+    {
+        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+
+        for(ReflectionGenerator::MetaData meta : info->m_MetaData)
         {
-            ReflectionGenerator::ArgumentInfo arg = event.m_Args[i];
+            if(enum_->Compare(Reflection::ReflectionAttribute::NAIVE_EVENT, meta.m_Key))
+            {
+                m_NaiveEvent = true;
+                m_EventName = info->m_Name;
+            }
+        }
+    }
+
+    void NaiveEventReflectionModule::ProcessProperty(ReflectionGenerator::PropertyScope* info)
+    {
+
+    }
+
+    void NaiveEventReflectionModule::ProcessFunction(ReflectionGenerator::FunctionScope* info)
+    {
+
+    }
+
+    void NaiveEventReflectionModule::ProcessConstructor(ReflectionGenerator::ConstructorScope* info)
+    {
+        for(Type::uint32 i = 0; i < info->m_Arguments.size(); i++)
+        {
+            ReflectionGenerator::Argument arg = info->m_Arguments[i];
 
             m_Args += arg.m_Type + " " + arg.m_Name;
 
-            if(i < event.m_Args.size() - 1)
+            if(i < info->m_Arguments.size() - 1)
             {
                 m_Args += ", ";
             }

@@ -53,9 +53,9 @@ namespace SteelEngine {
         // TODO: Delete this!!
         Profiler::Manager a;
         EventManager aa;
-        Reflection aaa;
+        // Reflection aaa;
 
-        aaa.Init2();
+        // aaa.Init2();
 
         m_EventManager = (IEventManager**)&Reflection::CreateInstance("SteelEngine::EventManager")->m_Object;
 
@@ -120,7 +120,7 @@ namespace SteelEngine {
 
         m_DeltaTimeVariant = Reflection::GetType("SteelEngine::Core")->GetMetaData(GlobalSystems::DELTA_TIME);
 
-        m_ReflectionGenerator = new ReflectionGenerator();
+        m_ReflectionGenerator = (SteelEngine::IReflectionGenerator*)SteelEngine::Reflection::CreateInstance("SteelEngine::ReflectionGenerator");
 
         if(m_EnginePathVariant == EnginePathVariant::ENGINE_DEV)
         {

@@ -8,11 +8,6 @@ namespace SteelEngine {
 
     NCE_ReflectionModule::NCE_ReflectionModule()
     {
-        Event::GlobalEvent::Add<ReflectionGenerator::SE_ClassMacroEvent>(this);
-        Event::GlobalEvent::Add<ReflectionGenerator::SE_ValueMacroEvent>(this);
-        Event::GlobalEvent::Add<ReflectionGenerator::GenerateHeaderEvent>(this);
-        Event::GlobalEvent::Add<ReflectionGenerator::ClearValuesEvent>(this);
-
         m_NetCommand = false;
     }
 
@@ -21,119 +16,106 @@ namespace SteelEngine {
 
     }
 
-    void NCE_ReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)
+    void NCE_ReflectionModule::ProcessStructure(ReflectionGenerator::StructScope* info)
     {
+        m_Methods = &info->m_Functions;
+
         IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
-        for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
+        for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
         {
-            ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
+            ReflectionGenerator::MetaData meta = info->m_MetaData[i];
 
             if(enum_->Compare(Reflection::ReflectionAttribute::NETWORK_COMMAND, meta.m_Key))
             {
                 m_NetCommand = true;
 
-                ReflectionGenerator::MethodInfo methInfo;
+                ReflectionGenerator::FunctionScope* func = new ReflectionGenerator::FunctionScope("Serialize");
 
-                methInfo.m_Name = "Serialize";
-				methInfo.m_ReturnType = "char*";
+                func->m_ReturnType = "char*";
+                func->m_Protection = ReflectionGenerator::ProtectionLevel::PUBLIC;
 
-                ReflectionGenerator::ClassMethod clsMeth;
+                ReflectionGenerator::FunctionScope* func2 = new ReflectionGenerator::FunctionScope("Deserialize");
 
-                clsMeth.m_MethodInfo = methInfo;
-				clsMeth.m_ProtectionFlag =  ReflectionGenerator::ProtectionFlag::PUBLIC;
+                func2->m_ReturnType = "char*";
+                func2->m_Protection = ReflectionGenerator::ProtectionLevel::PUBLIC;
 
-                m_Methods.push_back(clsMeth);
-
-                methInfo.m_Name = "Deserialize";
-                methInfo.m_ReturnType = "char*";
-
-                clsMeth.m_MethodInfo = methInfo;
-                clsMeth.m_ProtectionFlag = ReflectionGenerator::ProtectionFlag::PUBLIC;
-
-                m_Methods.push_back(clsMeth);
+                m_Methods->push_back(func);
+                m_Methods->push_back(func2);
             }
         }
     }
 
-    void NCE_ReflectionModule::operator()(const ReflectionGenerator::SE_ValueMacroEvent& event)
+    void NCE_ReflectionModule::ProcessProperty(ReflectionGenerator::PropertyScope* info)
     {
-        ReflectionGenerator::ClassProperty prop = *event.m_Info;
         IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
-        for(Type::uint32 i = 0; i < prop.m_MetaData.size(); i++)
+        for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
         {
-            ReflectionGenerator::MetaDataInfo meta = prop.m_MetaData[i];
+            ReflectionGenerator::MetaData meta = info->m_MetaData[i];
 
             if(enum_->Compare(Reflection::ReflectionAttribute::NET_VALUE, meta.m_Key))
             {
-                m_Properties.push_back(prop);
+                m_Properties.push_back(info);
             }
         }
     }
 
-    void NCE_ReflectionModule::operator()(const ReflectionGenerator::SE_MethodMacroEvent& event)
+    void NCE_ReflectionModule::ProcessFunction(ReflectionGenerator::FunctionScope* info) 
     {
-        std::vector<ReflectionGenerator::ClassMethod>& meth = *event.m_Methods;
 
-        for(Type::uint32 i = 0; i < m_Methods.size(); i++)
-        {
-            meth.push_back(m_Methods[i]);
-        }
     }
 
-    void NCE_ReflectionModule::operator()(const ReflectionGenerator::GenerateHeaderEvent& event)
+    void NCE_ReflectionModule::GenerateSource(std::ofstream& out)
+    {
+
+    }
+
+    void NCE_ReflectionModule::GenerateHeader(std::vector<std::string>& out) 
     {
         if(m_NetCommand)
         {
-            event.m_GeneratedBodyMacro->push_back("private:");
-            event.m_GeneratedBodyMacro->push_back("char* Serialize(char* data, size_t& totalSize) override");
-            event.m_GeneratedBodyMacro->push_back("{");
+            out.push_back("private:");
+            out.push_back("char* Serialize(char* data, size_t& totalSize) override");
+            out.push_back("{");
             {
-                event.m_GeneratedBodyMacro->push_back("char* out = SteelEngine::Network::INetworkCommand::Serialize(data, totalSize);");
-
-                for(Type::uint32 i = 0; i < m_Properties.size(); i++)
+                out.push_back("char* out = SteelEngine::Network::INetworkCommand::Serialize(data, totalSize);");
+  
+                for(ReflectionGenerator::PropertyScope* prop : m_Properties)
                 {
-                    event.m_GeneratedBodyMacro->push_back("Serialization::SerializeType(totalSize, " + m_Properties[i].m_ArgumentInfo.m_Name + ", out, &out);");
+                    out.push_back("Serialization::SerializeType(totalSize, " + prop->m_Name + ", out, &out);");
                 }
 
-                event.m_GeneratedBodyMacro->push_back("return out;");
+                out.push_back("return out;");
             }
-            event.m_GeneratedBodyMacro->push_back("}");
+            out.push_back("}");
 
-            event.m_GeneratedBodyMacro->push_back("char* Deserialize(char* data, size_t& totalSize) override");
-            event.m_GeneratedBodyMacro->push_back("{");
+            out.push_back("char* Deserialize(char* data, size_t& totalSize) override");
+            out.push_back("{");
             {
-                event.m_GeneratedBodyMacro->push_back("char* out = SteelEngine::Network::INetworkCommand::Deserialize(data, totalSize);");
+                out.push_back("char* out = SteelEngine::Network::INetworkCommand::Deserialize(data, totalSize);");
 
-                for(Type::uint32 i = 0; i < m_Properties.size(); i++)
+                for(ReflectionGenerator::PropertyScope* prop : m_Properties)
                 {
-                    event.m_GeneratedBodyMacro->push_back("Serialization::DeserializeType(totalSize, " + m_Properties[i].m_ArgumentInfo.m_Name + ", out, &out);");
+                    out.push_back("Serialization::DeserializeType(totalSize, " + prop->m_Name + ", out, &out);");
                 }
 
-                event.m_GeneratedBodyMacro->push_back("return out;");
+                out.push_back("return out;");
             }
-            event.m_GeneratedBodyMacro->push_back("}");
+            out.push_back("}");
 
-            event.m_GeneratedBodyMacro->push_back("void CalculateSize(size_t& totalSize) override");
-            event.m_GeneratedBodyMacro->push_back("{");
+            out.push_back("void CalculateSize(size_t& totalSize) override");
+            out.push_back("{");
             {
-                event.m_GeneratedBodyMacro->push_back("SteelEngine::Network::INetworkCommand::CalculateSize(totalSize);");
+                out.push_back("SteelEngine::Network::INetworkCommand::CalculateSize(totalSize);");
 
-                for(Type::uint32 i = 0; i < m_Properties.size(); i++)
+                for(ReflectionGenerator::PropertyScope* prop : m_Properties)
                 {
-                    event.m_GeneratedBodyMacro->push_back("Serialization::CalculateTotalSize(totalSize, " + m_Properties[i].m_ArgumentInfo.m_Name + ");");
+                    out.push_back("Serialization::CalculateTotalSize(totalSize, " + prop->m_Name + ");");
                 }
             }
-            event.m_GeneratedBodyMacro->push_back("}");
+            out.push_back("}");
         }
-    }
-
-    void NCE_ReflectionModule::operator()(const ReflectionGenerator::ClearValuesEvent& event)
-    {
-        m_Methods.clear();
-        m_Properties.clear();
-        m_NetCommand = false;
     }
 
 }

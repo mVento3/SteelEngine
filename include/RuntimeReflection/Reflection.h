@@ -22,10 +22,12 @@
 
 #include "Core/Type.h"
 
+#include "StaticHelper/StaticHelper.h"
+
 namespace SteelEngine {
 
 	SE_CLASS()
-	class Reflection
+	class Reflection : public StaticHelper
 	{
 		friend class ReflectionRecorder;
 	public:
@@ -63,7 +65,7 @@ namespace SteelEngine {
 		};
 
 	private:
-		static RuntimeDatabase* ms_RuntimeDatabase;
+		// static RuntimeDatabase* ms_RuntimeDatabase;
 
 		static RuntimeDatabase* LoadDatabase()
 		{
@@ -80,9 +82,7 @@ namespace SteelEngine {
 		}
 
 	public:
-		Reflection();
-
-		void Init2();
+		// void Init2();
 
 		static void Init()
 		{

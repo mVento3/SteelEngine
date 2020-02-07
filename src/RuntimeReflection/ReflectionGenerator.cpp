@@ -1,1100 +1,1280 @@
 #include "RuntimeReflection/ReflectionGenerator.h"
 
-#include "Module/ModuleExport.h"
+#include "Core/IReflectionModule.h"
 
-#include "RuntimeReflection/Reflection.h"
-
-#include "Utils/Utils.h"
-
-#include "FileSystem/FileSystem.h"
-
-// SE_PLUGIN(SteelEngine::ReflectionGenerator, "ReflectionGenerator", SteelEngine::Module::Details::PluginType::CORE_PLUGIN, SteelEngine::Module::Details::PluginFlag::NONE)
+#include "fstream"
+#include "queue"
 
 namespace SteelEngine {
 
-	void ReflectionGenerator::ParseHeader()
-	{
-		Event::GlobalEvent::Broadcast(PreHeaderProcessEvent{ &m_HeaderLines });
-
-		ClassData* currentData = 0;
-		ConstructorInfo cons;
-		ClassProperty prop;
-		ClassMethod meth;
-
-		std::stack<ClassData*> classStack;
-
-		Type::uint32 bracesSize = 0;
-		std::vector<Type::uint32> okBraces;
-		std::vector<Type::uint32> notOkBraces;
-
-		std::vector<std::string> namespaces;
-
-		bool wasOkBrace = false;
-		bool wasNotOkBrace = false;
-
-		bool seClass = false;
-		bool seValue = false;
-		bool seMethod = false;
-		bool seEnum = false;
-
-		m_LastProtectionFlag = ProtectionFlag::NOT_SPECIFIED;
-
-		Lexer lexer(m_HeaderLines);
-
-		while(1)
-		{
-			lexer++;
-
-			if(lexer.End())
-			{
-				break;
-			}
-
-			if(lexer.GetToken() == "namespace")
-			{
-				wasOkBrace = true;
-
-				lexer++;
-
-				namespaces.push_back(lexer.GetToken());
-			}
-			else if(lexer.GetToken() == "friend")
-			{
-				lexer.SkipLine();
-			}
-			else if(lexer.GetToken() == "return")
-			{
-				lexer.SkipLine();
-			}
-			else if(lexer.GetToken() == "struct" ||
-				lexer.GetToken() == "class")
-			{
-				wasOkBrace = true;
-
-				if(currentData == 0)
-				{
-					currentData = new ClassData();
-
-					classStack.push(currentData);
-				}
-				else if(!seClass)
-				{
-					ClassData* data = new ClassData();
-
-					currentData->m_Others.push_back(data);
-					currentData = data;
-					classStack.push(data);
-				}
-
-				if(lexer.GetToken() == "class")
-				{
-					currentData->m_Type = ClassType::CLASS_TYPE;
-				}
-				else if(lexer.GetToken() == "struct")
-				{
-					currentData->m_Type = ClassType::STRUCT_TYPE;
-				}
-
-				lexer++;
-
-				currentData->m_ClassName = lexer.GetToken();
-				currentData->m_Hierarchy = namespaces;
-				namespaces.push_back(lexer.GetToken());
-
-				std::string namespaced = "";
-
-				for(Type::uint32 i = 0; i < namespaces.size(); i++)
-				{
-					namespaced += namespaces[i];
-
-					if(i < namespaces.size() - 1)
-					{
-						namespaced += "::";
-					}
-				}
-
-				currentData->m_Data = Reflection::GetType(namespaced);
-
-				lexer++;
-
-				// Have some inheritance
-				if(lexer.GetToken() == ":")
-				{
-					lexer++; // or public or name
-
-					while(1)
-					{
-						InheritanceInfo inherit;
-
-						if(lexer.GetToken() == "{")
-						{
-							lexer.SaveToken(lexer.GetToken());
-
-							break;
-						}
-						else if(lexer.GetToken() == ",")
-						{
-							lexer++;
-
-							continue;
-						}
-
-						if(lexer.GetToken() == "SE_INHERITANCE")
-						{
-							lexer++;
-
-							std::string word = "";
-
-							ProcessMetaData(lexer, inherit.m_MetaData, word);
-
-							lexer++;
-						}
-
-						if(lexer.GetToken() == "public")
-						{
-							std::string word = "";
-
-							while(1)
-							{
-								lexer++;
-
-								if(lexer.GetToken() == "{" ||
-									lexer.GetToken() == ",")
-								{
-									lexer.SaveToken(lexer.GetToken());
-
-									break;
-								}
-
-								word += lexer.GetToken();
-							}
-
-							inherit.m_Name = word;
-							inherit.m_Protection = ProtectionFlag::PUBLIC;
-
-							currentData->m_Inheritance.push_back(inherit);
-						}
-						else if(lexer.GetToken() == "private")
-						{
-							std::string word = "";
-
-							while(1)
-							{
-								lexer++;
-
-								if(lexer.GetToken() == "{" ||
-									lexer.GetToken() == ",")
-								{
-									lexer.SaveToken(lexer.GetToken());
-
-									break;
-								}
-
-								word += lexer.GetToken();
-							}
-
-							inherit.m_Name = word;
-							inherit.m_Protection = ProtectionFlag::PRIVATE;
-
-							currentData->m_Inheritance.push_back(inherit);
-						}
-						else if(lexer.GetToken() == "protected")
-						{
-							std::string word = "";
-
-							while(1)
-							{
-								lexer++;
-
-								if(lexer.GetToken() == "{" ||
-									lexer.GetToken() == ",")
-								{
-									lexer.SaveToken(lexer.GetToken());
-
-									break;
-								}
-
-								word += lexer.GetToken();
-							}
-
-							inherit.m_Name = word;
-							inherit.m_Protection = ProtectionFlag::PROTECTED;
-
-							currentData->m_Inheritance.push_back(inherit);
-						}
-						else
-						{
-							// Pure inheritance name
-						}
-
-						lexer++;
-
-						// TODO: todo idk lol
-						Event::GlobalEvent::Broadcast(SE_InheritanceMacroEvent
-						{
-							&inherit,
-							&currentData->m_Inheritance
-						});
-					}
-				}
-				else if(lexer.GetToken() == ";")
-				{
-					classStack.pop();
-					namespaces.pop_back();
-
-					delete currentData;
-					currentData = 0;
-
-					wasOkBrace = false;
-
-					continue;
-				}
-				else
-				{
-					// Need to get back, or save the token
-					lexer.SaveToken(lexer.GetToken());
-				}
-
-				Event::GlobalEvent::Broadcast(SE_ClassMacroEvent
-				{
-					&currentData->m_ClassMetaDataInfo,
-					currentData->m_ClassName,
-					&currentData->m_Inheritance,
-					currentData->m_Data
-				});
-			}
-			else if(lexer.GetToken() == "public")
-			{
-				m_LastProtectionFlag = ProtectionFlag::PUBLIC;
-			}
-			else if(lexer.GetToken() == "protected")
-			{
-				m_LastProtectionFlag = ProtectionFlag::PROTECTED;
-			}
-			else if(lexer.GetToken() == "private")
-			{
-				m_LastProtectionFlag = ProtectionFlag::PRIVATE;
-			}
-			else if(lexer.GetToken() == "{")
-			{
-				seClass = false;
-
-				if(wasOkBrace)
-				{
-					wasOkBrace = false;
-
-					okBraces.push_back(bracesSize);
-				}
-				else
-				{
-					wasNotOkBrace = false;
-
-					notOkBraces.push_back(bracesSize);
-				}
-
-				bracesSize++;
-			}
-			else if(lexer.GetToken() == "}")
-			{
-				bracesSize--;
-
-				seClass = false;
-
-				bool found = false;
-
-				for(Type::uint32 i = 0; i < okBraces.size(); i++)
-				{
-					if(okBraces[i] == bracesSize)
-					{
-						okBraces.erase(okBraces.begin() + i);
-						found = true;
-
-						namespaces.pop_back();
-
-						if(!classStack.empty())
-						{
-							classStack.pop();
-						}
-
-						if(!classStack.empty())
-						{
-							currentData = classStack.top();
-						}
-						else if(currentData)
-						{
-							m_Classes.push_back(currentData);
-							currentData = 0;
-						}
-
-						break;
-					}
-				}
-
-				if(!found)
-				{
-					for(Type::uint32 i = 0; i < notOkBraces.size(); i++)
-					{
-						if(notOkBraces[i] == bracesSize)
-						{
-							notOkBraces.erase(notOkBraces.begin() + i);
-							found = true;
-
-							break;
-						}
-					}
-				}
-			}
-			else if(currentData && lexer.GetToken() == currentData->m_ClassName)
-			{
-				// Constructor
-
-				wasNotOkBrace = true;
-
-				lexer++;
-
-				if(lexer.GetToken() == "*" ||
-					lexer.GetToken() == "&" ||
-					lexer.GetToken() != "(" ||
-					lexer.GetToken() == ">")
-				{
-					continue;
-				}
-
-				if(!notOkBraces.empty())
-				{
-					continue;
-				}
-
-				std::string word = "";
-				ArgumentInfo arg;
-				std::string name = "";
-				std::vector<std::string> splitted;
-
-				while(1)
-				{
-					if(lexer.GetToken() == "(")
-					{
-						lexer++;
-
-						continue;
-					}
-					else if(lexer.GetToken() == ")")
-					{
-						if(splitted.size() == 0)
-						{
-							splitted = split(word, ' ');
-
-							if(splitted.size() == 2)
-							{
-								arg.m_Type = splitted[0];
-								arg.m_Name = splitted[1];
-
-								cons.m_Arguments.push_back(arg);
-							}
-							else if(splitted.size() == 3)
-							{
-								arg.m_Type = splitted[0] + " " + splitted[1];
-								arg.m_Name = splitted[2];
-
-								cons.m_Arguments.push_back(arg);
-							}
-						}
-						else
-						{
-							if(splitted.size() == 2)
-							{
-								arg.m_Type = splitted[0];
-								arg.m_Name = splitted[1];
-
-								cons.m_Arguments.push_back(arg);
-							}
-							else if(splitted.size() == 3)
-							{
-								arg.m_Type = splitted[0] + " " + splitted[1];
-								arg.m_Name = splitted[2];
-
-								cons.m_Arguments.push_back(arg);
-							}
-						}
-
-						word.clear();
-
-						break;
-					}
-					else if(lexer.GetToken() == ",")
-					{
-						lexer++;
-
-						if(splitted.size() == 0)
-						{
-							splitted = split(word, ' ');
-
-							if(splitted.size() == 2)
-							{
-								arg.m_Type = splitted[0];
-								arg.m_Name = splitted[1];
-
-								cons.m_Arguments.push_back(arg);
-							}
-							else if(splitted.size() == 3)
-							{
-								arg.m_Type = splitted[0] + " " + splitted[1];
-								arg.m_Name = splitted[2];
-
-								cons.m_Arguments.push_back(arg);
-							}
-						}
-						else
-						{
-							if(splitted.size() == 2)
-							{
-								arg.m_Type = splitted[0];
-								arg.m_Name = splitted[1];
-
-								cons.m_Arguments.push_back(arg);
-							}
-							else if(splitted.size() == 3)
-							{
-								arg.m_Type = splitted[0] + " " + splitted[1];
-								arg.m_Name = splitted[2];
-
-								cons.m_Arguments.push_back(arg);
-							}
-						}
-
-						word.clear();
-					}
-					else if(lexer.GetToken() == "=")
-					{
-						lexer++;
-
-						word.erase(word.end() - 1);
-
-						splitted = split(word, ' ');
-
-						word.clear();
-					}
-					else
-					{
-						word += lexer.GetToken();
-
-						if(lexer.Space())
-						{
-							word += " ";
-						}
-
-						lexer++;
-					}
-				}
-
-				Event::GlobalEvent::Broadcast(SE_ConstructorMacroEvent{ cons.m_Arguments });
-
-				currentData->m_Constructors.push_back(cons);
-			}
-			else if(lexer.GetToken() == "SE_CLASS" ||
-				lexer.GetToken() == "SE_STRUCT")
-			{
-				seClass = true;
-
-				if(currentData == 0)
-				{
-					currentData = new ClassData();
-
-					classStack.push(currentData);
-				}
-
-				currentData->m_Reflect = true;
-
-				if(lexer.GetToken() == "SE_CLASS")
-				{
-					currentData->m_Type = ClassType::CLASS_TYPE;
-				}
-				else if(lexer.GetToken() == "SE_STRUCT")
-				{
-					currentData->m_Type = ClassType::STRUCT_TYPE;
-				}
-
-				lexer++; // (
-
-				std::string word = "";
-
-				ProcessMetaData(lexer, currentData->m_ClassMetaDataInfo, word);
-			}
-			else if(lexer.GetToken() == "SE_VALUE")
-			{
-				seValue = true;
-
-				lexer++;
-
-				std::string word = "";
-
-				ProcessMetaData(lexer, prop.m_MetaData, word);
-			}
-			else if(lexer.GetToken() == "SE_ENUM")
-			{
-				lexer++;
-
-				if(!currentData)
-				{
-					// Generate enum map
-
-					currentData = new ClassData();
-
-					classStack.push(currentData);
-				}
-
-				std::vector<MetaDataInfo> meta;
-				std::string word = "";
-				EnumInfo enum_;
-
-				ProcessMetaData(lexer, currentData->m_ClassMetaDataInfo, word);
-
-				lexer++; // enum
-
-				// std::string enumName = lexer++.GetToken();
-				enum_.m_EnumName = lexer++.GetToken();
-
-				lexer++;
-
-				while(lexer++.GetToken() != "}")
-				{
-					if(lexer.GetToken() != ",")
-					{
-						// printf("%s\n", lexer.GetToken().c_str());
-						enum_.m_Elements.push_back(EnumElement(lexer.GetToken(), {}));
-					}
-				}
-
-				lexer++;
-
-				currentData->m_Enums.push_back(enum_);
-			}
-			else if(lexer.GetToken() == "SE_METHOD")
-			{
-				seMethod = true;
-
-				lexer++;
-
-				std::string word = "";
-
-				ProcessMetaData(lexer, meth.m_MetaData, word, &meth.m_ProtectionFlag);
-
-				lexer++;
-
-				while(1)
-				{
-					if(lexer.GetToken() == "const")
-					{
-						word += lexer.GetToken();
-
-						if(lexer.Space())
-						{
-							word += " ";
-						}
-
-						lexer++;
-					}
-					else if(lexer.GetToken() == "inline")
-					{
-						lexer++;
-					}
-					else if(lexer.GetToken() == "static")
-					{
-						lexer++;
-					}
-
-					word += lexer.GetToken();
-
-					if(lexer.Space())
-					{
-						lexer++;
-
-						break;
-					}
-
-					lexer++;
-				}
-
-				meth.m_MethodInfo.m_ReturnType = word;
-				meth.m_MethodInfo.m_Name = lexer.GetToken();
-
-				// bool openRoundBracket = false;
-				std::string argumentWord = "";
-				std::vector<ArgumentInfo> argTypes;
-				bool wasComma = false;
-				int bracketsSize = 0;
-
-				while(1)
-				{
-					lexer++;
-
-					if(lexer.GetToken() == "(")
-					{
-						if(bracketsSize > 0)
-						{
-							argumentWord += lexer.GetToken();
-						}
-
-						bracketsSize++;
-					}
-					else if(lexer.GetToken() == ")")
-					{
-						bracketsSize--;
-
-						if(bracketsSize == 0)
-						{
-							size_t found = argumentWord.find_last_of(" ");
-
-							if(found != RuntimeDatabase::s_InvalidID)
-							{
-								argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
-								argumentWord.clear();
-							}
-
-							break;
-						}
-						else
-						{
-							argumentWord += lexer.GetToken();
-						}
-					}
-					else if(lexer.GetToken() == ",")
-					{
-						if(bracketsSize > 1)
-						{
-							argumentWord += lexer.GetToken();
-						}
-						else
-						{
-							size_t found = argumentWord.find_last_of(" ");
-
-							if(found != RuntimeDatabase::s_InvalidID)
-							{
-								argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
-								argumentWord.clear();
-							}
-						}
-					}
-					else
-					{
-						argumentWord += lexer.GetToken();
-
-						if(lexer.Space())
-						{
-							argumentWord += " ";
-						}
-					}
-
-					// if(lexer.GetToken() == "(")
-					// {
-					// 	openRoundBracket = true;
-					// 	brackets++;
-					// }
-					// else if(lexer.GetToken() == ")")
-					// {
-					// 	openRoundBracket = false;
-					// 	brackets--;
-					// }
-					// else if(openRoundBracket)
-					// {
-					// 	if(lexer.GetToken() == ",")
-					// 	{
-					// 		wasComma = true;
-
-					// 		size_t found = argumentWord.find_last_of(" ");
-
-					// 		argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
-					// 		argumentWord.clear();
-					// 	}
-					// 	else
-					// 	{
-					// 		argumentWord += lexer.GetToken();
-
-					// 		if(lexer.Space())
-					// 		{
-					// 			argumentWord += " ";
-					// 		}
-					// 	}
-					// }
-					// else if(!openRoundBracket)
-					// {
-					// 	if(wasComma)
-					// 	{
-					// 		wasComma = false;
-
-					// 		size_t found = argumentWord.find_last_of(" ");
-
-					// 		argTypes.push_back(ArgumentInfo{ argumentWord.substr(0, found), argumentWord.substr(found + 1) });
-					// 	}
-
-					// 	break;
-					// }
-
-					// lexer++;
-				}
-
-				meth.m_MethodInfo.m_Arguments.insert(meth.m_MethodInfo.m_Arguments.begin(), argTypes.begin(), argTypes.end());
-
-				currentData->m_Methods.push_back(meth);
-
-				Event::GlobalEvent::Broadcast(SE_MethodMacroEvent{ &meth, &currentData->m_Methods });
-
-				meth.m_MetaData.clear();
-				meth.m_MethodInfo.m_Arguments.clear();
-			}
-			else if(lexer.GetToken() == "GENERATED_BODY")
-			{
-
-			}
-			else if(lexer.GetToken() == "#pragma")
-			{
-				lexer++;
-			}
-			else if(lexer.GetToken() == "#include")
-			{
-				lexer++;
-			}
-			else if(lexer.GetToken() == ";")
-			{
-				if(!notOkBraces.empty())
-				{
-					continue;
-				}
-
-				std::string curr = lexer.GetCurrentLine();
-
-				removeSpaces(curr);
-
-				std::vector<std::string> splittedEqual =
-					split(curr, '=');
-
-				std::vector<std::string> splitted =
-					split(splittedEqual[0], ' ');
-				
-				if(splitted.size() == 2 &&
-					splitted[1].find("(") == std::string::npos &&
-					splitted[1].find(")") == std::string::npos &&
-					splitted[splitted.size() - 1] != "override")
-				{
-					std::string& sec = splitted[1];
-
-					size_t pos1 = sec.find("[");
-					size_t pos2 = sec.find("]");
-
-					if(pos1 != std::string::npos &&
-						pos2 != std::string::npos)
-					{
-						sec.erase(sec.begin() + pos1, sec.end());
-					}
-
-					if(splitted[0] == "const")
-					{
-						prop.m_ArgumentInfo.m_Type =
-							splitted[0] + " " + splitted[1];
-
-						prop.m_ArgumentInfo.m_Name =
-							splitted[2];
-					}
-					else
-					{
-						prop.m_ArgumentInfo.m_Type =
-							splitted[0];
-
-						prop.m_ArgumentInfo.m_Name =
-							splitted[1];
-					}
-
-					if(currentData)
-					{
-						if(m_LastProtectionFlag == ProtectionFlag::NOT_SPECIFIED &&
-							currentData->m_Type == ClassType::CLASS_TYPE)
-						{
-							m_LastProtectionFlag = ProtectionFlag::PROTECTED;
-						}
-
-						prop.m_ProtectionFlag = m_LastProtectionFlag;
-
-						currentData->m_Properties.push_back(prop);
-
-						Event::GlobalEvent::Broadcast(SE_ValueMacroEvent{ &prop, &currentData->m_Properties });
-
-						prop.m_MetaData.clear();
-					}
-				}
-			}
-		}
-	}
-
-	std::vector<ReflectionGenerator::MetaDataInfo> ReflectionGenerator::ParseMeta(const std::string& line)
-	{
-		std::vector<MetaDataInfo> res;
-
-		std::string current = line;
-
-		replaceAll(current, " ", "");
-
-		if (current == "")
-		{
-			return res;
-		}
-
-		std::string value;
-		std::string key;
-		bool isOpen = false;
-		bool isNextAttribute = true;
-		bool wasComma = false;
-		bool wasEqual = false;
-
-		for (char c : current)
-		{
-			switch (c)
-			{
-			case '(':
-				isOpen = true;
-				value.push_back(c);
-				break;
-			case ')':
-				isOpen = false;
-				value.push_back(c);
-				break;
-			case ',':
-				wasComma = true;
-
-				if (!isOpen)
-				{
-					isNextAttribute = true;
-				}
-				else
-				{
-					isNextAttribute = false;
-					value.push_back(c);
-				}
-				break;
-			case '=':
-				wasEqual = true;
-				break;
-			default:
-				if (wasComma && isNextAttribute)
-				{
-					MetaDataInfo info;
-
-					info.m_Key = key;
-					info.m_Value = value;
-
-					if (info.m_Value == "")
-					{
-						info.m_Value = "true";
-					}
-
-					res.push_back(info);
-
-					key.clear();
-					value.clear();
-
-					wasComma = false;
-					isNextAttribute = true;
-					wasEqual = false;
-				}
-
-				if (!wasEqual)
-				{				
-					key.push_back(c);
-				}
-				else
-				{
-					value.push_back(c);
-				}
-				break;
-			}
-		}
-
-		MetaDataInfo info;
-
-		info.m_Key = key;
-		info.m_Value = value;
-
-		if (info.m_Value == "")
-		{
-			info.m_Value = "true";
-		}
-
-		res.push_back(info);
-
-		return res;
-	}
-
-	void ReflectionGenerator::GenerateMetaDataInfo(std::ofstream& out, std::vector<MetaDataInfo> meta)
-	{
-		if(!meta.empty())
-		{
-			out << "(\n";
-
-			for(Type::uint32 i = 0; i < meta.size(); i++)
-			{
-				out << "SteelEngine::Reflection::MetaData(" <<
-					meta[i].m_Key << ", " <<
-					meta[i].m_Value << ")";
-
-				if(i < meta.size() - 1)
-				{
-					out << ",\n";
-				}
-				else
-				{
-					out << "\n";
-				}
-			}
-
-			out << ")\n";
-		}
-	}
-
-	void ReflectionGenerator::ProcessMetaData(Lexer& lexer, std::vector<MetaDataInfo>& res, std::string& word, ProtectionFlag* flag)
-	{
-		// std::string word = "";
-		bool wasEqual = false;
-		MetaDataInfo meta;
-		std::stack<bool> roundBraces;
-
-		roundBraces.push(true);
-
-		while(1)
-		{
-			lexer++;
-
-			if(lexer.GetToken() == ")" && roundBraces.size() == 1)
-			{
-				if(wasEqual && word != "")
-				{
-					meta.m_Value = word;
-				}
-				else if(word != "")
-				{
-					meta.m_Key = word;
-					meta.m_Value = "true";
-				}
-				else
-				{
-					break;
-				}
-				
-				word.clear();
-				res.push_back(meta);
-				
-				if(flag)
-				{
-					*flag = m_LastProtectionFlag;
-				}
-
-				break;
-			}
-			else if(lexer.GetToken() == ")")
-			{
-				word += lexer.GetToken();
-				roundBraces.pop();
-			}
-			else if(lexer.GetToken() == "(")
-			{
-				word += lexer.GetToken();
-				roundBraces.push(true);
-			}
-			else if(lexer.GetToken() == "," && roundBraces.size() == 1)
-			{
-				if(wasEqual)
-				{
-					meta.m_Value = word;
-				}
-				else
-				{
-					meta.m_Key = word;
-					meta.m_Value = "true";
-				}
-
-				wasEqual = false;
-				word.clear();
-				res.push_back(meta);
-
-				if(flag)
-				{
-					*flag = m_LastProtectionFlag;
-				}
-			}
-			else if(lexer.GetToken() == "=")
-			{
-				wasEqual = true;
-				meta.m_Key = word;
-				word.clear();
-			}
-			else
-			{
-				word += lexer.GetToken();
-			}
-		}
-	}
-
-	ReflectionGenerator::ReflectionGenerator()
-	{
-		
-	}
-
-	ReflectionGenerator::~ReflectionGenerator()
-	{
-
-	}
-
-	Result ReflectionGenerator::Load(const std::filesystem::path& fileH)
-	{
-		m_PathHeader = fileH;
-
-		std::string line;
-
-		std::ifstream headerFile(fileH);
-
-		while (std::getline(headerFile, line))
-		{
-			m_HeaderLines.push_back(line);
-		}
-
-		headerFile.close();
-
-		return SE_TRUE;
-	}
-
-	Result ReflectionGenerator::Parse()
-	{
-		ParseHeader();
-
-		return SE_TRUE;
-	}
-
-	Result ReflectionGenerator::Generate(const std::filesystem::path& cwd, const std::filesystem::path& generatePath)
-	{
-		ClassData* data = 0;
-		bool found = false;
-
-		for(Type::uint32 i = 0; i < m_Classes.size(); i++)
-		{
-			data = m_Classes[i];
-
-			if(data->m_Reflect)
-			{
-				//return Result(SE_TRUE, "Nothing to reflect!");
-				found = true;
-
-				break;
-			}
-		}
-
-		if(!data)
-		{
-			printf("No reflection needed or parser error!\n");
-
-			return SE_FALSE;
-		}
-
-		std::filesystem::path path(m_PathHeader);
-
-		std::string p_ = path.string();
+    void checkStructOrClassParents(ReflectionGenerator::ScopeInfo* info, std::stack<std::string>& parents)
+    {
+        if(!info)
+        {
+            return;
+        }
+
+        if(info->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::CLASS || info->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::STRUCT)
+        {
+            parents.push(info->m_Parent->m_Name);
+
+            checkStructOrClassParents(info->m_Parent, parents);
+        }
+    }
+
+    void searchFor(const ReflectionGenerator::ScopeInfo* info, const std::string& name, const ReflectionGenerator::ScopeInfo** res)
+    {
+        if(*res)
+        {
+            return;
+        }
+
+        for(auto it = info->m_Structure.begin(); it != info->m_Structure.end(); ++it)
+        {
+            if((*it)->m_Name == name)
+            {
+                *res = *it;
+
+                break;
+            }
+            else
+            {
+                searchFor((*it), name, res);
+            }
+        }
+    }
+
+    void searchFor(const ReflectionGenerator::ScopeInfo* info, std::stack<std::string>& names, const ReflectionGenerator::ScopeInfo** res)
+    {
+        if(names.empty())
+        {
+            return;
+        }
+
+        for(auto it = info->m_Structure.begin(); it != info->m_Structure.end(); ++it)
+        {
+            if(names.empty())
+            {
+                return;
+            }
+
+            std::string name = names.top();
+
+            if((*it)->m_Name == name)
+            {
+                names.pop();
+
+                *res = *it;
+
+                searchFor(*it, names, res);
+            }
+            else
+            {
+                searchFor(*it, names, res);
+            }
+        }
+    }
+
+    void searchForReverse(const ReflectionGenerator::ScopeInfo* startPoint, std::stack<std::string>& names, const ReflectionGenerator::ScopeInfo** res)
+    {
+        if(!startPoint)
+        {
+            return;
+        }
+
+        for(auto it = startPoint->m_Structure.begin(); it != startPoint->m_Structure.end(); ++it)
+        {
+            if(names.empty())
+            {
+                return;
+            }
+
+            std::string name = names.top();
+
+            if((*it)->m_Name == name)
+            {
+                names.pop();
+
+                *res = *it;
+
+                searchForReverse(*it, names, res);
+            }
+        }
+
+        searchForReverse(startPoint->m_Parent, names, res);
+    }
+
+    void constructNamespace(const ReflectionGenerator::ScopeInfo* startPoint, std::stack<std::string>& res)
+    {
+        if(startPoint->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::CLASS || startPoint->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::STRUCT)
+        {
+            res.push(startPoint->m_Parent->m_Name);
+
+            constructNamespace(startPoint->m_Parent, res);
+        }
+    }
+
+    ReflectionGenerator::ScopeInfo* getLastStructOrClass(ReflectionGenerator::ScopeInfo* startPoint)
+    {
+        if(startPoint->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::CLASS || startPoint->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::STRUCT)
+        {
+            return getLastStructOrClass(startPoint->m_Parent);
+        }
+        else
+        {
+            return startPoint;
+        }
+    }
+
+    void ReflectionGenerator::ProcessArguments(std::vector<Argument>& args)
+    {
+        Type::uint32 brackets = 0;
+        std::string word;
+
+        while(1)
+        {
+            if(m_Lexer.GetToken() == "(")
+            {
+                if(brackets > 0)
+                {
+                    word += m_Lexer.GetToken();
+                }
+
+                brackets++;
+            }
+            else if(m_Lexer.GetToken() == ")")
+            {
+                brackets--;
+
+                if(brackets == 0)
+                {
+                    size_t found = word.find_last_of(" ");
+
+                    if(found != RuntimeDatabase::s_InvalidID)
+                    {
+                        args.push_back(Argument{ word.substr(0, found), word.substr(found + 1) });
+                        word.clear();
+                    }
+
+                    break;
+                }
+                else
+                {
+                    word += m_Lexer.GetToken();
+                }
+            }
+            else if(m_Lexer.GetToken() == ",")
+            {
+                if(brackets > 1)
+                {
+                    word += m_Lexer.GetToken();
+                }
+                else
+                {
+                    size_t found = word.find_last_of(" ");
+
+                    if(found != RuntimeDatabase::s_InvalidID)
+                    {
+                        args.push_back(Argument{ word.substr(0, found), word.substr(found + 1) });
+                        word.clear();
+                    }
+                }
+            }
+            else
+            {
+                word += m_Lexer.GetToken();
+
+                if(m_Lexer.Space())
+                {
+                    word += " ";
+                }
+            }
+
+            m_Lexer++;
+        }
+    }
+
+    void ReflectionGenerator::ProcessMetaData(std::vector<MetaData>& meta)
+    {
+        Type::uint32 braces = 0;
+        std::string word;
+        MetaData metaData;
+        bool wasEqual = false;
+
+        while(1)
+        {
+            m_Lexer++;
+
+            if(m_Lexer.GetToken() == "(")
+            {
+                if(braces != 0)
+                {
+                    word += m_Lexer.GetToken();
+
+                    if(m_Lexer.Space())
+                    {
+                        word += " ";
+                    }
+                }
+
+                braces++;
+            }
+            else if(m_Lexer.GetToken() == ")")
+            {
+                braces--;
+
+                if(braces == 0)
+                {
+                    if(wasEqual && word != "")
+                    {
+                        metaData.m_Value = word;
+                    }
+                    else if(word != "")
+                    {
+                        metaData.m_Key = word;
+                        metaData.m_Value = "true";
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    word.clear();
+                    meta.push_back(metaData);
+
+                    break;
+                }
+                else
+                {
+                    word += m_Lexer.GetToken();
+
+                    if(m_Lexer.Space())
+                    {
+                        word += " ";
+                    }
+                }
+            }
+            else if(m_Lexer.GetToken() == ",")
+            {
+                if(braces > 1)
+                {
+                    word += m_Lexer.GetToken();
+
+                    if(m_Lexer.Space())
+                    {
+                        word += " ";
+                    }
+                }
+                else
+                {
+                    if(wasEqual)
+                    {
+                        metaData.m_Value = word;
+                    }
+                    else
+                    {
+                        metaData.m_Key = word;
+                        metaData.m_Value = "true";
+                    }
+
+                    wasEqual = false;
+
+                    word.clear();
+                    meta.push_back(metaData);
+                }
+            }
+            else if(m_Lexer.GetToken() == "=")
+            {
+                metaData.m_Key = word;
+                wasEqual = true;
+
+                word.clear();
+            }
+            else
+            {
+                word += m_Lexer.GetToken();
+
+                if(m_Lexer.Space())
+                {
+                    word += " ";
+                }
+            }
+        }
+    }
+
+    std::string ReflectionGenerator::WriteArguments(const std::vector<ReflectionGenerator::Argument>& args, ReflectionGenerator::ScopeInfo* info)
+    {
+        std::string processedArgs;
+
+        for(Type::uint32 i = 0; i < args.size(); i++)
+        {
+            ReflectionGenerator::Argument arg = args[i];
+
+            std::vector<std::string> splitted = split(arg.m_Type, ' ');
+
+            for(Type::uint32 j = 0; j < splitted.size(); j++)
+            {
+                if(splitted[j] != "const")
+                {
+                    size_t found = RuntimeDatabase::s_InvalidID;
+                    std::string res = splitted[j];
+
+                    while((found = res.find('*')) != RuntimeDatabase::s_InvalidID || (found = res.find('&')) != RuntimeDatabase::s_InvalidID)
+                    {
+                        res.erase(found);
+                    }
+
+                    std::string res2 = res;
+
+                    replaceAll(res2, "::", " ");
+
+                    std::vector<std::string> splitted2 = split(res2, ' ');
+                    std::stack<std::string> names;
+
+                    for(auto it = splitted2.rbegin(); it != splitted2.rend(); ++it)
+                    {
+                        names.push(*it);
+                    }
+
+                    const ReflectionGenerator::ScopeInfo* foundScope = 0;
+
+                    searchForReverse(info, names, &foundScope);
+
+                    if(foundScope)
+                    {
+                        std::stack<std::string> constructedNamespace;
+
+                        constructNamespace(foundScope, constructedNamespace);
+
+                        while(!constructedNamespace.empty())
+                        {
+                            processedArgs.append(constructedNamespace.top()).append("::");
+
+                            constructedNamespace.pop();
+                        }
+
+                        processedArgs.append(splitted2[splitted2.size() - 1]);
+                    }
+                    else
+                    {
+                        processedArgs.append(splitted[j]);
+                    }
+                }
+                else
+                {
+                    processedArgs.append(splitted[j]).append(" ");
+                }
+            }
+
+            if(i < args.size() - 1)
+            {
+                processedArgs.append(", ");
+            }
+        }
+
+        return processedArgs;
+    }
+
+    std::string ReflectionGenerator::WriteMetaData(const ScopeInfo* info)
+    {
+        std::string result;
+
+        if(!info->m_MetaData.empty())
+        {
+            result.append("(\n");
+
+            for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
+            {
+                MetaData v = info->m_MetaData[i];
+
+                result.append("SteelEngine::Reflection::MetaData(").append(v.m_Key).append(", ").append(v.m_Value).append(")");
+
+                if(i < info->m_MetaData.size() - 1)
+                {
+                    result.append(",\n");
+                }
+                else
+                {
+                    result.append("\n");
+                }
+            }
+
+            result.append(")\n");
+        }
+
+        return result;
+    }
+
+    void ReflectionGenerator::Process(ScopeInfo* info, std::ofstream& file)
+    {
+        if(!info)
+        {
+            return;
+        }
+
+        static std::vector<std::string> namespaces;
+        static std::stack<std::string> parents;
+        static std::queue<std::string> parents2;
+
+        if(info->m_ScopeType == ScopeType::NAMESPACE)
+        {
+            file << "namespace " << info->m_Name << " {\n";
+
+            namespaces.push_back(info->m_Name);
+        }
+        else if(info->m_ScopeType == ScopeType::STRUCT || info->m_ScopeType == ScopeType::CLASS)
+        {
+            if(!m_BeginRecordingOnce)
+            {
+                if(info->m_IsReflectionLabelSet)
+                {
+                    file << "REGISTER_REFLECTION\n";
+                    file << "{\n";
+
+                    m_BeginRecordingOnce = true;
+                }
+            }
+
+            StructScope* str = (StructScope*)info;
+
+            IReflectionData const* const* types = Reflection::GetTypes();
+
+            for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
+            {
+                const IReflectionData* type = types[i];
+
+                if(type->GetMetaData(Reflection::ReflectionAttribute::REFLECTION_MODULE)->Convert<bool>())
+                {
+                    str->m_ReflectionModules.push_back((IReflectionModule*)type->Create());
+                }
+            }
+
+            if(str->m_IsReflectionLabelSet)
+            {
+                if(str->m_IsReflectionLabelSet)
+                {
+                    for(IReflectionModule* module : str->m_ReflectionModules)
+                    {
+                        module->ProcessStructure(str);
+                    }
+                }
+
+                checkStructOrClassParents(str, parents);
+
+                str->m_MetaData.push_back(MetaData{ "\"sizeof\"", "sizeof(" + str->m_Name + ")" });
+
+                file << "SteelEngine::ReflectionRecorder::Register<";
+
+                std::string parentsStr;
+
+                while(!parents.empty())
+                {
+                    parentsStr += parents.top() + "::";
+                    parents2.push(parents.top());
+
+                    parents.pop();
+                }
+
+                file << parentsStr << str->m_Name << ">(\"";
+                file << str->m_Name << "\"";
+
+                if(!namespaces.empty())
+                {
+                    file << ",";
+                    file << "{\n";
+
+                    for(Type::uint32 i = 0; i < namespaces.size(); i++)
+                    {
+                        file << "\"" << namespaces[i] << "\"";
+
+                        if(i < namespaces.size() - 1 || !parents2.empty())
+                        {
+                            file << ",\n";
+                        }
+                        else
+                        {
+                            file << "\n";
+                        }
+                    }
+
+                    size_t s = parents2.size();
+                    Type::uint32 i = 0;
+
+                    while(!parents2.empty())
+                    {
+                        file << "\"" << parents2.front() << "\"";
+
+                        parents2.pop();
+
+                        if(i < s - 1)
+                        {
+                            file << ",\n";
+                        }
+                        else
+                        {
+                            file << "\n";
+                        }
+                    }
+
+                    file << "}\n";
+                }
+
+                file << ")\n";
+                file << WriteMetaData(str);
+
+                for(ConstructorScope* v : str->m_Constructors)
+                {
+                    file << ".Constructor<";
+                    file << WriteArguments(v->m_Arguments, str);
+                    file << ">()\n";
+                    file << WriteMetaData(v);
+                }
+
+                for(InheritanceScope* v : str->m_Inheritance)
+                {
+                    file << ".Inheritance<" << v->m_Name << ">(\"" << v->m_Name << "\")\n";
+                }
+
+                for(PropertyScope* v : str->m_Properties)
+                {
+                    for(IReflectionModule* module : str->m_ReflectionModules)
+                    {
+                        module->ProcessProperty(v);
+                    }
+
+                    if((v->m_Protection == ProtectionLevel::PUBLIC || (v->m_ScopeType == ScopeType::STRUCT && v->m_Protection == ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
+                    {
+                        file << ".Property(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
+                        file << WriteMetaData(v);
+                    }
+                }
+
+                for(FunctionScope* v : str->m_Functions)
+                {
+                    if((v->m_Protection == ProtectionLevel::PUBLIC || (v->m_ScopeType == ScopeType::STRUCT && v->m_Protection == ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
+                    {
+                        file << ".Method(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
+                        file << WriteMetaData(v);
+                    }
+                }
+
+                for(EnumScope* v : str->m_Enums)
+                {
+                    if(v->m_IsReflectionLabelSet)
+                    {
+                        file << ".Enum<" << parentsStr << str->m_Name << "::" << v->m_Name << ">(\"" << v->m_Name << "\")\n";
+                        file << ".Values({\n";
+
+                        for(Type::uint32 i = 0; i < v->m_Elements.size(); i++)
+                        {
+                            EnumElementScope* e = v->m_Elements[i];
+
+                            file << "SteelEngine::ReflectionEnumElement(\"" << e->m_Name << "\", " << parentsStr << str->m_Name << "::" << v->m_Name << "::" << e->m_Name << ")";
+                            file << WriteMetaData(e);
+
+                            if(i < v->m_Elements.size() - 1)
+                            {
+                                file << ",\n";
+                            }
+                            else
+                            {
+                                file << "\n";
+                            }
+                        }
+
+                        file << "})\n";
+                        file << WriteMetaData(v);
+                    }
+                }
+
+                file << ";\n";
+            }
+        }
+
+        while(!info->m_Scopes.empty())
+        {
+            Process(info->m_Scopes.top(), file);
+
+            info->m_Scopes.pop();
+        }
+
+        if(info->m_Parent && info->m_Parent->m_ScopeType == ScopeType::NAMESPACE)
+        {
+            if(!m_EndRecordingOnce)
+            {
+                if(info->m_IsReflectionLabelSet)
+                {
+                    file << "}\n";
+
+                    if(info->m_Parent == 0 || info->m_Parent->m_ScopeType == ScopeType::NAMESPACE)
+                    {
+                        if(info->m_ScopeType == ScopeType::STRUCT || info->m_ScopeType == ScopeType::CLASS)
+                        {
+                            StructScope* str = (StructScope*)info;
+
+                            for(IReflectionModule* module : str->m_ReflectionModules)
+                            {
+                                module->GenerateSource(file);
+                            }
+
+                            for(IReflectionModule* module : str->m_ReflectionModules)
+                            {
+                                module->GenerateHeader(m_GeneratedHeaderLinesByModules);
+                            }
+
+                            if(!str->m_Constructors.empty())
+                            {
+                                file << "#ifdef RUNTIME_COMPILE\n";
+                                file << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)\n";
+                                file << "{\n";
+                                {
+                                    file << "DECLARE_TYPE_INFO(" << str->m_Name << ")\n";
+                                    file << "{\n";
+                                    {
+                                        file << "FIND_THE_RIGHT_OBJECT\n";
+                                        file << "\n";
+
+                                        for(ConstructorScope* cons : str->m_Constructors)
+                                        {
+                                            if(cons->m_Arguments.size() > 0)
+                                            {
+                                                file << "COMPARE_CONSTRUCTOR(";
+
+                                                for(Type::uint32 i = 0; i < cons->m_Arguments.size(); i++)
+                                                {
+                                                    file << cons->m_Arguments[i].m_Type;
+
+                                                    if(i < cons->m_Arguments.size() - 1)
+                                                    {
+                                                        file << ", ";
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                file << "COMPARE_CONSTRUCTOR_(";
+                                            }
+
+                                            file << ")\n";
+                                        }
+                                    }
+                                    file << "};\n";
+                                    file << "\n";
+                                    file << "return result;\n";
+                                }
+                                file << "}\n";
+                                file << "#endif\n";
+                            }
+                        }
+                    }
+
+                    m_EndRecordingOnce = true;
+                }
+            }
+        }
+
+        if(info->m_ScopeType == ScopeType::NAMESPACE)
+        {
+            file << "}\n";
+
+            namespaces.pop_back();
+        }
+    }
+
+    ReflectionGenerator::ReflectionGenerator()
+    {
+        m_CurrentWorkingScope = 0;
+        m_CurrentScopeToAddByMeta = 0;
+        m_CurrentProtectionLevel = ProtectionLevel::NONE;
+        m_BeginRecordingOnce = false;
+        m_EndRecordingOnce = false;
+    }
+
+    ReflectionGenerator::~ReflectionGenerator()
+    {
+
+    }
+
+    Result ReflectionGenerator::Load(const std::filesystem::path& filename)
+    {
+        std::ifstream file(filename);
+        std::string line;
+
+        while(std::getline(file, line))
+        {
+            m_LoadedLines.push_back(line);
+        }
+
+        if(file.is_open())
+        {
+            file.close();
+        }
+
+        m_Lexer.Load(m_LoadedLines);
+
+        m_Filename = filename;
+
+        return SE_TRUE;
+    }
+
+    Result ReflectionGenerator::Parse()
+    {
+        std::string word;
+
+        while(!m_Lexer.End())
+        {
+            m_Lexer++;
+
+            if(m_Lexer.GetToken() == "#pragma")
+            {
+                m_Lexer++;
+            }
+            else if(m_Lexer.GetToken() == "#include")
+            {
+                m_Lexer++;
+            }
+            else if(m_Lexer.GetToken() == "{")
+            {
+                if(m_Scopes.empty())
+                {
+                    m_Scopes.push(m_CurrentScopeToAdd);
+                }
+                else
+                {
+                    if(!m_CurrentWorkingScope)
+                    {
+                        m_CurrentWorkingScope = m_Scopes.top();
+                    }
+
+                    m_CurrentScopeToAdd->m_Parent = m_CurrentWorkingScope;
+                    m_CurrentScopeToAdd->m_Protection = m_CurrentProtectionLevel;
+
+                    m_CurrentWorkingScope->m_Scopes.push(m_CurrentScopeToAdd);
+                    m_CurrentWorkingScope->m_Structure.push_back(m_CurrentScopeToAdd);
+
+                    m_CurrentWorkingScope = m_CurrentScopeToAdd;
+                }
+            }
+            else if(m_Lexer.GetToken() == "}")
+            {
+                m_CurrentWorkingScope = m_CurrentWorkingScope->m_Parent;
+
+                if(m_CurrentWorkingScope)
+                {
+                    m_CurrentProtectionLevel = m_CurrentWorkingScope->m_Protection;
+                }
+            }
+            else if(m_Lexer.GetToken() == "class" || m_Lexer.GetToken() == "struct")
+            {
+                if(m_Lexer.GetToken() == "class")
+                {
+                    if(!m_CurrentScopeToAddByMeta)
+                    {
+                        m_CurrentScopeToAdd = new ClassScope(m_Lexer++.GetToken());
+                    }
+                    else
+                    {
+                        m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                        m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
+                        m_CurrentScopeToAddByMeta = 0;
+                    }
+                }
+                else
+                {
+                    if(!m_CurrentScopeToAddByMeta)
+                    {
+                        m_CurrentScopeToAdd = new StructScope(m_Lexer++.GetToken());
+                    }
+                    else
+                    {
+                        m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                        m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
+                        m_CurrentScopeToAddByMeta = 0;
+                    }
+                }
+
+                if(m_Lexer++.GetToken() == ":")
+                {
+                    std::string word;
+                    ProtectionLevel protection;
+                    StructScope* str = (StructScope*)m_CurrentScopeToAdd;
+
+                    while(1)
+                    {
+                        m_Lexer++;
+
+                        if(m_Lexer.GetToken() == "public")
+                        {
+                            protection = ProtectionLevel::PUBLIC;
+                        }
+                        else if(m_Lexer.GetToken() == "protected")
+                        {
+                            protection = ProtectionLevel::PROTECTED;
+                        }
+                        else if(m_Lexer.GetToken() == "private")
+                        {
+                            protection = ProtectionLevel::PRIVATE;
+                        }
+                        else if(m_Lexer.GetToken() == ",")
+                        {
+                            InheritanceScope* inherit = new InheritanceScope();
+
+                            inherit->m_Name = word;
+                            inherit->m_Protection = protection;
+
+                            str->m_Inheritance.push_back(inherit);
+
+                            word.clear();
+                        }
+                        else if(m_Lexer.GetToken() == "{")
+                        {
+                            InheritanceScope* inherit = new InheritanceScope();
+
+                            inherit->m_Name = word;
+                            inherit->m_Protection = protection;
+
+                            str->m_Inheritance.push_back(inherit);
+
+                            word.clear();
+
+                            m_Lexer.SaveToken(m_Lexer.GetToken());
+
+                            break;
+                        }
+                        else
+                        {
+                            word += m_Lexer.GetToken();
+                        }
+                    }
+
+                    // while(m_Lexer.GetToken() != "{")
+                    // {
+                    //     InheritanceScope* inherit = new InheritanceScope();
+                    //     std::string word = m_Lexer++.GetToken(); // public
+
+                    //     if(word == "public")
+                    //     {
+                    //         inherit->m_Protection == ProtectionLevel::PUBLIC;
+                    //     }
+                    //     else if(word == "protected")
+                    //     {
+                    //         inherit->m_Protection == ProtectionLevel::PROTECTED;
+                    //     }
+                    //     else if(word == "private")
+                    //     {
+                    //         inherit->m_Protection == ProtectionLevel::PRIVATE;
+                    //     }
+
+                    //     inherit->m_Name = m_Lexer++.GetToken(); // name
+
+                    //     StructScope* str = (StructScope*)m_CurrentScopeToAdd;
+
+                    //     str->m_Inheritance.push_back(inherit);
+
+                    //     m_Lexer++;
+                    // }
+                }
+                else
+                {
+                    m_Lexer.SaveToken(m_Lexer.GetToken());
+                }
+            }
+            else if(m_Lexer.GetToken() == "namespace")
+            {
+                if(!m_CurrentScopeToAddByMeta)
+                {
+                    m_CurrentScopeToAdd = new NamespaceScope(m_Lexer++.GetToken());
+                }
+                else
+                {
+                    m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                    m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
+                    m_CurrentScopeToAddByMeta = 0;
+                }
+            }
+            else if(m_Lexer.GetToken() == "enum")
+            {
+                if(!m_CurrentScopeToAddByMeta)
+                {
+                    m_CurrentScopeToAdd = new EnumScope(m_Lexer++.GetToken());
+                }
+                else
+                {
+                    m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                    m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
+                    m_CurrentScopeToAddByMeta = 0;
+                }
+
+                EnumScope* eS = (EnumScope*)m_CurrentScopeToAdd;
+                StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
+
+                bool waitForCloseBrace = false;
+                std::string word;
+
+                while(1)
+                {
+                    m_Lexer++;
+
+                    if(m_Lexer.GetToken() == ";" && !waitForCloseBrace)
+                    {
+                        break;
+                    }
+                    else if(m_Lexer.GetToken() == "{")
+                    {
+                        waitForCloseBrace = true;
+                    }
+                    else if(m_Lexer.GetToken() == "}" && waitForCloseBrace)
+                    {
+                        break;
+                    }
+                    else if(m_Lexer.GetToken() == "SE_ELEMENT")
+                    {
+                        m_CurrentScopeToAddByMeta = new StructScope();
+
+                        m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
+
+                        ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
+                    }
+                    else if(m_Lexer.GetToken() == ",")
+                    {
+                        if(!m_CurrentScopeToAddByMeta)
+                        {
+                            m_CurrentScopeToAdd = new EnumElementScope(word);
+                        }
+                        else
+                        {
+                            m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                            m_CurrentScopeToAdd->m_Name = word;
+                            m_CurrentScopeToAddByMeta = 0;
+                        }
+
+                        EnumElementScope* ele = (EnumElementScope*)m_CurrentScopeToAdd;
+
+                        ele->m_Parent = eS;
+
+                        eS->m_Elements.push_back(ele);
+
+                        word.clear();
+                    }
+                    else
+                    {
+                        word += m_Lexer.GetToken();
+                    }
+                }
+
+                eS->m_Parent = structScope;
+
+                structScope->m_Enums.push_back(eS);
+
+                m_CurrentWorkingScope->m_Scopes.push(eS);
+                m_CurrentWorkingScope->m_Structure.push_back(eS);
+            }
+            else if(m_Lexer.GetToken() == "public")
+            {
+                m_Lexer++; // :
+
+                if(m_CurrentWorkingScope)
+                {
+                    m_CurrentWorkingScope->m_Protection = ProtectionLevel::PUBLIC;
+                }
+
+                m_CurrentProtectionLevel = ProtectionLevel::PUBLIC;
+            }
+            else if(m_Lexer.GetToken() == "protected")
+            {
+                m_Lexer++; // :
+
+                if(m_CurrentWorkingScope)
+                {
+                    m_CurrentWorkingScope->m_Protection = ProtectionLevel::PROTECTED;
+                }
+
+                m_CurrentProtectionLevel = ProtectionLevel::PROTECTED;
+            }
+            else if(m_Lexer.GetToken() == "private")
+            {
+                m_Lexer++; // :
+
+                if(m_CurrentWorkingScope)
+                {
+                    m_CurrentWorkingScope->m_Protection = ProtectionLevel::PRIVATE;
+                }
+
+                m_CurrentProtectionLevel = ProtectionLevel::PRIVATE;
+            }
+            else if(m_Lexer.GetToken() == "SE_CLASS")
+            {
+                m_CurrentScopeToAddByMeta = new ClassScope();
+
+                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
+
+                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
+            }
+            else if(m_Lexer.GetToken() == "SE_STRUCT")
+            {
+                m_CurrentScopeToAddByMeta = new StructScope();
+
+                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
+
+                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
+            }
+            else if(m_Lexer.GetToken() == "SE_ENUM")
+            {
+                m_CurrentScopeToAddByMeta = new EnumScope();
+
+                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
+
+                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
+            }
+            else if(m_Lexer.GetToken() == "SE_VALUE")
+            {
+                m_CurrentScopeToAddByMeta = new PropertyScope();
+
+                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
+
+                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
+            }
+            else if(m_Lexer.GetToken() == "SE_METHOD")
+            {
+                m_CurrentScopeToAddByMeta = new FunctionScope();
+
+                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
+
+                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
+            }
+            else if(m_Lexer.GetToken() == "SE_NAMESPACE")
+            {
+                m_CurrentScopeToAddByMeta = new NamespaceScope();
+
+                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
+
+                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
+            }
+            else if(m_Lexer.GetToken() == "GENERATED_BODY")
+            {
+
+            }
+            else if(m_Lexer.GetToken() == "using" || m_Lexer.GetToken() == "friend")
+            {
+                while(m_Lexer++.GetToken() != ";")
+                {
+                    
+                }
+            }
+            else
+            {
+                if(m_Lexer.GetToken() == "[")
+                {
+                    while(m_Lexer.GetToken() != "]")
+                    {
+                        m_Lexer++;
+                    }
+
+                    m_Lexer++;
+                }
+
+                if(m_Lexer.GetToken() == "=")
+                {
+                    while(m_Lexer.GetToken() != ";")
+                    {
+                        m_Lexer++;
+                    }
+                }
+
+                if(m_Lexer.GetToken() == "const")
+                {
+                    while(m_Lexer.GetToken() != ";")
+                    {
+                        m_Lexer++;
+                    }
+
+                    continue;
+                }
+
+                std::string saved;
+                bool success = false;
+
+                if(!m_Scopes.empty())
+                {
+                    // Constructor
+                    if(m_CurrentWorkingScope && m_Lexer.GetToken() == m_CurrentWorkingScope->m_Name)
+                    {
+                        std::string token = m_Lexer.GetToken();
+
+                        if(m_Lexer++.GetToken() == "(")
+                        {
+                            success = true;
+
+                            if(!m_CurrentScopeToAddByMeta)
+                            {
+                                m_CurrentScopeToAdd = new ConstructorScope(m_CurrentWorkingScope->m_Name);
+                            }
+                            else
+                            {
+                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                                m_CurrentScopeToAdd->m_Name = m_CurrentWorkingScope->m_Name;
+                                m_CurrentScopeToAddByMeta = 0;
+                            }
+
+                            ConstructorScope* cons = (ConstructorScope*)m_CurrentScopeToAdd;
+
+                            ProcessArguments(cons->m_Arguments);
+
+                            bool waitForCloseBrace = false;
+
+                            while(1)
+                            {
+                                m_Lexer++;
+
+                                if(m_Lexer.GetToken() == ";" && !waitForCloseBrace)
+                                {
+                                    break;
+                                }
+                                else if(m_Lexer.GetToken() == "{")
+                                {
+                                    waitForCloseBrace = true;
+                                }
+                                else if(m_Lexer.GetToken() == "}" && waitForCloseBrace)
+                                {
+                                    break;
+                                }
+                            }
+
+                            StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
+
+                            cons->m_Parent = structScope;
+
+                            structScope->m_Constructors.push_back(cons);
+                        }
+                        else
+                        {
+                            saved = token;
+                        }
+                    }
+                    else if(m_CurrentWorkingScope && m_Lexer.GetToken() == "~" + m_CurrentWorkingScope->m_Name)
+                    {
+                        std::string token = m_Lexer.GetToken();
+
+                        if(m_Lexer++.GetToken() == "(")
+                        {
+                            success = true;
+                            m_Lexer++;
+
+                            bool waitForCloseBrace = false;
+
+                            while(1)
+                            {
+                                m_Lexer++;
+
+                                if(m_Lexer.GetToken() == ";" && !waitForCloseBrace)
+                                {
+                                    break;
+                                }
+                                else if(m_Lexer.GetToken() == "{")
+                                {
+                                    waitForCloseBrace = true;
+                                }
+                                else if(m_Lexer.GetToken() == "}" && waitForCloseBrace)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            saved = token;
+                        }
+                    }
+                }
+
+                if(!success)
+                {
+                    word += saved;
+                    word += m_Lexer.GetToken();
+
+                    if(m_Lexer.Space())
+                    {
+                        word += " ";
+                    }
+
+                    if(m_Lexer.GetToken() == "(" && word[0] != ':')
+                    {
+                        size_t found = word.find_last_of(" ");
+
+                        if(found != RuntimeDatabase::s_InvalidID)
+                        {
+                            if(!m_CurrentScopeToAddByMeta)
+                            {
+                                m_CurrentScopeToAdd = new FunctionScope(word.substr(found + 1, word.size() - 2 - found));
+                            }
+                            else
+                            {
+                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                                m_CurrentScopeToAdd->m_Name = word.substr(found + 1, word.size() - 2 - found);
+                                m_CurrentScopeToAddByMeta = 0;
+                            }
+                        }
+
+                        FunctionScope* func = (FunctionScope*)m_CurrentScopeToAdd;
+                        StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
+
+                        func->m_ReturnType = word.substr(0, found);
+                        func->m_Protection = m_CurrentProtectionLevel;
+                        func->m_Parent = m_CurrentWorkingScope;
+
+                        ProcessArguments(func->m_Arguments);
+
+                        structScope->m_Functions.push_back(func);
+
+                        word.clear();
+                    }
+                    else if(m_Lexer.GetToken() == ";")
+                    {
+                        while(word[word.size() - 2] == ' ')
+                        {
+                            word.erase(word.size() - 2, 1);
+                        }
+
+                        size_t found = word.find_last_of(" ");
+
+                        if(found != RuntimeDatabase::s_InvalidID)
+                        {
+                            StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
+
+                            if(!m_CurrentScopeToAddByMeta)
+                            {
+                                m_CurrentScopeToAdd = new PropertyScope(word.substr(found + 1, word.size() - 2 - found));
+                            }
+                            else
+                            {
+                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                                m_CurrentScopeToAdd->m_Name = word.substr(found + 1, word.size() - 2 - found);
+                                m_CurrentScopeToAddByMeta = 0;
+                            }
+
+                            PropertyScope* prop = (PropertyScope*)m_CurrentScopeToAdd;
+
+                            prop->m_Type = word.substr(0, found);
+                            prop->m_Parent = m_CurrentWorkingScope;
+                            prop->m_Protection = m_CurrentProtectionLevel;
+
+                            structScope->m_Properties.push_back(prop);
+                        }
+
+                        word.clear();
+                    }
+                }
+            }
+
+            // m_Lexer++;
+        }
+
+        return SE_TRUE;
+    }
+
+    Result ReflectionGenerator::Generate(const std::filesystem::path& cwd, const std::filesystem::path& generatePath)
+    {
+        std::string p_ = m_Filename.string();
 
 		replaceAll(p_, "\\", "/");
 
@@ -1102,11 +1282,11 @@ namespace SteelEngine {
 		std::string finalPath = generatePath.string() + "/";
 		std::string includePath = "";
 
-		std::string p2 = cwd.string();
+        std::string p2 = cwd.string();
 
-		replaceAll(p2, "/", "\\");
+		replaceAll(p2, "\\", "/");
 
-		for(Type::uint32 i = split(p2, '\\').size() + 1; i < splitted_.size() - 1; i++)
+		for(Type::uint32 i = split(p2, '/').size() + 1; i < splitted_.size() - 1; i++)
 		{
 			finalPath.append(splitted_[i]).append("/");
 			includePath.append(splitted_[i]).append("/");
@@ -1121,349 +1301,72 @@ namespace SteelEngine {
 			}
 		}
 
-		includePath.append(splitted_[splitted_.size() - 1]);
+        includePath.append(splitted_[splitted_.size() - 1]);
 
-		std::string rawFilename = path.filename().string();
+        std::string lol = "D:/Projects/C++/SteelEngine/Test";
 
-		rawFilename = split(rawFilename, '.')[0];
+        std::ofstream sourceFile(finalPath + m_Filename.stem().string() + ".Generated.cpp");
 
-		std::ofstream headerFile(finalPath + rawFilename + ".Generated.h");
+		sourceFile << "#include \"HotReloader/IRuntimeObject.h\"\n";
+		sourceFile << "#include \"RuntimeReflection/ReflectionRecorder.h\"\n";
+        sourceFile << "#include \"" << includePath << "\"\n";
+        sourceFile << "#include \"" << finalPath << m_Filename.stem().string() << ".Generated.h" << "\"\n";
+		sourceFile << "\n";
 
-		headerFile << "#include \"RuntimeReflection/ReflectionGeneratorMacros.h\"\n";
+        while(!m_Scopes.empty())
+        {
+            ScopeInfo* scope = m_Scopes.top();
+
+            Process(scope, sourceFile);
+
+            m_Scopes.pop();
+        }
+
+        if(sourceFile.is_open())
+        {
+            sourceFile.close();
+        }
+
+        std::ofstream headerFile(finalPath + m_Filename.stem().string() + ".Generated.h");
+
+        headerFile << "#include \"RuntimeReflection/ReflectionGeneratorMacros.h\"\n";
 		headerFile << "\n";
 		headerFile << "#define GENERATED_BODY";
 
-		if(found)
-		{
-			Event::GlobalEvent::Broadcast(GenerateHeaderEvent{ &headerFile, &m_GeneratedBodyMacro });
-		}
-
-		if(m_GeneratedBodyMacro.size() > 0)
-		{
-			headerFile << " \\\n";
-		}
-
-		for(Type::uint32 i = 0; i < m_GeneratedBodyMacro.size(); i++)
-		{
-			headerFile << m_GeneratedBodyMacro[i];
-
-			if(i < m_GeneratedBodyMacro.size() - 1)
-			{
-				headerFile << "\\";
-			}
-
-			headerFile << "\n";
-		}
-
-		m_GeneratedBodyMacro.clear();
-
-		headerFile.close();
-
-		std::ofstream sourceFile(finalPath + rawFilename + ".Generated.cpp");
-
-		std::string namespace_ = "";
-		std::string namespacedClassName = "";
-
-		for(Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
-		{
-			namespace_ += data->m_Hierarchy[i];
-
-			if(i < data->m_Hierarchy.size() - 1)
-			{
-				namespace_ += "::";
-			}
-		}
-
-		namespacedClassName = namespace_ + "::" + data->m_ClassName;
-
-		data->m_ClassMetaDataInfo.push_back(MetaDataInfo{ "\"sizeof\"", "sizeof(" + data->m_ClassName + ")" });
-
-		// We do not want to have serialization in reflectinon class
-		if(data->m_ClassName == "Reflection")
-		{
-			data->m_ClassMetaDataInfo.push_back(MetaDataInfo{ "SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE", "true" });
-		}
-
-		path.replace_extension(".h");
-
-		sourceFile << "#include \"" << finalPath << rawFilename << ".Generated.h" << "\"\n";
-
-		sourceFile << "#include \"" << includePath << "\"\n";
-		sourceFile << "#include \"HotReloader/IRuntimeObject.h\"\n";
-		sourceFile << "#include \"RuntimeReflection/ReflectionRecorder.h\"\n";
-		sourceFile << "\n";
-
-		// Here we are generating the reflection info
-
-		if(found)
-		{
-			for(Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
-			{
-				sourceFile << "namespace " << data->m_Hierarchy[i] << " {\n";
-			}
-
-			sourceFile << "REGISTER_REFLECTION\n";
-			sourceFile << "{\n";
-			{
-				sourceFile << "SteelEngine::ReflectionRecorder::Register<";
-				sourceFile << data->m_ClassName;
-				sourceFile << ">(\"" << data->m_ClassName << "\"";
-
-				if(data->m_Hierarchy.size() > 0)
-				{
-					sourceFile << ",{\n";
-					for(Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
-					{
-						sourceFile << "\"" << data->m_Hierarchy[i] << "\"";
-
-						if(i < data->m_Hierarchy.size() - 1)
-						{
-							sourceFile << ",\n";
-						}
-						else
-						{
-							sourceFile << "\n";
-						}
-					}
-
-					sourceFile << "}\n";
-				}
-
-				sourceFile << ")\n";
-
-				GenerateMetaDataInfo(sourceFile, data->m_ClassMetaDataInfo);
-
-				for(InheritanceInfo inh : data->m_Inheritance)
-				{
-					sourceFile << ".Inheritance<";
-					sourceFile << inh.m_Name << ">";
-					sourceFile << "(\"" << inh.m_Name << "\")\n";
-
-					GenerateMetaDataInfo(sourceFile, inh.m_MetaData);
-				}
-
-				for(ConstructorInfo consInfo : data->m_Constructors)
-				{
-					sourceFile << ".Constructor<";
-
-					for(Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
-					{
-						sourceFile << consInfo.m_Arguments[i].m_Type;
-
-						if (i < consInfo.m_Arguments.size() - 1)
-						{
-							sourceFile << ", ";
-						}
-					}
-
-					sourceFile << ">()\n";
-
-					GenerateMetaDataInfo(sourceFile, consInfo.m_MetaData);
-				}
-
-				for(ClassProperty clsProp : data->m_Properties)
-				{
-					if(clsProp.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
-						clsProp.m_ProtectionFlag == ProtectionFlag::PROTECTED)
-					{
-						continue;
-					}
-
-					sourceFile << ".Property(";
-					sourceFile << "\"" << clsProp.m_ArgumentInfo.m_Name << "\", ";
-					sourceFile << "&" << data->m_ClassName << "::" << clsProp.m_ArgumentInfo.m_Name;
-					sourceFile << ")\n";
-
-					GenerateMetaDataInfo(sourceFile, clsProp.m_MetaData);
-				}
-
-				for(ClassMethod clsMeth : data->m_Methods)
-				{
-					if(clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
-						clsMeth.m_ProtectionFlag == ProtectionFlag::PROTECTED)
-					{
-						continue;
-					}
-
-					std::vector<ClassMethod> sameNamedMethods;
-
-					for(ClassMethod isOverloaded : data->m_Methods)
-					{
-						if(isOverloaded.m_MethodInfo.m_Name == clsMeth.m_MethodInfo.m_Name)
-						{
-							sameNamedMethods.push_back(isOverloaded);
-						}
-					}
-
-					sourceFile << ".Method";
-
-					if(sameNamedMethods.size() > 1)
-					{
-						sourceFile << "<";
-
-						size_t size = clsMeth.m_MethodInfo.m_Arguments.size();
-
-						sourceFile << clsMeth.m_MethodInfo.m_ReturnType;
-
-						if(size > 0)
-						{
-							sourceFile << ", ";
-						}
-
-						for(Type::uint32 i = 0; i < size; i++)
-						{
-							ArgumentInfo arg = clsMeth.m_MethodInfo.m_Arguments[i];
-
-							sourceFile << arg.m_Type;
-
-							if(i < size - 1)
-							{
-								sourceFile << ", ";
-							}
-						}
-
-						sourceFile << ">";
-					}
-
-					sourceFile << "(\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
-					sourceFile << "&" << data->m_ClassName << "::" << clsMeth.m_MethodInfo.m_Name;
-					sourceFile << ")\n";
-
-					GenerateMetaDataInfo(sourceFile, clsMeth.m_MetaData);
-				}
-
-				GenerateMethodReflection* ev = new GenerateMethodReflection();
-
-				Event::GlobalEvent::Broadcast_(ev);
-
-				for(/*ClassMethod clsMeth : ev->m_Methods*/ Type::uint32 i = 0; i < ev->m_Methods.size(); i++)
-				{
-					ClassMethod clsMeth = ev->m_Methods[i];
-
-					if(clsMeth.m_ProtectionFlag == ProtectionFlag::PRIVATE ||
-						clsMeth.m_ProtectionFlag == ProtectionFlag::PROTECTED)
-					{
-						continue;
-					}
-
-					sourceFile << ".Method(";
-					sourceFile << "\"" << clsMeth.m_MethodInfo.m_Name << "\", ";
-					sourceFile << "&" << data->m_ClassName << "::" << clsMeth.m_MethodInfo.m_Name;
-					sourceFile << ")\n";
-
-					GenerateMetaDataInfo(sourceFile, clsMeth.m_MetaData);
-				}
-
-				for(EnumInfo enum_ : data->m_Enums)
-				{
-					sourceFile << ".Enum<" << data->m_ClassName << "::" << enum_.m_EnumName << ">(\"" << enum_.m_EnumName << "\")\n";
-
-					GenerateMetaDataInfo(sourceFile, enum_.m_MetaData);
-
-					if (enum_.m_Elements.size() > 0)
-					{
-						sourceFile << ".Values\n";
-						sourceFile << "({\n";
-
-						for (Type::uint32 i = 0; i < enum_.m_Elements.size(); i++)
-						{
-							EnumElement ele = enum_.m_Elements[i];
-
-							sourceFile << "SteelEngine::ReflectionEnumElement(\"" << ele.m_ElementName;
-							sourceFile << "\", " << data->m_ClassName << "::" << enum_.m_EnumName << "::" << ele.m_ElementName << ")";
-
-							GenerateMetaDataInfo(sourceFile, ele.m_MetaData);
-
-							if (i < enum_.m_Elements.size() - 1)
-							{
-								sourceFile << ",\n";
-							}
-							else
-							{
-								sourceFile << "\n";
-							}
-						}
-
-						sourceFile << "})\n";
-					}
-				}
-
-				sourceFile << ";\n";
-			}
-			sourceFile << "}\n\n";
-
-			Event::GlobalEvent::Broadcast(GenerateSourceEvent{ &sourceFile, data->m_ClassName });
-
-			// Here we are generating info for the runtime compilator
-
-			if(data->m_Constructors.size() > 0)
-			{
-				sourceFile << "#ifdef RUNTIME_COMPILE\n";
-				sourceFile << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)\n";
-				sourceFile << "{\n";
-				{
-					sourceFile << "DECLARE_TYPE_INFO(" << data->m_ClassName << ")\n";
-					sourceFile << "{\n";
-					{
-						sourceFile << "FIND_THE_RIGHT_OBJECT\n";
-						sourceFile << "\n";
-
-						for (ConstructorInfo consInfo : data->m_Constructors)
-						{
-							if(consInfo.m_Arguments.size() > 0)
-							{
-								sourceFile << "COMPARE_CONSTRUCTOR(";
-
-								for (Type::uint32 i = 0; i < consInfo.m_Arguments.size(); i++)
-								{
-									sourceFile << consInfo.m_Arguments[i].m_Type;
-
-									if (i < consInfo.m_Arguments.size() - 1)
-									{
-										sourceFile << ", ";
-									}
-								}
-							}
-							else
-							{
-								sourceFile << "COMPARE_CONSTRUCTOR_(";
-							}
-
-							sourceFile << ")\n";
-						}
-					}
-					sourceFile << "};\n";
-					sourceFile << "\n";
-					sourceFile << "return result;\n";
-				}
-				sourceFile << "}\n";
-				sourceFile << "#endif\n";
-			}
-
-			for(Type::uint32 i = 0; i < data->m_Hierarchy.size(); i++)
-			{
-				sourceFile << "}\n";
-			}
-		}
-
-		sourceFile.close();
-
-		return SE_TRUE;
-	}
-
-	void ReflectionGenerator::Clear()
-	{
-		m_HeaderLines.clear();
-
-		for(Type::uint32 i = 0; i < m_Classes.size(); i++)
-		{
-			delete m_Classes[i];
-			m_Classes[i] = 0;
-		}
-
-		m_Classes.clear();
-
-		Event::GlobalEvent::Broadcast(ClearValuesEvent{});
-	}
+        if(!m_GeneratedHeaderLinesByModules.empty())
+        {
+            headerFile << " \\\n";
+
+            for(Type::uint32 i = 0; i < m_GeneratedHeaderLinesByModules.size(); i++)
+            {
+                headerFile << m_GeneratedHeaderLinesByModules[i];
+
+                if(i < m_GeneratedHeaderLinesByModules.size() - 1)
+                {
+                    headerFile << "\\\n";
+                }
+                else
+                {
+                    headerFile << "\n";
+                }
+            }
+        }
+
+        if(headerFile.is_open())
+        {
+            headerFile.close();
+        }
+
+        return SE_TRUE;
+    }
+
+    void ReflectionGenerator::Clear()
+    {
+        m_GeneratedHeaderLinesByModules.clear();
+        m_LoadedLines.clear();
+
+        m_BeginRecordingOnce = false;
+        m_EndRecordingOnce = false;
+    }
 
 }

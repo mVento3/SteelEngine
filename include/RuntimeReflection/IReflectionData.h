@@ -19,9 +19,11 @@
 
 #include "Utils/Utils.h"
 
+#include "StaticHelper/IReflectionDataHelper.h"
+
 namespace SteelEngine {
 
-	struct IReflectionData : public MetaDataImplementation
+	struct IReflectionData : public MetaDataImplementation, public IReflectionDataHelper
 	{
 		friend class Reflection;
 		friend class ReflectionRecorder;
@@ -36,10 +38,9 @@ namespace SteelEngine {
 			return db;
 		}
 
-		void ProcessInheritance(std::vector<IReflectionData*>& res, HotReloader::IRuntimeObject* createdObject) const;
+		// void ProcessInheritance(const std::vector<IReflectionData*>& res, const std::vector<IReflectionInheritance*>& inheritance, HotReloader::IRuntimeObject* createdObject, const IReflectionData* data) const;
 
 	public:
-		// typedef std::unordered_map<std::string, IReflectionProperty*> PropertiesMap;
 		typedef std::vector<IReflectionProperty*> PropertiesVector;
 		typedef std::vector<IReflectionMethod*> MethodsVector;
 		typedef std::vector<IReflectionEnumeration*> EnumsVector;
@@ -147,6 +148,8 @@ namespace SteelEngine {
 		}
 
 	public:
+		virtual void ProcessMetaData(RuntimeDatabase* db, MetaDataImplementation* main, MetaDataInfoVector& infos) = 0;
+
 		virtual Variant GetProperty(const char* name, void* object) = 0;
 		virtual IReflectionProperty* GetProperty(const char* name) = 0;
 		virtual IReflectionMethod* GetMethod(const std::string& name) = 0;
@@ -186,7 +189,7 @@ namespace SteelEngine {
 						res.push_back((IReflectionData*)db->m_ReflectionDatabase->m_Types[i]);
 					}
 
-					ProcessInheritance(res, createdObject);
+					ProcessInheritance(res, GetInheritances(), createdObject, this);
 
 					return createdObject;
 				}

@@ -1,4 +1,3 @@
-#include "RuntimeReflection/ReflectionGenerator.h"
 #include "RuntimeReflection/Reflection.h"
 
 #include "Module/Module.h"
@@ -15,6 +14,8 @@
 #include "InformationTracker/InformationTracker.h"
 
 #include "Memory/Container/Vector.h"
+
+#include "RuntimeReflection/ReflectionGenerator.h"
 
 enum Index
 {
@@ -55,9 +56,9 @@ int main(int argc, char* argv[])
 // Initialize rest of allocators inside database
     db->Init();
 
-    SteelEngine::Reflection a;
+    // SteelEngine::Reflection a;
 
-    a.Init2();
+    // a.Init2();
 
     SteelEngine::Reflection::Init();
 
@@ -81,7 +82,7 @@ int main(int argc, char* argv[])
 
 //     SteelEngine::IReflectionGenerator* rg = (SteelEngine::IReflectionGenerator*)info->m_AllocateCallback(0, 0);
 
-    SteelEngine::IReflectionGenerator* rg = new SteelEngine::ReflectionGenerator();
+    SteelEngine::IReflectionGenerator* rg = (SteelEngine::IReflectionGenerator*)SteelEngine::Reflection::CreateInstance("SteelEngine::ReflectionGenerator");
 
     std::vector<SteelEngine::HotReloader::IRuntimeObject*> modules;
     SteelEngine::IReflectionData const* const* types = SteelEngine::Reflection::GetTypes();
@@ -138,14 +139,14 @@ int main(int argc, char* argv[])
         printf("Exception while generating in ReflectionGenerator.exe: %s!\n", e.what());
     };
 
-    try
-    {
-        rg->Clear();
-    }
-    catch(const std::exception& e)
-    {
-        printf("Exception while clearing in ReflectionGenerator.exe: %s!\n", e.what());
-    };
+    // try
+    // {
+    //     rg->Clear();
+    // }
+    // catch(const std::exception& e)
+    // {
+    //     printf("Exception while clearing in ReflectionGenerator.exe: %s!\n", e.what());
+    // };
 
     delete rg;
     rg = 0;

@@ -9,6 +9,7 @@ namespace SteelEngine {
         const char* m_Name;
         int m_Value;
         MetaDataInfoVector m_MetaData;
+        IReflectionData* m_ReflectionData;
 
         ReflectionEnumElement(const char* name, int value) :
             m_Name(name),
@@ -26,6 +27,18 @@ namespace SteelEngine {
         {
             return &m_MetaData;
         }
+
+        template <typename... Args>
+		ReflectionEnumElement& operator()(Args... args)
+		{
+			std::vector<MetaDataInfo> infos = { args... };
+            static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+
+            // TODO: Set reflection data
+            m_ReflectionData->ProcessMetaData(db, this, infos);
+
+			return *this;
+		}
     };
 
 }

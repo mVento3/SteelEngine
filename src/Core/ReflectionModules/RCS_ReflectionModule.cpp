@@ -1,20 +1,14 @@
 #include "Core/ReflectionModules/RCS_ReflectionModule.h"
 
-#include "RuntimeReflection/IReflectionData.h"
+#include "RuntimeReflection/ReflectionEnumeration.h"
 #include "RuntimeReflection/Reflection.h"
 
 namespace SteelEngine {
 
     RCS_ReflectionModule::RCS_ReflectionModule()
     {
-        Event::GlobalEvent::Add<ReflectionGenerator::SE_ClassMacroEvent>(this);
-        Event::GlobalEvent::Add<ReflectionGenerator::GenerateHeaderEvent>(this);
-        Event::GlobalEvent::Add<ReflectionGenerator::SE_ValueMacroEvent>(this);
-        Event::GlobalEvent::Add<ReflectionGenerator::GenerateSourceEvent>(this);
-        Event::GlobalEvent::Add<ReflectionGenerator::ClearValuesEvent>(this);
-
+        m_GenerateSerialization = true;
         m_SerializeAll = false;
-        m_GenerateSerializeFunction = true;
     }
 
     RCS_ReflectionModule::~RCS_ReflectionModule()
@@ -22,52 +16,69 @@ namespace SteelEngine {
 
     }
 
-    void RCS_ReflectionModule::operator()(const ReflectionGenerator::SE_ClassMacroEvent& event)
+    void RCS_ReflectionModule::GenerateSource(std::ofstream& out)
     {
-        if(event.m_Data)
+        if(m_GenerateSerialization)
         {
-            Variant* meta = event.m_Data->GetMetaData(Reflection::ReflectionAttribute::RUNTIME_SERIALIZE);
-            Variant* meta2 = event.m_Data->GetMetaData(Reflection::ReflectionAttribute::NO_SERIALIZE);
+            out << "void " + m_StructName + "::Serialize(SteelEngine::HotReloader::ISerializer* serializer)\n";
+            out << "{\n";
 
-            if(meta && (meta->IsValid() || meta->Convert<bool>()))
+            for(Type::uint32 i = 0; i < m_PropertiesToSerialize.size(); i++)
+            {
+                out << "SERIALIZE(" + m_StructName + "::" + m_PropertiesToSerialize[i] + ")\n";
+            }
+
+            for(size_t inh : m_Inheritance)
+            {
+                IReflectionData* data = Reflection::GetType(inh);     
+
+                if(data)
+                {
+                    Variant* meta = data->GetMetaData(Reflection::ReflectionAttribute::NO_SERIALIZE);
+
+                    if(meta && !meta->IsValid())
+                    {
+                        out << std::string(data->GetTypeName()) + "::Serialize(serializer);\n";
+                    }
+                }
+            }
+
+            out << "}\n";
+        }
+    }
+
+    void RCS_ReflectionModule::GenerateHeader(std::vector<std::string>& out) 
+    {
+        if(m_GenerateSerialization)
+        {
+            out.push_back("public:");
+            out.push_back("virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer) override;");
+        }
+    }
+
+    void RCS_ReflectionModule::ProcessStructure(ReflectionGenerator::StructScope* info) 
+    {
+        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+
+        m_StructName = info->m_Name;
+
+        for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
+        {
+            ReflectionGenerator::MetaData meta = info->m_MetaData[i];
+
+            if(enum_->Compare(Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, meta.m_Key))
             {
                 m_SerializeAll = true;
             }
-
-            if(meta2 && (meta2->IsValid() || meta2->Convert<bool>()))
+            else if(enum_->Compare(Reflection::ReflectionAttribute::NO_SERIALIZE, meta.m_Key))
             {
-                m_GenerateSerializeFunction = false;
-            }
-
-            const std::vector<IReflectionInheritance*> inhs = event.m_Data->GetInheritances();
-
-            for(Type::uint32 i = 0; i < inhs.size(); i++)
-            {
-                m_Inheritance.push_back(inhs[i]->GetTypeID());
-            }
-        }
-        else
-        {
-            IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
-
-            for(Type::uint32 i = 0; i < event.m_MetaData->size(); i++)
-            {
-                ReflectionGenerator::MetaDataInfo meta = event.m_MetaData->at(i);
-
-                if(enum_->Compare(Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, meta.m_Key))
-                {
-                    m_SerializeAll = true;
-                }
-                else if(enum_->Compare(Reflection::ReflectionAttribute::NO_SERIALIZE, meta.m_Key))
-                {
-                    m_GenerateSerializeFunction = false;
-                }
+                m_GenerateSerialization = false;
             }
         }
 
-        for(Type::uint32 i = 0; i < event.m_Inheritance->size(); i++)
+        for(Type::uint32 i = 0; i < info->m_Inheritance.size(); i++)
         {
-            IReflectionData* type = Reflection::GetType(event.m_Inheritance->at(i).m_Name);
+            IReflectionData* type = Reflection::GetType(info->m_Inheritance.at(i)->m_Name);
 
             if(type)
             {
@@ -76,99 +87,34 @@ namespace SteelEngine {
         }
     }
 
-    void RCS_ReflectionModule::operator()(const ReflectionGenerator::GenerateHeaderEvent& event)
+    void RCS_ReflectionModule::ProcessProperty(ReflectionGenerator::PropertyScope* info) 
     {
-        if(m_GenerateSerializeFunction)
-        {
-            event.m_GeneratedBodyMacro->push_back("public:");
-            event.m_GeneratedBodyMacro->push_back("virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer) override;");
-        }
-    }
-
-    void RCS_ReflectionModule::operator()(const ReflectionGenerator::SE_ValueMacroEvent& event)
-    {
-        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
-
         if(m_SerializeAll)
         {
-            // m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
+            IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
-            if(!event.m_Info->m_MetaData.empty())
+            if(!info->m_MetaData.empty())
             {
-                for(Type::uint32 i = 0; i < event.m_Info->m_MetaData.size(); i++)
+                for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
                 {
-                    ReflectionGenerator::MetaDataInfo meta = event.m_Info->m_MetaData[i];
+                    ReflectionGenerator::MetaData meta = info->m_MetaData[i];
 
                     if(!enum_->Compare(Reflection::ReflectionAttribute::NO_SERIALIZE, meta.m_Key))
                     {
-                        m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
+                        m_PropertiesToSerialize.push_back(info->m_Name);
                     }
                 }
             }
             else
             {
-                m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
-            }
-        }
-        else
-        {
-            for(Type::uint32 i = 0; i < event.m_Info->m_MetaData.size(); i++)
-            {
-                ReflectionGenerator::MetaDataInfo meta = event.m_Info->m_MetaData[i];
-
-                if(enum_->Compare(Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, meta.m_Key))
-                {
-                    m_PropertiesToSerialize.push_back(event.m_Info->m_ArgumentInfo.m_Name);
-                }
+                m_PropertiesToSerialize.push_back(info->m_Name);
             }
         }
     }
 
-    void RCS_ReflectionModule::operator()(const ReflectionGenerator::GenerateSourceEvent& event)
+    void RCS_ReflectionModule::ProcessFunction(ReflectionGenerator::FunctionScope* info) 
     {
-        std::ofstream& out = *event.m_Out;
 
-        if(m_GenerateSerializeFunction)
-        {
-            out << "void " + event.m_ClassName + "::Serialize(SteelEngine::HotReloader::ISerializer* serializer)\n";
-            out << "{\n";
-            {
-                for(Type::uint32 i = 0; i < m_PropertiesToSerialize.size(); i++)
-                {					
-                    out << "SERIALIZE(" << event.m_ClassName << "::" << m_PropertiesToSerialize[i] << ")\n";
-                }
-
-                for(size_t inh : m_Inheritance)
-                {
-                    IReflectionData* data = Reflection::GetType(inh);     
-
-                    if(data)
-                    {
-                        Variant* meta = data->GetMetaData(Reflection::ReflectionAttribute::NO_SERIALIZE);
-
-                        if(meta && !meta->IsValid())
-                        {
-                            out << data->GetTypeName() << "::Serialize(serializer);\n";
-                        }
-                    }
-
-                    // if(data && meta->IsValid() && !meta->Convert<bool>())
-                    // {
-                    //     out << data->GetTypeName() << "::Serialize(serializer);\n";
-                    // }
-                }
-            }
-            out << "}\n\n";
-        }
-    }
-
-    void RCS_ReflectionModule::operator()(const ReflectionGenerator::ClearValuesEvent& event)
-    {
-        m_Inheritance.clear();
-        m_PropertiesToSerialize.clear();
-
-        m_GenerateSerializeFunction = true;
-        m_SerializeAll = false;
     }
 
 }

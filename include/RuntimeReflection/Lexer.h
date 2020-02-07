@@ -83,6 +83,7 @@ namespace SteelEngine {
 
                     break;
                 }
+            // Comment
                 else if(m_CurrentCharacter == '/' &&
                     m_CurrentLine[m_CharacterIndex] == '/')
                 {
@@ -134,18 +135,37 @@ namespace SteelEngine {
         }
 
     public:
-        Lexer(std::vector<std::string>& lines) :
-            m_Lines(&lines)
+        Lexer()
         {
             m_LineIndex = 0; // +1
             m_CharacterIndex = 0;
 
-            m_CurrentLine = m_Lines->at(m_LineIndex++);
-            m_CurrentLineSize = m_CurrentLine.size();
+            m_End = false;
+
+            m_PendingSymbol = '\0';
+        }
+
+        Lexer(std::vector<std::string>& lines) :
+            Lexer()
+        {
+            Load(lines);
+        }
+
+        void Load(std::vector<std::string>& lines)
+        {
+            m_LineIndex = 0; // +1
+            m_CharacterIndex = 0;
 
             m_End = false;
 
             m_PendingSymbol = '\0';
+
+            m_Lines = &lines;
+
+            m_CurrentLine = m_Lines->at(m_LineIndex++);
+            m_CurrentLineSize = m_CurrentLine.size();
+
+            // Increment();
         }
 
         inline bool End()

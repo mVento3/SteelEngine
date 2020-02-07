@@ -1,19 +1,17 @@
 #pragma once
 
+#include "Core/IReflectionModule.h"
+
 #include "RuntimeReflection/Macro.h"
-
-#include "HotReloader/IRuntimeObject.h"
-
-#include "RuntimeReflection/ReflectionGenerator.h"
 
 #include "Core/ReflectionModules/NaiveEventReflectionModule.Generated.h"
 
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE
+        Reflection::ReflectionAttribute::REFLECTION_MODULE
     )
-    class NaiveEventReflectionModule : public HotReloader::IRuntimeObject
+    class NaiveEventReflectionModule : public IReflectionModule
     {
         GENERATED_BODY
     private:
@@ -25,9 +23,13 @@ namespace SteelEngine {
         NaiveEventReflectionModule();
         ~NaiveEventReflectionModule();
 
-        void operator()(const ReflectionGenerator::SE_ClassMacroEvent& event);
-        void operator()(const ReflectionGenerator::GenerateHeaderEvent& event);
-        void operator()(const ReflectionGenerator::SE_ConstructorMacroEvent& event);
+        void GenerateSource(std::ofstream& out) override;
+        void GenerateHeader(std::vector<std::string>& out) override;
+
+        void ProcessStructure(ReflectionGenerator::StructScope* info) override;
+        void ProcessProperty(ReflectionGenerator::PropertyScope* info) override;
+        void ProcessFunction(ReflectionGenerator::FunctionScope* info) override;
+        void ProcessConstructor(ReflectionGenerator::ConstructorScope* info) override;
     };
 
 }

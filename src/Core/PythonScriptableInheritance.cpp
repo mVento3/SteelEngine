@@ -26,6 +26,7 @@ namespace SteelEngine {
                 Script::Python::IScript* script = (Script::Python::IScript*)Reflection::CreateInstance("SteelEngine::Script::Python::Script");
                 HotReloader::IRuntimeObject* obj = (HotReloader::IRuntimeObject*)scriptable;
 
+                // TODO: Check this
                 if(obj->m_TypeID == RuntimeDatabase::s_InvalidID)
                 {
                     obj->m_Object = 		object;

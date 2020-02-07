@@ -1,39 +1,35 @@
 #pragma once
 
-#include "HotReloader/IRuntimeObject.h"
+#include "Core/IReflectionModule.h"
 
 #include "RuntimeReflection/Macro.h"
-#include "RuntimeReflection/ReflectionGenerator.h"
-#include "RuntimeReflection/IReflectionInheritance.h"
-
-#include "Event/GlobalEvent.h"
 
 #include "Core/ReflectionModules/CasterReflectionModule.Generated.h"
 
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE
+        Reflection::ReflectionAttribute::REFLECTION_MODULE
     )
-    class CasterReflectionModule : public HotReloader::IRuntimeObject
+    class CasterReflectionModule : public IReflectionModule
     {
         GENERATED_BODY
     private:
         bool m_GenerateCastFunctions;
-        std::vector<ReflectionGenerator::InheritanceInfo> m_Inheritance;
-        // std::vector<IReflectionInheritance*> m_Inheritance;
+        std::vector<ReflectionGenerator::InheritanceScope*> m_Inheritance;
         std::string m_ClassName;
-        std::vector<ReflectionGenerator::ClassMethod> m_Methods;
+        std::vector<ReflectionGenerator::FunctionScope*>* m_Methods;
 
     public:
         CasterReflectionModule();
         ~CasterReflectionModule();
 
-        void operator()(const ReflectionGenerator::GenerateHeaderEvent& event);
-        void operator()(const ReflectionGenerator::GenerateSourceEvent& event);
-        void operator()(const ReflectionGenerator::SE_ClassMacroEvent& event);
-        void operator()(const ReflectionGenerator::ClearValuesEvent& event);
-        void operator()(ReflectionGenerator::GenerateMethodReflection* event);
+        void GenerateSource(std::ofstream& out) override;
+        void GenerateHeader(std::vector<std::string>& out) override;
+
+        void ProcessStructure(ReflectionGenerator::StructScope* info) override;
+        void ProcessProperty(ReflectionGenerator::PropertyScope* info) override;
+        void ProcessFunction(ReflectionGenerator::FunctionScope* info) override;
     };
 
 }
