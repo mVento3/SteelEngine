@@ -50,6 +50,10 @@
 	"projects_path": "D:/Projects/SteelEngine",
 	"modules": [
 		{
+			"name": "StaticHelper",
+			"type": "lib"
+		},
+		{
 			"name": "FileWatcher",
 			"type": "lib"
 		},
@@ -78,10 +82,6 @@
 			"type": "lib"
 		},
 		{
-			"name": "RuntimeReflection",
-			"type": "lib"
-		},
-		{
 			"name": "Profiler",
 			"type": "lib"
 		},
@@ -94,12 +94,16 @@
 			"type": "lib"
 		},
 		{
-			"name": "Core",
+			"name": "ReflectionGenerator",
+			"type": "exe"
+		},
+		{
+			"name": "RuntimeReflection",
 			"type": "dll"
 		},
 		{
-			"name": "ReflectionGenerator",
-			"type": "exe"
+			"name": "Core",
+			"type": "dll"
 		},
 		{
 			"name": "Graphics",
