@@ -206,11 +206,53 @@ namespace SteelEngine { namespace Network {
 
             if(state != State::UP_TO_DATE)
             {
-                printf("File %s is not up to date!\n", filename.c_str());
-
                 if(state == State::OVERRIDE)
                 {
-                    if(overrideEvent.m_ShouldOverrideForAll)
+                    printf("File %s is out to date!\n", filename.c_str());
+                }
+                else if(state == State::NONE)
+                {
+                    printf("File %s not exists!\n", filename.c_str());
+                }
+
+                if(overrideEvent.m_ShouldOverrideForAll)
+                {
+                    network->Send(sock, "UPDATE", m_BufferSize);
+                    network->Receive(sock, m_Buffer, m_BufferSize);
+
+                    std::ofstream file(
+                        event.m_Path.string() + "\\" + filename,
+                        std::ios::binary
+                    );
+
+                    for(size_t j = 0; j < fileSize; j += m_BufferSize)
+                    {
+                        std::string fileBuf;
+
+                        fileBuf.resize(m_BufferSize);
+
+                        network->Send(sock, "DONE", m_BufferSize);
+                        network->Receive(sock, &fileBuf[0], m_BufferSize);
+
+                        file.write(&fileBuf[0], m_BufferSize);
+                    }
+
+                    file.close();
+                }
+                else
+                {
+                    overrideEvent.m_File = filename;
+
+                    m_ShouldOverrideEvent.Broadcast_(&overrideEvent);
+
+                    while(!overrideEvent.m_IsSet)
+                    {
+
+                    }
+
+                    overrideEvent.m_IsSet = false;
+
+                    if(overrideEvent.m_ShouldOverride || overrideEvent.m_ShouldOverrideForAll)
                     {
                         network->Send(sock, "UPDATE", m_BufferSize);
                         network->Receive(sock, m_Buffer, m_BufferSize);
@@ -236,46 +278,8 @@ namespace SteelEngine { namespace Network {
                     }
                     else
                     {
-                        overrideEvent.m_File = filename;
-
-                        m_ShouldOverrideEvent.Broadcast_(&overrideEvent);
-
-                        while(!overrideEvent.m_IsSet)
-                        {
-
-                        }
-
-                        overrideEvent.m_IsSet = false;
-
-                        if(overrideEvent.m_ShouldOverride || overrideEvent.m_ShouldOverrideForAll)
-                        {
-                            network->Send(sock, "UPDATE", m_BufferSize);
-                            network->Receive(sock, m_Buffer, m_BufferSize);
-
-                            std::ofstream file(
-                                event.m_Path.string() + "\\" + filename,
-                                std::ios::binary
-                            );
-
-                            for(size_t j = 0; j < fileSize; j += m_BufferSize)
-                            {
-                                std::string fileBuf;
-
-                                fileBuf.resize(m_BufferSize);
-
-                                network->Send(sock, "DONE", m_BufferSize);
-                                network->Receive(sock, &fileBuf[0], m_BufferSize);
-
-                                file.write(&fileBuf[0], m_BufferSize);
-                            }
-
-                            file.close();
-                        }
-                        else
-                        {
-                            network->Send(sock, "NO_UPDATE", m_BufferSize);
-                            network->Receive(sock, m_Buffer, m_BufferSize);
-                        }
+                        network->Send(sock, "NO_UPDATE", m_BufferSize);
+                        network->Receive(sock, m_Buffer, m_BufferSize);
                     }
                 }
             }

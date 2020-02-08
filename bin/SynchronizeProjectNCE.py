@@ -34,10 +34,9 @@ def compareFiles(project_path, client_data):
     # 2 - NONE
 
     for subdir, dirs, files in os.walk(project_path):
-        file_found = False
-
         if os.path.basename(subdir) != '.vscode':
             for file in files:
+                file_found = False
                 file = subdir + '\\' + file
                 file = fullToRelative(project_path, file)
 
