@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     SteelEngine::Options parser(argv, argc, desc);
 
 // Allocate main/root memory chunk
-    size_t rootMemorySize = 1024 * 1024LL * 512;
+    size_t rootMemorySize = 1024 * 1024LL * 8;
     void* rootMemory = malloc(rootMemorySize);
 	SteelEngine::Memory::Allocator* rootMemoryAllocator;
 
