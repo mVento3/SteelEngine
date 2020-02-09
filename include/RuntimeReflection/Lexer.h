@@ -21,12 +21,17 @@ namespace SteelEngine {
         bool m_End;
         bool m_Space;
         char m_PendingSymbol;
+        bool m_NewLine;
+        bool m_WasNewLine;
         std::stack<std::string> m_SavedToken;
 
         Lexer& Increment()
         {
+            m_WasNewLine = m_NewLine;
+
             m_Token.clear();
             m_Space = false;
+            m_NewLine = false;
 
             if(m_PendingSymbol != '\0')
             {
@@ -111,6 +116,7 @@ namespace SteelEngine {
                         m_CurrentLine = m_Lines->at(m_LineIndex++);
                         m_CurrentLineSize = m_CurrentLine.size();
                         m_CharacterIndex = 0;
+                        m_NewLine = true;
                     }
 
                     break;
@@ -141,6 +147,7 @@ namespace SteelEngine {
             m_CharacterIndex = 0;
 
             m_End = false;
+            m_NewLine = false;
 
             m_PendingSymbol = '\0';
         }
@@ -176,6 +183,16 @@ namespace SteelEngine {
         inline bool Space()
         {
             return m_Space;
+        }
+
+        inline bool NewLine()
+        {
+            return m_NewLine;
+        }
+
+        inline bool WasNewLine()
+        {
+            return m_WasNewLine;
         }
 
         inline std::string GetToken()

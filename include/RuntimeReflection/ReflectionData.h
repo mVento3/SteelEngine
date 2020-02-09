@@ -279,6 +279,8 @@ namespace SteelEngine {
 		template <typename A>
 		ReflectionEnumeration<T, A>& Enum(const std::string& name)
 		{
+			m_CurrentBind = CurrentBindFlag::ENUM_BIND;
+
 			ReflectionEnumeration<T, A>* enum_ = 0;
 
 			for(Type::uint32 i = 0; i < m_Enums.size(); i++)
@@ -296,6 +298,8 @@ namespace SteelEngine {
 			if(!enum_)
 			{
 				enum_ = new ReflectionEnumeration<T, A>(*this, name);
+
+				enum_->m_ReflectionData = this;
 
 				m_Enums.push_back(enum_);
 			}
@@ -339,6 +343,9 @@ namespace SteelEngine {
 				break;
 			case CurrentBindFlag::INHERITANCE_BIND:
 				ProcessMetaData(db, m_Inheritances[m_Inheritances.size() - 1], infos);
+				break;
+			case CurrentBindFlag::ENUM_BIND:
+				ProcessMetaData(db, m_Enums[m_Enums.size() - 1], infos);
 				break;
 			default:
 				break;

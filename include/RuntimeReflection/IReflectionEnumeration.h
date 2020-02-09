@@ -16,18 +16,18 @@ namespace SteelEngine {
 				return false;
 			}
 
-			const EnumElementVector* values = GetEnumElements();
+			const std::vector<ReflectionEnumElement*>* values = GetEnumElements();
 			std::string name_ = name;
 
 			replaceAll(name_, "::", " ");
 
 			std::vector<std::string> splitted = split(name_, ' ');
 
-			for(EnumElementVector::const_iterator it = values->begin(); it != values->end(); ++it)
+			for(std::vector<ReflectionEnumElement*>::const_iterator it = values->begin(); it != values->end(); ++it)
 			{
-				if(strcmp(it->m_Name, splitted[splitted.size() - 1].c_str()) == 0)
+				if(strcmp((*it)->m_Name, splitted[splitted.size() - 1].c_str()) == 0)
 				{
-					return enum_ == it->m_Value;
+					return enum_ == (*it)->m_Value;
 				}
 			}
 
@@ -43,7 +43,7 @@ namespace SteelEngine {
 		virtual const MetaDataInfoVector* GetMetaDataInfoVector() const override = 0;
 		virtual MetaDataInfoVector* GetMetaDataInfoVector() override = 0;
 
-		virtual const EnumElementVector* GetEnumElements() const = 0;
+		virtual const std::vector<ReflectionEnumElement*>* GetEnumElements() const = 0;
 
 		virtual int GetEnumValue(const std::string& name) = 0;
 		virtual ReflectionEnumElement GetEnum(const std::string& name) = 0;

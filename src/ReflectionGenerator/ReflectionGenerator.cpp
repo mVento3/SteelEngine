@@ -139,14 +139,14 @@ int main(int argc, char* argv[])
         printf("Exception while generating in ReflectionGenerator.exe: %s!\n", e.what());
     };
 
-    // try
-    // {
-    //     rg->Clear();
-    // }
-    // catch(const std::exception& e)
-    // {
-    //     printf("Exception while clearing in ReflectionGenerator.exe: %s!\n", e.what());
-    // };
+    try
+    {
+        rg->Clear();
+    }
+    catch(const std::exception& e)
+    {
+        printf("Exception while clearing in ReflectionGenerator.exe: %s!\n", e.what());
+    };
 
     delete rg;
     rg = 0;

@@ -22,55 +22,24 @@ namespace SteelEngine {
         }
     }
 
-    void searchFor(const ReflectionGenerator::ScopeInfo* info, const std::string& name, const ReflectionGenerator::ScopeInfo** res)
+    void checkIfAnyStructOrClass(const ReflectionGenerator::ScopeInfo* info, bool& res)
     {
-        if(*res)
+        if(res)
         {
             return;
         }
 
         for(auto it = info->m_Structure.begin(); it != info->m_Structure.end(); ++it)
         {
-            if((*it)->m_Name == name)
+            if(((*it)->m_ScopeType == ReflectionGenerator::ScopeType::CLASS || (*it)->m_ScopeType == ReflectionGenerator::ScopeType::STRUCT) && (*it)->m_IsReflectionLabelSet)
             {
-                *res = *it;
+                res = true;
 
                 break;
             }
             else
             {
-                searchFor((*it), name, res);
-            }
-        }
-    }
-
-    void searchFor(const ReflectionGenerator::ScopeInfo* info, std::stack<std::string>& names, const ReflectionGenerator::ScopeInfo** res)
-    {
-        if(names.empty())
-        {
-            return;
-        }
-
-        for(auto it = info->m_Structure.begin(); it != info->m_Structure.end(); ++it)
-        {
-            if(names.empty())
-            {
-                return;
-            }
-
-            std::string name = names.top();
-
-            if((*it)->m_Name == name)
-            {
-                names.pop();
-
-                *res = *it;
-
-                searchFor(*it, names, res);
-            }
-            else
-            {
-                searchFor(*it, names, res);
+                checkIfAnyStructOrClass((*it), res);
             }
         }
     }
@@ -148,6 +117,11 @@ namespace SteelEngine {
 
                 if(brackets == 0)
                 {
+                    while(word[word.size() - 1] == ' ')
+                    {
+                        word.erase(word.size() - 1);
+                    }
+
                     size_t found = word.find_last_of(" ");
 
                     if(found != RuntimeDatabase::s_InvalidID)
@@ -177,6 +151,31 @@ namespace SteelEngine {
                     {
                         args.push_back(Argument{ word.substr(0, found), word.substr(found + 1) });
                         word.clear();
+                    }
+                }
+            }
+            else if(m_Lexer.GetToken() == "=")
+            {
+                Type::uint32 braces = 1;
+
+                while(1)
+                {
+                    m_Lexer++;
+
+                    if(m_Lexer.GetToken() == "(")
+                    {
+                        braces++;
+                    }
+                    else if(m_Lexer.GetToken() == ")")
+                    {
+                        braces--;
+
+                        if(braces == 0)
+                        {
+                            m_Lexer.SaveToken(m_Lexer.GetToken());
+
+                            break;
+                        }
                     }
                 }
             }
@@ -551,10 +550,54 @@ namespace SteelEngine {
 
                 for(FunctionScope* v : str->m_Functions)
                 {
-                    if((v->m_Protection == ProtectionLevel::PUBLIC || (v->m_ScopeType == ScopeType::STRUCT && v->m_Protection == ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
+                    bool found = false;
+
+                    for(FunctionScope* v2 : str->m_Functions)
                     {
-                        file << ".Method(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
-                        file << WriteMetaData(v);
+                        if(v != v2 && v->m_Name == v2->m_Name)
+                        {
+                            // We nee
+                            // printf("AAA\n");
+                            found = true;
+                        }
+                    }
+
+                    if(!found)
+                    {
+                        if((v->m_Protection == ProtectionLevel::PUBLIC || (v->m_ScopeType == ScopeType::STRUCT && v->m_Protection == ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
+                        {
+                            file << ".Method(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
+                            file << WriteMetaData(v);
+                        }
+                    }
+                    else
+                    {
+                        if((v->m_Protection == ProtectionLevel::PUBLIC || (v->m_ScopeType == ScopeType::STRUCT && v->m_Protection == ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
+                        {
+                            file << ".Method<";
+
+                            if(!v->m_Arguments.empty())
+                            {
+                                file << v->m_ReturnType << ", ";
+                            }
+                            else
+                            {
+                                file << v->m_ReturnType;
+                            }
+
+                            for(Type::uint32 i = 0; i < v->m_Arguments.size(); i++)
+                            {
+                                file << v->m_Arguments[i].m_Type;
+
+                                if(i < v->m_Arguments.size() - 1)
+                                {
+                                    file << ", ";
+                                }
+                            }
+
+                            file << ">(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
+                            file << WriteMetaData(v);
+                        }
                     }
                 }
 
@@ -569,7 +612,7 @@ namespace SteelEngine {
                         {
                             EnumElementScope* e = v->m_Elements[i];
 
-                            file << "SteelEngine::ReflectionEnumElement(\"" << e->m_Name << "\", " << parentsStr << str->m_Name << "::" << v->m_Name << "::" << e->m_Name << ")";
+                            file << "SteelEngine::Reflection::EnumElement(\"" << e->m_Name << "\", " << parentsStr << str->m_Name << "::" << v->m_Name << "::" << e->m_Name << ")";
                             file << WriteMetaData(e);
 
                             if(i < v->m_Elements.size() - 1)
@@ -733,11 +776,18 @@ namespace SteelEngine {
             {
                 m_Lexer++;
             }
+            else if(m_Lexer.GetToken() == "#define")
+            {
+                m_Lexer.SkipLine();
+            }
             else if(m_Lexer.GetToken() == "{")
             {
                 if(m_Scopes.empty())
                 {
                     m_Scopes.push(m_CurrentScopeToAdd);
+                    m_Structure.push_back(m_CurrentScopeToAdd);
+
+                    m_CurrentWorkingScope = m_CurrentScopeToAdd;
                 }
                 else
                 {
@@ -753,6 +803,7 @@ namespace SteelEngine {
                     m_CurrentWorkingScope->m_Structure.push_back(m_CurrentScopeToAdd);
 
                     m_CurrentWorkingScope = m_CurrentScopeToAdd;
+                    m_CurrentScopeToAdd = 0;
                 }
             }
             else if(m_Lexer.GetToken() == "}")
@@ -815,11 +866,29 @@ namespace SteelEngine {
                         {
                             protection = ProtectionLevel::PRIVATE;
                         }
+                        else if(m_Lexer.GetToken() == "SE_INHERITANCE")
+                        {
+                            m_CurrentScopeToAddByMeta = new InheritanceScope();
+
+                            m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
+
+                            ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
+                        }
                         else if(m_Lexer.GetToken() == ",")
                         {
-                            InheritanceScope* inherit = new InheritanceScope();
+                            if(!m_CurrentScopeToAddByMeta)
+                            {
+                                m_CurrentScopeToAdd = new InheritanceScope(word);
+                            }
+                            else
+                            {
+                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                                m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
+                                m_CurrentScopeToAddByMeta = 0;
+                            }
 
-                            inherit->m_Name = word;
+                            InheritanceScope* inherit = (InheritanceScope*)m_CurrentScopeToAdd;
+
                             inherit->m_Protection = protection;
 
                             str->m_Inheritance.push_back(inherit);
@@ -828,9 +897,19 @@ namespace SteelEngine {
                         }
                         else if(m_Lexer.GetToken() == "{")
                         {
-                            InheritanceScope* inherit = new InheritanceScope();
+                            if(!m_CurrentScopeToAddByMeta)
+                            {
+                                m_CurrentScopeToAdd = new InheritanceScope(word);
+                            }
+                            else
+                            {
+                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
+                                m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
+                                m_CurrentScopeToAddByMeta = 0;
+                            }
 
-                            inherit->m_Name = word;
+                            InheritanceScope* inherit = (InheritanceScope*)m_CurrentScopeToAdd;
+
                             inherit->m_Protection = protection;
 
                             str->m_Inheritance.push_back(inherit);
@@ -846,33 +925,6 @@ namespace SteelEngine {
                             word += m_Lexer.GetToken();
                         }
                     }
-
-                    // while(m_Lexer.GetToken() != "{")
-                    // {
-                    //     InheritanceScope* inherit = new InheritanceScope();
-                    //     std::string word = m_Lexer++.GetToken(); // public
-
-                    //     if(word == "public")
-                    //     {
-                    //         inherit->m_Protection == ProtectionLevel::PUBLIC;
-                    //     }
-                    //     else if(word == "protected")
-                    //     {
-                    //         inherit->m_Protection == ProtectionLevel::PROTECTED;
-                    //     }
-                    //     else if(word == "private")
-                    //     {
-                    //         inherit->m_Protection == ProtectionLevel::PRIVATE;
-                    //     }
-
-                    //     inherit->m_Name = m_Lexer++.GetToken(); // name
-
-                    //     StructScope* str = (StructScope*)m_CurrentScopeToAdd;
-
-                    //     str->m_Inheritance.push_back(inherit);
-
-                    //     m_Lexer++;
-                    // }
                 }
                 else
                 {
@@ -929,7 +981,7 @@ namespace SteelEngine {
                     }
                     else if(m_Lexer.GetToken() == "SE_ELEMENT")
                     {
-                        m_CurrentScopeToAddByMeta = new StructScope();
+                        m_CurrentScopeToAddByMeta = new EnumElementScope();
 
                         m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
 
@@ -1054,11 +1106,38 @@ namespace SteelEngine {
             {
 
             }
-            else if(m_Lexer.GetToken() == "using" || m_Lexer.GetToken() == "friend")
+            else if(m_Lexer.GetToken() == "override")
+            {
+                // m_Lexer++;
+            }
+            else if(m_Lexer.GetToken() == "using" || m_Lexer.GetToken() == "friend" || m_Lexer.GetToken() == "typedef")
             {
                 while(m_Lexer++.GetToken() != ";")
                 {
-                    
+
+                }
+            }
+            else if(m_Lexer.GetToken() == "template")
+            {
+                Type::uint32 braces = 0;
+
+                while(1)
+                {
+                    m_Lexer++;
+
+                    if(m_Lexer.GetToken() == "<")
+                    {
+                        braces++;
+                    }
+                    else if(m_Lexer.GetToken() == ">")
+                    {
+                        braces--;
+
+                        if(braces == 0)
+                        {
+                            break;
+                        }
+                    }
                 }
             }
             else
@@ -1081,14 +1160,19 @@ namespace SteelEngine {
                     }
                 }
 
-                if(m_Lexer.GetToken() == "const")
+                if(m_Lexer.GetToken() == "static")
                 {
-                    while(m_Lexer.GetToken() != ";")
-                    {
-                        m_Lexer++;
-                    }
+                    m_Lexer++;
+                }
 
-                    continue;
+                if(m_Lexer.GetToken() == "inline")
+                {
+                    m_Lexer++;
+                }
+
+                if(m_Lexer.GetToken() == "virtual")
+                {
+                    m_Lexer++;
                 }
 
                 std::string saved;
@@ -1120,23 +1204,28 @@ namespace SteelEngine {
 
                             ProcessArguments(cons->m_Arguments);
 
-                            bool waitForCloseBrace = false;
+                            Type::uint32 braces = 0;
 
                             while(1)
                             {
                                 m_Lexer++;
 
-                                if(m_Lexer.GetToken() == ";" && !waitForCloseBrace)
+                                if(m_Lexer.GetToken() == ";" && braces == 0)
                                 {
                                     break;
                                 }
                                 else if(m_Lexer.GetToken() == "{")
                                 {
-                                    waitForCloseBrace = true;
+                                    braces++;
                                 }
-                                else if(m_Lexer.GetToken() == "}" && waitForCloseBrace)
+                                else if(m_Lexer.GetToken() == "}")
                                 {
-                                    break;
+                                    braces--;
+
+                                    if(braces == 0)
+                                    {
+                                        break;
+                                    }
                                 }
                             }
 
@@ -1187,7 +1276,7 @@ namespace SteelEngine {
                     }
                 }
 
-                if(!success)
+                if(!success && m_CurrentWorkingScope)
                 {
                     word += saved;
                     word += m_Lexer.GetToken();
@@ -1197,7 +1286,36 @@ namespace SteelEngine {
                         word += " ";
                     }
 
-                    if(m_Lexer.GetToken() == "(" && word[0] != ':')
+                    Lexer lexer;
+                    std::vector<std::string> line;
+                    Type::uint32 braces = 0;
+                    bool wasBracket = false;
+
+                    line.push_back(word);
+                    lexer.Load(line);
+
+                    while(!lexer.End())
+                    {
+                        lexer++;
+
+                        if(lexer.GetToken() == "<")
+                        {
+                            braces++;
+
+                            wasBracket = true;
+                        }
+                        else if(lexer.GetToken() == ">")
+                        {
+                            braces--;
+
+                            if(braces == 0)
+                            {
+                                wasBracket = false;
+                            }
+                        }
+                    }
+
+                    if(m_Lexer.GetToken() == "(" && word[0] != ':' && !wasBracket)
                     {
                         size_t found = word.find_last_of(" ");
 
@@ -1216,7 +1334,6 @@ namespace SteelEngine {
                         }
 
                         FunctionScope* func = (FunctionScope*)m_CurrentScopeToAdd;
-                        StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
 
                         func->m_ReturnType = word.substr(0, found);
                         func->m_Protection = m_CurrentProtectionLevel;
@@ -1224,7 +1341,42 @@ namespace SteelEngine {
 
                         ProcessArguments(func->m_Arguments);
 
-                        structScope->m_Functions.push_back(func);
+                        Type::uint32 braces = 0;
+
+                        while(1)
+                        {
+                            m_Lexer++;
+
+                            if(m_Lexer.GetToken() == ";" && braces == 0)
+                            {
+                                break;
+                            }
+                            else if(m_Lexer.GetToken() == "{")
+                            {
+                                braces++;
+                            }
+                            else if(m_Lexer.GetToken() == "}")
+                            {
+                                braces--;
+
+                                if(braces == 0)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                        if(m_CurrentWorkingScope->m_ScopeType == ScopeType::CLASS || m_CurrentWorkingScope->m_ScopeType == ScopeType::STRUCT)
+                        {
+                            StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
+
+                            structScope->m_Functions.push_back(func);
+                        }
+                        else if(m_CurrentWorkingScope && m_CurrentWorkingScope->m_ScopeType == ScopeType::NAMESPACE)
+                        {
+                            m_CurrentWorkingScope->m_Scopes.push(func);
+                            m_CurrentWorkingScope->m_Structure.push_back(func);
+                        }
 
                         word.clear();
                     }
@@ -1233,6 +1385,40 @@ namespace SteelEngine {
                         while(word[word.size() - 2] == ' ')
                         {
                             word.erase(word.size() - 2, 1);
+                        }
+
+                        Lexer lexer;
+                        bool wasConst = false;
+                        std::vector<std::string> lines;
+
+                        lines.push_back(word);
+                        lexer.Load(lines);
+                        word.clear();
+
+                        while(!lexer.End())
+                        {
+                            lexer++;
+
+                            if(lexer.GetToken() == "const")
+                            {
+                                wasConst = true;
+
+                                break;
+                            }
+                            else
+                            {
+                                word += lexer.GetToken();
+
+                                if(lexer.Space())
+                                {
+                                    word += " ";
+                                }
+                            }
+                        }
+
+                        if(wasConst)
+                        {
+                            continue;
                         }
 
                         size_t found = word.find_last_of(" ");
@@ -1274,6 +1460,25 @@ namespace SteelEngine {
 
     Result ReflectionGenerator::Generate(const std::filesystem::path& cwd, const std::filesystem::path& generatePath)
     {
+        if(!m_Structure.empty())
+        {
+            for(Type::uint32 i = 0; i < m_Structure.size(); i++)
+            {
+                bool res = false;
+
+                checkIfAnyStructOrClass(m_Structure[i], res);
+
+                if(!res)
+                {
+                    return SE_TRUE;
+                }
+            }
+        }
+        else
+        {
+            return SE_TRUE;
+        }
+
         std::string p_ = m_Filename.string();
 
 		replaceAll(p_, "\\", "/");
@@ -1367,6 +1572,11 @@ namespace SteelEngine {
 
         m_BeginRecordingOnce = false;
         m_EndRecordingOnce = false;
+
+        for(Type::uint32 i = 0; i < m_Structure.size(); i++)
+        {
+            m_Structure[i]->Clear();
+        }
     }
 
 }

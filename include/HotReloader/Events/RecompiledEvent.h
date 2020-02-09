@@ -4,7 +4,7 @@
 
 namespace SteelEngine {
 
-    SE_CLASS(
+    SE_STRUCT(
         SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
     )
     struct RecompiledEvent

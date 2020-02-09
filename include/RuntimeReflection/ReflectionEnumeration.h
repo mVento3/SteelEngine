@@ -12,17 +12,17 @@ namespace SteelEngine {
 	{
 		ReflectionData<T>* m_Data;
 		MetaDataInfoVector m_MetaData;
-		EnumElementVector m_Values;
+		// EnumElementVector m_Values;
+		std::vector<ReflectionEnumElement*> m_Values;
 		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
 		std::string m_Name;
+		IReflectionData* m_ReflectionData;
 
 		ReflectionEnumeration(ReflectionData<T>& data, const std::string& name) :
 			m_Data(&data),
 			m_Name(name)
 		{
 			m_TypeID = typeid(A).hash_code();
-
-			m_Values.reserve(100);
 		}
 
 		const MetaDataInfoVector* GetMetaDataInfoVector() const override
@@ -37,11 +37,11 @@ namespace SteelEngine {
 
 		int GetEnumValue(const std::string& name) override
 		{
-			for(EnumElementVector::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
+			for(std::vector<ReflectionEnumElement*>::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
 			{
-				if(it->m_Name == name)
+				if((*it)->m_Name == name)
 				{
-					return it->m_Value;
+					return (*it)->m_Value;
 				}
 			}
 
@@ -50,11 +50,11 @@ namespace SteelEngine {
 
 		ReflectionEnumElement GetEnum(const std::string& name) override
 		{
-			for(EnumElementVector::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
+			for(std::vector<ReflectionEnumElement*>::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
 			{
-				if(it->m_Name == name)
+				if((*it)->m_Name == name)
 				{
-					return *it;
+					return **it;
 				}
 			}
 
@@ -63,17 +63,25 @@ namespace SteelEngine {
 			return wrong;
 		}
 
-		ReflectionData<T>& Values(const EnumElementVector& args)
+		ReflectionData<T>& Values(const std::vector<std::reference_wrapper<ReflectionEnumElement>>& args)
 		{
-			for(ReflectionEnumElement v : args)
+			static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+
+			for(ReflectionEnumElement& v : args)
 			{
-				m_Values.push_back(v);
+				ReflectionEnumElement* vv = &v;
+
+				m_ReflectionData->ProcessMetaData(db, vv, vv->toProcess);
+
+				vv->toProcess.clear();
+
+				m_Values.push_back(vv);
 			}
 
 			return *m_Data;
 		}
 
-		const EnumElementVector* GetEnumElements() const override
+		const std::vector<ReflectionEnumElement*>* GetEnumElements() const override
 		{
 			return &m_Values;
 		}

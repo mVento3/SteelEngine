@@ -18,6 +18,11 @@ namespace SteelEngine {
     {
         IReflectionData* type_ = Reflection::GetType("SteelEngine::Script::Python::Scriptable");
 
+        if(!type_)
+        {
+            return;
+        }
+
         for(Type::uint32 i = 0; i < data.size(); i++)
         {
             if(data[i]->GetTypeID() == type_->GetTypeID())

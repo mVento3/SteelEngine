@@ -26,7 +26,9 @@
 
 namespace SteelEngine {
 
-	SE_CLASS()
+	SE_CLASS(
+		Reflection::ReflectionAttribute::NO_SERIALIZE
+	)
 	class Reflection : public StaticHelper
 	{
 		friend class ReflectionRecorder;
@@ -303,6 +305,13 @@ namespace SteelEngine {
 		static MetaDataInfo MetaData(KeyType key, ValueType value)
 		{
 			return MetaDataInfo(key, value);
+		}
+
+		static ReflectionEnumElement& EnumElement(const char* name, int value)
+		{
+			ReflectionEnumElement* element = new ReflectionEnumElement(name, value);
+
+			return *element;
 		}
 	};
 

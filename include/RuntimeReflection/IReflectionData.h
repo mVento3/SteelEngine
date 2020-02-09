@@ -54,7 +54,8 @@ namespace SteelEngine {
 			METHOD_BIND,
 			PROPERTY_BIND,
 			TYPE_BIND,
-			INHERITANCE_BIND
+			INHERITANCE_BIND,
+			ENUM_BIND
 		};
 
 	protected:

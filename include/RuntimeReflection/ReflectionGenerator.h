@@ -69,6 +69,26 @@ namespace SteelEngine {
             ProtectionLevel m_Protection;
             std::vector<MetaData> m_MetaData;
             bool m_IsReflectionLabelSet;
+
+            void Clear()
+            {
+                for(Type::uint32 i = 0; i < m_Structure.size(); i++)
+                {
+                    m_Structure[i]->Clear();
+                }
+
+                if(!m_Parent)
+                {
+                    return;
+                }
+
+                for(Type::uint32 i = 0; i < m_Parent->m_Structure.size(); i++)
+                {
+                    delete m_Parent->m_Structure[i];
+
+                    m_Parent->m_Structure.pop_back();
+                }
+            }
         };
 
         struct Argument
@@ -248,6 +268,7 @@ namespace SteelEngine {
         std::filesystem::path m_Filename;
 
         std::stack<ScopeInfo*> m_Scopes;
+        std::vector<ScopeInfo*> m_Structure;
         ScopeInfo* m_CurrentScopeToAdd;
         ScopeInfo* m_CurrentWorkingScope;
         ScopeInfo* m_CurrentScopeToAddByMeta;
