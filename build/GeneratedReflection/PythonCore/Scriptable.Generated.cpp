@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/PythonCore/Scriptable.Generated.h"
-#include "PythonCore/Scriptable.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "PythonCore/Scriptable.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/PythonCore/Scriptable.Generated.h"
 
 namespace SteelEngine {
 namespace Script {
@@ -23,7 +23,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Scriptable))
 .Method("GetScriptName", &Scriptable::GetScriptName)
 ;
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

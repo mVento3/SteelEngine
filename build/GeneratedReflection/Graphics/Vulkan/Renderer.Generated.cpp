@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Vulkan/Renderer.Generated.h"
-#include "Graphics/Vulkan/Renderer.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Graphics/Vulkan/Renderer.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Vulkan/Renderer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
@@ -18,13 +18,12 @@ SteelEngine::ReflectionRecorder::Register<Renderer>("Renderer",{
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 )
+.Constructor<IWindow*>()
 .Inheritance<IRendererAPI<IRenderer::API::VULKAN_API>>("IRendererAPI<IRenderer::API::VULKAN_API>")
 .Inheritance<EventObserver>("EventObserver")
-.Constructor<IWindow*>()
 .Method("RecreateSwapChain", &Renderer::RecreateSwapChain)
 ;
 }
-
 void Renderer::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(Renderer::m_Instance)
@@ -68,7 +67,6 @@ SERIALIZE(Renderer::m_Trans2)
 SERIALIZE(Renderer::m_VertexArray)
 SERIALIZE(Renderer::m_DeltaTimeVariant)
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

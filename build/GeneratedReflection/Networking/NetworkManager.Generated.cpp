@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/NetworkManager.Generated.h"
-#include "Networking/NetworkManager.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "Networking/NetworkManager.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/NetworkManager.Generated.h"
 
 namespace SteelEngine {
 namespace Network {
@@ -15,17 +15,15 @@ SteelEngine::ReflectionRecorder::Register<NetworkManager>("NetworkManager",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NetworkManager))
 )
-.Inheritance<INetworkManager>("INetworkManager")
 .Constructor<>()
+.Inheritance<INetworkManager>("INetworkManager")
 .Method("GetConnectedClientsCount", &NetworkManager::GetConnectedClientsCount)
 .Method("GetConnectionStatus", &NetworkManager::GetConnectionStatus)
 ;
 }
-
 void NetworkManager::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

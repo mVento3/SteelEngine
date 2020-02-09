@@ -1,7 +1,7 @@
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/HotReloader/RuntimeReloader.Generated.h"
-#include "HotReloader/RuntimeReloader.h"
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
+#include "HotReloader/RuntimeReloader.h"
+#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/HotReloader/RuntimeReloader.Generated.h"
 
 namespace SteelEngine {
 namespace HotReloader {
@@ -15,15 +15,13 @@ SteelEngine::ReflectionRecorder::Register<RuntimeReloader>("RuntimeReloader",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(RuntimeReloader))
 )
-.Inheritance<IRuntimeReloader>("IRuntimeReloader")
 .Constructor<>()
+.Inheritance<IRuntimeReloader>("IRuntimeReloader")
 ;
 }
-
 void RuntimeReloader::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 }
-
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

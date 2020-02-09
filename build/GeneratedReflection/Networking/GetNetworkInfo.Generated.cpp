@@ -1,7 +1,0 @@
-#include "HotReloader/IRuntimeObject.h"
-#include "RuntimeReflection/ReflectionRecorder.h"
-#include "Networking/GetNetworkInfo.h"
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/GetNetworkInfo.Generated.h"
-
-namespace SteelEngine {
-}
