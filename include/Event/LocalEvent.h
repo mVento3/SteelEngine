@@ -35,7 +35,7 @@ namespace SteelEngine { namespace Event {
 		}
 
 		template <typename ...Args>
-		inline void BroadcastVaradic(Args... args)
+		inline void BroadcastVariadic(Args... args)
 		{
 			m_Event.Broadcast(tMessage(args...));
 		}

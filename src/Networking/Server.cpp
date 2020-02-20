@@ -32,7 +32,7 @@ namespace SteelEngine {
 #else
             closes(info->m_Socket);
 #endif
-            m_ClientDisconnectedEvent.BroadcastVaradic(info->m_Socket);
+            m_ClientDisconnectedEvent.BroadcastVariadic(info->m_Socket);
             info->m_Signal.set_value();
         }
         else if(bytesIn == 0)
@@ -43,7 +43,7 @@ namespace SteelEngine {
 #else
             closes(info->m_Socket);
 #endif
-            m_ClientDisconnectedEvent.BroadcastVaradic(info->m_Socket);
+            m_ClientDisconnectedEvent.BroadcastVariadic(info->m_Socket);
             info->m_Signal.set_value();
         }
         else
