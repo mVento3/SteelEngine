@@ -23,6 +23,7 @@ namespace SteelEngine {
 
         std::vector<size_t> m_Inheritance;
         std::vector<std::string> m_PropertiesToSerialize;
+        std::vector<Parser::ConstructorScope*> m_Constructors;
 
     public:
         RCS_ReflectionModule();

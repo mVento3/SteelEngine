@@ -456,50 +456,6 @@ namespace SteelEngine {
                             {
                                 module->GenerateHeader(m_GeneratedHeaderLinesByModules);
                             }
-
-                            if(!str->m_Constructors.empty())
-                            {
-                                file << "#ifdef RUNTIME_COMPILE\n";
-                                file << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)\n";
-                                file << "{\n";
-                                {
-                                    file << "DECLARE_TYPE_INFO(" << str->m_Name << ")\n";
-                                    file << "{\n";
-                                    {
-                                        file << "FIND_THE_RIGHT_OBJECT\n";
-                                        file << "\n";
-
-                                        for(Parser::ConstructorScope* cons : str->m_Constructors)
-                                        {
-                                            if(cons->m_Arguments.size() > 0)
-                                            {
-                                                file << "COMPARE_CONSTRUCTOR(";
-
-                                                for(Type::uint32 i = 0; i < cons->m_Arguments.size(); i++)
-                                                {
-                                                    file << cons->m_Arguments[i].m_Type;
-
-                                                    if(i < cons->m_Arguments.size() - 1)
-                                                    {
-                                                        file << ", ";
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                file << "COMPARE_CONSTRUCTOR_(";
-                                            }
-
-                                            file << ")\n";
-                                        }
-                                    }
-                                    file << "};\n";
-                                    file << "\n";
-                                    file << "return result;\n";
-                                }
-                                file << "}\n";
-                                file << "#endif\n";
-                            }
                         }
                     }
 

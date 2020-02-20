@@ -232,7 +232,6 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
                         for(Type::uint32 i = 0; i < a.size(); i++)
                         {
-                            // IReflectionData::PropertyInfo info = a[i];
                             Variant prop = type->GetProperty(a[i]->GetName().c_str(), runtime->m_Object);
 
                             if(prop.GetType() == m_FloatTypeID)

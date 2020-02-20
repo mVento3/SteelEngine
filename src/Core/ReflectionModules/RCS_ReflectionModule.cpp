@@ -45,6 +45,47 @@ namespace SteelEngine {
             }
 
             out << "}\n";
+
+            out << "#ifdef RUNTIME_COMPILE\n";
+            out << "extern \"C\" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)\n";
+            out << "{\n";
+            {
+                out << "DECLARE_TYPE_INFO(" << m_StructName << ")\n";
+                out << "{\n";
+                {
+                    out << "FIND_THE_RIGHT_OBJECT\n";
+                    out << "\n";
+
+                    for(Parser::ConstructorScope* cons : m_Constructors)
+                    {
+                        if(cons->m_Arguments.size() > 0)
+                        {
+                            out << "COMPARE_CONSTRUCTOR(";
+
+                            for(Type::uint32 i = 0; i < cons->m_Arguments.size(); i++)
+                            {
+                                out << cons->m_Arguments[i].m_Type;
+
+                                if(i < cons->m_Arguments.size() - 1)
+                                {
+                                    out << ", ";
+                                }
+                            }
+                        }
+                        else
+                        {
+                            out << "COMPARE_CONSTRUCTOR_(";
+                        }
+
+                        out << ")\n";
+                    }
+                }
+                out << "};\n";
+                out << "\n";
+                out << "return result;\n";
+            }
+            out << "}\n";
+            out << "#endif\n";
         }
     }
 
@@ -58,7 +99,7 @@ namespace SteelEngine {
         else if(m_GenerateSerializationOwn)
         {
             out.push_back("public:");
-            out.push_back("virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer);");
+            out.push_back("void Serialize(SteelEngine::HotReloader::ISerializer* serializer);");
         }
     }
 
@@ -76,6 +117,7 @@ namespace SteelEngine {
             if(enum_->Compare(Reflection::ReflectionAttribute::HOT_RELOAD, meta.m_Key))
             {
                 hotReload = true;
+                m_Constructors.insert(m_Constructors.begin(), info->m_Constructors.begin(), info->m_Constructors.end());
             }
         }
 
@@ -168,6 +210,18 @@ namespace SteelEngine {
                         {
                             m_Inheritance.push_back(typeID);
                         }
+                    }
+                }
+            }
+            else
+            {
+                for(Type::uint32 i = 0; i < info->m_Inheritance.size(); i++)
+                {
+                    IReflectionData* type = Reflection::GetType(info->m_Inheritance.at(i)->m_Name);
+
+                    if(type)
+                    {
+                        m_Inheritance.push_back(type->GetTypeID());
                     }
                 }
             }
