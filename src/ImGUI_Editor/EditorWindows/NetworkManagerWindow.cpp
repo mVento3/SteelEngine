@@ -32,7 +32,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         Event::GlobalEvent::Broadcast(Network::ConnectToServerEvent(m_ServerIP));
 
         Network::INetworkManager* networkManager =
-            *Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager**>();
+            Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager*>();
 
         std::vector<HotReloader::InheritanceTrackKeeper*> commands = networkManager->GetCommands();
 
