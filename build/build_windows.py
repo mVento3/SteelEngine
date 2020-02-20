@@ -43,9 +43,23 @@ for subdir, dirs, files in os.walk('include'):
 
                 break
 
-for module in modules:
-    module.generateReflection()
-    lib_updated = module.compileWhole(lib_updated)
+generatedStaticLibReflection = False
+
+for i in range(0, len(modules)):
+    if not generatedStaticLibReflection and modules[i].type != 'lib':
+        generatedStaticLibReflection = True
+        staticLibReflectionModule = Module.Module('StaticLibraryReflection', 'dll', process, cwd, config['compiler'], working_directory, config['modules'], state['filesHash'])
+
+        for j in range(0, i):
+            module = modules[j]
+            for k in range(0, len(module.generated_reflection_objs)):
+                staticLibReflectionModule.object_files.append(module.generated_reflection_objs[k])
+
+        staticLibReflectionModule.forceCompile = True
+        staticLibReflectionModule.compileWhole(lib_updated)
+
+    modules[i].generateReflection()
+    lib_updated = modules[i].compileWhole(lib_updated)
 
 with open('build/state.json', 'w') as f:
     json.dump(state, f, indent=4)

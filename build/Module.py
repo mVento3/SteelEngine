@@ -27,6 +27,8 @@ class Module:
         self.modules = modules
         self.hashes = hashes
         self.directory = ''
+        self.generated_reflection_objs = []
+        self.forceCompile = False
 
     def generateReflection(self):
         for h in self.header_files:
@@ -35,8 +37,6 @@ class Module:
             except:
                 print(os.sys.exc_info())
 
-            # for src in self.source_files:
-            #     if os.path.splitext(os.path.basename(h))[0] == os.path.splitext(os.path.basename(src))[0]:
             splitted = h.split(os.sep)
             res = ''
 
@@ -134,7 +134,9 @@ class Module:
                 self.process.WriteInput('cd ' + self.cwd + '/' + self.working_directory)
                 self.process.Wait()
 
-            self.object_files.append(self.working_directory + '/' + obj_dir + splitted[len(splitted) - 1].split('.')[0] + '.Generated.obj')
+            obj = self.working_directory + '/' + obj_dir + splitted[len(splitted) - 1].split('.')[0] + '.Generated.obj'
+            self.object_files.append(obj)
+            self.generated_reflection_objs.append(obj)
 
         for src in self.source_files:
             splitted = src.split(os.sep)
@@ -198,7 +200,7 @@ class Module:
 
             self.object_files.append(self.working_directory + '/' + obj_dir + splitted[len(splitted) - 1].split('.')[0] + '.obj')
 
-        if whole_compile or lib_updated:
+        if whole_compile or lib_updated or self.forceCompile:
             obj_files = ''
 
             for o in self.object_files:
