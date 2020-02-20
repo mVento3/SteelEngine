@@ -19,17 +19,4 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(WindowResizedEvent))
 .Inheritance<Event::Naive>("Event::Naive")
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(WindowResizedEvent)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR(Type::uint32, Type::uint32)
-};
-
-return result;
-}
-#endif
 }

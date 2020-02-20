@@ -22,19 +22,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(IndexBuffer))
 .Inheritance<Buffer>("Buffer")
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(IndexBuffer)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR_()
-};
-
-return result;
-}
-#endif
 }
 }
 }

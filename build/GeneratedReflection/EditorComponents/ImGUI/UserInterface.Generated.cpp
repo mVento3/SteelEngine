@@ -41,7 +41,6 @@ DECLARE_TYPE_INFO(UserInterface)
 {
 FIND_THE_RIGHT_OBJECT
 
-COMPARE_CONSTRUCTOR_()
 };
 
 return result;

@@ -30,6 +30,18 @@ SERIALIZE(Window::m_Title)
 SERIALIZE(Window::m_Context)
 SERIALIZE(Window::m_Editor)
 }
+#ifdef RUNTIME_COMPILE
+extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
+{
+DECLARE_TYPE_INFO(Window)
+{
+FIND_THE_RIGHT_OBJECT
+
+};
+
+return result;
+}
+#endif
 namespace ImGUI {
 }
 }

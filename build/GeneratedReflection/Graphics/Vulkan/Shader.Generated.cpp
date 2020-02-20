@@ -22,19 +22,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Shader))
 .Inheritance<IShader>("IShader")
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(Shader)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR_()
-};
-
-return result;
-}
-#endif
 }
 }
 }

@@ -19,17 +19,4 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(AnyItemActiveChangedEvent))
 .Inheritance<Event::Naive>("Event::Naive")
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(AnyItemActiveChangedEvent)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR(bool)
-};
-
-return result;
-}
-#endif
 }

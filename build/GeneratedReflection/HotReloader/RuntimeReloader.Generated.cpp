@@ -19,18 +19,5 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(RuntimeReloader))
 .Inheritance<IRuntimeReloader>("IRuntimeReloader")
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(RuntimeReloader)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR_()
-};
-
-return result;
-}
-#endif
 }
 }

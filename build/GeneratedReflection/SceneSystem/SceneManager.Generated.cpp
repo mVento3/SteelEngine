@@ -17,17 +17,4 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SceneManager))
 .Inheritance<ISceneManager>("ISceneManager")
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(SceneManager)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR_()
-};
-
-return result;
-}
-#endif
 }

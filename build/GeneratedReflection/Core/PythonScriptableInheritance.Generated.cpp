@@ -19,17 +19,4 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(PythonScriptableInheritance))
 .Method("ProcessInheritance", &PythonScriptableInheritance::ProcessInheritance)
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(PythonScriptableInheritance)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR_()
-};
-
-return result;
-}
-#endif
 }

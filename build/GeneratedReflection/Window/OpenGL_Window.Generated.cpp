@@ -21,17 +21,4 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(OpenGL_Window))
 .Method("MakeCurrent", &OpenGL_Window::MakeCurrent)
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(OpenGL_Window)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR_()
-};
-
-return result;
-}
-#endif
 }

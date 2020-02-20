@@ -19,17 +19,4 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(MouseMotionEvent))
 .Inheritance<Event::Naive>("Event::Naive")
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(MouseMotionEvent)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR(int, int)
-};
-
-return result;
-}
-#endif
 }

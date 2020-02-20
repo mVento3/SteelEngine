@@ -19,17 +19,4 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(KeyDownEvent))
 .Inheritance<Event::Naive>("Event::Naive")
 ;
 }
-#ifdef RUNTIME_COMPILE
-extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
-{
-DECLARE_TYPE_INFO(KeyDownEvent)
-{
-FIND_THE_RIGHT_OBJECT
-
-COMPARE_CONSTRUCTOR(int)
-};
-
-return result;
-}
-#endif
 }
