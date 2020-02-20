@@ -10,5 +10,9 @@ Script::Python::Scriptable* Cast_Scriptable()\
 {\
 return static_cast<NetworkManagerWindow*>(this);\
 }\
+HotReloader::IRuntimeObject* Cast_IRuntimeObject()\
+{\
+return static_cast<NetworkManagerWindow*>(this);\
+}\
 public:\
 virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer) override;

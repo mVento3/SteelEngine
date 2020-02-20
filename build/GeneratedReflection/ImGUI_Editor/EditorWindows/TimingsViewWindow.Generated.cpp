@@ -16,11 +16,24 @@ SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::EDI
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData(SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW, true),
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(TimingsViewWindow))
 )
 .Constructor<>()
 .Inheritance<EditorComponents::ImGUI::UserInterface>("EditorComponents::ImGUI::UserInterface")
+.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Method("Cast_UserInterface", &TimingsViewWindow::Cast_UserInterface)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
+)
+.Method("Cast_IRuntimeObject", &TimingsViewWindow::Cast_IRuntimeObject)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
+)
+.Method("Serialize", &TimingsViewWindow::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void TimingsViewWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
@@ -29,6 +42,7 @@ SERIALIZE(TimingsViewWindow::m_Manager)
 SERIALIZE(TimingsViewWindow::m_Type)
 SERIALIZE(TimingsViewWindow::m_GetTimeMethod)
 SERIALIZE(TimingsViewWindow::m_Timings)
+UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

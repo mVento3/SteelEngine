@@ -1,6 +1,15 @@
 #include "RuntimeReflection/ReflectionGeneratorMacros.h"
 
 #define GENERATED_BODY \
+public:\
+INetworkCommand* Cast_INetworkCommand()\
+{\
+return static_cast<SwapModuleNetCommandEvent*>(this);\
+}\
+HotReloader::IRuntimeObject* Cast_IRuntimeObject()\
+{\
+return static_cast<SwapModuleNetCommandEvent*>(this);\
+}\
 private:\
 char* Serialize(char* data, size_t& totalSize) override\
 {\

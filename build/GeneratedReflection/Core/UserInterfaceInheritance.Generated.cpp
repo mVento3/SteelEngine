@@ -12,11 +12,16 @@ SteelEngine::ReflectionRecorder::Register<UserInterfaceInheritance>("UserInterfa
 )
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(UserInterfaceInheritance))
 )
 .Constructor<>()
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Method("ProcessInheritance", &UserInterfaceInheritance::ProcessInheritance)
+.Method("Serialize", &UserInterfaceInheritance::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void UserInterfaceInheritance::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

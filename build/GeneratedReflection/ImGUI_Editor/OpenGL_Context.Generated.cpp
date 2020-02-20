@@ -11,12 +11,17 @@ SteelEngine::ReflectionRecorder::Register<OpenGL_Context>("OpenGL_Context",{
 }
 )
 (
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(OpenGL_Context))
 )
 .Constructor<>()
 .Inheritance<IContext>("IContext")
 .Method("GetContext", &OpenGL_Context::GetContext)
 .Method("MakeCurrent", &OpenGL_Context::MakeCurrent)
+.Method("Serialize", &OpenGL_Context::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void OpenGL_Context::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

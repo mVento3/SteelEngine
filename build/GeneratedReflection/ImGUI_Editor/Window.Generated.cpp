@@ -14,9 +14,14 @@ SteelEngine::ReflectionRecorder::Register<Window>("Window",{
 )
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Window))
 )
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
+.Method("Serialize", &Window::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void Window::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

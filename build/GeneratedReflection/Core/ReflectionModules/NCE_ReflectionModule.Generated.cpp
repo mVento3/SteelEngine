@@ -12,10 +12,15 @@ SteelEngine::ReflectionRecorder::Register<NCE_ReflectionModule>("NCE_ReflectionM
 )
 (
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::REFLECTION_MODULE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NCE_ReflectionModule))
 )
 .Constructor<>()
 .Inheritance<IReflectionModule>("IReflectionModule")
+.Method("Serialize", &NCE_ReflectionModule::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void NCE_ReflectionModule::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

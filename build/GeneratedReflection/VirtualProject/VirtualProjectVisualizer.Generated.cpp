@@ -11,10 +11,15 @@ SteelEngine::ReflectionRecorder::Register<VirtualProjectVisualizer>("VirtualProj
 }
 )
 (
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(VirtualProjectVisualizer))
 )
 .Constructor<VirtualProject**>()
 .Inheritance<IVirtualProjectVisualizer>("IVirtualProjectVisualizer")
+.Method("Serialize", &VirtualProjectVisualizer::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void VirtualProjectVisualizer::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

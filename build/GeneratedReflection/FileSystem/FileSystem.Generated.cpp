@@ -17,9 +17,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(FileSystem))
 .Inheritance<IFileSystem>("IFileSystem")
 ;
 }
-void FileSystem::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
-{
-}
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

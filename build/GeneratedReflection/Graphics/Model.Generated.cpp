@@ -13,7 +13,6 @@ SteelEngine::ReflectionRecorder::Register<Model>("Model",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Model))
 )
 .Constructor<const char*>()

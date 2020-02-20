@@ -11,10 +11,15 @@ SteelEngine::ReflectionRecorder::Register<MemoryTracker>("MemoryTracker",{
 }
 )
 (
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(MemoryTracker))
 )
 .Constructor<Memory::Allocator*>()
 .Inheritance<IMemoryTracker>("IMemoryTracker")
+.Method("Serialize", &MemoryTracker::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void MemoryTracker::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

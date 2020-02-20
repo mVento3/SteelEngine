@@ -14,6 +14,10 @@ EditorComponents::ImGUI::UserInterface* Cast_UserInterface()\
 {\
 return static_cast<SynchronizeProjectNCE*>(this);\
 }\
+HotReloader::IRuntimeObject* Cast_IRuntimeObject()\
+{\
+return static_cast<SynchronizeProjectNCE*>(this);\
+}\
 private:\
 char* Serialize(char* data, size_t& totalSize) override\
 {\

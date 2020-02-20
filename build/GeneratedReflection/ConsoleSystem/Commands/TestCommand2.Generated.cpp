@@ -12,10 +12,15 @@ SteelEngine::ReflectionRecorder::Register<TestCommand2>("TestCommand2",{
 )
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CONSOLE_COMMAND, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(TestCommand2))
 )
 .Constructor<>()
 .Inheritance<ICommand>("ICommand")
+.Method("Serialize", &TestCommand2::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void TestCommand2::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

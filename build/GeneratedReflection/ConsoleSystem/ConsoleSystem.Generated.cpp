@@ -11,10 +11,15 @@ SteelEngine::ReflectionRecorder::Register<ConsoleSystem>("ConsoleSystem",{
 }
 )
 (
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ConsoleSystem))
 )
 .Constructor<>()
 .Inheritance<IConsoleSystem>("IConsoleSystem")
+.Method("Serialize", &ConsoleSystem::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void ConsoleSystem::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

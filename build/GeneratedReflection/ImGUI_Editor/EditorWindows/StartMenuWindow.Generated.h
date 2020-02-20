@@ -2,7 +2,11 @@
 
 #define GENERATED_BODY \
 public:\
-SteelEngine::EditorComponents::ImGUI::UserInterface* Cast_UserInterface()\
+EditorComponents::ImGUI::UserInterface* Cast_UserInterface()\
+{\
+return static_cast<StartMenuWindow*>(this);\
+}\
+HotReloader::IRuntimeObject* Cast_IRuntimeObject()\
 {\
 return static_cast<StartMenuWindow*>(this);\
 }\

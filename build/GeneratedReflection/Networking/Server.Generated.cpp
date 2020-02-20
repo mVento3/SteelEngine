@@ -12,6 +12,7 @@ SteelEngine::ReflectionRecorder::Register<Server>("Server",{
 )
 (
 SteelEngine::Reflection::MetaData(SteelEngine::SERVER_INFO , SteelEngine::ServerInfo(1024, 5004)),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Server))
 )
 .Constructor<>()
@@ -20,6 +21,10 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Server))
 .Method("Send", &Server::Send)
 .Method("Receive", &Server::Receive)
 .Method("GetCommands", &Server::GetCommands)
+.Method("Serialize", &Server::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void Server::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

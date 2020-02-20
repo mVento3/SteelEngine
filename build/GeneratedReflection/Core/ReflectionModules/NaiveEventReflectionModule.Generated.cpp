@@ -12,10 +12,15 @@ SteelEngine::ReflectionRecorder::Register<NaiveEventReflectionModule>("NaiveEven
 )
 (
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::REFLECTION_MODULE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NaiveEventReflectionModule))
 )
 .Constructor<>()
 .Inheritance<IReflectionModule>("IReflectionModule")
+.Method("Serialize", &NaiveEventReflectionModule::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void NaiveEventReflectionModule::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

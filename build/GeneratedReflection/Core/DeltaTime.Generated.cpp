@@ -11,7 +11,6 @@ SteelEngine::ReflectionRecorder::Register<DeltaTime>("DeltaTime",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(DeltaTime))
 )
 .Constructor<>()

@@ -15,7 +15,6 @@ SteelEngine::ReflectionRecorder::Register<Scriptable>("Scriptable",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Scriptable))
 )
 .Constructor<const std::string&>()

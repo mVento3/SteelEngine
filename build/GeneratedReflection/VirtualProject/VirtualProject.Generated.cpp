@@ -13,13 +13,24 @@ SteelEngine::ReflectionRecorder::Register<VirtualProject>("VirtualProject",{
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(VirtualProject))
 )
 .Constructor<>()
 .Inheritance<IVirtualProject>("IVirtualProject")
 .Inheritance<Script::Python::Scriptable>("Script::Python::Scriptable")
 .Method("Cast_IVirtualProject", &VirtualProject::Cast_IVirtualProject)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
+)
 .Method("Cast_Scriptable", &VirtualProject::Cast_Scriptable)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
+)
+.Method("Serialize", &VirtualProject::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void VirtualProject::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

@@ -20,9 +20,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Logger))
 .Method<void, const std::string&, int, va_list>("Log", &Logger::Log)
 ;
 }
-void Logger::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
-{
-}
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

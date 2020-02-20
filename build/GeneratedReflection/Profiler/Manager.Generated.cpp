@@ -13,12 +13,17 @@ SteelEngine::ReflectionRecorder::Register<Manager>("Manager",{
 }
 )
 (
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Manager))
 )
 .Constructor<>()
 .Inheritance<IManager>("IManager")
 .Method("AddTime", &Manager::AddTime)
 .Method("GetTime", &Manager::GetTime)
+.Method("Serialize", &Manager::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void Manager::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

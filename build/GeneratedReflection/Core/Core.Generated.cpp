@@ -11,7 +11,6 @@ SteelEngine::ReflectionRecorder::Register<Core>("Core",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Core))
 )
 .Constructor<>()
@@ -20,28 +19,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Core))
 .Method("Stop", &Core::Stop)
 .Method("SetPathVariant", &Core::SetPathVariant)
 ;
-}
-void Core::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
-{
-SERIALIZE(Core::m_RuntimeReloader)
-SERIALIZE(Core::m_ReflectionGenerator)
-SERIALIZE(Core::m_Logger)
-SERIALIZE(Core::m_Renderer)
-SERIALIZE(Core::m_Window)
-SERIALIZE(Core::m_Editor)
-SERIALIZE(Core::m_VirtualProject)
-SERIALIZE(Core::m_NetworkManager)
-SERIALIZE(Core::m_Python)
-SERIALIZE(Core::m_ImGUI_ContextAPI)
-SERIALIZE(Core::m_EventManager)
-SERIALIZE(Core::m_SceneManager)
-SERIALIZE(Core::m_DeltaTimeVariant)
-SERIALIZE(Core::m_CompileConfig)
-SERIALIZE(Core::m_Running)
-SERIALIZE(Core::m_OneSecondTime)
-SERIALIZE(Core::m_EnginePathVariant)
-SERIALIZE(Core::m_ReflectionModules)
-SERIALIZE(Core::ent)
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

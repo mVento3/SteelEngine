@@ -20,11 +20,24 @@ SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::SCE
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData(SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(StartMenuWindow))
 )
 .Constructor<>()
-.Inheritance<SteelEngine::EditorComponents::ImGUI::UserInterface>("SteelEngine::EditorComponents::ImGUI::UserInterface")
+.Inheritance<EditorComponents::ImGUI::UserInterface>("EditorComponents::ImGUI::UserInterface")
+.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Method("Cast_UserInterface", &StartMenuWindow::Cast_UserInterface)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
+)
+.Method("Cast_IRuntimeObject", &StartMenuWindow::Cast_IRuntimeObject)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
+)
+.Method("Serialize", &StartMenuWindow::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void StartMenuWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

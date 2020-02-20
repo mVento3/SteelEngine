@@ -13,10 +13,15 @@ SteelEngine::ReflectionRecorder::Register<PythonCore>("PythonCore",{
 }
 )
 (
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(PythonCore))
 )
 .Constructor<>()
 .Inheritance<IPython>("IPython")
+.Method("Serialize", &PythonCore::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void PythonCore::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

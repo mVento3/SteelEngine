@@ -16,12 +16,17 @@ SteelEngine::ReflectionRecorder::Register<Renderer>("Renderer",{
 )
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 )
 .Constructor<IWindow*>()
 .Inheritance<IRendererAPI<IRenderer::API::VULKAN_API>>("IRendererAPI<IRenderer::API::VULKAN_API>")
 .Inheritance<EventObserver>("EventObserver")
 .Method("RecreateSwapChain", &Renderer::RecreateSwapChain)
+.Method("Serialize", &Renderer::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void Renderer::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

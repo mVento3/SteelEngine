@@ -12,11 +12,16 @@ SteelEngine::ReflectionRecorder::Register<WindowInheritance>("WindowInheritance"
 )
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(WindowInheritance))
 )
 .Constructor<>()
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Method("ProcessInheritance", &WindowInheritance::ProcessInheritance)
+.Method("Serialize", &WindowInheritance::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void WindowInheritance::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

@@ -21,9 +21,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(NetworkManager))
 .Method("GetConnectionStatus", &NetworkManager::GetConnectionStatus)
 ;
 }
-void NetworkManager::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
-{
-}
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
 {

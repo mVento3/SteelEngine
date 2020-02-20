@@ -34,7 +34,12 @@ SteelEngine::Reflection::EnumElement("DO_NOT_GENERATE_CAST_FUNCTIONS", Reflectio
 SteelEngine::Reflection::EnumElement("SYSTEMS_INFORMATION_TRACKER", Reflection::ReflectionAttribute::SYSTEMS_INFORMATION_TRACKER),
 SteelEngine::Reflection::EnumElement("NO_RECOMPILE", Reflection::ReflectionAttribute::NO_RECOMPILE),
 SteelEngine::Reflection::EnumElement("INHERITANCE_MODULE", Reflection::ReflectionAttribute::INHERITANCE_MODULE),
-SteelEngine::Reflection::EnumElement("NAIVE_EVENT", Reflection::ReflectionAttribute::NAIVE_EVENT)
+SteelEngine::Reflection::EnumElement("NAIVE_EVENT", Reflection::ReflectionAttribute::NAIVE_EVENT),
+SteelEngine::Reflection::EnumElement("CONSOLE_COMMAND", Reflection::ReflectionAttribute::CONSOLE_COMMAND),
+SteelEngine::Reflection::EnumElement("HOT_RELOAD", Reflection::ReflectionAttribute::HOT_RELOAD),
+SteelEngine::Reflection::EnumElement("GENERATE_OWN_SERIALIZE_FUNC", Reflection::ReflectionAttribute::GENERATE_OWN_SERIALIZE_FUNC),
+SteelEngine::Reflection::EnumElement("CAST_FUNCTION", Reflection::ReflectionAttribute::CAST_FUNCTION),
+SteelEngine::Reflection::EnumElement("SERIALIZE_FUNCTION", Reflection::ReflectionAttribute::SERIALIZE_FUNCTION)
 })
 ;
 }

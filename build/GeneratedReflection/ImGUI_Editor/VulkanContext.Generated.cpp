@@ -11,11 +11,16 @@ SteelEngine::ReflectionRecorder::Register<VulkanContext>("VulkanContext",{
 }
 )
 (
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(VulkanContext))
 )
 .Constructor<>()
 .Inheritance<IContext>("IContext")
 .Method("GetContext", &VulkanContext::GetContext)
+.Method("Serialize", &VulkanContext::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void VulkanContext::Serialize(SteelEngine::HotReloader::ISerializer* serializer)

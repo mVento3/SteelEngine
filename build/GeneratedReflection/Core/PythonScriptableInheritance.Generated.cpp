@@ -11,16 +11,13 @@ SteelEngine::ReflectionRecorder::Register<PythonScriptableInheritance>("PythonSc
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::INHERITANCE_MODULE, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(PythonScriptableInheritance))
 )
 .Constructor<>()
-.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
 .Method("ProcessInheritance", &PythonScriptableInheritance::ProcessInheritance)
 ;
-}
-void PythonScriptableInheritance::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
-{
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

@@ -17,13 +17,24 @@ SteelEngine::ReflectionRecorder::Register<Renderer>("Renderer",{
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE, true),
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 )
 .Constructor<IWindow*>()
 .Inheritance<IRenderer>("IRenderer")
 .Inheritance<EventObserver>("EventObserver")
 .Method("Cast_IRenderer", &Renderer::Cast_IRenderer)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
+)
 .Method("Cast_EventObserver", &Renderer::Cast_EventObserver)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
+)
+.Method("Serialize", &Renderer::Serialize)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
+)
 ;
 }
 void Renderer::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
