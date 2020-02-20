@@ -6,9 +6,7 @@
 
 namespace SteelEngine {
 
-    SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
-    )
+    SE_CLASS()
     class DeltaTime : public IDeltaTime
     {
     private:

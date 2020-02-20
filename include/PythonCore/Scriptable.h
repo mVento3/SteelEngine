@@ -3,8 +3,6 @@
 #include "PythonCore/IScript.h"
 #include "PythonCore/ResultConverter.h"
 
-// #include "HotReloader/IRuntimeObject.h"
-
 #include "RuntimeReflection/Macro.h"
 
 #include "vector"
@@ -30,7 +28,7 @@ namespace SteelEngine { namespace Script { namespace Python {
         return unpack(script, arr, t) + unpack(script, arr, rest...);
     }
 
-    SE_CLASS(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE)
+    SE_CLASS()
     class Scriptable
     {
         friend struct IReflectionData;
@@ -46,12 +44,6 @@ namespace SteelEngine { namespace Script { namespace Python {
         }
 
         ~Scriptable()
-        {
-
-        }
-
-        // IDK
-        virtual void Serialize(SteelEngine::HotReloader::ISerializer* serializer)
         {
 
         }

@@ -45,7 +45,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     SE_CLASS(
         SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
-        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
     class Renderer : public IRenderer, public EventObserver
     {

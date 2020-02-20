@@ -8,8 +8,8 @@ namespace SteelEngine {
 
     struct IReflectionInheritance : public MetaDataImplementation
     {
-        virtual const std::string& GetName() = 0;
-        virtual size_t GetTypeID() = 0;
+        virtual const std::string& GetName() const = 0;
+        virtual size_t GetTypeID() const = 0;
     };
 
 }

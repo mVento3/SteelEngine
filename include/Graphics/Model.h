@@ -9,9 +9,7 @@
 
 namespace SteelEngine { namespace Graphics {
 
-    SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE
-    )
+    SE_CLASS()
     class Model : public IModel
     {
     private:

@@ -9,16 +9,17 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        Reflection::ReflectionAttribute::REFLECTION_MODULE
+        Reflection::ReflectionAttribute::REFLECTION_MODULE,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
     class CasterReflectionModule : public IReflectionModule
     {
         GENERATED_BODY
     private:
         bool m_GenerateCastFunctions;
-        std::vector<ReflectionGenerator::InheritanceScope*> m_Inheritance;
+        std::vector<Parser::InheritanceScope*> m_Inheritance;
         std::string m_ClassName;
-        std::vector<ReflectionGenerator::FunctionScope*>* m_Methods;
+        std::vector<Parser::FunctionScope*>* m_Methods;
 
     public:
         CasterReflectionModule();
@@ -27,9 +28,9 @@ namespace SteelEngine {
         void GenerateSource(std::ofstream& out) override;
         void GenerateHeader(std::vector<std::string>& out) override;
 
-        void ProcessStructure(ReflectionGenerator::StructScope* info) override;
-        void ProcessProperty(ReflectionGenerator::PropertyScope* info) override;
-        void ProcessFunction(ReflectionGenerator::FunctionScope* info) override;
+        void ProcessStructure(Parser::StructScope* info) override;
+        void ProcessProperty(Parser::PropertyScope* info) override;
+        void ProcessFunction(Parser::FunctionScope* info) override;
     };
 
 }

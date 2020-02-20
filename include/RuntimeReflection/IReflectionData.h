@@ -64,39 +64,39 @@ namespace SteelEngine {
 			var->m_TypeID = RuntimeDatabase::s_InvalidID;
 		}
 
-		HotReloader::IRuntimeObject* CreateObject(RuntimeDatabase* db, const std::string& typeName)
-		{
-			for(Type::uint32 j = 0; j < db->m_ReflectionDatabase->m_TypesSize; j++)
-			{
-				IReflectionData* type = (IReflectionData*)db->m_ReflectionDatabase->m_Types[j];
-				std::string name = typeName;
+		// HotReloader::IRuntimeObject* CreateObject(RuntimeDatabase* db, const std::string& typeName)
+		// {
+		// 	for(Type::uint32 j = 0; j < db->m_ReflectionDatabase->m_TypesSize; j++)
+		// 	{
+		// 		IReflectionData* type = (IReflectionData*)db->m_ReflectionDatabase->m_Types[j];
+		// 		std::string name = typeName;
 
-				replaceAll(name, "::", ":");
+		// 		replaceAll(name, "::", ":");
 
-				std::vector<std::string> splitted = split(name, ':');
-				const NamespacesVector& namespaces = type->GetNamespacesVector();
+		// 		std::vector<std::string> splitted = split(name, ':');
+		// 		const NamespacesVector& namespaces = type->GetNamespacesVector();
 
-				if(namespaces.size() == splitted.size() - 1)
-				{
-					bool isEqual = true;
+		// 		if(namespaces.size() == splitted.size() - 1)
+		// 		{
+		// 			bool isEqual = true;
 
-					for(Type::uint32 k = 0; k < splitted.size() - 1; k++)
-					{
-						if(namespaces[k] != splitted[k])
-						{
-							isEqual = false;
+		// 			for(Type::uint32 k = 0; k < splitted.size() - 1; k++)
+		// 			{
+		// 				if(namespaces[k] != splitted[k])
+		// 				{
+		// 					isEqual = false;
 
-							break;
-						}
-					}
+		// 					break;
+		// 				}
+		// 			}
 
-					if(strcmp(type->GetTypeName(), splitted[splitted.size() - 1].c_str()) == 0 && isEqual)
-					{
-						return type->Create();
-					}
-				}
-			}
-		}
+		// 			if(strcmp(type->GetTypeName(), splitted[splitted.size() - 1].c_str()) == 0 && isEqual)
+		// 			{
+		// 				return type->Create();
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		IReflectionData* GetType(RuntimeDatabase* db, const std::string& typeName)
 		{
@@ -134,7 +134,7 @@ namespace SteelEngine {
 
 		virtual const NamespacesVector& GetNamespacesVector() = 0;
 		virtual const MethodsVector& GetMethodsVector() const = 0;
-		virtual const PropertiesVector& GetPropertiesVector() = 0;
+		virtual const PropertiesVector& GetPropertiesVector() const = 0;
 		virtual const EnumsVector& GetEnumsVector() = 0;
 		virtual const ConstructorsVector& GetConstructorsVector() const = 0;
 
@@ -151,7 +151,7 @@ namespace SteelEngine {
 	public:
 		virtual void ProcessMetaData(RuntimeDatabase* db, MetaDataImplementation* main, MetaDataInfoVector& infos) = 0;
 
-		virtual Variant GetProperty(const char* name, void* object) = 0;
+		virtual Variant GetProperty(const char* name, void* object) const = 0;
 		virtual IReflectionProperty* GetProperty(const char* name) = 0;
 		virtual IReflectionMethod* GetMethod(const std::string& name) = 0;
 		virtual IReflectionEnumeration* GetEnum(const std::string& name) = 0;
@@ -160,7 +160,7 @@ namespace SteelEngine {
 		virtual const std::vector<IReflectionInheritance*>& GetInheritances() const = 0;
 
 		template <typename... Args>
-		HotReloader::IRuntimeObject* Create(Args... args) const
+		void* Create(Args... args) const
 		{
 			static RuntimeDatabase* db;
 
@@ -171,17 +171,22 @@ namespace SteelEngine {
 
 			for(IReflectionConstructor* cons : GetConstructorsVector())
 			{
-				if(cons->GetConstructorID() == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
+				if(cons->GetConstructorID() == typeid(void*(Args...)).hash_code())
 				{
 					ReflectionConstructor<Args...>* con_ = (ReflectionConstructor<Args...>*)cons;
-					HotReloader::IRuntimeObject* createdObject = (HotReloader::IRuntimeObject*)con_->m_Function(args...);
+					void* obj = con_->m_Function(args...);
 
-					createdObject->m_Object = 			createdObject;
-					createdObject->m_ConstructorID = 	cons->GetConstructorID();
-					createdObject->m_ObjectID = 		db->GetNextPerObjectID();
-					createdObject->m_TypeID = 			GetTypeID();
+					if(Process(this))
+					{
+						HotReloader::IRuntimeObject* createdObject = (HotReloader::IRuntimeObject*)obj;
 
-					db->m_HotReloaderDatabase->m_Objects->PushBack(ConstrucedObject(createdObject->m_ObjectID, cons->GetConstructorID(), GetTypeID(), new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
+						createdObject->m_Object = 			createdObject;
+						createdObject->m_ConstructorID = 	cons->GetConstructorID();
+						createdObject->m_ObjectID = 		db->GetNextPerObjectID();
+						createdObject->m_TypeID = 			GetTypeID();
+
+						db->m_HotReloaderDatabase->m_Objects->PushBack(ConstrucedObject(createdObject->m_ObjectID, cons->GetConstructorID(), GetTypeID(), new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
+					}
 
 					std::vector<IReflectionData*> res;
 
@@ -190,9 +195,63 @@ namespace SteelEngine {
 						res.push_back((IReflectionData*)db->m_ReflectionDatabase->m_Types[i]);
 					}
 
-					ProcessInheritance(res, GetInheritances(), createdObject, this);
+					ProcessInheritance(res, GetInheritances(), obj, this);
 
-					return createdObject;
+					return obj;
+				}
+			}
+
+			return 0;
+		}
+
+		template <typename... Args>
+		void** Create_(Args... args) const
+		{
+			static RuntimeDatabase* db;
+
+			if(!db)
+			{
+				db = LoadDatabase();
+			}
+
+			for(IReflectionConstructor* cons : GetConstructorsVector())
+			{
+				if(cons->GetConstructorID() == typeid(void*(Args...)).hash_code())
+				{
+					ReflectionConstructor<Args...>* con_ = (ReflectionConstructor<Args...>*)cons;
+					void* obj = con_->m_Function(args...);
+					void** obj2;
+
+					if(Process(this))
+					{
+						Variant caster = Invoke("Cast_IRuntimeObject", obj);
+						HotReloader::IRuntimeObject* createdObject = (HotReloader::IRuntimeObject*)obj;
+
+						if(caster.IsValid())
+						{
+							createdObject = caster.Convert<HotReloader::IRuntimeObject*>();
+						}
+
+						createdObject->m_Object = 			(HotReloader::IRuntimeObject*)obj;
+						createdObject->m_ConstructorID = 	cons->GetConstructorID();
+						createdObject->m_ObjectID = 		db->GetNextPerObjectID();
+						createdObject->m_TypeID = 			GetTypeID();
+
+						db->m_HotReloaderDatabase->m_Objects->PushBack(ConstrucedObject(createdObject->m_ObjectID, cons->GetConstructorID(), GetTypeID(), new Tuple<Args...>(std::tuple<Args...>(args...)), createdObject));
+
+						obj2 = (void**)&createdObject->m_Object;
+					}
+
+					std::vector<IReflectionData*> res;
+
+					for(Type::uint32 i = 0; i < db->m_ReflectionDatabase->m_TypesSize; i++)
+					{
+						res.push_back((IReflectionData*)db->m_ReflectionDatabase->m_Types[i]);
+					}
+
+					ProcessInheritance(res, GetInheritances(), obj, this);
+
+					return obj2;
 				}
 			}
 
@@ -207,6 +266,16 @@ namespace SteelEngine {
 		const PropertiesVector& GetProperties()
 		{
 			return GetPropertiesVector();
+		}
+
+		const PropertiesVector& GetProperties() const
+		{
+			return GetPropertiesVector();
+		}
+
+		const MethodsVector& GetMethods() const
+		{
+			return GetMethodsVector();
 		}
 
 		template <typename... Args>
@@ -249,8 +318,9 @@ namespace SteelEngine {
 
 			if(!res)
 			{
-				static Result noneRes(SE_FALSE, "NONE");
-				static Variant none(noneRes, typeid(noneRes).hash_code());
+				// static Result noneRes(SE_FALSE, "NONE");
+				// static Variant none(noneRes, typeid(noneRes).hash_code());
+				static Variant none;
 
 				return none;
 			}
@@ -278,8 +348,9 @@ namespace SteelEngine {
 
 			if(!res)
 			{
-				static Result noneRes(SE_FALSE, "NONE");
-				static Variant none(noneRes, typeid(noneRes).hash_code());
+				// static Result noneRes(SE_FALSE, "NONE");
+				// static Variant none(noneRes, typeid(noneRes).hash_code());
+				static Variant none;
 
 				return none;
 			}
@@ -287,7 +358,7 @@ namespace SteelEngine {
 			return res->Invoke(args...);
 		}
 
-		Variant GetInfo(IReflectionProperty* prop)
+		Variant GetInfo(IReflectionProperty* prop) const
 		{
 			return prop->GetInfo();
 		}

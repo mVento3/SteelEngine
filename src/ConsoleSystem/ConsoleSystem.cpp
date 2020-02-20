@@ -25,7 +25,7 @@ namespace SteelEngine {
 
             if(consoleCommandVariant->IsValid() && consoleCommandVariant->Convert<bool>())
             {
-                RegisterCommand((ICommand*)type->Create()->m_Object);
+                RegisterCommand((ICommand*)type->Create());
             }
         }
 

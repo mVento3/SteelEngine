@@ -2,7 +2,7 @@
 
 #include "fstream"
 
-#include "RuntimeReflection/ReflectionGenerator.h"
+#include "RuntimeReflection/Parser.h"
 
 #include "HotReloader/IRuntimeObject.h"
 
@@ -14,10 +14,10 @@ namespace SteelEngine {
         virtual void GenerateSource(std::ofstream& out) = 0;
         virtual void GenerateHeader(std::vector<std::string>& out) = 0;
 
-        virtual void ProcessStructure(ReflectionGenerator::StructScope* info) = 0;
-        virtual void ProcessProperty(ReflectionGenerator::PropertyScope* info) = 0;
-        virtual void ProcessFunction(ReflectionGenerator::FunctionScope* info) = 0;
-        virtual void ProcessConstructor(ReflectionGenerator::ConstructorScope* info) { }
+        virtual void ProcessStructure(Parser::StructScope* info) = 0;
+        virtual void ProcessProperty(Parser::PropertyScope* info) = 0;
+        virtual void ProcessFunction(Parser::FunctionScope* info) = 0;
+        virtual void ProcessConstructor(Parser::ConstructorScope* info) { }
     };
 
 }

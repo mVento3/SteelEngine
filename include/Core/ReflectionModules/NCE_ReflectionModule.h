@@ -9,14 +9,15 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        Reflection::ReflectionAttribute::REFLECTION_MODULE
+        Reflection::ReflectionAttribute::REFLECTION_MODULE,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
     class NCE_ReflectionModule : public IReflectionModule
     {
         GENERATED_BODY
     private:
-        std::vector<ReflectionGenerator::FunctionScope*>* m_Methods;
-        std::vector<ReflectionGenerator::PropertyScope*> m_Properties;
+        std::vector<Parser::FunctionScope*>* m_Methods;
+        std::vector<Parser::PropertyScope*> m_Properties;
 
         bool m_NetCommand;
 
@@ -27,9 +28,9 @@ namespace SteelEngine {
         void GenerateSource(std::ofstream& out) override;
         void GenerateHeader(std::vector<std::string>& out) override;
 
-        void ProcessStructure(ReflectionGenerator::StructScope* info) override;
-        void ProcessProperty(ReflectionGenerator::PropertyScope* info) override;
-        void ProcessFunction(ReflectionGenerator::FunctionScope* info) override;
+        void ProcessStructure(Parser::StructScope* info) override;
+        void ProcessProperty(Parser::PropertyScope* info) override;
+        void ProcessFunction(Parser::FunctionScope* info) override;
     };
 
 }

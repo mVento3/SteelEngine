@@ -1,12 +1,10 @@
 #pragma once
 
-#include "HotReloader/IRuntimeObject.h"
-
 #include "entt/entt.hpp"
 
 namespace SteelEngine {
 
-    struct ISceneManager : public HotReloader::IRuntimeObject
+    struct ISceneManager
     {
         virtual void Init() = 0;
 

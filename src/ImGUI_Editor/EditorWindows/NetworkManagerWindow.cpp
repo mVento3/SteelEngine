@@ -34,11 +34,11 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         Network::INetworkManager* networkManager =
             *Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager**>();
 
-        std::vector<Network::INetworkCommand*> commands = networkManager->GetCommands();
+        std::vector<HotReloader::InheritanceTrackKeeper*> commands = networkManager->GetCommands();
 
         for(Type::uint32 i = 0; i < commands.size(); i++)
         {
-            if(commands[i]->m_TypeID == Reflection::GetType("SteelEngine::Network::SynchronizeProjectNCE")->GetTypeID())
+            if(commands[i]->Get<HotReloader::IRuntimeObject>()->m_TypeID == Reflection::GetType("SteelEngine::Network::SynchronizeProjectNCE")->GetTypeID())
             {
                 Event::GlobalEvent::Broadcast_(commands[i]);
             }
@@ -170,8 +170,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void NetworkManagerWindow::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
-        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
-        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
+        UserInterface::OnRecompile(oldObject);
     }
 
 }}}

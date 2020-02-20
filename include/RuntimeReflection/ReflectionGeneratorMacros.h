@@ -40,13 +40,13 @@ for(SteelEngine::Type::uint32 i = 0; i < typeInfo->Size(); i++) \
 }
 
 #define COMPARE_CONSTRUCTOR_() \
-if(constructorID == typeid(SteelEngine::HotReloader::IRuntimeObject*()).hash_code()) \
+if(constructorID == typeid(void*()).hash_code()) \
 { \
 	return (SteelEngine::HotReloader::IRuntimeObject*)SteelEngine::createType<ClassType>(); \
 }
 
 #define COMPARE_CONSTRUCTOR(...) \
-if(constructorID == typeid(SteelEngine::HotReloader::IRuntimeObject*(__VA_ARGS__)).hash_code()) \
+if(constructorID == typeid(void*(__VA_ARGS__)).hash_code()) \
 { \
 	SteelEngine::Tuple<__VA_ARGS__>* tupleArguments = (SteelEngine::Tuple<__VA_ARGS__>*)obj->m_Args; \
  \

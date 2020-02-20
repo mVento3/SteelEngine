@@ -12,7 +12,9 @@
 
 namespace SteelEngine {
 
-    SE_CLASS()
+    SE_CLASS(
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
     class OpenGL_Context : public IContext
     {
         GENERATED_BODY

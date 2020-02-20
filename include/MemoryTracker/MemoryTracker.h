@@ -10,7 +10,9 @@
 
 namespace SteelEngine {
 
-    SE_CLASS()
+    SE_CLASS(
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
     class MemoryTracker : public IMemoryTracker
     {
         GENERATED_BODY

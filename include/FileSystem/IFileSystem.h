@@ -1,12 +1,10 @@
 #pragma once
 
-#include "HotReloader/IRuntimeObject.h"
-
 #include "filesystem"
 
 namespace SteelEngine {
 
-    struct IFileSystem : public HotReloader::IRuntimeObject
+    struct IFileSystem
     {
     protected:
 

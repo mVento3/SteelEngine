@@ -346,7 +346,7 @@ namespace SteelEngine { namespace Network {
 
     void SynchronizeProjectNCE::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
-        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
+        UserInterface::OnRecompile(oldObject);
     }
 
     void SynchronizeProjectNCE::operator()(ShouldOverrideEvent* event)

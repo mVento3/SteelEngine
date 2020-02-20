@@ -1,12 +1,12 @@
 #pragma once
 
-#include "HotReloader/IRuntimeObject.h"
+// #include "HotReloader/IRuntimeObject.h"
 
 #include "Core/Result.h"
 
 namespace SteelEngine {
 
-    struct IWindow : public HotReloader::IRuntimeObject
+    struct IWindow
     {
         struct WindowCloseEvent
         {
@@ -16,6 +16,11 @@ namespace SteelEngine {
         virtual Result Create()
         {
             return SE_NOT_IMPLEMENTED;
+        }
+
+        virtual void Update()
+        {
+            
         }
 
         virtual void Close()

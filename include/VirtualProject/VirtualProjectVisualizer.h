@@ -10,7 +10,9 @@ namespace SteelEngine {
 
     class VirtualProject;
 
-    SE_CLASS()
+    SE_CLASS(
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
     class VirtualProjectVisualizer : public IVirtualProjectVisualizer
     {
         GENERATED_BODY

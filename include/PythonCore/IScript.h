@@ -1,7 +1,5 @@
 #pragma once
 
-#include "HotReloader/IRuntimeObject.h"
-
 #include "RuntimeDatabase/RuntimeDatabase.h"
 
 namespace SteelEngine {
@@ -11,7 +9,7 @@ namespace SteelEngine {
 
     namespace Script { namespace Python {
 
-    struct IScript : public HotReloader::IRuntimeObject
+    struct IScript
     {
         friend struct IReflectionData;
         friend class PythonScriptableInheritance;

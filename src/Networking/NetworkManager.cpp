@@ -9,6 +9,7 @@ namespace SteelEngine { namespace Network {
     NetworkManager::NetworkManager()
     {
         m_Connected = new bool(false);
+        m_Network = 0;
     }
 
     NetworkManager::~NetworkManager()
@@ -26,11 +27,13 @@ namespace SteelEngine { namespace Network {
 
             if(type->GetMetaData(Reflection::ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
             {
-                Network::INetworkCommand* comm = (Network::INetworkCommand*)type->Create();
+                void** comm = type->Create_();
 
-                comm->m_Commands = &m_CommandTypes;
+                HotReloader::InheritanceTrackKeeper* swapper = new HotReloader::InheritanceTrackKeeper(type, comm);
 
-                m_CommandTypes.push_back(comm);
+                swapper->Get<Network::INetworkCommand>()->m_Commands = &m_CommandTypes;
+
+                m_CommandTypes.push_back(swapper);
             }
         }
 

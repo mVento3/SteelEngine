@@ -78,11 +78,11 @@ int main(int argc, char* argv[])
         new SteelEngine::InformationTracker()
     );
 
-    SteelEngine::HotReloader::IRuntimeObject* core = SteelEngine::Reflection::CreateInstance("SteelEngine::Core");
+    void* core = SteelEngine::Reflection::CreateInstance("SteelEngine::Core");
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
         SteelEngine::Core::GlobalSystems::FILE_SYSTEM,
-        (SteelEngine::IFileSystem*)SteelEngine::Reflection::CreateInstance("SteelEngine::FileSystem")
+        SteelEngine::Reflection::CreateInstance("SteelEngine::FileSystem")
     );
 
     // Then after that we need to prepare file system

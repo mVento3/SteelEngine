@@ -63,12 +63,16 @@ namespace SteelEngine {
 			NO_RECOMPILE,
 			INHERITANCE_MODULE,
 			NAIVE_EVENT,
-			CONSOLE_COMMAND
+			CONSOLE_COMMAND,
+			HOT_RELOAD,
+			GENERATE_OWN_SERIALIZE_FUNC,
+		// Mark as function to cast inheritance into ptr
+			CAST_FUNCTION,
+		// Mark as function to serialize properties
+			SERIALIZE_FUNCTION
 		};
 
 	private:
-		// static RuntimeDatabase* ms_RuntimeDatabase;
-
 		static RuntimeDatabase* LoadDatabase()
 		{
 			ModuleManager::LoadAll();
@@ -84,8 +88,6 @@ namespace SteelEngine {
 		}
 
 	public:
-		// void Init2();
-
 		static void Init()
 		{
 			if(!ms_RuntimeDatabase)
@@ -235,7 +237,7 @@ namespace SteelEngine {
 		}
 
 		template <typename... Args>
-		static HotReloader::IRuntimeObject* CreateInstance(const std::string& name, Args... args)
+		static void* CreateInstance(const std::string& name, Args... args)
 		{
 			std::string name_ = name;
 
@@ -274,8 +276,48 @@ namespace SteelEngine {
 			return 0;
 		}
 
+		template <typename... Args>
+		static void** CreateInstance_(const std::string& name, Args... args)
+		{
+			std::string name_ = name;
+
+			replaceAll(name_, "::", ":");
+
+			std::vector<std::string> splitted = split(name_, ':');
+
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
+			{
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_ReflectionDatabase->m_Types[i];
+				const IReflectionData::NamespacesVector& namespaces = type->GetNamespacesVector();
+
+				if(namespaces.size() == splitted.size() - 1)
+				{
+					bool isEqual = true;
+
+					for(Type::uint32 i = 0; i < splitted.size() - 1; i++)
+					{
+						if(namespaces[i] != splitted[i])
+						{
+							isEqual = false;
+
+							break;
+						}
+					}
+
+					if(strcmp(type->GetTypeName(), splitted[splitted.size() - 1].c_str()) == 0 && isEqual)
+					{
+						return type->Create_(args...);
+					}
+				}
+			}
+
+			// throw TypeNotFoundException(name);
+
+			return 0;
+		}
+
 		template <typename T, typename... Args>
-		static HotReloader::IRuntimeObject* CreateInstance(Args... args)
+		static void* CreateInstance(Args... args)
 		{
 			size_t typeID = typeid(T).hash_code();
 
@@ -286,6 +328,26 @@ namespace SteelEngine {
 				if(type->GetTypeID() == typeID)
 				{
 					return type->Create(args...);
+				}
+			}
+
+			// throw TypeNotFoundException(SE_GET_TYPE_NAME(T));
+
+			return 0;
+		}
+
+		template <typename T, typename... Args>
+		static void** CreateInstance_(Args... args)
+		{
+			size_t typeID = typeid(T).hash_code();
+
+			for(Type::uint32 i = 0; i < GetTypesSize(); i++)
+			{
+				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_ReflectionDatabase->m_Types[i];
+
+				if(type->GetTypeID() == typeID)
+				{
+					return type->Create_(args...);
 				}
 			}
 

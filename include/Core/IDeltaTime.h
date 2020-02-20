@@ -1,10 +1,10 @@
 #pragma once
 
-#include "HotReloader/IRuntimeObject.h"
+#include "Core/Type.h"
 
 namespace SteelEngine {
 
-    struct IDeltaTime : public HotReloader::IRuntimeObject
+    struct IDeltaTime
     {
         friend class Core;
     protected:

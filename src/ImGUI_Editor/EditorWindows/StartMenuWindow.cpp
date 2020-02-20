@@ -182,8 +182,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void StartMenuWindow::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
-        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
-        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
+        UserInterface::OnRecompile(oldObject);
     }
 
 }}}

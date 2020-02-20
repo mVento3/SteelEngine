@@ -7,12 +7,13 @@
 #include "ModuleManager/ModuleManager.h"
 
 #include "RuntimeReflection/Macro.h"
-
-#include "FileSystem/FileSystem.Generated.h"
+#include "RuntimeReflection/Reflection.h"
 
 #include "map"
 
 #include "Core/Core.h"
+
+#include "FileSystem/FileSystem.Generated.h"
 
 namespace SteelEngine {
 

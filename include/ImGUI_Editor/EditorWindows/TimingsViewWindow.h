@@ -23,9 +23,10 @@ namespace SteelEngine {
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW,
-        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
-    class TimingsViewWindow : public EditorComponents::ImGUI::UserInterface
+    class TimingsViewWindow : public EditorComponents::ImGUI::UserInterface, public HotReloader::IRuntimeObject
     {
         GENERATED_BODY
     private:

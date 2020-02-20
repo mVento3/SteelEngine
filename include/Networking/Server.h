@@ -24,7 +24,10 @@
 
 namespace SteelEngine {
 
-    SE_CLASS(SteelEngine::SERVER_INFO = SteelEngine::ServerInfo(1024, 5004))
+    SE_CLASS(
+        SteelEngine::SERVER_INFO = SteelEngine::ServerInfo(1024, 5004),
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
     class Server : public Network::INetwork
     {
         GENERATED_BODY

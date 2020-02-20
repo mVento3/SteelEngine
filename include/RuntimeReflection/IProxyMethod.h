@@ -10,6 +10,8 @@ namespace SteelEngine {
 	{
 		virtual Variant Invoke(void* obj, Args...) = 0;
 		virtual Variant Invoke(Args...) = 0;
+
+		virtual size_t GetReturnTypeID() const override = 0;
 	};
 
 }

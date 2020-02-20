@@ -173,7 +173,9 @@ namespace SteelEngine {
 
                         for(Type::uint32 i = 0; i < m_NetworkManager->GetCommands().size(); i++)
                         {
-                            Network::INetworkCommand* command = m_NetworkManager->GetCommands()[i];
+                            // Network::INetworkCommand* command = m_NetworkManager->GetCommands()[i];
+                            HotReloader::InheritanceTrackKeeper* swapper = m_NetworkManager->GetCommands()[i];
+                            Network::INetworkCommand* command = swapper->Get<Network::INetworkCommand>();
 
                             if(strcmp(command->m_Header.c_str(), data.c_str()) == 0)
                             {

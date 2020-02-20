@@ -16,7 +16,10 @@ namespace SteelEngine { namespace Editor {
 
     }
 
-    SE_STRUCT(SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE)
+    SE_STRUCT(
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
     struct Window : public HotReloader::IRuntimeObject
     {
         GENERATED_BODY

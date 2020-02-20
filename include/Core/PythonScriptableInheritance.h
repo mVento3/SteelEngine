@@ -11,9 +11,10 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE
+        Reflection::ReflectionAttribute::INHERITANCE_MODULE,
+        Reflection::ReflectionAttribute::NO_SERIALIZE
     )
-    class PythonScriptableInheritance : public HotReloader::IRuntimeObject
+    class PythonScriptableInheritance
     {
         GENERATED_BODY
     private:
@@ -23,9 +24,9 @@ namespace SteelEngine {
         ~PythonScriptableInheritance();
 
         SE_METHOD()
-        static void ProcessInheritance(const std::vector<IReflectionInheritance*>& data, IReflectionData* type, HotReloader::IRuntimeObject* object);
+        static void ProcessInheritance(const std::vector<IReflectionInheritance*>& data, IReflectionData* type, void* object);
 
-        void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
+        // void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
     };
 
 }

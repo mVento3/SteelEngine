@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RuntimeReflection/Macro.h"
+#include "RuntimeReflection/Reflection.h"
 
 #include "HotReloader/IRuntimeObject.h"
 
@@ -17,9 +18,10 @@ namespace SteelEngine {
     namespace EditorComponents { namespace ImGUI {
 
     SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
+        Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        Reflection::ReflectionAttribute::GENERATE_OWN_SERIALIZE_FUNC
     )
-    class UserInterface : public HotReloader::IRuntimeObject
+    class UserInterface
     {
         GENERATED_BODY
     public:
@@ -30,6 +32,9 @@ namespace SteelEngine {
             FLAGS
         };
 
+    private:
+        bool m_Draw;
+
     protected:
 
     public:
@@ -39,11 +44,14 @@ namespace SteelEngine {
         void* m_Context;
         char m_Title[64];
         Editor::ImGUI::ImGUI_Editor** m_Editor;
+        size_t m_TypeID;
 
         virtual void Init();
-        virtual void Draw();
+        virtual void Draw() { }
+        void DrawUser();
 
-        virtual void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
+        virtual void OnRecompile(HotReloader::IRuntimeObject* oldObject);
+        // void OnSwap(HotReloader::SwapStage stage, HotReloader::ObjectAge age);
     };
 
 }}}

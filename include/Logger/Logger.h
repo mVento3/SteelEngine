@@ -35,7 +35,7 @@ namespace SteelEngine {
         std::ofstream m_OutFile;
         const char* m_LogFilePath;
         bool m_LogToFile;
-        std::vector<HotReloader::IRuntimeObject**> m_Dispatchers;
+        std::vector<HotReloader::InheritanceTrackKeeper*> m_Dispatchers;
 
         void* m_Console;
 
@@ -142,15 +142,15 @@ namespace SteelEngine {
             va_end(args);
         }
 
-        void SetDispatcher(HotReloader::IRuntimeObject** dispatcher) override
+        void SetDispatcher(HotReloader::InheritanceTrackKeeper* dispatcher) override
         {
             m_Dispatchers.push_back(dispatcher);
         }
     };
 
-#define SE_INFO(message, ...) (*SteelEngine::Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::LOGGER)->Convert<SteelEngine::Logger**>())->Info(__LINE__, __FILE__, message, __VA_ARGS__)
-#define SE_WARNING(message, ...) (*SteelEngine::Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::LOGGER)->Convert<SteelEngine::Logger**>())->Warning(__LINE__, __FILE__, message, __VA_ARGS__)
-#define SE_ERROR(message, ...) (*SteelEngine::Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::LOGGER)->Convert<SteelEngine::Logger**>())->Error(__LINE__, __FILE__, message, __VA_ARGS__)
-#define SE_FATAL(message, ...) (*SteelEngine::Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::LOGGER)->Convert<SteelEngine::Logger**>())->Fatal(__LINE__, __FILE__, message, __VA_ARGS__)
+#define SE_INFO(message, ...) SteelEngine::Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::LOGGER)->Convert<SteelEngine::Logger*>()->Info(__LINE__, __FILE__, message, __VA_ARGS__)
+#define SE_WARNING(message, ...) SteelEngine::Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::LOGGER)->Convert<SteelEngine::Logger*>()->Warning(__LINE__, __FILE__, message, __VA_ARGS__)
+#define SE_ERROR(message, ...) SteelEngine::Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::LOGGER)->Convert<SteelEngine::Logger*>()->Error(__LINE__, __FILE__, message, __VA_ARGS__)
+#define SE_FATAL(message, ...) SteelEngine::Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::LOGGER)->Convert<SteelEngine::Logger*>()->Fatal(__LINE__, __FILE__, message, __VA_ARGS__)
 
 }

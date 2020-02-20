@@ -5,6 +5,7 @@
 #include "HotReloader/Events/SwapModuleEvent.h"
 
 #include "HotReloader/IRuntimeObject.h"
+#include "HotReloader/InheritanceTrackKeeper.h"
 
 #include "RuntimeReflection/Reflection.h"
 #include "RuntimeReflection/Macro.h"
@@ -25,8 +26,8 @@ namespace SteelEngine { namespace Network {
         CLIENT_TO_SERVER
     };
 
-    SE_CLASS(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE)
-    struct INetworkCommand : public HotReloader::IRuntimeObject
+    SE_CLASS()
+    struct INetworkCommand
     {
         SE_VALUE(SteelEngine::Reflection::ReflectionAttribute::NET_VALUE)
         CommunicationFlow m_Flow;
@@ -37,7 +38,7 @@ namespace SteelEngine { namespace Network {
         bool m_Deserialized = false;
         bool m_Busy = false;
 
-        const std::vector<INetworkCommand*>* m_Commands;
+        const std::vector<HotReloader::InheritanceTrackKeeper*>* m_Commands;
 
         virtual char* Serialize(char* data, size_t& totalSize)
         {

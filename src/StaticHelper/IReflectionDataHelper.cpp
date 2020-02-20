@@ -7,7 +7,7 @@
 
 namespace SteelEngine {
 
-    void IReflectionDataHelper::ProcessInheritance(const std::vector<IReflectionData*>& res, const std::vector<IReflectionInheritance*>& inheritance, HotReloader::IRuntimeObject* createdObject, const IReflectionData* data) const
+    void IReflectionDataHelper::ProcessInheritance(const std::vector<IReflectionData*>& res, const std::vector<IReflectionInheritance*>& inheritance, void* createdObject, const IReflectionData* data) const
     {
         const IReflectionData* data_ = data;
 
@@ -21,6 +21,18 @@ namespace SteelEngine {
                 data->InvokeStatic("ProcessInheritance", inheritance, data_, createdObject);
             }
         }
+    }
+
+    bool IReflectionDataHelper::Process(const IReflectionData* data) const
+    {
+        Variant* isHotReloadAble = data->GetMetaData(Reflection::ReflectionAttribute::HOT_RELOAD);
+
+        if(isHotReloadAble && (isHotReloadAble->IsValid() || isHotReloadAble->Convert<bool>()))
+        {
+            return true;
+        }
+
+        return false;
     }
 
 }

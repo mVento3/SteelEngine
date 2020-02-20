@@ -782,7 +782,7 @@ namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     void Renderer::Update()
     {
-        float delta = (*m_DeltaTimeVariant->Convert<IDeltaTime**>())->GetDeltaTime();
+        float delta = m_DeltaTimeVariant->Convert<IDeltaTime*>()->GetDeltaTime();
 
         if(m_RotateCamera)
         {

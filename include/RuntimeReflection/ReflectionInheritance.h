@@ -34,12 +34,12 @@ namespace SteelEngine {
 
         }
 
-        const std::string& GetName() override
+        const std::string& GetName() const override
         {
             return m_Name;
         }
 
-        size_t GetTypeID() override
+        size_t GetTypeID() const override
         {
             return m_TypeID;
         }

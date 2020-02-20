@@ -40,10 +40,10 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void SystemsMonitorWindow::Draw()
     {
-        IDeltaTime** delta = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::DELTA_TIME)->Convert<IDeltaTime**>();
+        IDeltaTime* delta = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::DELTA_TIME)->Convert<IDeltaTime*>();
 
-        ImGui::Text("%f ms", (*delta)->GetDeltaTime() * 1000.f);
-        ImGui::Text("%u fps", (*delta)->GetUPS());
+        ImGui::Text("%f ms", delta->GetDeltaTime() * 1000.f);
+        ImGui::Text("%u fps", delta->GetUPS());
         ImGui::Text("Some info about engine systems...");
 
         if(ImGui::IsItemHovered())
@@ -82,8 +82,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void SystemsMonitorWindow::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
-        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
-        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
+        UserInterface::OnRecompile(oldObject);
     }
 
 }}}

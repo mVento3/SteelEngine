@@ -22,7 +22,9 @@
 
 namespace SteelEngine {
 
-    SE_CLASS()
+    SE_CLASS(
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
     class Client : public Network::INetwork
     {
         GENERATED_BODY

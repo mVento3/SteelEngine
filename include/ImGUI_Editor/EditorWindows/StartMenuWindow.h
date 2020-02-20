@@ -23,9 +23,12 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::START_MENU_SCENE,
         SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
-        SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW
+        SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
-    class StartMenuWindow : public SteelEngine::EditorComponents::ImGUI::UserInterface
+    class StartMenuWindow :
+        public EditorComponents::ImGUI::UserInterface,
+        public HotReloader::IRuntimeObject
     {
         GENERATED_BODY
     private:

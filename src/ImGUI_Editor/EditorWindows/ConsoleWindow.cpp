@@ -30,17 +30,19 @@ namespace SteelEngine {
 
     void ConsoleWindow::Init()
     {
-        ILogger* logger = *Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::LOGGER)->Convert<ILogger**>();
+        ILogger* logger = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::LOGGER)->Convert<ILogger*>();
+        IReflectionData* type = Reflection::GetType<ConsoleWindow>();
+        HotReloader::IRuntimeObject* runtime = type->Invoke("Cast_IRuntimeObject", this).Convert<HotReloader::IRuntimeObject*>();
 
-        logger->SetDispatcher(&m_Object);
+        logger->SetDispatcher(runtime->m_Tracker);
 
-        m_ConsoleSystem = (IConsoleSystem**)&Reflection::CreateInstance("SteelEngine::ConsoleSystem")->m_Object;
+        m_ConsoleSystem = (IConsoleSystem**)Reflection::CreateInstance_("SteelEngine::ConsoleSystem");
 
         (*m_ConsoleSystem)->Init();
 
-        IEventManager** eventManager = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::EVENT_MANAGER)->Convert<IEventManager**>();
+        IEventManager* eventManager = Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::EVENT_MANAGER)->Convert<IEventManager*>();
 
-        (*eventManager)->AddEventObserver(this);
+        eventManager->AddEventObserver(this);
     }
 
     void ConsoleWindow::Draw()
@@ -245,8 +247,7 @@ namespace SteelEngine {
 
     void ConsoleWindow::OnRecompile(HotReloader::IRuntimeObject* oldObject)
     {
-        EditorComponents::ImGUI::UserInterface::OnRecompile(oldObject);
-        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
+        UserInterface::OnRecompile(oldObject);
     }
 
 }

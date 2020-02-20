@@ -3,6 +3,7 @@
 #include "SceneSystem/ISceneManager.h"
 
 #include "RuntimeReflection/Macro.h"
+#include "RuntimeReflection/Reflection.h"
 
 #include "SceneSystem/SceneManager.Generated.h"
 

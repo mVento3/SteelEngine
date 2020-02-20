@@ -31,7 +31,8 @@ namespace SteelEngine {
 
     SE_CLASS(
         SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
-        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
     class VirtualProject : public IVirtualProject, public Script::Python::Scriptable
     {
@@ -58,7 +59,7 @@ namespace SteelEngine {
         Utils::json m_ProjectConfig;
         Utils::json m_CompileConfig;
 
-        std::vector<HotReloader::IRuntimeObject**> m_ProjectScripts;
+        std::vector<HotReloader::InheritanceTrackKeeper*> m_ProjectScripts;
 
         void ProcessFile(const std::filesystem::path& toRemove, const std::filesystem::path& filePath);
         void SetupProjectStructure(ProjectStructure& project);

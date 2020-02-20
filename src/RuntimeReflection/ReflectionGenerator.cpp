@@ -7,14 +7,14 @@
 
 namespace SteelEngine {
 
-    void checkStructOrClassParents(ReflectionGenerator::ScopeInfo* info, std::stack<std::string>& parents)
+    void checkStructOrClassParents(Parser::ScopeInfo* info, std::stack<std::string>& parents)
     {
         if(!info)
         {
             return;
         }
 
-        if(info->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::CLASS || info->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::STRUCT)
+        if(info->m_Parent->m_ScopeType == Parser::ScopeType::CLASS || info->m_Parent->m_ScopeType == Parser::ScopeType::STRUCT)
         {
             parents.push(info->m_Parent->m_Name);
 
@@ -22,7 +22,7 @@ namespace SteelEngine {
         }
     }
 
-    void checkIfAnyStructOrClass(const ReflectionGenerator::ScopeInfo* info, bool& res)
+    void checkIfAnyStructOrClass(const Parser::ScopeInfo* info, bool& res)
     {
         if(res)
         {
@@ -31,7 +31,7 @@ namespace SteelEngine {
 
         for(auto it = info->m_Structure.begin(); it != info->m_Structure.end(); ++it)
         {
-            if(((*it)->m_ScopeType == ReflectionGenerator::ScopeType::CLASS || (*it)->m_ScopeType == ReflectionGenerator::ScopeType::STRUCT) && (*it)->m_IsReflectionLabelSet)
+            if(((*it)->m_ScopeType == Parser::ScopeType::CLASS || (*it)->m_ScopeType == Parser::ScopeType::STRUCT) && (*it)->m_IsReflectionLabelSet)
             {
                 res = true;
 
@@ -44,7 +44,7 @@ namespace SteelEngine {
         }
     }
 
-    void searchForReverse(const ReflectionGenerator::ScopeInfo* startPoint, std::stack<std::string>& names, const ReflectionGenerator::ScopeInfo** res)
+    void searchForReverse(const Parser::ScopeInfo* startPoint, std::stack<std::string>& names, const Parser::ScopeInfo** res)
     {
         if(!startPoint)
         {
@@ -73,9 +73,9 @@ namespace SteelEngine {
         searchForReverse(startPoint->m_Parent, names, res);
     }
 
-    void constructNamespace(const ReflectionGenerator::ScopeInfo* startPoint, std::stack<std::string>& res)
+    void constructNamespace(const Parser::ScopeInfo* startPoint, std::stack<std::string>& res)
     {
-        if(startPoint->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::CLASS || startPoint->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::STRUCT)
+        if(startPoint->m_Parent->m_ScopeType == Parser::ScopeType::CLASS || startPoint->m_Parent->m_ScopeType == Parser::ScopeType::STRUCT)
         {
             res.push(startPoint->m_Parent->m_Name);
 
@@ -83,9 +83,9 @@ namespace SteelEngine {
         }
     }
 
-    ReflectionGenerator::ScopeInfo* getLastStructOrClass(ReflectionGenerator::ScopeInfo* startPoint)
+    Parser::ScopeInfo* getLastStructOrClass(Parser::ScopeInfo* startPoint)
     {
-        if(startPoint->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::CLASS || startPoint->m_Parent->m_ScopeType == ReflectionGenerator::ScopeType::STRUCT)
+        if(startPoint->m_Parent->m_ScopeType == Parser::ScopeType::CLASS || startPoint->m_Parent->m_ScopeType == Parser::ScopeType::STRUCT)
         {
             return getLastStructOrClass(startPoint->m_Parent);
         }
@@ -95,219 +95,13 @@ namespace SteelEngine {
         }
     }
 
-    void ReflectionGenerator::ProcessArguments(std::vector<Argument>& args)
-    {
-        Type::uint32 brackets = 0;
-        std::string word;
-
-        while(1)
-        {
-            if(m_Lexer.GetToken() == "(")
-            {
-                if(brackets > 0)
-                {
-                    word += m_Lexer.GetToken();
-                }
-
-                brackets++;
-            }
-            else if(m_Lexer.GetToken() == ")")
-            {
-                brackets--;
-
-                if(brackets == 0)
-                {
-                    while(word[word.size() - 1] == ' ')
-                    {
-                        word.erase(word.size() - 1);
-                    }
-
-                    size_t found = word.find_last_of(" ");
-
-                    if(found != RuntimeDatabase::s_InvalidID)
-                    {
-                        args.push_back(Argument{ word.substr(0, found), word.substr(found + 1) });
-                        word.clear();
-                    }
-
-                    break;
-                }
-                else
-                {
-                    word += m_Lexer.GetToken();
-                }
-            }
-            else if(m_Lexer.GetToken() == ",")
-            {
-                if(brackets > 1)
-                {
-                    word += m_Lexer.GetToken();
-                }
-                else
-                {
-                    size_t found = word.find_last_of(" ");
-
-                    if(found != RuntimeDatabase::s_InvalidID)
-                    {
-                        args.push_back(Argument{ word.substr(0, found), word.substr(found + 1) });
-                        word.clear();
-                    }
-                }
-            }
-            else if(m_Lexer.GetToken() == "=")
-            {
-                Type::uint32 braces = 1;
-
-                while(1)
-                {
-                    m_Lexer++;
-
-                    if(m_Lexer.GetToken() == "(")
-                    {
-                        braces++;
-                    }
-                    else if(m_Lexer.GetToken() == ")")
-                    {
-                        braces--;
-
-                        if(braces == 0)
-                        {
-                            m_Lexer.SaveToken(m_Lexer.GetToken());
-
-                            break;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                word += m_Lexer.GetToken();
-
-                if(m_Lexer.Space())
-                {
-                    word += " ";
-                }
-            }
-
-            m_Lexer++;
-        }
-    }
-
-    void ReflectionGenerator::ProcessMetaData(std::vector<MetaData>& meta)
-    {
-        Type::uint32 braces = 0;
-        std::string word;
-        MetaData metaData;
-        bool wasEqual = false;
-
-        while(1)
-        {
-            m_Lexer++;
-
-            if(m_Lexer.GetToken() == "(")
-            {
-                if(braces != 0)
-                {
-                    word += m_Lexer.GetToken();
-
-                    if(m_Lexer.Space())
-                    {
-                        word += " ";
-                    }
-                }
-
-                braces++;
-            }
-            else if(m_Lexer.GetToken() == ")")
-            {
-                braces--;
-
-                if(braces == 0)
-                {
-                    if(wasEqual && word != "")
-                    {
-                        metaData.m_Value = word;
-                    }
-                    else if(word != "")
-                    {
-                        metaData.m_Key = word;
-                        metaData.m_Value = "true";
-                    }
-                    else
-                    {
-                        break;
-                    }
-
-                    word.clear();
-                    meta.push_back(metaData);
-
-                    break;
-                }
-                else
-                {
-                    word += m_Lexer.GetToken();
-
-                    if(m_Lexer.Space())
-                    {
-                        word += " ";
-                    }
-                }
-            }
-            else if(m_Lexer.GetToken() == ",")
-            {
-                if(braces > 1)
-                {
-                    word += m_Lexer.GetToken();
-
-                    if(m_Lexer.Space())
-                    {
-                        word += " ";
-                    }
-                }
-                else
-                {
-                    if(wasEqual)
-                    {
-                        metaData.m_Value = word;
-                    }
-                    else
-                    {
-                        metaData.m_Key = word;
-                        metaData.m_Value = "true";
-                    }
-
-                    wasEqual = false;
-
-                    word.clear();
-                    meta.push_back(metaData);
-                }
-            }
-            else if(m_Lexer.GetToken() == "=")
-            {
-                metaData.m_Key = word;
-                wasEqual = true;
-
-                word.clear();
-            }
-            else
-            {
-                word += m_Lexer.GetToken();
-
-                if(m_Lexer.Space())
-                {
-                    word += " ";
-                }
-            }
-        }
-    }
-
-    std::string ReflectionGenerator::WriteArguments(const std::vector<ReflectionGenerator::Argument>& args, ReflectionGenerator::ScopeInfo* info)
+    std::string ReflectionGenerator::WriteArguments(const std::vector<Parser::Argument>& args, Parser::ScopeInfo* info)
     {
         std::string processedArgs;
 
         for(Type::uint32 i = 0; i < args.size(); i++)
         {
-            ReflectionGenerator::Argument arg = args[i];
+            Parser::Argument arg = args[i];
 
             std::vector<std::string> splitted = split(arg.m_Type, ' ');
 
@@ -335,7 +129,7 @@ namespace SteelEngine {
                         names.push(*it);
                     }
 
-                    const ReflectionGenerator::ScopeInfo* foundScope = 0;
+                    const Parser::ScopeInfo* foundScope = 0;
 
                     searchForReverse(info, names, &foundScope);
 
@@ -374,7 +168,7 @@ namespace SteelEngine {
         return processedArgs;
     }
 
-    std::string ReflectionGenerator::WriteMetaData(const ScopeInfo* info)
+    std::string ReflectionGenerator::WriteMetaData(const Parser::ScopeInfo* info)
     {
         std::string result;
 
@@ -384,7 +178,7 @@ namespace SteelEngine {
 
             for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
             {
-                MetaData v = info->m_MetaData[i];
+                Parser::MetaData v = info->m_MetaData[i];
 
                 result.append("SteelEngine::Reflection::MetaData(").append(v.m_Key).append(", ").append(v.m_Value).append(")");
 
@@ -404,7 +198,7 @@ namespace SteelEngine {
         return result;
     }
 
-    void ReflectionGenerator::Process(ScopeInfo* info, std::ofstream& file)
+    void ReflectionGenerator::Process(Parser::ScopeInfo* info, std::ofstream& file)
     {
         if(!info)
         {
@@ -415,13 +209,13 @@ namespace SteelEngine {
         static std::stack<std::string> parents;
         static std::queue<std::string> parents2;
 
-        if(info->m_ScopeType == ScopeType::NAMESPACE)
+        if(info->m_ScopeType == Parser::ScopeType::NAMESPACE)
         {
             file << "namespace " << info->m_Name << " {\n";
 
             namespaces.push_back(info->m_Name);
         }
-        else if(info->m_ScopeType == ScopeType::STRUCT || info->m_ScopeType == ScopeType::CLASS)
+        else if(info->m_ScopeType == Parser::ScopeType::STRUCT || info->m_ScopeType == Parser::ScopeType::CLASS)
         {
             if(!m_BeginRecordingOnce)
             {
@@ -434,7 +228,7 @@ namespace SteelEngine {
                 }
             }
 
-            StructScope* str = (StructScope*)info;
+            Parser::StructScope* str = (Parser::StructScope*)info;
 
             IReflectionData const* const* types = Reflection::GetTypes();
 
@@ -460,7 +254,7 @@ namespace SteelEngine {
 
                 checkStructOrClassParents(str, parents);
 
-                str->m_MetaData.push_back(MetaData{ "\"sizeof\"", "sizeof(" + str->m_Name + ")" });
+                str->m_MetaData.push_back(Parser::MetaData{ "\"sizeof\"", "sizeof(" + str->m_Name + ")" });
 
                 file << "SteelEngine::ReflectionRecorder::Register<";
 
@@ -521,7 +315,7 @@ namespace SteelEngine {
                 file << ")\n";
                 file << WriteMetaData(str);
 
-                for(ConstructorScope* v : str->m_Constructors)
+                for(Parser::ConstructorScope* v : str->m_Constructors)
                 {
                     file << ".Constructor<";
                     file << WriteArguments(v->m_Arguments, str);
@@ -529,42 +323,40 @@ namespace SteelEngine {
                     file << WriteMetaData(v);
                 }
 
-                for(InheritanceScope* v : str->m_Inheritance)
+                for(Parser::InheritanceScope* v : str->m_Inheritance)
                 {
                     file << ".Inheritance<" << v->m_Name << ">(\"" << v->m_Name << "\")\n";
                 }
 
-                for(PropertyScope* v : str->m_Properties)
+                for(Parser::PropertyScope* v : str->m_Properties)
                 {
                     for(IReflectionModule* module : str->m_ReflectionModules)
                     {
                         module->ProcessProperty(v);
                     }
 
-                    if((v->m_Protection == ProtectionLevel::PUBLIC || (v->m_ScopeType == ScopeType::STRUCT && v->m_Protection == ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
+                    if((v->m_Protection == Parser::ProtectionLevel::PUBLIC || (v->m_ScopeType == Parser::ScopeType::STRUCT && v->m_Protection == Parser::ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
                     {
                         file << ".Property(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
                         file << WriteMetaData(v);
                     }
                 }
 
-                for(FunctionScope* v : str->m_Functions)
+                for(Parser::FunctionScope* v : str->m_Functions)
                 {
                     bool found = false;
 
-                    for(FunctionScope* v2 : str->m_Functions)
+                    for(Parser::FunctionScope* v2 : str->m_Functions)
                     {
                         if(v != v2 && v->m_Name == v2->m_Name)
                         {
-                            // We nee
-                            // printf("AAA\n");
                             found = true;
                         }
                     }
 
                     if(!found)
                     {
-                        if((v->m_Protection == ProtectionLevel::PUBLIC || (v->m_ScopeType == ScopeType::STRUCT && v->m_Protection == ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
+                        if((v->m_Protection == Parser::ProtectionLevel::PUBLIC || (v->m_ScopeType == Parser::ScopeType::STRUCT && v->m_Protection == Parser::ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
                         {
                             file << ".Method(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
                             file << WriteMetaData(v);
@@ -572,7 +364,7 @@ namespace SteelEngine {
                     }
                     else
                     {
-                        if((v->m_Protection == ProtectionLevel::PUBLIC || (v->m_ScopeType == ScopeType::STRUCT && v->m_Protection == ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
+                        if((v->m_Protection == Parser::ProtectionLevel::PUBLIC || (v->m_ScopeType == Parser::ScopeType::STRUCT && v->m_Protection == Parser::ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
                         {
                             file << ".Method<";
 
@@ -601,7 +393,7 @@ namespace SteelEngine {
                     }
                 }
 
-                for(EnumScope* v : str->m_Enums)
+                for(Parser::EnumScope* v : str->m_Enums)
                 {
                     if(v->m_IsReflectionLabelSet)
                     {
@@ -610,7 +402,7 @@ namespace SteelEngine {
 
                         for(Type::uint32 i = 0; i < v->m_Elements.size(); i++)
                         {
-                            EnumElementScope* e = v->m_Elements[i];
+                            Parser::EnumElementScope* e = v->m_Elements[i];
 
                             file << "SteelEngine::Reflection::EnumElement(\"" << e->m_Name << "\", " << parentsStr << str->m_Name << "::" << v->m_Name << "::" << e->m_Name << ")";
                             file << WriteMetaData(e);
@@ -641,7 +433,7 @@ namespace SteelEngine {
             info->m_Scopes.pop();
         }
 
-        if(info->m_Parent && info->m_Parent->m_ScopeType == ScopeType::NAMESPACE)
+        if(info->m_Parent && info->m_Parent->m_ScopeType == Parser::ScopeType::NAMESPACE)
         {
             if(!m_EndRecordingOnce)
             {
@@ -649,11 +441,11 @@ namespace SteelEngine {
                 {
                     file << "}\n";
 
-                    if(info->m_Parent == 0 || info->m_Parent->m_ScopeType == ScopeType::NAMESPACE)
+                    if(info->m_Parent == 0 || info->m_Parent->m_ScopeType == Parser::ScopeType::NAMESPACE)
                     {
-                        if(info->m_ScopeType == ScopeType::STRUCT || info->m_ScopeType == ScopeType::CLASS)
+                        if(info->m_ScopeType == Parser::ScopeType::STRUCT || info->m_ScopeType == Parser::ScopeType::CLASS)
                         {
-                            StructScope* str = (StructScope*)info;
+                            Parser::StructScope* str = (Parser::StructScope*)info;
 
                             for(IReflectionModule* module : str->m_ReflectionModules)
                             {
@@ -677,7 +469,7 @@ namespace SteelEngine {
                                         file << "FIND_THE_RIGHT_OBJECT\n";
                                         file << "\n";
 
-                                        for(ConstructorScope* cons : str->m_Constructors)
+                                        for(Parser::ConstructorScope* cons : str->m_Constructors)
                                         {
                                             if(cons->m_Arguments.size() > 0)
                                             {
@@ -716,7 +508,7 @@ namespace SteelEngine {
             }
         }
 
-        if(info->m_ScopeType == ScopeType::NAMESPACE)
+        if(info->m_ScopeType == Parser::ScopeType::NAMESPACE)
         {
             file << "}\n";
 
@@ -726,11 +518,9 @@ namespace SteelEngine {
 
     ReflectionGenerator::ReflectionGenerator()
     {
-        m_CurrentWorkingScope = 0;
-        m_CurrentScopeToAddByMeta = 0;
-        m_CurrentProtectionLevel = ProtectionLevel::NONE;
         m_BeginRecordingOnce = false;
         m_EndRecordingOnce = false;
+        m_GenerateReflection = true;
     }
 
     ReflectionGenerator::~ReflectionGenerator()
@@ -753,7 +543,7 @@ namespace SteelEngine {
             file.close();
         }
 
-        m_Lexer.Load(m_LoadedLines);
+        m_Parser.Load(m_LoadedLines);
 
         m_Filename = filename;
 
@@ -762,719 +552,35 @@ namespace SteelEngine {
 
     Result ReflectionGenerator::Parse()
     {
-        std::string word;
+        Result res = m_Parser.Parse();
 
-        while(!m_Lexer.End())
+        m_ParsedStructure = &m_Parser.GetParsed();
+
+        if(!m_ParsedStructure->empty())
         {
-            m_Lexer++;
-
-            if(m_Lexer.GetToken() == "#pragma")
-            {
-                m_Lexer++;
-            }
-            else if(m_Lexer.GetToken() == "#include")
-            {
-                m_Lexer++;
-            }
-            else if(m_Lexer.GetToken() == "#define")
-            {
-                m_Lexer.SkipLine();
-            }
-            else if(m_Lexer.GetToken() == "{")
-            {
-                if(m_Scopes.empty())
-                {
-                    m_Scopes.push(m_CurrentScopeToAdd);
-                    m_Structure.push_back(m_CurrentScopeToAdd);
-
-                    m_CurrentWorkingScope = m_CurrentScopeToAdd;
-                }
-                else
-                {
-                    if(!m_CurrentWorkingScope)
-                    {
-                        m_CurrentWorkingScope = m_Scopes.top();
-                    }
-
-                    m_CurrentScopeToAdd->m_Parent = m_CurrentWorkingScope;
-                    m_CurrentScopeToAdd->m_Protection = m_CurrentProtectionLevel;
-
-                    m_CurrentWorkingScope->m_Scopes.push(m_CurrentScopeToAdd);
-                    m_CurrentWorkingScope->m_Structure.push_back(m_CurrentScopeToAdd);
-
-                    m_CurrentWorkingScope = m_CurrentScopeToAdd;
-                    m_CurrentScopeToAdd = 0;
-                }
-            }
-            else if(m_Lexer.GetToken() == "}")
-            {
-                m_CurrentWorkingScope = m_CurrentWorkingScope->m_Parent;
-
-                if(m_CurrentWorkingScope)
-                {
-                    m_CurrentProtectionLevel = m_CurrentWorkingScope->m_Protection;
-                }
-            }
-            else if(m_Lexer.GetToken() == "class" || m_Lexer.GetToken() == "struct")
-            {
-                if(m_Lexer.GetToken() == "class")
-                {
-                    if(!m_CurrentScopeToAddByMeta)
-                    {
-                        m_CurrentScopeToAdd = new ClassScope(m_Lexer++.GetToken());
-                    }
-                    else
-                    {
-                        m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                        m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
-                        m_CurrentScopeToAddByMeta = 0;
-                    }
-                }
-                else
-                {
-                    if(!m_CurrentScopeToAddByMeta)
-                    {
-                        m_CurrentScopeToAdd = new StructScope(m_Lexer++.GetToken());
-                    }
-                    else
-                    {
-                        m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                        m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
-                        m_CurrentScopeToAddByMeta = 0;
-                    }
-                }
-
-                if(m_Lexer++.GetToken() == ":")
-                {
-                    std::string word;
-                    ProtectionLevel protection;
-                    StructScope* str = (StructScope*)m_CurrentScopeToAdd;
-
-                    while(1)
-                    {
-                        m_Lexer++;
-
-                        if(m_Lexer.GetToken() == "public")
-                        {
-                            protection = ProtectionLevel::PUBLIC;
-                        }
-                        else if(m_Lexer.GetToken() == "protected")
-                        {
-                            protection = ProtectionLevel::PROTECTED;
-                        }
-                        else if(m_Lexer.GetToken() == "private")
-                        {
-                            protection = ProtectionLevel::PRIVATE;
-                        }
-                        else if(m_Lexer.GetToken() == "SE_INHERITANCE")
-                        {
-                            m_CurrentScopeToAddByMeta = new InheritanceScope();
-
-                            m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
-
-                            ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
-                        }
-                        else if(m_Lexer.GetToken() == ",")
-                        {
-                            if(!m_CurrentScopeToAddByMeta)
-                            {
-                                m_CurrentScopeToAdd = new InheritanceScope(word);
-                            }
-                            else
-                            {
-                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                                m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
-                                m_CurrentScopeToAddByMeta = 0;
-                            }
-
-                            InheritanceScope* inherit = (InheritanceScope*)m_CurrentScopeToAdd;
-
-                            inherit->m_Protection = protection;
-
-                            str->m_Inheritance.push_back(inherit);
-
-                            word.clear();
-                        }
-                        else if(m_Lexer.GetToken() == "{")
-                        {
-                            if(!m_CurrentScopeToAddByMeta)
-                            {
-                                m_CurrentScopeToAdd = new InheritanceScope(word);
-                            }
-                            else
-                            {
-                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                                m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
-                                m_CurrentScopeToAddByMeta = 0;
-                            }
-
-                            InheritanceScope* inherit = (InheritanceScope*)m_CurrentScopeToAdd;
-
-                            inherit->m_Protection = protection;
-
-                            str->m_Inheritance.push_back(inherit);
-
-                            word.clear();
-
-                            m_Lexer.SaveToken(m_Lexer.GetToken());
-
-                            break;
-                        }
-                        else
-                        {
-                            word += m_Lexer.GetToken();
-                        }
-                    }
-                }
-                else
-                {
-                    m_Lexer.SaveToken(m_Lexer.GetToken());
-                }
-            }
-            else if(m_Lexer.GetToken() == "namespace")
-            {
-                if(!m_CurrentScopeToAddByMeta)
-                {
-                    m_CurrentScopeToAdd = new NamespaceScope(m_Lexer++.GetToken());
-                }
-                else
-                {
-                    m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                    m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
-                    m_CurrentScopeToAddByMeta = 0;
-                }
-            }
-            else if(m_Lexer.GetToken() == "enum")
-            {
-                if(!m_CurrentScopeToAddByMeta)
-                {
-                    m_CurrentScopeToAdd = new EnumScope(m_Lexer++.GetToken());
-                }
-                else
-                {
-                    m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                    m_CurrentScopeToAdd->m_Name = m_Lexer++.GetToken();
-                    m_CurrentScopeToAddByMeta = 0;
-                }
-
-                EnumScope* eS = (EnumScope*)m_CurrentScopeToAdd;
-                StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
-
-                bool waitForCloseBrace = false;
-                std::string word;
-
-                while(1)
-                {
-                    m_Lexer++;
-
-                    if(m_Lexer.GetToken() == ";" && !waitForCloseBrace)
-                    {
-                        break;
-                    }
-                    else if(m_Lexer.GetToken() == "{")
-                    {
-                        waitForCloseBrace = true;
-                    }
-                    else if(m_Lexer.GetToken() == "}" && waitForCloseBrace)
-                    {
-                        break;
-                    }
-                    else if(m_Lexer.GetToken() == "SE_ELEMENT")
-                    {
-                        m_CurrentScopeToAddByMeta = new EnumElementScope();
-
-                        m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
-
-                        ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
-                    }
-                    else if(m_Lexer.GetToken() == ",")
-                    {
-                        if(!m_CurrentScopeToAddByMeta)
-                        {
-                            m_CurrentScopeToAdd = new EnumElementScope(word);
-                        }
-                        else
-                        {
-                            m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                            m_CurrentScopeToAdd->m_Name = word;
-                            m_CurrentScopeToAddByMeta = 0;
-                        }
-
-                        EnumElementScope* ele = (EnumElementScope*)m_CurrentScopeToAdd;
-
-                        ele->m_Parent = eS;
-
-                        eS->m_Elements.push_back(ele);
-
-                        word.clear();
-                    }
-                    else
-                    {
-                        word += m_Lexer.GetToken();
-                    }
-                }
-
-                eS->m_Parent = structScope;
-
-                structScope->m_Enums.push_back(eS);
-
-                m_CurrentWorkingScope->m_Scopes.push(eS);
-                m_CurrentWorkingScope->m_Structure.push_back(eS);
-            }
-            else if(m_Lexer.GetToken() == "public")
-            {
-                m_Lexer++; // :
-
-                if(m_CurrentWorkingScope)
-                {
-                    m_CurrentWorkingScope->m_Protection = ProtectionLevel::PUBLIC;
-                }
-
-                m_CurrentProtectionLevel = ProtectionLevel::PUBLIC;
-            }
-            else if(m_Lexer.GetToken() == "protected")
-            {
-                m_Lexer++; // :
-
-                if(m_CurrentWorkingScope)
-                {
-                    m_CurrentWorkingScope->m_Protection = ProtectionLevel::PROTECTED;
-                }
-
-                m_CurrentProtectionLevel = ProtectionLevel::PROTECTED;
-            }
-            else if(m_Lexer.GetToken() == "private")
-            {
-                m_Lexer++; // :
-
-                if(m_CurrentWorkingScope)
-                {
-                    m_CurrentWorkingScope->m_Protection = ProtectionLevel::PRIVATE;
-                }
-
-                m_CurrentProtectionLevel = ProtectionLevel::PRIVATE;
-            }
-            else if(m_Lexer.GetToken() == "SE_CLASS")
-            {
-                m_CurrentScopeToAddByMeta = new ClassScope();
-
-                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
-
-                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
-            }
-            else if(m_Lexer.GetToken() == "SE_STRUCT")
-            {
-                m_CurrentScopeToAddByMeta = new StructScope();
-
-                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
-
-                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
-            }
-            else if(m_Lexer.GetToken() == "SE_ENUM")
-            {
-                m_CurrentScopeToAddByMeta = new EnumScope();
-
-                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
-
-                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
-            }
-            else if(m_Lexer.GetToken() == "SE_VALUE")
-            {
-                m_CurrentScopeToAddByMeta = new PropertyScope();
-
-                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
-
-                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
-            }
-            else if(m_Lexer.GetToken() == "SE_METHOD")
-            {
-                m_CurrentScopeToAddByMeta = new FunctionScope();
-
-                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
-
-                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
-            }
-            else if(m_Lexer.GetToken() == "SE_NAMESPACE")
-            {
-                m_CurrentScopeToAddByMeta = new NamespaceScope();
-
-                m_CurrentScopeToAddByMeta->m_IsReflectionLabelSet = true;
-
-                ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
-            }
-            else if(m_Lexer.GetToken() == "GENERATED_BODY")
-            {
-
-            }
-            else if(m_Lexer.GetToken() == "override")
-            {
-                // m_Lexer++;
-            }
-            else if(m_Lexer.GetToken() == "using" || m_Lexer.GetToken() == "friend" || m_Lexer.GetToken() == "typedef")
-            {
-                while(m_Lexer++.GetToken() != ";")
-                {
-
-                }
-            }
-            else if(m_Lexer.GetToken() == "template")
-            {
-                Type::uint32 braces = 0;
-
-                while(1)
-                {
-                    m_Lexer++;
-
-                    if(m_Lexer.GetToken() == "<")
-                    {
-                        braces++;
-                    }
-                    else if(m_Lexer.GetToken() == ">")
-                    {
-                        braces--;
-
-                        if(braces == 0)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if(m_Lexer.GetToken() == "[")
-                {
-                    while(m_Lexer.GetToken() != "]")
-                    {
-                        m_Lexer++;
-                    }
-
-                    m_Lexer++;
-                }
-
-                if(m_Lexer.GetToken() == "=")
-                {
-                    while(m_Lexer.GetToken() != ";")
-                    {
-                        m_Lexer++;
-                    }
-                }
-
-                if(m_Lexer.GetToken() == "static")
-                {
-                    m_Lexer++;
-                }
-
-                if(m_Lexer.GetToken() == "inline")
-                {
-                    m_Lexer++;
-                }
-
-                if(m_Lexer.GetToken() == "virtual")
-                {
-                    m_Lexer++;
-                }
-
-                std::string saved;
-                bool success = false;
-
-                if(!m_Scopes.empty())
-                {
-                    // Constructor
-                    if(m_CurrentWorkingScope && m_Lexer.GetToken() == m_CurrentWorkingScope->m_Name)
-                    {
-                        std::string token = m_Lexer.GetToken();
-
-                        if(m_Lexer++.GetToken() == "(")
-                        {
-                            success = true;
-
-                            if(!m_CurrentScopeToAddByMeta)
-                            {
-                                m_CurrentScopeToAdd = new ConstructorScope(m_CurrentWorkingScope->m_Name);
-                            }
-                            else
-                            {
-                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                                m_CurrentScopeToAdd->m_Name = m_CurrentWorkingScope->m_Name;
-                                m_CurrentScopeToAddByMeta = 0;
-                            }
-
-                            ConstructorScope* cons = (ConstructorScope*)m_CurrentScopeToAdd;
-
-                            ProcessArguments(cons->m_Arguments);
-
-                            Type::uint32 braces = 0;
-
-                            while(1)
-                            {
-                                m_Lexer++;
-
-                                if(m_Lexer.GetToken() == ";" && braces == 0)
-                                {
-                                    break;
-                                }
-                                else if(m_Lexer.GetToken() == "{")
-                                {
-                                    braces++;
-                                }
-                                else if(m_Lexer.GetToken() == "}")
-                                {
-                                    braces--;
-
-                                    if(braces == 0)
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-
-                            StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
-
-                            cons->m_Parent = structScope;
-
-                            structScope->m_Constructors.push_back(cons);
-                        }
-                        else
-                        {
-                            saved = token;
-                        }
-                    }
-                    else if(m_CurrentWorkingScope && m_Lexer.GetToken() == "~" + m_CurrentWorkingScope->m_Name)
-                    {
-                        std::string token = m_Lexer.GetToken();
-
-                        if(m_Lexer++.GetToken() == "(")
-                        {
-                            success = true;
-                            m_Lexer++;
-
-                            bool waitForCloseBrace = false;
-
-                            while(1)
-                            {
-                                m_Lexer++;
-
-                                if(m_Lexer.GetToken() == ";" && !waitForCloseBrace)
-                                {
-                                    break;
-                                }
-                                else if(m_Lexer.GetToken() == "{")
-                                {
-                                    waitForCloseBrace = true;
-                                }
-                                else if(m_Lexer.GetToken() == "}" && waitForCloseBrace)
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            saved = token;
-                        }
-                    }
-                }
-
-                if(!success && m_CurrentWorkingScope)
-                {
-                    word += saved;
-                    word += m_Lexer.GetToken();
-
-                    if(m_Lexer.Space())
-                    {
-                        word += " ";
-                    }
-
-                    Lexer lexer;
-                    std::vector<std::string> line;
-                    Type::uint32 braces = 0;
-                    bool wasBracket = false;
-
-                    line.push_back(word);
-                    lexer.Load(line);
-
-                    while(!lexer.End())
-                    {
-                        lexer++;
-
-                        if(lexer.GetToken() == "<")
-                        {
-                            braces++;
-
-                            wasBracket = true;
-                        }
-                        else if(lexer.GetToken() == ">")
-                        {
-                            braces--;
-
-                            if(braces == 0)
-                            {
-                                wasBracket = false;
-                            }
-                        }
-                    }
-
-                    if(m_Lexer.GetToken() == "(" && word[0] != ':' && !wasBracket)
-                    {
-                        size_t found = word.find_last_of(" ");
-
-                        if(found != RuntimeDatabase::s_InvalidID)
-                        {
-                            if(!m_CurrentScopeToAddByMeta)
-                            {
-                                m_CurrentScopeToAdd = new FunctionScope(word.substr(found + 1, word.size() - 2 - found));
-                            }
-                            else
-                            {
-                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                                m_CurrentScopeToAdd->m_Name = word.substr(found + 1, word.size() - 2 - found);
-                                m_CurrentScopeToAddByMeta = 0;
-                            }
-                        }
-
-                        FunctionScope* func = (FunctionScope*)m_CurrentScopeToAdd;
-
-                        func->m_ReturnType = word.substr(0, found);
-                        func->m_Protection = m_CurrentProtectionLevel;
-                        func->m_Parent = m_CurrentWorkingScope;
-
-                        ProcessArguments(func->m_Arguments);
-
-                        Type::uint32 braces = 0;
-
-                        while(1)
-                        {
-                            m_Lexer++;
-
-                            if(m_Lexer.GetToken() == ";" && braces == 0)
-                            {
-                                break;
-                            }
-                            else if(m_Lexer.GetToken() == "{")
-                            {
-                                braces++;
-                            }
-                            else if(m_Lexer.GetToken() == "}")
-                            {
-                                braces--;
-
-                                if(braces == 0)
-                                {
-                                    break;
-                                }
-                            }
-                        }
-
-                        if(m_CurrentWorkingScope->m_ScopeType == ScopeType::CLASS || m_CurrentWorkingScope->m_ScopeType == ScopeType::STRUCT)
-                        {
-                            StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
-
-                            structScope->m_Functions.push_back(func);
-                        }
-                        else if(m_CurrentWorkingScope && m_CurrentWorkingScope->m_ScopeType == ScopeType::NAMESPACE)
-                        {
-                            m_CurrentWorkingScope->m_Scopes.push(func);
-                            m_CurrentWorkingScope->m_Structure.push_back(func);
-                        }
-
-                        word.clear();
-                    }
-                    else if(m_Lexer.GetToken() == ";")
-                    {
-                        while(word[word.size() - 2] == ' ')
-                        {
-                            word.erase(word.size() - 2, 1);
-                        }
-
-                        Lexer lexer;
-                        bool wasConst = false;
-                        std::vector<std::string> lines;
-
-                        lines.push_back(word);
-                        lexer.Load(lines);
-                        word.clear();
-
-                        while(!lexer.End())
-                        {
-                            lexer++;
-
-                            if(lexer.GetToken() == "const")
-                            {
-                                wasConst = true;
-
-                                break;
-                            }
-                            else
-                            {
-                                word += lexer.GetToken();
-
-                                if(lexer.Space())
-                                {
-                                    word += " ";
-                                }
-                            }
-                        }
-
-                        if(wasConst)
-                        {
-                            continue;
-                        }
-
-                        size_t found = word.find_last_of(" ");
-
-                        if(found != RuntimeDatabase::s_InvalidID)
-                        {
-                            StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
-
-                            if(!m_CurrentScopeToAddByMeta)
-                            {
-                                m_CurrentScopeToAdd = new PropertyScope(word.substr(found + 1, word.size() - 2 - found));
-                            }
-                            else
-                            {
-                                m_CurrentScopeToAdd = m_CurrentScopeToAddByMeta;
-                                m_CurrentScopeToAdd->m_Name = word.substr(found + 1, word.size() - 2 - found);
-                                m_CurrentScopeToAddByMeta = 0;
-                            }
-
-                            PropertyScope* prop = (PropertyScope*)m_CurrentScopeToAdd;
-
-                            prop->m_Type = word.substr(0, found);
-                            prop->m_Parent = m_CurrentWorkingScope;
-                            prop->m_Protection = m_CurrentProtectionLevel;
-
-                            structScope->m_Properties.push_back(prop);
-                        }
-
-                        word.clear();
-                    }
-                }
-            }
-
-            // m_Lexer++;
-        }
-
-        return SE_TRUE;
-    }
-
-    Result ReflectionGenerator::Generate(const std::filesystem::path& cwd, const std::filesystem::path& generatePath)
-    {
-        if(!m_Structure.empty())
-        {
-            for(Type::uint32 i = 0; i < m_Structure.size(); i++)
+            for(Type::uint32 i = 0; i < m_ParsedStructure->size(); i++)
             {
                 bool res = false;
 
-                checkIfAnyStructOrClass(m_Structure[i], res);
+                checkIfAnyStructOrClass(m_ParsedStructure->at(i), res);
 
                 if(!res)
                 {
-                    return SE_TRUE;
+                    m_GenerateReflection = false;
                 }
             }
         }
         else
+        {
+            m_GenerateReflection = false;
+        }
+
+        return res;
+    }
+
+    Result ReflectionGenerator::Generate(const std::filesystem::path& cwd, const std::filesystem::path& generatePath)
+    {
+        if(!m_GenerateReflection)
         {
             return SE_TRUE;
         }
@@ -1493,22 +599,20 @@ namespace SteelEngine {
 
 		for(Type::uint32 i = split(p2, '/').size() + 1; i < splitted_.size() - 1; i++)
 		{
-			finalPath.append(splitted_[i]).append("/");
 			includePath.append(splitted_[i]).append("/");
+            finalPath.append(splitted_[i]).append("/");
 
-			try
-			{
-				std::filesystem::create_directory(finalPath);
-			}
-			catch(const std::exception& e)
-			{
-				printf("%s\n", e.what());
-			}
+            try
+            {
+                std::filesystem::create_directory(finalPath);
+            }
+            catch(const std::exception& e)
+            {
+                printf("%s\n", e.what());
+            }
 		}
 
         includePath.append(splitted_[splitted_.size() - 1]);
-
-        std::string lol = "D:/Projects/C++/SteelEngine/Test";
 
         std::ofstream sourceFile(finalPath + m_Filename.stem().string() + ".Generated.cpp");
 
@@ -1518,13 +622,11 @@ namespace SteelEngine {
         sourceFile << "#include \"" << finalPath << m_Filename.stem().string() << ".Generated.h" << "\"\n";
 		sourceFile << "\n";
 
-        while(!m_Scopes.empty())
+        for(Type::uint32 i = 0; i < m_ParsedStructure->size(); i++)
         {
-            ScopeInfo* scope = m_Scopes.top();
+            Parser::ScopeInfo* scope = m_ParsedStructure->at(i);
 
             Process(scope, sourceFile);
-
-            m_Scopes.pop();
         }
 
         if(sourceFile.is_open())
@@ -1573,10 +675,7 @@ namespace SteelEngine {
         m_BeginRecordingOnce = false;
         m_EndRecordingOnce = false;
 
-        for(Type::uint32 i = 0; i < m_Structure.size(); i++)
-        {
-            m_Structure[i]->Clear();
-        }
+        m_Parser.Clear();
     }
 
 }

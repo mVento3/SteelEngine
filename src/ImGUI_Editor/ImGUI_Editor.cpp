@@ -49,7 +49,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     {
         m_API_Context = context;
         m_Context = (ImGuiContext*)Reflection::GetType("SteelEngine::OpenGL_Context")->Invoke("GetContext", context).Convert<void*>();
-        m_NaiveManager = Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::EVENT_MANAGER)->Convert<IEventManager**>();
+        m_NaiveManager = Reflection::GetType("SteelEngine::Core")->GetMetaData(SteelEngine::Core::GlobalSystems::EVENT_MANAGER)->Convert<IEventManager*>();
 
         ImGui::SetCurrentContext(m_Context);
 
@@ -64,26 +64,29 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
             {
                 if(inhs[i]->GetTypeID() == typeid(EditorComponents::ImGUI::UserInterface).hash_code() && type->GetMetaData(ReflectionAttributes::EDITOR_WINDOW)->Convert<bool>())
                 {
-                    EditorComponents::ImGUI::UserInterface** window = (EditorComponents::ImGUI::UserInterface**)&type->Create()->m_Object;
+                    void** windowPtr = type->Create_();
 
-                    strcpy((*window)->m_Title, type->GetTypeName());
-                    (*window)->m_Context = m_Context;
-                    (*window)->m_Editor = (ImGUI_Editor**)&m_Object;
+                    HotReloader::InheritanceTrackKeeper* swapper = new HotReloader::InheritanceTrackKeeper(type, windowPtr);
+                    EditorComponents::ImGUI::UserInterface* window = swapper->Get<EditorComponents::ImGUI::UserInterface>();
+
+                    strcpy(window->m_Title, type->GetTypeName());
+                    window->m_Context = m_Context;
+                    window->m_Editor = (ImGUI_Editor**)&m_Object;
 
                     if(type->GetMetaData(ReflectionAttributes::EDITOR_WINDOW)->Convert<bool>())
                     {
                         if(type->GetMetaData(ReflectionAttributes::SCENE_TYPE)->Convert<SceneType>() & SceneType::EDITOR_SCENE)
                         {
-                            m_MainEditorWindows.push_back(window);
+                            m_MainEditorWindows.push_back(swapper);
                         }
 
                         if(type->GetMetaData(ReflectionAttributes::SCENE_TYPE)->Convert<SceneType>() & SceneType::START_MENU_SCENE)
                         {
-                            m_StartMenuWindows.push_back(window);
+                            m_StartMenuWindows.push_back(swapper);
                         }
                     }
 
-                    (*window)->Init();
+                    window->Init();
                 }
             }
         }
@@ -136,9 +139,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         {
             for(Type::uint32 i = 0; i < m_StartMenuWindows.size(); i++)
             {
-                HotReloader::IRuntimeObject* uiObject = (*m_StartMenuWindows[i]);
-                IReflectionData* type = Reflection::GetType(uiObject);
-                EditorComponents::ImGUI::UserInterface* ui = type->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
+                HotReloader::InheritanceTrackKeeper* swapper = m_StartMenuWindows[i];
+                const IReflectionData* type = swapper->GetType();
+                EditorComponents::ImGUI::UserInterface* ui = swapper->Get<EditorComponents::ImGUI::UserInterface>();
 
                 if(type->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
                 {
@@ -171,9 +174,9 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         {
             for(Type::uint32 i = 0; i < m_UIs.size(); i++)
             {
-                HotReloader::IRuntimeObject* uiObject = (*m_UIs[i]);
-                IReflectionData* type = Reflection::GetType(uiObject);
-                EditorComponents::ImGUI::UserInterface* ui = type->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
+                HotReloader::InheritanceTrackKeeper* swapper = m_UIs[i];
+                const IReflectionData* type = swapper->GetType();
+                EditorComponents::ImGUI::UserInterface* ui = swapper->Get<EditorComponents::ImGUI::UserInterface>();
 
                 if(type->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
                 {
@@ -204,9 +207,10 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
             for(Type::uint32 i = 0; i < m_MainEditorWindows.size(); i++)
             {
-                HotReloader::IRuntimeObject* uiObject = (*m_MainEditorWindows[i]);
-                IReflectionData* type = Reflection::GetType(uiObject);
-                EditorComponents::ImGUI::UserInterface* ui = type->Invoke("Cast_UserInterface", uiObject).Convert<EditorComponents::ImGUI::UserInterface*>();
+                HotReloader::InheritanceTrackKeeper* swapper = m_MainEditorWindows[i];
+                const IReflectionData* type = swapper->GetType();
+                EditorComponents::ImGUI::UserInterface* ui = swapper->Get<EditorComponents::ImGUI::UserInterface>();
+                HotReloader::IRuntimeObject* runtime = swapper->Get<HotReloader::IRuntimeObject>();
 
                 if(type->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
                 {
@@ -229,7 +233,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
                         for(Type::uint32 i = 0; i < a.size(); i++)
                         {
                             // IReflectionData::PropertyInfo info = a[i];
-                            Variant prop = type->GetProperty(a[i]->GetName().c_str(), uiObject);
+                            Variant prop = type->GetProperty(a[i]->GetName().c_str(), runtime->m_Object);
 
                             if(prop.GetType() == m_FloatTypeID)
                             {
@@ -270,7 +274,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         {
             isAnyItemActive = ImGui::IsAnyItemActive();
 
-            (*m_NaiveManager)->DispatchEvent(new AnyItemActiveChangedEvent(isAnyItemActive));
+            m_NaiveManager->DispatchEvent(new AnyItemActiveChangedEvent(isAnyItemActive));
         }
 
         ImGui::Render();
@@ -301,17 +305,17 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
             bool found = false;
 
-            for(EditorComponents::ImGUI::UserInterface** wnd : m_MainEditorWindows)
+            for(HotReloader::InheritanceTrackKeeper* swapper : m_MainEditorWindows)
             {
-                if((*wnd)->m_TypeID == type->GetTypeID())
+                if(swapper->Get<HotReloader::IRuntimeObject>()->m_TypeID == type->GetTypeID())
                 {
                     found = true;
                 }
             }
 
-            for(EditorComponents::ImGUI::UserInterface** wnd : m_StartMenuWindows)
+            for(HotReloader::InheritanceTrackKeeper* swapper : m_StartMenuWindows)
             {
-                if((*wnd)->m_TypeID == type->GetTypeID())
+                if(swapper->Get<HotReloader::IRuntimeObject>()->m_TypeID == type->GetTypeID())
                 {
                     found = true;
                 }
@@ -323,19 +327,21 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
                 for(Type::uint32 i = 0; i < inhs.size(); i++)
                 {
-                    if(inhs[i]->GetTypeID() == Reflection::GetType(SE_GET_TYPE_NAME(SteelEngine::EditorComponents::ImGUI::UserInterface))->GetTypeID())
+                    if(inhs[i]->GetTypeID() == Reflection::GetType<SteelEngine::EditorComponents::ImGUI::UserInterface>()->GetTypeID())
                     {
                         if(type->GetMetaData(Reflection::ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
                         {
-                            Network::INetworkManager** manager =
-                                Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager**>();
-                            std::vector<Network::INetworkCommand*> commands = (*manager)->GetCommands();
+                            Network::INetworkManager* manager =
+                                Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager*>();
+                            std::vector<HotReloader::InheritanceTrackKeeper*> commands = manager->GetCommands();
 
-                            for(Network::INetworkCommand* cmd : commands)
+                            for(HotReloader::InheritanceTrackKeeper* cmd : commands)
                             {
-                                if(type->GetTypeID() == cmd->m_TypeID)
+                                HotReloader::IRuntimeObject* runtime = cmd->Get<HotReloader::IRuntimeObject>();
+
+                                if(type->GetTypeID() == runtime->m_TypeID)
                                 {
-                                    EditorComponents::ImGUI::UserInterface* ui = type->Invoke("Cast_UserInterface", cmd->m_Object).Convert<EditorComponents::ImGUI::UserInterface*>();
+                                    EditorComponents::ImGUI::UserInterface* ui = cmd->Get<EditorComponents::ImGUI::UserInterface>();
 
                                     strcpy(ui->m_Title, type->GetTypeName());
 
@@ -343,53 +349,13 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
                                     ui->Init();
 
-                                    m_UIs.push_back(&(cmd->m_Object));
+                                    m_UIs.push_back(cmd);
                                 }
                             }
                         }
                     }
                 }
             }
-
-            // if(!found && type->GetMetaData(Utils::Editor::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
-            // {
-            //     if(type->GetMetaData(Reflection::ReflectionAttribute::NETWORK_COMMAND)->Convert<bool>())
-            //     {
-            //         Network::INetworkManager** manager =
-            //             Reflection::GetType("SteelEngine::Core")->GetMetaData(Core::GlobalSystems::NETWORK_MANAGER)->Convert<Network::INetworkManager**>();
-
-            //         std::vector<Network::INetworkCommand*> commands = (*manager)->GetCommands();
-
-            //         for(Network::INetworkCommand* cmd : commands)
-            //         {
-            //             if(type->GetTypeID() == cmd->m_TypeID)
-            //             {
-            //                 Utils::Editor::UserInterface* ui = type->Invoke("Cast_UserInterface", cmd->m_Object).Convert<Utils::Editor::UserInterface*>();
-
-            //                 strcpy(ui->m_Title, type->GetTypeName().c_str());
-
-            //                 ui->m_Context = m_Context;
-
-            //                 ui->Init();
-
-            //                 m_OtherWindows.push_back(ui);
-            //             }
-            //         }
-            //     }
-            //     else
-            //     {
-            //         Window** wnd = (Window**)&type->Create()->m_Object;
-
-            //         m_Windows.push_back(wnd);
-
-            //         (*wnd)->m_Title = type->GetTypeName();
-            //         (*wnd)->m_Context = m_Context;
-
-            //         (*wnd)->Init();
-            //     }
-
-            //     break;
-            // }
         }
     }
 

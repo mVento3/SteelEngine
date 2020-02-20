@@ -11,7 +11,7 @@ namespace SteelEngine {
     struct Lexer
     {
     private:
-        std::vector<std::string>* m_Lines;
+        std::vector<std::string> m_Lines;
         std::string m_Token;
         std::string m_CurrentLine;
         Type::uint32 m_LineIndex;
@@ -92,7 +92,7 @@ namespace SteelEngine {
                 else if(m_CurrentCharacter == '/' &&
                     m_CurrentLine[m_CharacterIndex] == '/')
                 {
-                    m_CurrentLine = m_Lines->at(m_LineIndex++);
+                    m_CurrentLine = m_Lines[m_LineIndex++];
                     m_CurrentLineSize = m_CurrentLine.size();
                     m_CharacterIndex = 0;
 
@@ -107,13 +107,13 @@ namespace SteelEngine {
                 }
                 else if(m_CharacterIndex >= m_CurrentLineSize || m_CurrentCharacter == '\n')
                 {
-                    if(m_Lines->size() == m_LineIndex)
+                    if(m_Lines.size() == m_LineIndex)
                     {
                         m_End = true;
                     }
                     else
                     {
-                        m_CurrentLine = m_Lines->at(m_LineIndex++);
+                        m_CurrentLine = m_Lines[m_LineIndex++];
                         m_CurrentLineSize = m_CurrentLine.size();
                         m_CharacterIndex = 0;
                         m_NewLine = true;
@@ -158,7 +158,7 @@ namespace SteelEngine {
             Load(lines);
         }
 
-        void Load(std::vector<std::string>& lines)
+        void Load(const std::vector<std::string>& lines)
         {
             m_LineIndex = 0; // +1
             m_CharacterIndex = 0;
@@ -167,9 +167,9 @@ namespace SteelEngine {
 
             m_PendingSymbol = '\0';
 
-            m_Lines = &lines;
+            m_Lines = lines;
 
-            m_CurrentLine = m_Lines->at(m_LineIndex++);
+            m_CurrentLine = m_Lines[m_LineIndex++];
             m_CurrentLineSize = m_CurrentLine.size();
 
             // Increment();
@@ -219,14 +219,14 @@ namespace SteelEngine {
         {
             m_LineIndex++;
 
-            if(m_LineIndex >= m_Lines->size())
+            if(m_LineIndex >= m_Lines.size())
             {
                 m_End = true;
 
                 return;
             }
 
-            m_CurrentLine = m_Lines->at(m_LineIndex - 1);
+            m_CurrentLine = m_Lines.at(m_LineIndex - 1);
             m_CharacterIndex = 0;
             m_CurrentLineSize = m_CurrentLine.size();
         }

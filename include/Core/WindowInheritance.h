@@ -11,7 +11,8 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE
+        SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
     class WindowInheritance : public HotReloader::IRuntimeObject
     {

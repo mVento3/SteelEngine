@@ -10,7 +10,8 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE
+        SteelEngine::Reflection::ReflectionAttribute::INHERITANCE_MODULE,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
     class UserInterfaceInheritance : public HotReloader::IRuntimeObject
     {

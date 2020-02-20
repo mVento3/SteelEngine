@@ -40,11 +40,11 @@ namespace SteelEngine {
 
     }
 
-    void NaiveEventReflectionModule::ProcessStructure(ReflectionGenerator::StructScope* info)
+    void NaiveEventReflectionModule::ProcessStructure(Parser::StructScope* info)
     {
         IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
-        for(ReflectionGenerator::MetaData meta : info->m_MetaData)
+        for(Parser::MetaData meta : info->m_MetaData)
         {
             if(enum_->Compare(Reflection::ReflectionAttribute::NAIVE_EVENT, meta.m_Key))
             {
@@ -54,21 +54,21 @@ namespace SteelEngine {
         }
     }
 
-    void NaiveEventReflectionModule::ProcessProperty(ReflectionGenerator::PropertyScope* info)
+    void NaiveEventReflectionModule::ProcessProperty(Parser::PropertyScope* info)
     {
 
     }
 
-    void NaiveEventReflectionModule::ProcessFunction(ReflectionGenerator::FunctionScope* info)
+    void NaiveEventReflectionModule::ProcessFunction(Parser::FunctionScope* info)
     {
 
     }
 
-    void NaiveEventReflectionModule::ProcessConstructor(ReflectionGenerator::ConstructorScope* info)
+    void NaiveEventReflectionModule::ProcessConstructor(Parser::ConstructorScope* info)
     {
         for(Type::uint32 i = 0; i < info->m_Arguments.size(); i++)
         {
-            ReflectionGenerator::Argument arg = info->m_Arguments[i];
+            Parser::Argument arg = info->m_Arguments[i];
 
             m_Args += arg.m_Type + " " + arg.m_Name;
 

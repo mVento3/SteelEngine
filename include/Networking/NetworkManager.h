@@ -2,7 +2,6 @@
 
 #include "RuntimeReflection/Macro.h"
 
-#include "Networking/NetworkManager.Generated.h"
 #include "Networking/INetworkManager.h"
 #include "Networking/INetwork.h"
 #include "Networking/GetNetworkInfo.h"
@@ -14,6 +13,8 @@
 #include "Networking/Events/ConnectToServerEvent.h"
 
 #include "vector"
+
+#include "Networking/NetworkManager.Generated.h"
 
 namespace SteelEngine { namespace Network {
 
@@ -27,7 +28,7 @@ namespace SteelEngine { namespace Network {
     private:
         INetwork* m_Network;
         ClientInfoVector m_ConnectedClients;
-        std::vector<INetworkCommand*> m_CommandTypes;
+        std::vector<HotReloader::InheritanceTrackKeeper*> m_CommandTypes;
         bool* m_Connected;
 
     public:
@@ -36,7 +37,7 @@ namespace SteelEngine { namespace Network {
 
         void Init() override;
 
-        const std::vector<INetworkCommand*>& GetCommands() override { return m_CommandTypes; }
+        const std::vector<HotReloader::InheritanceTrackKeeper*>& GetCommands() override { return m_CommandTypes; }
 
         template <typename ...Args>
         static void CallNetworkCommand(const char* commandName, const Args&... args)

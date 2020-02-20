@@ -10,7 +10,7 @@
 
 namespace SteelEngine { namespace HotReloader {
 
-    struct IRuntimeReloader : public IRuntimeObject
+    struct IRuntimeReloader
     {
         virtual Result Initalize()
         {

@@ -115,7 +115,7 @@ namespace SteelEngine {
 			return m_Methods;
 		}
 
-		const PropertiesVector& GetPropertiesVector() override
+		const PropertiesVector& GetPropertiesVector() const override
 		{
 			return m_Properties;
 		}
@@ -168,7 +168,7 @@ namespace SteelEngine {
 
 			ReflectionConstructor<Args...>* cons = new ReflectionConstructor<Args...>(&createType<T, Args...>);
 
-			cons->m_ConstructorID = typeid(HotReloader::IRuntimeObject*(Args...)).hash_code();
+			cons->m_ConstructorID = typeid(void*(Args...)).hash_code();
 			cons->m_TypeID = m_TypeID;
 
 			m_Constructors.push_back(cons);
@@ -354,7 +354,7 @@ namespace SteelEngine {
 			return *this;
 		}
 
-		Variant GetProperty(const char* name, void* object) override
+		Variant GetProperty(const char* name, void* object) const override
 		{
 			ReflectionProperty<Variant, T>* te = 0;
 

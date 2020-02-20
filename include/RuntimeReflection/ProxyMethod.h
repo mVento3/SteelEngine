@@ -15,12 +15,13 @@ namespace SteelEngine {
 		FunctionCallback m_FunctionCallback;
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 		std::string m_Name;
+		size_t m_ReturnTypeID;
 
 		ProxyMethod(FunctionCallback func, const std::string& name) :
 			m_FunctionCallback(func),
 			m_Name(name)
 		{
-
+			m_ReturnTypeID = typeid(void).hash_code();
 		}
 
 		const MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() const override
@@ -61,6 +62,11 @@ namespace SteelEngine {
 		{
 			return m_Name;
 		}
+
+		size_t GetReturnTypeID() const override
+		{
+			return m_ReturnTypeID;
+		}
 	};
 
 	template <typename T, typename R, typename ...Args>
@@ -71,12 +77,13 @@ namespace SteelEngine {
 		FunctionCallback m_FunctionCallback;
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 		std::string m_Name;
+		size_t m_ReturnTypeID;
 
 		ProxyMethod(FunctionCallback func, const std::string& name) :
 			m_FunctionCallback(func),
 			m_Name(name)
 		{
-
+			m_ReturnTypeID = typeid(R).hash_code();
 		}
 
 		const MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() const override
@@ -114,6 +121,11 @@ namespace SteelEngine {
 		{
 			return m_Name;
 		}
+
+		size_t GetReturnTypeID() const override
+		{
+			return m_ReturnTypeID;
+		}
 	};
 
 	template <typename ...Args>
@@ -124,12 +136,13 @@ namespace SteelEngine {
 		FunctionCallback m_FunctionCallback;
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 		std::string m_Name;
+		size_t m_ReturnTypeID;
 
 		ProxyMethod(FunctionCallback func, const std::string& name) :
 			m_FunctionCallback(func),
 			m_Name(name)
 		{
-
+			m_ReturnTypeID = typeid(void).hash_code();
 		}
 
 		const MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() const override
@@ -171,6 +184,11 @@ namespace SteelEngine {
 		{
 			return m_Name;
 		}
+
+		size_t GetReturnTypeID() const override
+		{
+			return m_ReturnTypeID;
+		}
 	};
 
 	template <typename R, typename ...Args>
@@ -181,12 +199,13 @@ namespace SteelEngine {
 		FunctionCallback m_FunctionCallback;
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 		std::string m_Name;
+		size_t m_ReturnTypeID;
 
 		ProxyMethod(FunctionCallback func, const std::string& name) :
 			m_FunctionCallback(func),
 			m_Name(name)
 		{
-
+			m_ReturnTypeID = typeid(R).hash_code();
 		}
 
 		const MetaDataImplementation::MetaDataInfoVector* GetMetaDataInfoVector() const override
@@ -222,6 +241,11 @@ namespace SteelEngine {
 		const std::string& GetName() const override
 		{
 			return m_Name;
+		}
+
+		size_t GetReturnTypeID() const override
+		{
+			return m_ReturnTypeID;
 		}
 	};
 

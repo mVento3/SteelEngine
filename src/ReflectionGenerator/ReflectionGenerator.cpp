@@ -56,10 +56,6 @@ int main(int argc, char* argv[])
 // Initialize rest of allocators inside database
     db->Init();
 
-    // SteelEngine::Reflection a;
-
-    // a.Init2();
-
     SteelEngine::Reflection::Init();
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->SetMetaData(
@@ -69,33 +65,7 @@ int main(int argc, char* argv[])
 
     printf("Generating reflection for: %s\n", parser[INCLUDE_FILE].m_Result.c_str());
 
-    void* dll;
-
-// #ifdef SE_WINDOWS
-//     SteelEngine::Module::Load("RuntimeReflection.dll", &dll);
-// #else
-//     SteelEngine::Module::Load("RuntimeReflection.so", &dll);
-// #endif
-//     SteelEngine::Module::Details* info;
-
-//     SteelEngine::Module::Get("exports", dll, (void**)&info);
-
-//     SteelEngine::IReflectionGenerator* rg = (SteelEngine::IReflectionGenerator*)info->m_AllocateCallback(0, 0);
-
     SteelEngine::IReflectionGenerator* rg = (SteelEngine::IReflectionGenerator*)SteelEngine::Reflection::CreateInstance("SteelEngine::ReflectionGenerator");
-
-    std::vector<SteelEngine::HotReloader::IRuntimeObject*> modules;
-    SteelEngine::IReflectionData const* const* types = SteelEngine::Reflection::GetTypes();
-
-    for(SteelEngine::Type::uint32 i = 0; i < SteelEngine::Reflection::GetTypesSize(); i++)
-    {
-        const SteelEngine::IReflectionData* type = types[i];
-
-        if(type->GetMetaData(SteelEngine::Reflection::ReflectionAttribute::REFLECTION_MODULE)->Convert<bool>())
-        {
-            modules.push_back(type->Create());
-        }
-    }
 
     try
     {
@@ -111,19 +81,19 @@ int main(int argc, char* argv[])
         printf("Exception while loading in ReflectionGenerator.exe: %s!\n", e.what());
     }
 
-    // try
-    // {
+    try
+    {
         if(rg->Parse() == SteelEngine::SE_FALSE)
         {
             printf("Failed to parse!\n");
 
             return 0;
         }
-    // }
-    // catch(const std::exception& e)
-    // {
-    //     printf("Exception while parsing in ReflectionGenerator.exe: %s!\n", e.what());
-    // };
+    }
+    catch(const std::exception& e)
+    {
+        printf("Exception while parsing in ReflectionGenerator.exe: %s!\n", e.what());
+    };
 
     try
     {

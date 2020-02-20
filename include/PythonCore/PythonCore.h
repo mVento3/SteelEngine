@@ -4,6 +4,7 @@
 #include "PythonCore/IScript.h"
 
 #include "RuntimeReflection/Macro.h"
+#include "RuntimeReflection/Reflection.h"
 
 #include "PythonCore/PythonCore.Generated.h"
 
@@ -13,7 +14,9 @@
 
 namespace SteelEngine { namespace Script {
 
-    SE_CLASS()
+    SE_CLASS(
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
     class PythonCore : public IPython
     {
         GENERATED_BODY

@@ -6,6 +6,8 @@
 
 #include "Window/IWindow.h"
 
+#include "vector"
+
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     class Renderer;

@@ -75,6 +75,9 @@ namespace SteelEngine {
 				type->m_Constructors.clear();
 				type->m_MetaData.clear();
 				type->m_Namespaces.clear();
+				type->m_Inheritances.clear();
+				type->m_Methods.clear();
+				type->m_Properties.clear();
 
 				type->m_Namespaces.insert(type->m_Namespaces.begin(), namespaces.begin(), namespaces.end());
 			}

@@ -21,6 +21,8 @@
 
 #include "Profiler/ScopeTimer.h"
 
+#include "HotReloader/InheritanceTrackKeeper.h"
+
 #ifdef SE_WINDOWS
 #include "crtdefs.h"
 #include "process.h"
@@ -124,8 +126,8 @@ namespace SteelEngine { namespace HotReloader {
 							}
 						}
 
-						CHECK_SPEED(
-							{
+						// CHECK_SPEED(
+						// 	{
 								if(file.extension() == ".cpp")
 								{
 									std::string dirPath = file.parent_path().string();
@@ -156,11 +158,11 @@ namespace SteelEngine { namespace HotReloader {
 								m_ReflectionGenerator->Parse();
 								m_ReflectionGenerator->Generate(FileSystem::Get("fileWatcherPath"), FileSystem::Get("fileWatcherPath") / "build/GeneratedReflection");
 								m_ReflectionGenerator->Clear();
-							},
-							{
-								SE_INFO("Reflection generation time %f ms", delta * 1000.f);
-							}
-						);
+						// 	},
+						// 	{
+						// 		SE_INFO("Reflection generation time %f ms", delta * 1000.f);
+						// 	}
+						// );
 
 						Thread* thread = new Thread();
 
@@ -418,8 +420,6 @@ namespace SteelEngine { namespace HotReloader {
 		std::string moduleName_ = moduleName;
 		replaceAll(moduleName_, "/", "\\");
 
-		m_IsSwapComplete = false;
-
 		static RuntimeDatabase* db = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
 
 		void* hotReloadedModule;
@@ -460,6 +460,7 @@ namespace SteelEngine { namespace HotReloader {
 		size_t size = db->m_HotReloaderDatabase->m_Objects->Size();
 		HotReloader::IRuntimeObject* old = 0;
 		HotReloader::IRuntimeObject* obj = 0;
+		HotReloader::IRuntimeObject* org = 0;
 		bool found = false;
 
 		for(Type::uint32 i = 0; i < size; i++)
@@ -474,9 +475,29 @@ namespace SteelEngine { namespace HotReloader {
 			Serializer serializer;
 
 			HotReloader::IRuntimeObject* currentObject = db->m_HotReloaderDatabase->m_Objects->At(i).m_Object;
+			IReflectionData* type = Reflection::GetType(currentObject->m_TypeID);
+			const std::vector<IReflectionInheritance*>& inhs = type->GetInheritances();
+			static size_t _IRuntimeObejctTypeID = Reflection::GetType<HotReloader::IRuntimeObject>()->GetTypeID();
+			Variant* generateCastFuncs = type->GetMetaData(Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS);
 
-			obj = info->m_CreateObjectCallback(currentObject->m_ObjectID, currentObject->m_ConstructorID);
+			org = info->m_CreateObjectCallback(currentObject->m_ObjectID, currentObject->m_ConstructorID);
+			obj = org;
 			old = currentObject->m_Object;
+
+			for(const IReflectionInheritance* inh : inhs)
+			{
+				if(inh->GetTypeID() == _IRuntimeObejctTypeID && generateCastFuncs->IsValid() && generateCastFuncs->Convert<bool>())
+				{
+					obj = Reflection::GetType(currentObject->m_TypeID)->Invoke("Cast_IRuntimeObject", obj).Convert<HotReloader::IRuntimeObject*>();
+					old = Reflection::GetType(currentObject->m_TypeID)->Invoke("Cast_IRuntimeObject", currentObject->m_Object).Convert<HotReloader::IRuntimeObject*>();
+
+					break;
+				}
+			}
+
+			old->OnSwap(SwapStage::BEFORE, ObjectAge::OLD);
+			obj->OnSwap(SwapStage::BEFORE, ObjectAge::YOUNG);
+			m_IsSwapComplete = false;
 
 			serializer.SetIsLoading(false);
 			serializer.Serialize(old);
@@ -484,12 +505,19 @@ namespace SteelEngine { namespace HotReloader {
 			obj->m_ObjectID = 		currentObject->m_ObjectID;
 			obj->m_ConstructorID = 	currentObject->m_ConstructorID;
 			obj->m_TypeID = 		currentObject->m_TypeID;
-			obj->m_Object = 		obj;
+			obj->m_Object = 		org;
+			obj->m_Tracker =		currentObject->m_Tracker;
 
 			serializer.SetIsLoading(true);
 			serializer.Serialize(obj);
 
-			currentObject->m_Object = obj;
+			currentObject->m_Object = org;
+
+			Event::GlobalEvent::Broadcast(InheritanceTrackKeeper::SwapInheritancePointersEvent{});
+
+			old->OnSwap(SwapStage::AFTER, ObjectAge::OLD);
+			obj->OnSwap(SwapStage::AFTER, ObjectAge::YOUNG);
+			m_IsSwapComplete = true;
 
 			break;
 		}
@@ -509,10 +537,8 @@ namespace SteelEngine { namespace HotReloader {
 			obj->m_ObjectID = 		objectID;
 			obj->m_TypeID = 		info->m_TypeID;
 
-			db->m_HotReloaderDatabase->m_Objects->PushBack(ConstrucedObject(obj->m_ObjectID, constructorID, m_TypeID, new Tuple(std::tuple()), obj));
+			db->m_HotReloaderDatabase->m_Objects->PushBack(ConstrucedObject(obj->m_ObjectID, constructorID, obj->m_TypeID, new Tuple(std::tuple()), obj));
 		}
-
-		m_IsSwapComplete = true;
 
 		obj->OnRecompile(old);
 

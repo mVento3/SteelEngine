@@ -20,13 +20,15 @@ namespace SteelEngine { namespace Network {
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE,
         // SteelEngine::EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW,
-        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
     class SynchronizeProjectNCE :
         // SE_INHERITANCE(SteelEngine::Reflection::ReflectionAttribute::DO_NOT_GENERATE_CAST_FUNCTIONS)
         public INetworkCommand,
         public Script::Python::Scriptable,
-        public EditorComponents::ImGUI::UserInterface
+        public EditorComponents::ImGUI::UserInterface,
+        public HotReloader::IRuntimeObject
     {
         GENERATED_BODY
     public:

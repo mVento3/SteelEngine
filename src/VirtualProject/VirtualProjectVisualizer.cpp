@@ -8,6 +8,8 @@
 
 #include "EditorComponents/ImGUI/UserInterface.h"
 
+#include "HotReloader/InheritanceTrackKeeper.h"
+
 namespace SteelEngine {
 
     VirtualProjectVisualizer::VirtualProjectVisualizer(VirtualProject** virtualProject) :
@@ -33,7 +35,8 @@ namespace SteelEngine {
 
         for(Type::uint32 i = 0; i < vp->m_ProjectScripts.size(); i++)
         {
-            HotReloader::IRuntimeObject* obj = *vp->m_ProjectScripts[i];
+            HotReloader::InheritanceTrackKeeper* swapper = vp->m_ProjectScripts[i];
+            HotReloader::IRuntimeObject* obj = swapper->Get<HotReloader::IRuntimeObject>();
             IReflectionData* type = Reflection::GetType(obj);
             const std::vector<IReflectionInheritance*>& inhs = type->GetInheritances();
 
@@ -41,20 +44,19 @@ namespace SteelEngine {
             {
                 if(inhs[j]->GetTypeID() == m_UserInterfaceTypeID)
                 {
-                    EditorComponents::ImGUI::UserInterface* ui =
-                        type->Invoke("Cast_UserInterface", obj).Convert<EditorComponents::ImGUI::UserInterface*>();
+                    EditorComponents::ImGUI::UserInterface* ui = swapper->Get<EditorComponents::ImGUI::UserInterface>();
 
                     if(Reflection::GetType(obj)->GetMetaData(EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW)->Convert<bool>())
                     {
                         ImGui::Begin(ui->m_Title);
                         {
-                            ui->Draw();
+                            ui->DrawUser();
                         }
                         ImGui::End();
                     }
                     else
                     {
-                        ui->Draw();
+                        ui->DrawUser();
                     }
 
                     break;
@@ -77,7 +79,8 @@ namespace SteelEngine {
 
         for(Type::uint32 i = 0; i < vp->m_ProjectScripts.size(); i++)
         {
-            HotReloader::IRuntimeObject* obj = *vp->m_ProjectScripts[i];
+            HotReloader::InheritanceTrackKeeper* swapper = vp->m_ProjectScripts[i];
+            HotReloader::IRuntimeObject* obj = swapper->Get<HotReloader::IRuntimeObject>();
             IReflectionData* type = Reflection::GetType(obj);
             const std::vector<IReflectionInheritance*>& inhs = type->GetInheritances();
 
@@ -85,8 +88,7 @@ namespace SteelEngine {
             {
                 if(inhs[j]->GetTypeID() == typeID)
                 {
-                    EditorComponents::ImGUI::UserInterface* ui =
-                        type->Invoke("Cast_UserInterface", obj).Convert<EditorComponents::ImGUI::UserInterface*>();
+                    EditorComponents::ImGUI::UserInterface* ui = swapper->Get<EditorComponents::ImGUI::UserInterface>();
 
                     strcpy(ui->m_Title, type->GetTypeName());
                     ui->m_Context = Reflection::GetType("SteelEngine::OpenGL_Context")->Invoke("GetContext", m_Context).Convert<ImGuiContext*>();

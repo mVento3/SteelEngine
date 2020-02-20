@@ -8,6 +8,7 @@
 
 #include "HotReloader/RuntimeReloader.h"
 #include "HotReloader/Serializer.h"
+#include "HotReloader/InheritanceTrackKeeper.h"
 
 #include "Utils/Utils.h"
 #include "Utils/Time.h"
@@ -45,9 +46,7 @@ namespace SteelEngine {
 
     using json = nlohmann::json;
 
-    SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
-    )
+    SE_CLASS()
     class Core : public ICore
     {
         friend class PythonCore;
@@ -83,8 +82,8 @@ namespace SteelEngine {
         Network::INetworkManager*   m_NetworkManager;
         Script::IPython*            m_Python;
         IContext*                   m_ImGUI_ContextAPI;
-        IEventManager**             m_EventManager;
-        ISceneManager**             m_SceneManager;
+        IEventManager*              m_EventManager;
+        ISceneManager*              m_SceneManager;
 
         Variant* m_DeltaTimeVariant;
 
@@ -95,7 +94,7 @@ namespace SteelEngine {
 
         EnginePathVariant m_EnginePathVariant;
 
-        std::vector<HotReloader::IRuntimeObject*> m_ReflectionModules;
+        std::vector<void*> m_ReflectionModules;
 
         entt::entity ent;
 
@@ -117,8 +116,6 @@ namespace SteelEngine {
 
         SE_METHOD()
         void SetPathVariant(EnginePathVariant variant);
-
-        void OnRecompile(HotReloader::IRuntimeObject* oldObject) override;
 
         void operator()(const IWindow::WindowCloseEvent& event);
         void operator()(const LoadedProjectEvent& event);

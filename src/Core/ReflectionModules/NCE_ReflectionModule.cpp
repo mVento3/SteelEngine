@@ -16,7 +16,7 @@ namespace SteelEngine {
 
     }
 
-    void NCE_ReflectionModule::ProcessStructure(ReflectionGenerator::StructScope* info)
+    void NCE_ReflectionModule::ProcessStructure(Parser::StructScope* info)
     {
         m_Methods = &info->m_Functions;
 
@@ -24,21 +24,21 @@ namespace SteelEngine {
 
         for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
         {
-            ReflectionGenerator::MetaData meta = info->m_MetaData[i];
+            Parser::MetaData meta = info->m_MetaData[i];
 
             if(enum_->Compare(Reflection::ReflectionAttribute::NETWORK_COMMAND, meta.m_Key))
             {
                 m_NetCommand = true;
 
-                ReflectionGenerator::FunctionScope* func = new ReflectionGenerator::FunctionScope("Serialize");
+                Parser::FunctionScope* func = new Parser::FunctionScope("Serialize");
 
                 func->m_ReturnType = "char*";
-                func->m_Protection = ReflectionGenerator::ProtectionLevel::PUBLIC;
+                func->m_Protection = Parser::ProtectionLevel::PUBLIC;
 
-                ReflectionGenerator::FunctionScope* func2 = new ReflectionGenerator::FunctionScope("Deserialize");
+                Parser::FunctionScope* func2 = new Parser::FunctionScope("Deserialize");
 
                 func2->m_ReturnType = "char*";
-                func2->m_Protection = ReflectionGenerator::ProtectionLevel::PUBLIC;
+                func2->m_Protection = Parser::ProtectionLevel::PUBLIC;
 
                 m_Methods->push_back(func);
                 m_Methods->push_back(func2);
@@ -46,13 +46,13 @@ namespace SteelEngine {
         }
     }
 
-    void NCE_ReflectionModule::ProcessProperty(ReflectionGenerator::PropertyScope* info)
+    void NCE_ReflectionModule::ProcessProperty(Parser::PropertyScope* info)
     {
         IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
         for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
         {
-            ReflectionGenerator::MetaData meta = info->m_MetaData[i];
+            Parser::MetaData meta = info->m_MetaData[i];
 
             if(enum_->Compare(Reflection::ReflectionAttribute::NET_VALUE, meta.m_Key))
             {
@@ -61,7 +61,7 @@ namespace SteelEngine {
         }
     }
 
-    void NCE_ReflectionModule::ProcessFunction(ReflectionGenerator::FunctionScope* info) 
+    void NCE_ReflectionModule::ProcessFunction(Parser::FunctionScope* info) 
     {
 
     }
@@ -81,7 +81,7 @@ namespace SteelEngine {
             {
                 out.push_back("char* out = SteelEngine::Network::INetworkCommand::Serialize(data, totalSize);");
   
-                for(ReflectionGenerator::PropertyScope* prop : m_Properties)
+                for(Parser::PropertyScope* prop : m_Properties)
                 {
                     out.push_back("Serialization::SerializeType(totalSize, " + prop->m_Name + ", out, &out);");
                 }
@@ -95,7 +95,7 @@ namespace SteelEngine {
             {
                 out.push_back("char* out = SteelEngine::Network::INetworkCommand::Deserialize(data, totalSize);");
 
-                for(ReflectionGenerator::PropertyScope* prop : m_Properties)
+                for(Parser::PropertyScope* prop : m_Properties)
                 {
                     out.push_back("Serialization::DeserializeType(totalSize, " + prop->m_Name + ", out, &out);");
                 }
@@ -109,7 +109,7 @@ namespace SteelEngine {
             {
                 out.push_back("SteelEngine::Network::INetworkCommand::CalculateSize(totalSize);");
 
-                for(ReflectionGenerator::PropertyScope* prop : m_Properties)
+                for(Parser::PropertyScope* prop : m_Properties)
                 {
                     out.push_back("Serialization::CalculateTotalSize(totalSize, " + prop->m_Name + ");");
                 }

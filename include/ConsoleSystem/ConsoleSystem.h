@@ -4,12 +4,15 @@
 #include "ConsoleSystem/ICommand.h"
 
 #include "RuntimeReflection/Macro.h"
+#include "RuntimeReflection/Reflection.h"
 
 #include "ConsoleSystem/ConsoleSystem.Generated.h"
 
 namespace SteelEngine {
 
-    SE_CLASS()
+    SE_CLASS(
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
     class ConsoleSystem : public IConsoleSystem
     {
         GENERATED_BODY

@@ -21,9 +21,10 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     SE_CLASS(
         SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE,
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
-        SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW
+        SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
-    class NetworkManagerWindow : public EditorComponents::ImGUI::UserInterface, public Script::Python::Scriptable
+    class NetworkManagerWindow : public EditorComponents::ImGUI::UserInterface, public Script::Python::Scriptable, public HotReloader::IRuntimeObject
     {
         GENERATED_BODY
     private:

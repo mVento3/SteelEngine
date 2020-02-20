@@ -141,9 +141,11 @@ namespace SteelEngine {
 
             for(Type::uint32 i = 0; i < m_Dispatchers.size(); i++)
             {
-                HotReloader::IRuntimeObject* obj = (*m_Dispatchers[i]);
+                m_Dispatchers[i]->Get<LogDispatcher>()->Dispatch(log);
 
-                Reflection::GetType(obj)->Invoke("Cast_LogDispatcher", obj).Convert<LogDispatcher*>()->Dispatch(log);
+                // HotReloader::IRuntimeObject* obj = (*m_Dispatchers[i]);
+
+                // Reflection::GetType(obj)->Invoke("Cast_LogDispatcher", obj).Convert<LogDispatcher*>()->Dispatch(log);
             }
 
             m_PendingLogs.pop();

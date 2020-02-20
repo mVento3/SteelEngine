@@ -50,7 +50,8 @@
 namespace SteelEngine { namespace Graphics { namespace Vulkan {
 
     SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
+        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
     class Renderer : public IRendererAPI<IRenderer::API::VULKAN_API>, public EventObserver
     {

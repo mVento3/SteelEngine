@@ -36,7 +36,7 @@ namespace SteelEngine {
         SDL_Event m_Event;
         SDL_GLContext m_Context;
 
-        IEventManager** m_EventManager;
+        IEventManager* m_EventManager;
 
     public:
         OpenGL_Window();

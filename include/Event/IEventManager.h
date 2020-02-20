@@ -1,12 +1,10 @@
 #pragma once
 
-#include "HotReloader/IRuntimeObject.h"
-
 #include "Event/EventObserver.h"
 
 namespace SteelEngine {
 
-    struct IEventManager : public HotReloader::IRuntimeObject
+    struct IEventManager
     {
         friend class ICore;
     protected:

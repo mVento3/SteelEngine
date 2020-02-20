@@ -3,12 +3,15 @@
 #include "Profiler/IManager.h"
 
 #include "RuntimeReflection/Macro.h"
+#include "RuntimeReflection/Reflection.h"
 
 #include "Profiler/Manager.Generated.h"
 
 namespace SteelEngine { namespace Profiler {
 
-    SE_CLASS()
+    SE_CLASS(
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
     class Manager : public IManager
     {
         GENERATED_BODY

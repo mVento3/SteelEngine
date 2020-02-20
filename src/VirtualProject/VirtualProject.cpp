@@ -345,7 +345,7 @@ namespace SteelEngine {
             SE_ERROR("Something wrong with runtime compiler!");
         }
 
-        m_Visualizer = (IVirtualProjectVisualizer**)&Reflection::CreateInstance("SteelEngine::VirtualProjectVisualizer", (VirtualProject**)&m_Object)->m_Object;
+        m_Visualizer = (IVirtualProjectVisualizer**)Reflection::CreateInstance_("SteelEngine::VirtualProjectVisualizer", (VirtualProject**)&m_Object);
 
         Event::GlobalEvent::Add_<LoadProjectEvent>(this);
         Event::GlobalEvent::Add_<CreateNewProjectEvent>(this);
@@ -362,9 +362,9 @@ namespace SteelEngine {
 
     void VirtualProject::Update()
     {
-        for(HotReloader::IRuntimeObject** obj : m_ProjectScripts)
+        for(HotReloader::InheritanceTrackKeeper* obj : m_ProjectScripts)
         {
-            (*obj)->Update();
+            obj->Get<HotReloader::IRuntimeObject>()->Update();
         }
     }
 
@@ -610,7 +610,7 @@ namespace SteelEngine {
 
             if(data->GetMetaData(Reflection::ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
             {
-                m_ProjectScripts.push_back(&data->Create()->m_Object);
+                m_ProjectScripts.push_back(new HotReloader::InheritanceTrackKeeper(data, data->Create_()));
             }
         }
 
@@ -658,7 +658,8 @@ namespace SteelEngine {
 
                 for(Type::uint32 i = 0; i < m_ProjectScripts.size(); i++)
                 {
-                    HotReloader::IRuntimeObject* obj = *m_ProjectScripts[i];
+                    HotReloader::InheritanceTrackKeeper* swapper = m_ProjectScripts[i];
+                    HotReloader::IRuntimeObject* obj = swapper->Get<HotReloader::IRuntimeObject>();
 
                     if(obj->m_TypeID == data->GetTypeID())
                     {
@@ -670,7 +671,7 @@ namespace SteelEngine {
 
                 if(!found)
                 {
-                    m_ProjectScripts.push_back(&data->Create()->m_Object);
+                    m_ProjectScripts.push_back(new HotReloader::InheritanceTrackKeeper(data, data->Create_()));
                 }
             }
         }

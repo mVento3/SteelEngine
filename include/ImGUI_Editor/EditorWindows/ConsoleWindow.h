@@ -20,14 +20,19 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE,
-        SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
-        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
-        SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW,
-        SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::FLAGS = ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar,
-        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE
+        Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE,
+        Editor::ReflectionAttributes::EDITOR_WINDOW,
+        Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW,
+        EditorComponents::ImGUI::UserInterface::Attributes::FLAGS = ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar,
+        Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        Reflection::ReflectionAttribute::HOT_RELOAD
     )
-    class ConsoleWindow : public EditorComponents::ImGUI::UserInterface, public LogDispatcher, public EventObserver
+    class ConsoleWindow :
+        public EditorComponents::ImGUI::UserInterface,
+        public LogDispatcher,
+        public EventObserver,
+        public HotReloader::IRuntimeObject
     {
         GENERATED_BODY
     private:

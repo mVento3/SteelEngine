@@ -11,8 +11,13 @@
 
 namespace SteelEngine { namespace Network {
 
-    SE_CLASS(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, SteelEngine::Reflection::ReflectionAttribute::NETWORK_COMMAND)
-    class SwapModuleNetCommandEvent : public INetworkCommand
+    SE_CLASS(
+        SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE,
+        SteelEngine::Reflection::ReflectionAttribute::NETWORK_COMMAND,
+        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        Reflection::ReflectionAttribute::HOT_RELOAD
+    )
+    class SwapModuleNetCommandEvent : public INetworkCommand, public HotReloader::IRuntimeObject
     {
         GENERATED_BODY
     public:

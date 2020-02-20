@@ -14,7 +14,7 @@ namespace SteelEngine {
 
     }
 
-    void PythonScriptableInheritance::ProcessInheritance(const std::vector<IReflectionInheritance*>& data, IReflectionData* type, HotReloader::IRuntimeObject* object)
+    void PythonScriptableInheritance::ProcessInheritance(const std::vector<IReflectionInheritance*>& data, IReflectionData* type, void* object)
     {
         IReflectionData* type_ = Reflection::GetType("SteelEngine::Script::Python::Scriptable");
 
@@ -29,16 +29,16 @@ namespace SteelEngine {
             {
                 void* scriptable = type->Invoke("Cast_Scriptable", object).Convert<void*>();
                 Script::Python::IScript* script = (Script::Python::IScript*)Reflection::CreateInstance("SteelEngine::Script::Python::Script");
-                HotReloader::IRuntimeObject* obj = (HotReloader::IRuntimeObject*)scriptable;
+                // HotReloader::IRuntimeObject* obj = (HotReloader::IRuntimeObject*)scriptable;
 
                 // TODO: Check this
-                if(obj->m_TypeID == RuntimeDatabase::s_InvalidID)
-                {
-                    obj->m_Object = 		object;
-                    obj->m_ConstructorID = 	object->m_ConstructorID;
-                    obj->m_ObjectID = 		object->m_ObjectID;
-                    obj->m_TypeID = 		object->m_TypeID;
-                }
+                // if(obj->m_TypeID == RuntimeDatabase::s_InvalidID)
+                // {
+                //     obj->m_Object = 		object;
+                //     obj->m_ConstructorID = 	object->m_ConstructorID;
+                //     obj->m_ObjectID = 		object->m_ObjectID;
+                //     obj->m_TypeID = 		object->m_TypeID;
+                // }
 
                 type_->Invoke("SetPython", scriptable, script);
 
@@ -56,9 +56,9 @@ namespace SteelEngine {
         }
     }
 
-    void PythonScriptableInheritance::OnRecompile(HotReloader::IRuntimeObject* oldObject)
-    {
+    // void PythonScriptableInheritance::OnRecompile(HotReloader::IRuntimeObject* oldObject)
+    // {
 
-    }
+    // }
 
 }

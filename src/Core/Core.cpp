@@ -29,15 +29,13 @@ namespace SteelEngine {
 
     void Core::Loop()
     {
-        Core** core = (Core**)&m_Object;
-
         while(m_Running)
         {
-            m_Object->Update();
+            Update();
         }
 
         (*m_Renderer)->Cleanup();
-        (*core)->m_Window->Close();
+        m_Window->Close();
 
         Cleanup();
     }
@@ -50,17 +48,11 @@ namespace SteelEngine {
     Result Core::Init()
     {
         SE_PROFILE_FUNC;
-        // TODO: Delete this!!
-        Profiler::Manager a;
-        EventManager aa;
-        // Reflection aaa;
 
-        // aaa.Init2();
-
-        m_EventManager = (IEventManager**)&Reflection::CreateInstance("SteelEngine::EventManager")->m_Object;
+        m_EventManager = (IEventManager*)Reflection::CreateInstance("SteelEngine::EventManager");
 
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::EVENT_MANAGER, m_EventManager);
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::PROFILER, &Reflection::CreateInstance("SteelEngine::Profiler::Manager")->m_Object);
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::PROFILER, Reflection::CreateInstance_("SteelEngine::Profiler::Manager"));
 
         std::string logPath = FileSystem::Get("se_init_log").string();
 
@@ -73,7 +65,7 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::LOGGER, &m_Logger->m_Object);
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::LOGGER, m_Logger);
 
         SE_INFO("Initializing core!");
 
@@ -116,7 +108,7 @@ namespace SteelEngine {
             m_ReflectionModules.push_back(types[i]->Create());
         }
 
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::DELTA_TIME, &Reflection::CreateInstance("SteelEngine::DeltaTime")->m_Object);
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::DELTA_TIME, Reflection::CreateInstance("SteelEngine::DeltaTime"));
 
         m_DeltaTimeVariant = Reflection::GetType("SteelEngine::Core")->GetMetaData(GlobalSystems::DELTA_TIME);
 
@@ -141,31 +133,31 @@ namespace SteelEngine {
 
         m_NetworkManager->Init();
 
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::NETWORK_MANAGER, &m_NetworkManager->m_Object);
+        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::NETWORK_MANAGER, m_NetworkManager);
 
-        m_VirtualProject = (IVirtualProject**)&Reflection::CreateInstance("SteelEngine::VirtualProject")->m_Object;
+        m_VirtualProject = (IVirtualProject**)Reflection::CreateInstance_("SteelEngine::VirtualProject");
 
         (*m_VirtualProject)->SetReflectionGenerator(m_ReflectionGenerator);
         (*m_VirtualProject)->Init();
 
     // Graphics stuff
         m_Window = (IWindow*)Reflection::CreateInstance("SteelEngine::OpenGL_Window");
-        m_Renderer = (Graphics::IRenderer**)&Reflection::CreateInstance("SteelEngine::Graphics::OpenGL::Renderer", m_Window)->m_Object;
-        m_Editor = (Editor::IEditor**)&Reflection::CreateInstance("SteelEngine::Editor::ImGUI::ImGUI_Editor")->m_Object;
+        m_Renderer = (Graphics::IRenderer**)Reflection::CreateInstance_("SteelEngine::Graphics::OpenGL::Renderer", m_Window);
+        m_Editor = (Editor::IEditor**)Reflection::CreateInstance_("SteelEngine::Editor::ImGUI::ImGUI_Editor");
 
-        m_SceneManager = (ISceneManager**)&Reflection::CreateInstance("SteelEngine::SceneManager")->m_Object;
+        m_SceneManager = (ISceneManager*)Reflection::CreateInstance("SteelEngine::SceneManager");
 
         // entt::registry* reg = (*m_SceneManager)->GetCurrentScene();
 
         // auto ent = reg->create();
 
-        (*m_SceneManager)->Init();
+        m_SceneManager->Init();
 
         EventObserver* eve = Reflection::GetType("SteelEngine::Graphics::OpenGL::Renderer")->Invoke("Cast_EventObserver", *m_Renderer).Convert<EventObserver*>();
         EventObserver* eve2 = Reflection::GetType("SteelEngine::Editor::ImGUI::ImGUI_Editor")->Invoke("Cast_EventObserver", *m_Editor).Convert<EventObserver*>();
 
-        (*m_EventManager)->AddEventObserver(eve);
-        (*m_EventManager)->AddEventObserver(eve2);
+        m_EventManager->AddEventObserver(eve);
+        m_EventManager->AddEventObserver(eve2);
 
         m_Window->SetTitle("Test Window!");
         m_Window->SetWidth(1920);
@@ -187,7 +179,7 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
-        Event::GlobalEvent::Add<IWindow::WindowCloseEvent>((Core*)m_Object);
+        Event::GlobalEvent::Add<IWindow::WindowCloseEvent>(this);
 
         FileSystem::Map("shaders", getBinaryLocation() / "Resources/Shaders");
 
@@ -234,7 +226,7 @@ namespace SteelEngine {
 
         ent = (*m_Renderer)->AddModel
             (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj"),
-            (*m_SceneManager)->GetCurrentScene(),
+            m_SceneManager->GetCurrentScene(),
             Transform(glm::vec3(0, 20, 10))
         );
 
@@ -242,7 +234,7 @@ namespace SteelEngine {
         {
             (*m_Renderer)->AddModel
                 (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/cube.obj"),
-                (*m_SceneManager)->GetCurrentScene(),
+                m_SceneManager->GetCurrentScene(),
                 Transform(glm::vec3(i * 2, 1, 0))
             );
         }
@@ -253,7 +245,7 @@ namespace SteelEngine {
             {
                 (*m_Renderer)->AddModel
                     (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj"),
-                    (*m_SceneManager)->GetCurrentScene(),
+                    m_SceneManager->GetCurrentScene(),
                     Transform(glm::vec3(j * 2, (i * 2) + 5, 0))
                 );
             }
@@ -265,7 +257,7 @@ namespace SteelEngine {
 
         (*m_Renderer)->AddModel
             (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj"),
-            (*m_SceneManager)->GetCurrentScene(),
+            m_SceneManager->GetCurrentScene(),
             trans
         );
 
@@ -285,20 +277,20 @@ namespace SteelEngine {
 
     void Core::Update()
     {
-        IDeltaTime* time = (*m_DeltaTimeVariant->Convert<IDeltaTime**>());
+        IDeltaTime* time = m_DeltaTimeVariant->Convert<IDeltaTime*>();
 
         time->Update();
 
         {
             SE_PROFILE_SCOPE("Naive Event Manager");
 
-            ProcessEvents(*m_EventManager);
+            ProcessEvents(m_EventManager);
         }
 
         // The runtime compiler file watcher is not too perform
         if(m_RuntimeReloader)
         {
-            m_RuntimeReloader->m_Object->Update();
+            m_RuntimeReloader->Update();
         }
 
         m_OneSecondTime += time->GetDeltaTime();
@@ -313,7 +305,7 @@ namespace SteelEngine {
         {
             SE_PROFILE_SCOPE("Logger");
 
-            m_Logger->m_Object->Update();
+            m_Logger->Update();
         }
 
         {
@@ -323,7 +315,7 @@ namespace SteelEngine {
             (*m_Editor)->Draw();
         }
     
-        m_Window->m_Object->Update();
+        m_Window->Update();
 
         {
             SE_PROFILE_SCOPE("Graphics");
@@ -343,7 +335,7 @@ namespace SteelEngine {
             {
                 SE_PROFILE_SCOPE("Graphics::Render");
 
-                (*m_Renderer)->Render((*m_SceneManager)->GetCurrentScene());
+                (*m_Renderer)->Render(m_SceneManager->GetCurrentScene());
             }
 
             m_ImGUI_ContextAPI->UploadDrawData();
@@ -396,11 +388,11 @@ namespace SteelEngine {
         Reflection::GetType("SteelEngine::Core")->SetMetaData(Reflection::ReflectionAttribute::ENGINE_START_TYPE, variant);
     }
 
-    void Core::OnRecompile(HotReloader::IRuntimeObject* oldObject)
-    {
-        Event::GlobalEvent::Remove<IWindow::WindowCloseEvent>(oldObject);
-        Event::GlobalEvent::Add<IWindow::WindowCloseEvent>((Core*)m_Object);
-    }
+    // void Core::OnRecompile(HotReloader::IRuntimeObject* oldObject)
+    // {
+    //     Event::GlobalEvent::Remove<IWindow::WindowCloseEvent>(oldObject);
+    //     Event::GlobalEvent::Add<IWindow::WindowCloseEvent>((Core*)m_Object);
+    // }
 
     void Core::operator()(const IWindow::WindowCloseEvent& event)
     {
