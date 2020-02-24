@@ -10,6 +10,10 @@
                 {
                     "filename": "StaticHelper.cpp",
                     "hash": "24f3da8ac5ec99cc0fe3567282c96255789faeb9b9a5ed18d53efebabda54cd9b76ec92e3f53cff0ab94f05f939289ec0bc5b9740bfc9e751d65d40b84e46617"
+                },
+                {
+                    "filename": "VirtualModuleManagerHelper.cpp",
+                    "hash": "d8be274393e036d411137e5dcb40b45f2a8eac0db7a1f96c8136c141b815d018426c892a56310ae7bef971e07e18818e215b50c8552a074d587dde5672bd1e7c"
                 }
             ]
         },
@@ -86,7 +90,11 @@
             "files": [
                 {
                     "filename": "Module.cpp",
-                    "hash": "b2f662eff14f53f025da07a2ee3233e252f80fa36330c742788ef307832b226901b62f7729556c65f02f04def2b9b2f2f897b21c26e7e52602fdb6427c35c6be"
+                    "hash": "166b527a32330809ce6a4bc5ec4a6979acfcf9b7b211812720450b2a58a61b4bb46f53d398663552781791b591a23fe6ca8b0128b115b27f4c6bbd50dc2d9e0d"
+                },
+                {
+                    "filename": "VirtualModule.cpp",
+                    "hash": "b8e0168ed2157acd3eedd2f64f9fa6c09c4dbc19833ffc54f14a1d70ac06baf525bf3452c421f49b3191af16ccb2e598917ec60867ad520d799322f7b7877f7d"
                 }
             ]
         },
@@ -238,7 +246,7 @@
                 },
                 {
                     "filename": "Parser.cpp",
-                    "hash": "7ca346a341b1165ee1142a3d196bbe8d2f7d1ca9c4bac7420b76faf0772a5e1007ba5bcb92461ab31ec15a2d859b6e7241a1ef0a1385a6ebe4401b1b39f23b0e"
+                    "hash": "f40357e5caffd25c7720176b3d016b50a13f343d047f6678f80da0cfca9f51fec3ea6e23ca0df20ac18736d5872e68737a62d4ca5054aa9e910bd43b0dd8ec95"
                 }
             ]
         },
@@ -612,7 +620,7 @@
                 },
                 {
                     "filename": "NetworkManagerWindow.cpp",
-                    "hash": "9b87921acc62ffba3ed45f4b73e78b290cc49e0a6a574c0f03a52e539e4f706e4529c2eec04483a804c6bbb5abe5cf8dc4c3adf46ce1016023038a76f4358988"
+                    "hash": "a38a16955e4e8189f7d2fe37ae3a83c0092d05223deb2ff1e529d45220227566520dda7b759a5b67a6e36fc694004a81ca491a3fe02feb8b26ccd4e808cf4c2a"
                 },
                 {
                     "filename": "StartMenuWindow.cpp",
@@ -650,7 +658,7 @@
                 },
                 {
                     "filename": "VirtualProject.cpp",
-                    "hash": "19663d3dd12aba0537f2f1b30f98c3eb4d0bdb81d2ac4058b9ad92d9b1c048b0e686be3401d585c8339dd90f37a69a1696818d46d8d47f91589428355c4c8840"
+                    "hash": "b4edb42d3d72133c9d477043c4d68090cc91dbb99a02fb3561984f4df65618e787b8940272933e8de92f7e710145ed7bc28bbf26d6a1bee278e342005aa47555"
                 },
                 {
                     "filename": "VirtualProjectVisualizer.cpp",
@@ -728,7 +736,11 @@
             "files": [
                 {
                     "filename": "ModuleManager.cpp",
-                    "hash": "dbe1b794029cdc17a65b112523c7521bae62b610068501ffe5b838c5f010f1bf98783bbdf74aeefe975f27f7975d0702755bb47df1d20733e6b5c819927cd773"
+                    "hash": "af0c42349e169a19cfab47e2449b21fd34e3b53b3b6be15163212ab6b926f2ff30d46413eefed81cad67b800a29c6779cc1a09bdcaa1f85aa74359b9e51ac32a"
+                },
+                {
+                    "filename": "VirtualModuleManager.cpp",
+                    "hash": "d12202be611abf10d86353668c16bfa7e9ddd31646cb5fb7f22965e8c7b7b7921ff089d646b229721eb0d54e6a903beeb19f2551ecf9ce46a4fd5826e6734a2e"
                 }
             ]
         },
@@ -767,7 +779,7 @@
                 },
                 {
                     "filename": "RuntimeReloader.cpp",
-                    "hash": "9ca7c1c71f85beb63c8c42b1b9adf521c41c51f386f1f7cd972e1b2b4e0ffdcc80f629703748cce60ed1ecc1fbbb2e7c81bbafb2a416c8a5c17e927bea39db67"
+                    "hash": "4f51e50af235f6d8acf986cd340562a63246c09a686189ebe1176e90d6161341c6c775603ce257fc2a1b61a141ad7fca66a26c6d46682123bcc85423979c5fc5"
                 },
                 {
                     "filename": "Serializer.cpp",
@@ -789,7 +801,7 @@
             "files": [
                 {
                     "filename": "Client.Generated.cpp",
-                    "hash": "5acc99422cd10a42f13109c1461de7e07b57f6bc5bbd943a2614a3ccf653b82f9cae86b71c2cc3158104f282646ba33db1a416544fd7570d8eda5680798cfc9a"
+                    "hash": "4a8dcb908e58e75cecdc36374066ad73ccf6ac760557d5ed03a96d31cf6eb843835cd60c92fb8121198943766a3d901272089efb0a1f839b953835a6bce768a3"
                 },
                 {
                     "filename": "NetworkManager.Generated.cpp",
@@ -797,7 +809,7 @@
                 },
                 {
                     "filename": "Server.Generated.cpp",
-                    "hash": "60cc13498eb7e40dabc86a0e52957495b10748c373aae5e9c1bb290972429952f6aca95dccfb3e4a523165116e782ac7d1152dd7d6508394044d6a601c967ac9"
+                    "hash": "1fde4141713641e40c6c5aa2bd47458584fe78ed786152846785c6fe04dd7eaa382226d6400daf96a987a30a7160e8248a04317da2692d1555c6ef7d4ebc05e0"
                 }
             ]
         },
@@ -832,11 +844,11 @@
                 },
                 {
                     "filename": "NetworkManager.cpp",
-                    "hash": "6c441317ad49f7866e30b4dc41f2c8bc07196678f345a15aa4c9857fd6e063aab9eba8188c7272ecf3f19a0ea053e8c6e89d8782a36bd6d95ce0c99f0bd1602c"
+                    "hash": "39db1180e1fb5e21c92817eb39d5d0d14061bd548f33a1256c888f30e45c6083de35e032d7ddddcf57ff1f9365ea0e04dcaaf2a460bb7e2f710525f83b8bd29f"
                 },
                 {
                     "filename": "Server.cpp",
-                    "hash": "9586280c7ab6c56a306d7b4ef6896d639eab0d5074c30c4c281570b9b9f6c05d823d59c50e003775d070be2279e57b714e3fc9b86ccc0efd4b1d84aa04721e1b"
+                    "hash": "4310ccba59774ff2e957759912a9c656c8800929fbe807504c5b6ebe90d883a94d1da86264eb044fb9f1737d7c4cc6f7c0438443117c13e76b35cabe646fc681"
                 }
             ]
         },
@@ -849,7 +861,7 @@
                 },
                 {
                     "filename": "SynchronizeProjectNCE.cpp",
-                    "hash": "1a55554f459ec4a246d7dbe00f7ddb59e8efd95b227616f2efb5fca5cd562da7bab24ee9ba592a4e0a229426e8be8bec4f89304e7b47f86771aa6effcc7b09ff"
+                    "hash": "8deca10ad71d4009d42003ddf858b46e42122798ac5340a7767387337680e4b4e02419d9ae0cf42b0878c0e2e0ab98236540b3c7c00925b383f6354fc82f143a"
                 }
             ]
         },
@@ -1082,6 +1094,15 @@
                 {
                     "filename": "TestSome.cpp",
                     "hash": "37183694f68ce404da489d4198d12813d073dfaaa45ed234b26e462f8be343ca3126262aa4f7427eb9686cd42e58a0db1d08509e4d694c4baf23fedd37d9bdec"
+                }
+            ]
+        },
+        {
+            "folder": "src/PythonReflectionGeneratorWrapper",
+            "files": [
+                {
+                    "filename": "PythonReflectionGeneratorWrapper.cpp",
+                    "hash": "dd4c41725e1aac3ccf3f4a787c50aa2b1e4fe9731cc86fba0fdffa363b94cea57e401931ab16a5189cd71be0907cd925861d6f326d252879dfd624cf8b4f0d31"
                 }
             ]
         }
