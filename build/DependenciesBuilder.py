@@ -3,8 +3,8 @@ import PythonProcessWrapper
 import json
 
 external_path = 'D:/Projects/C++/SteelEngine/external'
-folder_path = 'imgui'
-process = PythonProcessWrapper.PythonProcess()
+folder_path = 'MemoryModule'
+process = PythonProcessWrapper.PythonProcessWrapper()
 cwd = os.getcwd()
 working_directory = 'build/Windows'
 j_config = json.load(open(external_path + '/' + folder_path + '/config.json'))
@@ -28,7 +28,7 @@ for subdir, dirs, files in os.walk(external_path + '/' + folder_path):
         for file in files:
             file = subdir + '/' + file
 
-            if os.path.splitext(file)[1] == '.cpp':
+            if os.path.splitext(file)[1] == '.cpp' or os.path.splitext(file)[1] == '.c':
                 files_to_compile.append(file)
 
         process.WriteInput('cd ' + cwd + '/' + working_directory)

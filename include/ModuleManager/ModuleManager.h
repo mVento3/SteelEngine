@@ -43,19 +43,37 @@ namespace SteelEngine {
 
 		bool FreeIf(const std::vector<std::string>& a, const std::string& b, Mode mode);
 
+		static ModuleManager* GetModuleManager(const std::filesystem::path& path)
+		{
+			static void* module;
+			static void*(*getStateCallback)();
+
+			if(!module)
+			{
+#ifdef SE_WINDOWS
+				Module::load((path / "ModuleManager.dll").string(), (void**)&module);
+#else
+				Module::load("ModuleManager.so", (void**)&module);
+#endif
+				Module::get("getModuleManager", module, (void**)&getStateCallback);
+			}
+
+			return (ModuleManager*)getStateCallback();
+		}
+
 		static ModuleManager* GetModuleManager()
 		{
 			static void* module;
 			static void*(*getStateCallback)();
 
-			if (!module)
+			if(!module)
 			{
 #ifdef SE_WINDOWS
-				Module::Load("ModuleManager.dll", (void**)&module);
+				Module::load("ModuleManager.dll", (void**)&module);
 #else
-				Module::Load("ModuleManager.so", (void**)&module);
+				Module::load("ModuleManager.so", (void**)&module);
 #endif
-				Module::Get("getState", module, (void**)&getStateCallback);
+				Module::get("getModuleManager", module, (void**)&getStateCallback);
 			}
 
 			return (ModuleManager*)getStateCallback();
@@ -66,6 +84,7 @@ namespace SteelEngine {
 		~ModuleManager();
 
 		void LoadAllImpl() override;
+		void LoadAllImpl(const std::filesystem::path& path) override;
 		void UnloadImpl(const std::string& blackList, Mode mode) override;
 		void LoadImpl(const std::filesystem::path& name) override;
 
@@ -76,9 +95,23 @@ namespace SteelEngine {
 			mm->LoadAllImpl();
 		}
 
+		static void LoadAll(const std::filesystem::path& path)
+		{
+			static ModuleManager* mm = GetModuleManager(path);
+
+			mm->LoadAllImpl(path);
+		}
+
 		static void Load(const std::filesystem::path& name)
 		{
 			static ModuleManager* mm = GetModuleManager();
+
+			mm->LoadImpl(name);
+		}
+
+		static void Load(const std::filesystem::path& path, const std::filesystem::path& name)
+		{
+			static ModuleManager* mm = GetModuleManager(path);
 
 			mm->LoadImpl(name);
 		}

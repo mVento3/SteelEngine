@@ -14,11 +14,11 @@ namespace SteelEngine {
 
 			if (!module)
 			{
-				Module::Load("RuntimeDatabase.dll", &module);
+				Module::load("RuntimeDatabase.dll", &module);
 			}
 
 			RuntimeDatabase::GetStateCallback get;
-			SteelEngine::Module::Get("getState", module, (void**)&get);
+			SteelEngine::Module::get("getModuleManager", module, (void**)&get);
 
 			static RuntimeDatabase* db;
 

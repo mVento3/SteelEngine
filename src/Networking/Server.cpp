@@ -224,7 +224,7 @@ namespace SteelEngine {
         {
             while(1)
             {
-                m_Object->Update();
+                Update();
 
                 Sleep(100);
             }

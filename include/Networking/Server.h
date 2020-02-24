@@ -25,8 +25,7 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::SERVER_INFO = SteelEngine::ServerInfo(1024, 5004),
-        Reflection::ReflectionAttribute::HOT_RELOAD
+        SteelEngine::SERVER_INFO = SteelEngine::ServerInfo(1024, 5004)
     )
     class Server : public Network::INetwork
     {

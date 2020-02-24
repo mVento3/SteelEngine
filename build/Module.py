@@ -13,14 +13,13 @@ def sha512(fname):
     return hash.hexdigest()
 
 class Module:
-    def __init__(self, name, type, process, cwd, compile_config, working_directory, modules, hashes):
+    def __init__(self, name, type, cwd, compile_config, working_directory, modules, hashes):
         self.name = name
         self.type = type
         self.source_files = []
         self.header_files = []
         self.object_files = []
         self.reflection_src_files = []
-        self.process = process
         self.cwd = cwd
         self.compile_config = compile_config    
         self.working_directory = working_directory
@@ -48,7 +47,7 @@ class Module:
             if os.path.isfile(self.cwd + '/build/GeneratedReflection/' + res):
                 self.reflection_src_files.append(res)
 
-    def compileWhole(self, lib_updated):
+    def compileWhole(self, lib_updated, process):
         flags = ''
         defs = ''
         whole_compile = False
@@ -84,12 +83,12 @@ class Module:
                 obj_dir += splitted[s] + '/'
 
                 if os.path.isdir(dir_):
-                    self.process.WriteInput('cd ' + dir_)
-                    self.process.Wait()
+                    process.WriteInput('cd ' + dir_)
+                    process.Wait()
                 else:
                     os.mkdir(dir_)
-                    self.process.WriteInput('cd ' + dir_)
-                    self.process.Wait()
+                    process.WriteInput('cd ' + dir_)
+                    process.Wait()
 
             compile = True
             found = False
@@ -125,14 +124,14 @@ class Module:
 
             if compile or not os.path.isfile(dir_ + '/' + splitted[len(splitted) - 1].split('.')[0] + '.Generated.obj'):
                 whole_compile = True
-                self.process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + self.cwd + '/build/GeneratedReflection/' + src)
-                self.process.Wait()
+                process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + self.cwd + '/build/GeneratedReflection/' + src)
+                process.Wait()
 
-                if self.process.WasError():
-                    print("Error while compiling:", self.process.GetErrorMessage())
+                if process.WasError():
+                    print("Error while compiling:", process.GetErrorMessage())
 
-                self.process.WriteInput('cd ' + self.cwd + '/' + self.working_directory)
-                self.process.Wait()
+                process.WriteInput('cd ' + self.cwd + '/' + self.working_directory)
+                process.Wait()
 
             obj = self.working_directory + '/' + obj_dir + splitted[len(splitted) - 1].split('.')[0] + '.Generated.obj'
             self.object_files.append(obj)
@@ -148,12 +147,12 @@ class Module:
                 obj_dir += splitted[s] + '/'
 
                 if os.path.isdir(dir_):
-                    self.process.WriteInput('cd ' + dir_)
-                    self.process.Wait()
+                    process.WriteInput('cd ' + dir_)
+                    process.Wait()
                 else:
                     os.mkdir(dir_)
-                    self.process.WriteInput('cd ' + dir_)
-                    self.process.Wait()
+                    process.WriteInput('cd ' + dir_)
+                    process.Wait()
 
             compile = True
             found = False
@@ -189,14 +188,14 @@ class Module:
 
             if compile or not os.path.isfile(dir_ + '/' + splitted[len(splitted) - 1].split('.')[0] + '.obj'):
                 whole_compile = True
-                self.process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + self.cwd + '/' + src)
-                self.process.Wait()
+                process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + self.cwd + '/' + src)
+                process.Wait()
 
-                if self.process.WasError():
-                    print("Error while compiling:", self.process.GetErrorMessage())
+                if process.WasError():
+                    print("Error while compiling:", process.GetErrorMessage())
 
-                self.process.WriteInput('cd ' + self.cwd + '/' + self.working_directory)
-                self.process.Wait()
+                process.WriteInput('cd ' + self.cwd + '/' + self.working_directory)
+                process.Wait()
 
             self.object_files.append(self.working_directory + '/' + obj_dir + splitted[len(splitted) - 1].split('.')[0] + '.obj')
 
@@ -206,43 +205,43 @@ class Module:
             for o in self.object_files:
                 obj_files += self.cwd + '/' + o + ' '
 
-            self.process.WriteInput('cd ' + self.cwd + '/' + self.working_directory + '/' + self.name)
-            self.process.Wait()
+            process.WriteInput('cd ' + self.cwd + '/' + self.working_directory + '/' + self.name)
+            process.Wait()
 
             if self.type == 'lib':
                 lib_updated = True
-                self.process.WriteInput('lib ' + obj_files + '/OUT:' + self.cwd + '/bin/' + self.name + '.lib')
-                self.process.Wait()
+                process.WriteInput('lib ' + obj_files + '/OUT:' + self.cwd + '/bin/' + self.name + '.lib')
+                process.Wait()
 
-                if self.process.WasError():
-                    print("Error while compiling:", self.process.GetErrorMessage())
+                if process.WasError():
+                    print("Error while compiling:", process.GetErrorMessage())
 
             elif self.type == 'dll':
                 for key in self.compile_config['dll']:
                     flags += key + ' '
 
-                self.process.WriteInput('cl ' +
+                process.WriteInput('cl ' +
                     flags + ' ' +
                     defs + ' ' +
                     includes + ' ' +
                     ' /Fe' + self.cwd + '/bin/' + self.name + '.dll ' +
                     obj_files + '/link ' + ' ' + libs
                 )
-                self.process.Wait()
+                process.Wait()
 
-                if self.process.WasError():
-                    print("Error while compiling:", self.process.GetErrorMessage())
+                if process.WasError():
+                    print("Error while compiling:", process.GetErrorMessage())
             elif self.type == 'exe':
-                self.process.WriteInput('cl ' +
+                process.WriteInput('cl ' +
                     flags + ' ' +
                     defs + ' ' +
                     includes + ' ' +
                     '/Fe' + self.cwd + '/bin/' + self.name + '.exe ' +
                     obj_files + ' /link ' + ' ' + libs
                 )
-                self.process.Wait()
+                process.Wait()
 
-                if self.process.WasError():
-                    print("Error while compiling:", self.process.GetErrorMessage())
+                if process.WasError():
+                    print("Error while compiling:", process.GetErrorMessage())
 
         return lib_updated

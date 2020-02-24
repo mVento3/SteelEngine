@@ -75,8 +75,8 @@ namespace SteelEngine { namespace HotReloader {
 
 		void* dll;
 		ProcessAllocator allocate;
-		SteelEngine::Module::Load("PythonProcess.dll", &dll);
-		SteelEngine::Module::Get("PythonProcess_new", dll, (void**)&allocate);
+		SteelEngine::Module::load("PythonProcess.dll", &dll);
+		SteelEngine::Module::get("PythonProcess_new", dll, (void**)&allocate);
 
 		m_Process = allocate();
 
@@ -106,26 +106,6 @@ namespace SteelEngine { namespace HotReloader {
 						break;
 					case FileWatcher::FileStatus::MODIFIED:
 					{
-						for(Type::uint32 i = 0; i < m_Threads.size(); i++)
-						{
-							Thread* thread = m_Threads[i];
-
-							if (thread && thread->m_Done)
-							{
-								thread->m_Done = false;
-
-								if (thread->m_Thread.joinable())
-								{
-									thread->m_Thread.join();
-								}
-
-								delete thread;
-								thread = 0;
-
-								m_Threads.pop_back();
-							}
-						}
-
 						// CHECK_SPEED(
 						// 	{
 								if(file.extension() == ".cpp")
@@ -194,14 +174,20 @@ namespace SteelEngine { namespace HotReloader {
 									SwapModule(m_BinaryLocation.string() + "/Runtime/Swap/" + m_ModuleName + ".dll");
 								},
 								{
-									
+
 								}
 							);
 
 #ifdef SE_WINDOWS
-							Network::INetworkCommand* ev = (Network::INetworkCommand*)Reflection::CreateInstance("SteelEngine::Network::SwapModuleNetCommandEvent", (m_ModuleName + "\0").c_str());
+						// TODO: Fix memory leak, but we cant just delete it right after broadcasting, but after command finish
+							IReflectionData* type = Reflection::GetType("SteelEngine::Network::SwapModuleNetCommandEvent");
+							void** ev = type->Create_((m_ModuleName + "\0").c_str());
+							InheritanceTrackKeeper* swapper = new InheritanceTrackKeeper(type, ev);
 
-							Event::GlobalEvent::Broadcast_(ev);
+							Event::GlobalEvent::Broadcast_(swapper->Get<Network::INetworkCommand>());
+
+							// delete *ev;
+							// delete swapper;
 
 							// Reflection::DestroyInstance(ev);
 #else
@@ -251,7 +237,25 @@ namespace SteelEngine { namespace HotReloader {
 
 	void RuntimeReloader::Update()
 	{
+		for(Type::uint32 i = 0; i < m_Threads.size(); i++)
+		{
+			Thread* thread = m_Threads[i];
 
+			if(thread && thread->m_Done)
+			{
+				thread->m_Done = false;
+
+				if(thread->m_Thread.joinable())
+				{
+					thread->m_Thread.join();
+				}
+
+				delete thread;
+				thread = 0;
+
+				m_Threads.pop_back();
+			}
+		}
 	}
 
     void RuntimeReloader::Compile(const std::filesystem::path& file)
@@ -427,8 +431,8 @@ namespace SteelEngine { namespace HotReloader {
 
 		try
 		{
-			Module::Load(moduleName, &hotReloadedModule);
-			Module::Get("allocateRuntimeObject", hotReloadedModule, (void**)&getPerModule);
+			Module::load(moduleName, &hotReloadedModule);
+			Module::get("allocateRuntimeObject", hotReloadedModule, (void**)&getPerModule);
 
 			HotModule hot;
 

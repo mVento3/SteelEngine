@@ -14,11 +14,13 @@ namespace SteelEngine { namespace Network {
 
     struct INetworkManager;
 
-    struct INetwork : public HotReloader::IRuntimeObject
+    struct INetwork
     {
         Event::LocalEvent<ServerDisconnectedEvent>  m_DisconnectEvent;
         Event::LocalEvent<ClientConnectedEvent>     m_ClientConnectedEvent;
         Event::LocalEvent<ClientDisconnectedEvent>  m_ClientDisconnectedEvent;
+
+        virtual void Update() { }
 
         virtual int Receive(SOCKET sock, char* buffer, Type::uint32 size) = 0;
         virtual int Send(SOCKET sock, const char* buffer, Type::uint32 size) = 0;

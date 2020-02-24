@@ -40,7 +40,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         {
             if(commands[i]->Get<HotReloader::IRuntimeObject>()->m_TypeID == Reflection::GetType("SteelEngine::Network::SynchronizeProjectNCE")->GetTypeID())
             {
-                Event::GlobalEvent::Broadcast_(commands[i]);
+                Event::GlobalEvent::Broadcast_(commands[i]->Get<Network::INetworkCommand>());
             }
         }
     }

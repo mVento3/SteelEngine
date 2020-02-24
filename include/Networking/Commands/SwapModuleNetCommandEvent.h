@@ -17,7 +17,9 @@ namespace SteelEngine { namespace Network {
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         Reflection::ReflectionAttribute::HOT_RELOAD
     )
-    class SwapModuleNetCommandEvent : public INetworkCommand, public HotReloader::IRuntimeObject
+    class SwapModuleNetCommandEvent :
+        public INetworkCommand,
+        public HotReloader::IRuntimeObject
     {
         GENERATED_BODY
     public:

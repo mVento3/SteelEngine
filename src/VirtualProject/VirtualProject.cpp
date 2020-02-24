@@ -327,8 +327,8 @@ namespace SteelEngine {
             void* dll;
             PythonProcess_new allocator; 
 
-            Module::Load("PythonProcess.dll", &dll);
-            Module::Get("PythonProcess_new", dll, (void**)&allocator);
+            Module::load("PythonProcess.dll", &dll);
+            Module::get("PythonProcess_new", dll, (void**)&allocator);
 
             m_Process = allocator();
 
@@ -569,7 +569,7 @@ namespace SteelEngine {
             return;
         }
 
-        Module::Load(dllFilename, &m_ProjectDLL);
+        Module::load(dllFilename, &m_ProjectDLL);
         Event::GlobalEvent::Add<LoadedProjectEvent>(this);
         Event::GlobalEvent::Broadcast(LoadedProjectEvent{  });
 

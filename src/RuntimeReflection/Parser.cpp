@@ -963,6 +963,7 @@ namespace SteelEngine {
             m_Structure[i]->Clear();
 
             delete m_Structure[i];
+            m_Structure[i] = 0;
         }
 
         m_Structure.clear();

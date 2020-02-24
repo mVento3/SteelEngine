@@ -50,10 +50,6 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
         IReflectionData const* const* m_Types;
 
-        // std::vector<EditorComponents::ImGUI::UserInterface**> m_MainEditorWindows;
-        // std::vector<EditorComponents::ImGUI::UserInterface**> m_StartMenuWindows;
-        // std::vector<HotReloader::IRuntimeObject**> m_UIs;
-
         std::vector<HotReloader::InheritanceTrackKeeper*> m_MainEditorWindows;
         std::vector<HotReloader::InheritanceTrackKeeper*> m_StartMenuWindows;
         std::vector<HotReloader::InheritanceTrackKeeper*> m_UIs;

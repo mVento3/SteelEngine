@@ -82,7 +82,7 @@ namespace SteelEngine { namespace Network {
 
         Reflection::GetType("SteelEngine::Server")->Invoke("Start", m_Network);
 
-        printf("Hosting started!\n");
+        SE_INFO("Hosting server started!");
 
         m_Network->m_ClientConnectedEvent.Add(this);
         m_Network->m_ClientDisconnectedEvent.Add(this);
@@ -98,7 +98,7 @@ namespace SteelEngine { namespace Network {
 
         if(Reflection::GetType("SteelEngine::Client")->Invoke("Connect", m_Network, event.m_ServerIP.c_str()).Convert<Result>() == SE_TRUE)
         {
-            printf("Connected successful!\n");
+            SE_INFO("Connected to server successful!");
 
             *m_Connected = true;
 

@@ -208,7 +208,7 @@ namespace SteelEngine { namespace Network {
             {
                 if(state == State::OVERRIDE)
                 {
-                    printf("File %s is out to date!\n", filename.c_str());
+                    printf("File %s is out of date!\n", filename.c_str());
                 }
                 else if(state == State::NONE)
                 {
@@ -236,6 +236,8 @@ namespace SteelEngine { namespace Network {
 
                         file.write(&fileBuf[0], m_BufferSize);
                     }
+
+                    printf("Downloaded %s\n", filename.c_str());
 
                     file.close();
                 }

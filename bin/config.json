@@ -44,7 +44,8 @@
 			"python37.lib",
 			"glew32.lib",
 			"OpenGL32.lib",
-			"assimp-vc142-mt.lib"
+			"assimp-vc142-mt.lib",
+			"MemoryModule.lib"
 		]
 	},
 	"projects_path": "D:/Projects/SteelEngine",

@@ -6,7 +6,7 @@
 
 extern "C"
 {
-	__declspec(dllexport) void* getState()
+	__declspec(dllexport) void* getModuleManager()
 	{
 		static SteelEngine::ModuleManager state;
 
@@ -18,17 +18,17 @@ namespace SteelEngine {
 
 	void* ModuleManager::GetModuleLocal(const std::string& name)
 	{
-		for (StaticModuleInfo info : m_StaticGlobalModules)
+		for(StaticModuleInfo info : m_StaticGlobalModules)
 		{
-			if (info.m_ModuleName == name)
+			if(info.m_ModuleName == name)
 			{
 				return info.m_Module;
 			}
 		}
 
-		for (ModuleInfo info : m_Modules)
+		for(ModuleInfo info : m_Modules)
 		{
-			if (info.m_ModuleName == name)
+			if(info.m_ModuleName == name)
 			{
 				return info.m_CreateCallback(0, 0);
 			}
@@ -41,17 +41,17 @@ namespace SteelEngine {
 	{
 		bool found = false;
 
-		for (std::string s : a)
+		for(std::string s : a)
 		{
-			if (b.find(s) != std::string::npos && mode == BLACK_LIST)
+			if(b.find(s) != std::string::npos && mode == BLACK_LIST)
 			{
 				found = true;
 			}
-			else if (b.find(s) != std::string::npos && mode == WHITE_LIST)
+			else if(b.find(s) != std::string::npos && mode == WHITE_LIST)
 			{
 				found = false;
 			}
-			else if (b.find(s) == std::string::npos)
+			else if(b.find(s) == std::string::npos)
 			{
 				found = true;
 			}
@@ -80,6 +80,16 @@ namespace SteelEngine {
 		}
 	}
 
+	void ModuleManager::LoadAllImpl(const std::filesystem::path& name)
+	{
+		for(const auto& entry : std::filesystem::directory_iterator(name))
+		{
+			std::filesystem::path path = entry.path();
+
+			Load(path);
+		}
+	}
+
 	void ModuleManager::UnloadImpl(const std::string& blackList, Mode mode)
 	{
 		std::vector<std::string> splitted = split(blackList, ' ');
@@ -88,7 +98,7 @@ namespace SteelEngine {
 		{
 			if(!FreeIf(splitted, info.m_ModuleName, mode))
 			{
-				Module::Free(&info.m_Raw);
+				Module::free(&info.m_Raw);
 			}
 		}
 
@@ -96,7 +106,7 @@ namespace SteelEngine {
 		{
 			if(!FreeIf(splitted, info.m_ModuleName, mode))
 			{
-				Module::Free(&info.m_Raw);
+				Module::free(&info.m_Raw);
 			}
 		}
 
@@ -104,7 +114,7 @@ namespace SteelEngine {
 		{
 			if(!FreeIf(splitted, info.m_ModuleName, mode))
 			{
-				Module::Free(&info.m_Raw);
+				Module::free(&info.m_Raw);
 			}
 		}
 	}
@@ -119,11 +129,11 @@ namespace SteelEngine {
 		{
 			void* module;
 
-			Module::Load(name.string(), (void**)&module);
+			Module::load(name.string(), (void**)&module);
 
 			Module::Details* info;
 
-			Module::Get("exports", module, (void**)&info);
+			Module::get("exports", module, (void**)&info);
 
 			if(info)
 			{
@@ -131,7 +141,7 @@ namespace SteelEngine {
 				{
 					if(info_.m_ModuleName == info->m_PluginName)
 					{
-						Module::Free((void**)&module);
+						Module::free((void**)&module);
 
 						return;
 					}
@@ -141,7 +151,7 @@ namespace SteelEngine {
 				{
 					if(info_.m_ModuleName == info->m_PluginName)
 					{
-						Module::Free((void**)&module);
+						Module::free((void**)&module);
 
 						return;
 					}
@@ -192,7 +202,7 @@ namespace SteelEngine {
 				}
 				else
 				{
-					Module::Free((void**)&module);
+					Module::free((void**)&module);
 				}
 			}
 		}

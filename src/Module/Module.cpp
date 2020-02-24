@@ -4,7 +4,7 @@
 
 namespace SteelEngine { namespace Module {
 
-    Result Load(const std::string& filename, void** dll)
+    Result load(const std::string& filename, void** dll)
     {
         *dll = LoadLibraryA(filename.c_str()); 
 
@@ -28,7 +28,7 @@ namespace SteelEngine { namespace Module {
         return SE_TRUE;
     }
 
-    Result Get(const std::string& name, void* dll, void** result)
+    Result get(const std::string& name, void* dll, void** result)
     {
         *result = (void*)GetProcAddress((HMODULE)dll, name.c_str());
 
@@ -40,7 +40,7 @@ namespace SteelEngine { namespace Module {
         return SE_TRUE;
     }
 
-    Result Free(void** dll)
+    Result free(void** dll)
     {
         if(FreeLibrary((HMODULE)*dll) == 0)
         {
