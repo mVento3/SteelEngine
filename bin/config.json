@@ -15,26 +15,26 @@
 			"/LD"
 		],
 		"includes": [
-			"include",
-			"build/GeneratedReflection",
-			"external/SDL2-2.0.9/include",
-			"external/Vulkan/Include",
-			"external/glm",
-			"external",
-			"external/imgui",
-			"external/json/include",
-			"external/Python/include",
-			"external/glew-2.1.0/include",
-			"external/assimp/include",
-			"external/assimp/build/include",
-			"external/entt/src"
+			"$CWD$/include",
+			"$CWD$/build/GeneratedReflection",
+			"$CWD$/external/SDL2-2.0.9/include",
+			"$CWD$/external/Vulkan/Include",
+			"$CWD$/external/glm",
+			"$CWD$/external",
+			"$CWD$/external/imgui",
+			"$CWD$/external/json/include",
+			"$CWD$/external/Python/include",
+			"$CWD$/external/glew-2.1.0/include",
+			"$CWD$/external/assimp/include",
+			"$CWD$/external/assimp/build/include",
+			"$CWD$/external/entt/src"
 		],
 		"lib_paths": [
-			"bin",
-			"external/Vulkan/Lib",
-			"external/SDL2-2.0.9/lib/x64",
-			"external/Python/libs",
-			"external/glew-2.1.0/lib/Release/x64"
+			"$CWD$/bin",
+			"$CWD$/external/Vulkan/Lib",
+			"$CWD$/external/SDL2-2.0.9/lib/x64",
+			"$CWD$/external/Python/libs",
+			"$CWD$/external/glew-2.1.0/lib/Release/x64"
 		],
 		"libs": [
 			"SDL2.lib",

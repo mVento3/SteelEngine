@@ -12,13 +12,13 @@
 			"IMGUI_IMPL_OPENGL_LOADER_GLEW"
 		],
 		"includes": [
-			"external/imgui",
-			"external/SDL2-2.0.9/include",
-			"external/glew-2.1.0/include",
-			"external/Vulkan/Include"
+			"$CWD$/external/imgui",
+			"$CWD$/external/SDL2-2.0.9/include",
+			"$CWD$/external/glew-2.1.0/include",
+			"$CWD$/external/Vulkan/Include"
 		],
 		"lib_paths": [
-			"external/Vulkan/Lib"
+			"$CWD$/external/Vulkan/Lib"
 		],
 		"libs": [
 			"vulkan-1.lib"

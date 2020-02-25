@@ -64,10 +64,12 @@ def compile_dep(process, config, external_folder):
         defs += '/D' + key + ' '
 
     for key in j_config['includes']:
-        includes += '/I' + cwd + '/' + key + ' '
+        key = key.replace('$CWD$', cwd)
+        includes += '/I' + key + ' '
 
     for key in j_config['lib_paths']:
-        external_libs += '/LIBPATH:' + cwd + '/' + key + ' '
+        key = key.replace('$CWD$', cwd)
+        external_libs += '/LIBPATH:' + key + ' '
 
     for key in j_config['libs']:
         external_libs += key + ' '

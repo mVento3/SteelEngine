@@ -61,10 +61,12 @@ class Module:
             defs += '/D' + key + ' '
 
         for key in self.compile_config['includes']:
-            includes += '/I' + self.cwd + '/' + key + ' '
+            key = key.replace('$CWD$', self.cwd)
+            includes += '/I' + key + ' '
 
         for key in self.compile_config['lib_paths']:
-            libs += '/LIBPATH:' + self.cwd + '/' + key + ' '
+            key = key.replace('$CWD$', self.cwd)
+            libs += '/LIBPATH:' + key + ' '
 
         for key in self.compile_config['libs']:
             libs += key + ' '
