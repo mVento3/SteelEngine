@@ -1,0 +1,40 @@
+{
+	"type": "external_lib_config",
+	"name": "imgui",
+	"compiler": {
+		"flags": [
+			"O2",
+			"ZI",
+			"DEBUG:FASTLINK",
+			"std:c++17"
+		],
+		"definitions": [
+			"IMGUI_IMPL_OPENGL_LOADER_GLEW"
+		],
+		"includes": [
+			"external/imgui",
+			"external/SDL2-2.0.9/include",
+			"external/glew-2.1.0/include",
+			"external/Vulkan/Include"
+		],
+		"lib_paths": [
+			"external/Vulkan/Lib"
+		],
+		"libs": [
+			"vulkan-1.lib"
+		],
+		"groups": [
+			{
+				"name": "MAIN",
+				"src_files": [
+					"imgui.cpp",
+					"imgui_impl_opengl3.cpp",
+					"imgui_impl_sdl.cpp",
+					"imgui_impl_vulkan.cpp",
+					"imgui_widgets.cpp",
+					"imgui_draw.cpp"
+				]
+			}
+		]
+	}
+}

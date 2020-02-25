@@ -3,83 +3,90 @@ import PythonProcessWrapper
 import json
 
 external_path = 'D:/Projects/C++/SteelEngine/external'
-folder_path = 'MemoryModule'
+# folder_path = 'MemoryModule'
 process = PythonProcessWrapper.PythonProcessWrapper()
 cwd = os.getcwd()
 working_directory = 'build/Windows'
-j_config = json.load(open(external_path + '/' + folder_path + '/config.json'))
-j_config = j_config['compiler']
+# j_config = json.load(open(external_path + '/' + folder_path + '/config.json'))
+# j_config = j_config['compiler']
 
 process.Setup()
 
-for subdir, dirs, files in os.walk(external_path + '/' + folder_path):
-    src_found = False
-    include_found = False
+def compile_dep(process, config, external_folder):
+    j_config = config['compiler']
 
-    for dir in dirs:
-        if dir == 'src':
-            src_found = True
-        elif dir == 'include':
-            include_found = True
+    if 'groups' not in j_config:
+        print('Please specify groups!')
 
-    if not src_found and not include_found:
-        files_to_compile = []
+        return
 
-        for file in files:
-            file = subdir + '/' + file
+    src_files = j_config['groups']
+    found_group = False
 
-            if os.path.splitext(file)[1] == '.cpp' or os.path.splitext(file)[1] == '.c':
-                files_to_compile.append(file)
+    for group in src_files:
+        if group['name'] == 'MAIN':
+            src_files = group
+            found_group = True
 
-        process.WriteInput('cd ' + cwd + '/' + working_directory)
+            break
+
+    files_to_compile = []
+
+    if found_group:
+        for file in src_files['src_files']:
+            files_to_compile.append(external_path + '/' + external_folder + '/' + file)
+    else:
+        print('Please specify files to compile!')
+
+    process.WriteInput('cd ' + cwd + '/' + working_directory)
+    process.Wait()
+
+    check_path = cwd + '/' + working_directory + '/' + external_folder
+
+    if os.path.isdir(check_path):
+        process.WriteInput('cd ' + external_folder)
+        process.Wait()
+    else:
+        os.mkdir(check_path)
+        process.WriteInput('cd ' + external_folder)
         process.Wait()
 
-        check_path = cwd + '/' + working_directory + '/' + folder_path
+    flags = ''
+    defs = ''
+    includes = ''
+    external_libs = ''
+    obj_files = ''
 
-        if os.path.isdir(check_path):
-            process.WriteInput('cd ' + folder_path)
-            process.Wait()
-        else:
-            os.mkdir(check_path)
-            process.WriteInput('cd ' + folder_path)
-            process.Wait()
+    for key in j_config['flags']:
+        flags += '/' + key + ' '
 
-        flags = ''
-        defs = ''
-        includes = ''
-        external_libs = ''
-        obj_files = ''
+    for key in j_config['definitions']:
+        defs += '/D' + key + ' '
 
-        for key in j_config['flags']:
-            flags += '/' + key + ' '
+    for key in j_config['includes']:
+        includes += '/I' + cwd + '/' + key + ' '
 
-        for key in j_config['definitions']:
-            defs += '/D' + key + ' '
+    for key in j_config['lib_paths']:
+        external_libs += '/LIBPATH:' + cwd + '/' + key + ' '
 
-        for key in j_config['includes']:
-            includes += '/I' + cwd + '/' + key + ' '
+    for key in j_config['libs']:
+        external_libs += key + ' '
 
-        for key in j_config['lib_paths']:
-            external_libs += '/LIBPATH:' + cwd + '/' + key + ' '
+    for file_to_compile in files_to_compile:
+        process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + file_to_compile)
+        process.Wait()
 
-        for key in j_config['libs']:
-            external_libs += key + ' '
+        if process.WasError():
+            print("Error while compiling:", process.GetErrorMessage())
 
-        for file_to_compile in files_to_compile:
-            process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + file_to_compile)
-            process.Wait()
+        file_to_compile = cwd + '/' + working_directory + '/' + external_folder + '/' + os.path.splitext(os.path.basename(file_to_compile))[0] + '.obj '
 
-            if process.WasError():
-                print("Error while compiling:", process.GetErrorMessage())
+        if os.path.isfile(file_to_compile):
+            obj_files += file_to_compile
 
-            file_to_compile = cwd + '/' + working_directory + '/' + folder_path + '/' + os.path.splitext(os.path.basename(file_to_compile))[0] + '.obj '
+    if obj_files != '':
+        process.WriteInput('lib ' + obj_files + '/OUT:' + cwd + '/bin/' + external_folder + '.lib')
+        process.Wait()
 
-            if os.path.isfile(file_to_compile):
-                obj_files += file_to_compile
-
-        if obj_files != '':
-            process.WriteInput('lib ' + obj_files + '/OUT:' + cwd + '/bin/' + folder_path + '.lib')
-            process.Wait()
-
-            if process.WasError():
-                print("Error while compiling:", process.GetErrorMessage())
+        if process.WasError():
+            print("Error while compiling:", process.GetErrorMessage())

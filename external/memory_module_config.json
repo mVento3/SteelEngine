@@ -1,0 +1,31 @@
+{
+	"type": "external_lib_config",
+	"name": "MemoryModule",
+	"compiler": {
+		"flags": [
+			"Od",
+			"Zi",
+			"std:c++17"
+		],
+		"definitions": [
+			
+		],
+		"includes": [
+			
+		],
+		"lib_paths": [
+			
+		],
+		"libs": [
+			
+		],
+		"groups": [
+			{
+				"name": "MAIN",
+				"src_files": [
+					"MemoryModule.c"
+				]
+			}
+		]
+	}
+}

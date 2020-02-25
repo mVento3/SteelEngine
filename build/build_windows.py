@@ -4,6 +4,7 @@ import json
 import PythonProcessWrapper
 import concurrent.futures
 import time
+import DependenciesBuilder
 
 cwd = os.getcwd()
 config = json.load(open('bin/config.json'))
@@ -16,6 +17,15 @@ process = PythonProcessWrapper.PythonProcessWrapper()
 process.Setup()
 process.WriteInput('cd ' + working_directory)
 process.Wait()
+
+for file in os.listdir('external'):
+    if file.endswith('.json'):
+        j_config = json.load(open(cwd + '/external/' + file))
+
+        if 'type' in j_config and j_config['type'] == 'external_lib_config':
+            DependenciesBuilder.compile_dep(process, j_config, j_config['name'])
+    else:
+        continue
 
 modules = []
 
