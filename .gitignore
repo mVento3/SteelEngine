@@ -58,3 +58,4 @@ external/json-develop/**
 external/Python/**
 !external/Python/.gitkeep
 build/GeneratedReflection/imgui/**
+!build/PythonProcess.dll
