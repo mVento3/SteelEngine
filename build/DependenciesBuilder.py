@@ -2,7 +2,6 @@ import os
 import PythonProcessWrapper
 import json
 
-external_path = 'D:/Projects/C++/SteelEngine/external'
 # folder_path = 'MemoryModule'
 process = PythonProcessWrapper.PythonProcessWrapper()
 cwd = os.getcwd()
@@ -37,12 +36,12 @@ def compile_dep(process, config, external_folder):
             if file.find('$RCV$') >= 0:
                 file = file.replace('$RCV$', '')
 
-                for subdir, dirs, files in os.walk(external_path + '/' + external_folder + '/' + file):
+                for subdir, dirs, files in os.walk(cwd + '/external/' + external_folder + '/' + file):
                     for file_ in files:
                         if file_.endswith('.cpp') or file_.endswith('.c'):
                             files_to_compile.append(subdir + '/' + file_)
             else:
-                files_to_compile.append(external_path + '/' + external_folder + '/' + file)
+                files_to_compile.append(cwd + '/external/' + external_folder + '/' + file)
     else:
         print('Please specify files to compile!')
 

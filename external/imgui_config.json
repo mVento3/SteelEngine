@@ -28,9 +28,9 @@
 				"name": "MAIN",
 				"src_files": [
 					"imgui.cpp",
-					"imgui_impl_opengl3.cpp",
-					"imgui_impl_sdl.cpp",
-					"imgui_impl_vulkan.cpp",
+					"examples/imgui_impl_opengl3.cpp",
+					"examples/imgui_impl_sdl.cpp",
+					"examples/imgui_impl_vulkan.cpp",
 					"imgui_widgets.cpp",
 					"imgui_draw.cpp"
 				]
