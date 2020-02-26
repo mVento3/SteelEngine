@@ -16,3 +16,6 @@
 [submodule "external/MemoryModule"]
 	path = external/MemoryModule
 	url = https://github.com/fancycode/MemoryModule.git
+[submodule "external/imgui_club"]
+	path = external/imgui_club
+	url = https://github.com/ocornut/imgui_club.git
