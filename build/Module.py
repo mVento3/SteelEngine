@@ -62,11 +62,11 @@ class Module:
 
         for key in self.compile_config['includes']:
             key = key.replace('$CWD$', self.cwd)
-            includes += '/I' + key + ' '
+            includes += '/I"' + key + '" '
 
         for key in self.compile_config['lib_paths']:
             key = key.replace('$CWD$', self.cwd)
-            libs += '/LIBPATH:' + key + ' '
+            libs += '/LIBPATH:"' + key + '" '
 
         for key in self.compile_config['libs']:
             libs += key + ' '
