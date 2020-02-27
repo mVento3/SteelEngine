@@ -68,7 +68,7 @@ namespace SteelEngine {
 
         for(Type::uint32 i = 0; i < includes.size(); i++)
         {
-            includesStr += "/I" + includes[i];
+            includesStr += "/I\"" + includes[i] + "\"";
 
             if(i < includes.size() - 1)
             {
@@ -78,7 +78,7 @@ namespace SteelEngine {
 
         for(Type::uint32 i = 0; i < libPaths.size(); i++)
         {
-            libPathsStr += "/LIBPATH:" + libPaths[i];
+            libPathsStr += "/LIBPATH:\"" + libPaths[i] + "\"";
 
             if(i < libPaths.size() - 1)
             {
