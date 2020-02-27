@@ -42,7 +42,7 @@ namespace SteelEngine {
         typedef IPythonProcess*(*PythonProcess_new)();
 
     private:
-        const std::string m_EnginePath = "D:/Projects/C++/SteelEngine";
+        std::string m_EnginePath;
 
         std::filesystem::path m_LoadedProject;
         std::string m_ProjectName;

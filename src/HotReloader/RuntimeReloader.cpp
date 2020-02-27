@@ -215,7 +215,7 @@ namespace SteelEngine { namespace HotReloader {
 
 		m_WatchDogThread = new std::thread([&]()
 		{
-			// Change to some state variable
+		// TODO: Change to some state variable
 			while(1)
 			{
 				Sleep(100);

@@ -83,12 +83,12 @@ namespace SteelEngine {
 
         for(std::string& file : includeVector)
 		{
-			file = m_EnginePath + "/" + file;
+			replaceAll(file, "$CWD$", m_EnginePath);
 		}
 
 		for(std::string& file : libPathVector)
 		{
-			file = m_EnginePath + "/" + file;
+			replaceAll(file, "$CWD$", m_EnginePath);
 		}
 
         includeVector.push_back((m_LoadedProject / "include").string());
@@ -322,6 +322,8 @@ namespace SteelEngine {
 
     Result VirtualProject::Init()
     {
+        m_EnginePath = Call("getCWD")->ToString();
+
         if(!m_Process)
         {
             void* dll;
@@ -494,12 +496,12 @@ namespace SteelEngine {
 
             for(std::string& file : includeVector)
             {
-                file = m_EnginePath + "/" + file;
+                replaceAll(file, "$CWD$", m_EnginePath);
             }
 
             for(std::string& file : libPathVector)
             {
-                file = m_EnginePath + "/" + file;
+                replaceAll(file, "$CWD$", m_EnginePath);
             }
 
             includeVector.push_back((m_LoadedProject / "include").string());

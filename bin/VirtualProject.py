@@ -10,3 +10,6 @@ def sha512(fname):
             hash.update(chunk)
 
     return hash.hexdigest()
+
+def getCWD():
+    return os.getcwd()
