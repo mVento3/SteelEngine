@@ -93,7 +93,7 @@ namespace SteelEngine { namespace HotReloader {
 
         m_SourceFileWatcher = new FileWatcher(
 			ppp / "src",
-			[this](const std::filesystem::path& file, FileWatcher::FileStatus status)
+			[this, ppp](const std::filesystem::path& file, FileWatcher::FileStatus status)
 			{
 				if(std::filesystem::is_regular_file(file) && m_Process->IsCompileComplete() && m_IsSwapComplete)
 				{
@@ -111,13 +111,20 @@ namespace SteelEngine { namespace HotReloader {
 								if(file.extension() == ".cpp")
 								{
 									std::string dirPath = file.parent_path().string();
+
 									replaceAll(dirPath, "/", "\\");
+
 									std::vector<std::string> splitted = split(dirPath, '\\');
 									std::string p;
+									std::string projectsPath = ppp.string();
 
-									for(Type::uint32 i = split(m_BinaryLocation.string(), '\\').size(); i < splitted.size(); i++)
+									replaceAll(projectsPath, "/", "\\");
+
+									size_t splittedSize = split(projectsPath, '\\').size();
+
+									for(Type::uint32 i = splittedSize + 1; i < splitted.size(); i++)
 									{
-										p.append(splitted[i]);
+										p.append(splitted[i]); 
 
 										if(i < splitted.size() - 1)
 										{
@@ -339,12 +346,12 @@ namespace SteelEngine { namespace HotReloader {
 
 		for(std::string& file : includeVector)
 		{
-			file = enginePath + "/" + file;
+			replaceAll(file, "$CWD$", enginePath);
 		}
 
 		for(std::string& file : libPathVector)
 		{
-			file = enginePath + "/" + file;
+			replaceAll(file, "$CWD$", enginePath);
 		}
 
 		includeVector.push_back(FileSystem::Get("fileWatcherPath").string() + "/include");
