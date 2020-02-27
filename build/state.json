@@ -641,7 +641,7 @@
             "files": [
                 {
                     "filename": "VirtualProject.Generated.cpp",
-                    "hash": "60e2cb1665978b8f994c8c7ea59f2109acd4c06081796b564ff076212a6e1e3776c0b0be3e6827bae8d7905d61e2ba1ac7c3e9ccbf651732c84d3d2638d1c27f"
+                    "hash": "552993876dcb5728000dba6b72242ca8c34ed10355010af05fe9b0d30dceeaf7fbfef8f38ca29c3be07e047028ae4f4bd4a069ae5275160de95cf9232f8d71ae"
                 },
                 {
                     "filename": "VirtualProjectVisualizer.Generated.cpp",
@@ -658,7 +658,7 @@
                 },
                 {
                     "filename": "VirtualProject.cpp",
-                    "hash": "b4edb42d3d72133c9d477043c4d68090cc91dbb99a02fb3561984f4df65618e787b8940272933e8de92f7e710145ed7bc28bbf26d6a1bee278e342005aa47555"
+                    "hash": "ed469baac4f723b62d89bcf49bef14727a177c1178a39297dc27d7225b8eeae98db20e829792ff409e589e13ccb9a96cebbb871c8396c2455b237b404c606984"
                 },
                 {
                     "filename": "VirtualProjectVisualizer.cpp",
@@ -779,7 +779,7 @@
                 },
                 {
                     "filename": "RuntimeReloader.cpp",
-                    "hash": "4f51e50af235f6d8acf986cd340562a63246c09a686189ebe1176e90d6161341c6c775603ce257fc2a1b61a141ad7fca66a26c6d46682123bcc85423979c5fc5"
+                    "hash": "5f75d5d8baff08f2eea04ad0260c888e11e95cf10643b7654ba8d334e51c93f1c5315a8033c448ec65e99d0f744ad4d91f087e83a4c7a6f9cc75b24aa8f0fc04"
                 },
                 {
                     "filename": "Serializer.cpp",
@@ -879,7 +879,7 @@
             "files": [
                 {
                     "filename": "RuntimeCompiler.cpp",
-                    "hash": "ccd5807cd5f86dd525633b501a8157be1b0459516564a6cf53536cd415f33cbe080299d29a691af82c093b92b34cfb68c35921e144f9f991fe1d7be6715344aa"
+                    "hash": "89380bbcf643a3b59563488f97f4f9fb75c635184e712243d630fd76a15b6a80e72cc64c1c81c235cdff70181df2b92306297f965ceca529ecf827f43e103639"
                 }
             ]
         },

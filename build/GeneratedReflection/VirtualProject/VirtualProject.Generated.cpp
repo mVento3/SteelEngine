@@ -35,6 +35,7 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 }
 void VirtualProject::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
+SERIALIZE(VirtualProject::m_EnginePath)
 SERIALIZE(VirtualProject::m_LoadedProject)
 SERIALIZE(VirtualProject::m_ProjectName)
 SERIALIZE(VirtualProject::m_ReflectionGenerator)
