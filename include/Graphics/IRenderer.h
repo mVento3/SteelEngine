@@ -14,6 +14,8 @@
 
 #include "Event/LocalEvent.h"
 
+#include "Graphics/ITexture.h"
+
 #include "Graphics/Events/AddModelEvent.h"
 
 namespace SteelEngine { namespace Graphics {
@@ -39,6 +41,8 @@ namespace SteelEngine { namespace Graphics {
         virtual void PreRender() { }
         virtual void Render(entt::registry* scene) { }
         virtual void PostRender() { }
+
+        virtual ITexture* GetFinalTexture() { return 0; }
 
         entt::entity AddModel(IModel* model, entt::registry* scene, const Transform& transform, bool castShadow = true)
         {

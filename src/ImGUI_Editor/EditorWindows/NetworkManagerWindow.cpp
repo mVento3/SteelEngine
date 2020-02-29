@@ -78,33 +78,38 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void NetworkManagerWindow::Draw()
     {
-        if(ImGui::BeginMainMenuBar())
+        if(ImGui::Begin("EditorMainMenuBar"))
         {
-            if(ImGui::BeginMenu("Network"))
+            if(ImGui::BeginMenuBar())
             {
-                if(ImGui::MenuItem("Host server"))
+                if(ImGui::BeginMenu("Network"))
                 {
-                    m_HostServerPopup = true;
+                    if(ImGui::MenuItem("Host server"))
+                    {
+                        m_HostServerPopup = true;
+                    }
+
+                    if(ImGui::MenuItem("Connect"))
+                    {
+                        m_ConnectToServerPopup = true;
+                    }
+
+                    ImGui::EndMenu();
                 }
 
-                if(ImGui::MenuItem("Connect"))
+                if(ImGui::IsItemHovered())
                 {
-                    m_ConnectToServerPopup = true;
+                    ImGui::BeginTooltip();
+                    {
+                        ImGui::Text("Some info like server status: connected to: ... or hosting");
+                    }
+                    ImGui::EndTooltip();
                 }
 
-                ImGui::EndMenu();
+                ImGui::EndMenuBar();
             }
 
-            if(ImGui::IsItemHovered())
-            {
-                ImGui::BeginTooltip();
-                {
-                    ImGui::Text("Some info like server status: connected to: ... or hosting");
-                }
-                ImGui::EndTooltip();
-            }
-
-            ImGui::EndMainMenuBar();
+            ImGui::End();
         }
 
         if(m_HostServerPopup)

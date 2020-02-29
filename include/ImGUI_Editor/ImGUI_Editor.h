@@ -23,6 +23,8 @@
 
 #include "HotReloader/InheritanceTrackKeeper.h"
 
+#include "Graphics/Material.h"
+
 #include "ImGUI_Editor/ImGUI_Editor.Generated.h"
 
 namespace SteelEngine { namespace Editor { namespace ImGUI {
@@ -54,6 +56,8 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         std::vector<HotReloader::InheritanceTrackKeeper*> m_StartMenuWindows;
         std::vector<HotReloader::InheritanceTrackKeeper*> m_UIs;
 
+        Graphics::ITexture* texture;
+
         void LoadProject();
         void CreateNewProject();
 
@@ -62,7 +66,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         ~ImGUI_Editor();
 
         Result Init(Graphics::IRenderer* renderer, IContext* context) override;
-        void Draw() override;
+        void Draw(Graphics::ITexture* finalTexture) override;
         void ProcessEvents(void* event) override;
         void OnEvent(Event::Naive* event) override;
 

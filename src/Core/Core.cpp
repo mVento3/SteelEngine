@@ -307,13 +307,6 @@ namespace SteelEngine {
 
             m_Logger->Update();
         }
-
-        {
-            SE_PROFILE_SCOPE("Editor");
-
-            m_ImGUI_ContextAPI->Update();
-            (*m_Editor)->Draw();
-        }
     
         m_Window->Update();
 
@@ -338,14 +331,23 @@ namespace SteelEngine {
                 (*m_Renderer)->Render(m_SceneManager->GetCurrentScene());
             }
 
-            m_ImGUI_ContextAPI->UploadDrawData();
-
             {
                 SE_PROFILE_SCOPE("Graphics::PostRender");
 
                 (*m_Renderer)->PostRender();
             }
         }
+
+        {
+            SE_PROFILE_SCOPE("Editor");
+
+            m_ImGUI_ContextAPI->Update();
+            (*m_Editor)->Draw((*m_Renderer)->GetFinalTexture());
+        }
+
+        m_ImGUI_ContextAPI->UploadDrawData();
+
+        m_Window->SwapBuffers();
 
         {
             SE_PROFILE_SCOPE("Project");

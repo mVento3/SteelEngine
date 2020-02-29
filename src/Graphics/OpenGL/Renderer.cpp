@@ -182,7 +182,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         m_Window->GetWindowSize(w, h);
 
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glViewport(0, 0, w, h);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1);
@@ -264,18 +264,18 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     // Render quad
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        m_QuadShader->Bind();
+        // m_QuadShader->Bind();
 
-        m_PositionTexture->Bind(GL_TEXTURE0);
-        m_NormalTexture->Bind(GL_TEXTURE1);
-        m_AlbedoTexture->Bind(GL_TEXTURE2);
+        // m_PositionTexture->Bind(GL_TEXTURE0);
+        // m_NormalTexture->Bind(GL_TEXTURE1);
+        // m_AlbedoTexture->Bind(GL_TEXTURE2);
 
-        m_QuadMesh->Draw();
+        // m_QuadMesh->Draw();
     }
 
     void Renderer::PostRender()
     {
-        m_Window->SwapBuffers();
+
     }
 
     void Renderer::OnEvent(Event::Naive* event)
@@ -321,6 +321,11 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
             m_Controlls = eve->m_State;
         }
+    }
+
+    ITexture* Renderer::GetFinalTexture()
+    {
+        return m_AlbedoTexture;
     }
 
 }}}

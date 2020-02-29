@@ -100,6 +100,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Render(entt::registry* scene) override;
         void PostRender() override;
 
+        ITexture* GetFinalTexture() override;
+
         void OnEvent(Event::Naive* event) override;
     };
 

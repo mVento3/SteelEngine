@@ -8,6 +8,7 @@
 
 #include "Graphics/IContext.h"
 #include "Graphics/IRenderer.h"
+#include "Graphics/ITexture.h"
 
 #include "VirtualProject/IVirtualProjectVisualizer.h"
 
@@ -16,7 +17,7 @@ namespace SteelEngine { namespace Editor {
     struct IEditor : public HotReloader::IRuntimeObject
     {
         virtual Result Init(Graphics::IRenderer* renderer, IContext* context) { return SE_NOT_IMPLEMENTED; }
-        virtual void Draw() { }
+        virtual void Draw(Graphics::ITexture* finalTexture) { }
         virtual void ProcessEvents(void* event) { }
 
         virtual void Render(IVirtualProjectVisualizer* visualizer) { visualizer->Render(); }
