@@ -44,8 +44,9 @@ namespace SteelEngine {
         );
 
 		// Render commands
-        ImGuiContext& g = *m_Context;
-        ImDrawData* imDrawData = &g.DrawData;
+        // ImGuiContext& g = *m_Context;
+        ImDrawData* imDrawData = ImGui::GetDrawData();
+
 		int32_t vertexOffset = 0;
 		int32_t indexOffset = 0;
 
@@ -103,8 +104,8 @@ namespace SteelEngine {
             m_MemoryToClean.pop();
         }
 
-        ImGuiContext& g = *m_Context;
-        ImDrawData* imDrawData = &g.DrawData;
+        // ImGuiContext& g = *m_Context;
+        ImDrawData* imDrawData = ImGui::GetDrawData();
 
 		VkDeviceSize vertexBufferSize = imDrawData->TotalVtxCount * sizeof(ImDrawVert);
 		VkDeviceSize indexBufferSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
