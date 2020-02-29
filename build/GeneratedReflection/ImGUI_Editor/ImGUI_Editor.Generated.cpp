@@ -49,6 +49,7 @@ SERIALIZE(ImGUI_Editor::m_NaiveManager)
 SERIALIZE(ImGUI_Editor::m_MainEditorWindows)
 SERIALIZE(ImGUI_Editor::m_StartMenuWindows)
 SERIALIZE(ImGUI_Editor::m_UIs)
+SERIALIZE(ImGUI_Editor::texture)
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

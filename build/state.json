@@ -305,7 +305,7 @@
             "files": [
                 {
                     "filename": "Core.cpp",
-                    "hash": "cb896b694bd9870aa54677b505c7c7700f1f19e5da56ed4dd897fb9a462fd25abb7559991185e9cf544f79315e0989df8f92f50c5a58d9f7c3c4dae21494391b"
+                    "hash": "09f35c2ea94dad704e83a414bae4d2d77851c81bf363fccaae993f57745beff6ca1a6f134c99175e26479cd74e935495f83f33666e07bdae7759321b43532ab9"
                 },
                 {
                     "filename": "DeltaTime.cpp",
@@ -352,6 +352,10 @@
                 {
                     "filename": "Model.Generated.cpp",
                     "hash": "6c1df83e9f736acc30502edc1b8535abc5bf37336395f3bf84d0ecc23e38b39d9f2393fcb034d35c3f232b85796f88c8b2b61910dedfe74d3fb47b847b3f634f"
+                },
+                {
+                    "filename": "Material.Generated.cpp",
+                    "hash": "b2aed2397a617eca6da594923771d38be380473602ce79c82256cbef66b5ed68a3d2906b356b97e0f98fb88f9f893bfded0a3c6b9f37e0113e7f47aeb54098ac"
                 }
             ]
         },
@@ -399,6 +403,10 @@
                 {
                     "filename": "Renderer.cpp",
                     "hash": "e953a0744d0785c3bd5a27ca7b718043c792fc3dc448dab06f45cfed97c4ad9fa15fd9ab208d7eff3c290b0cb0a6f8ded2bfbf96cd94d42b8811e25b4aea9703"
+                },
+                {
+                    "filename": "Material.cpp",
+                    "hash": "9518b2dbdb9a2f1730f3a67482214432bf7b350235536f806f2b65fbcd53908c0aa2e64d4c3d7a703f91bba92626617a6abc3676c93d8a7c6ed9007b67283959"
                 }
             ]
         },
@@ -419,7 +427,7 @@
                 },
                 {
                     "filename": "Renderer.cpp",
-                    "hash": "86da4fc2e294b88dfb27f092d8ccabb309d9df63ced818da1cf41b3bf4f1323375a9703cbac707db4c612183e54571ef406e519b6a92fa32f05e512335a9356e"
+                    "hash": "17971b5c14ce62e2e0a7418490da6b9936cbedc5d028eab39a23fd64ea6bf6ca0ce56c268822207b7644fc36101d317a24b4524d3d441abf87808cdd05e96ce1"
                 },
                 {
                     "filename": "Shader.cpp",
@@ -532,7 +540,7 @@
             "files": [
                 {
                     "filename": "ImGUI_Editor.Generated.cpp",
-                    "hash": "62487d52bc5a82cde956f7d20bdff9641a42032de52cafcd55d8eac9fdd88b565a16d390b850f576e72256351e9ac2398c0e43f53ec866fa52c44c1e83d6b1e4"
+                    "hash": "7d569d1cfe4fa5159784dbef62759b6d53bee77c1031f5c4e436c6f00ef95891394e7178a5ca219ee5a09011105a243fb51469a4dec88682493f7c936749fd4e"
                 },
                 {
                     "filename": "OpenGL_Context.Generated.cpp",
@@ -591,7 +599,7 @@
             "files": [
                 {
                     "filename": "ImGUI_Editor.cpp",
-                    "hash": "47e020787cfee78a50b7a28fd919e1efe2ecbbce7a05071c808888d343f1849901fc3d57c16f2411a256c9ed5972b0df7edfde4e5b4032c782572b053cff4255"
+                    "hash": "ff1d5a1b46d03c0fd9c18db76dd8142b3715a6e08985fa52db2d728a05cfb7973ed5c8dca4d3e490567eae83ac8e5ccef04937b3010a5e46bc2c549cf14fc2f4"
                 },
                 {
                     "filename": "OpenGL_Context.cpp",
@@ -599,7 +607,7 @@
                 },
                 {
                     "filename": "VulkanContext.cpp",
-                    "hash": "14cf5c2724f6201576b4b900e659df0c1e9f64a8fe361e7a4426fc487c45dda5de544f76a9a29dbd250f936ed4a66cb822a66588efad67381688a66e01cb83f6"
+                    "hash": "b95a92694f71abfee13ce5e4f9924150aa15400bc588651cb3b58aabc424c26574074e05ae767575d1f26a80d9a6da3b28852a58c44d10536dc33d553bc24829"
                 },
                 {
                     "filename": "Window.cpp",
@@ -620,7 +628,7 @@
                 },
                 {
                     "filename": "NetworkManagerWindow.cpp",
-                    "hash": "a38a16955e4e8189f7d2fe37ae3a83c0092d05223deb2ff1e529d45220227566520dda7b759a5b67a6e36fc694004a81ca491a3fe02feb8b26ccd4e808cf4c2a"
+                    "hash": "157c061e81c08a09eca4e6ed375f3a7a5bbce6797b3b367f7a19beea0f7d27704ec0680f24c84bf5a41d550bd3ed13d46d1f4696cf4d4be4f382702b46aa2b0b"
                 },
                 {
                     "filename": "StartMenuWindow.cpp",
