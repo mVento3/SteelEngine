@@ -2,13 +2,15 @@
 
 #include "GL/glew.h"
 
+#include "Graphics/ITexture.h"
+
 #include "string"
 
 #include "Core/Type.h"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
-    class Texture
+    class Texture : public ITexture
     {
         friend struct Framebuffer;
     private:
@@ -32,10 +34,12 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         Texture(GLint internalFormat, GLenum format, GLenum type, GLfloat filter, bool clamp);
         ~Texture();
 
-        void Setup();
+        void Setup() override;
         void Cleanup();
 
         void Bind(GLint texture) const;
+
+        unsigned int GetTextureID() override { return m_Texture; }
     };
 
 }}}
