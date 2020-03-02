@@ -134,6 +134,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             light->Setup(*m_G_Shader);
         }
 
+        Event::GlobalEvent::Add<ViewportSizeChangedEvent>(this);
+
         return SE_TRUE;
     }
 
@@ -326,6 +328,11 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     ITexture* Renderer::GetFinalTexture()
     {
         return m_AlbedoTexture;
+    }
+
+    void Renderer::operator()(const ViewportSizeChangedEvent& event)
+    {
+        m_Camera->SetProjection(glm::perspectiveFov(m_Camera->m_Fov, (float)event.m_X, (float)event.m_Y, m_Camera->m_Near, m_Camera->m_Far));
     }
 
 }}}

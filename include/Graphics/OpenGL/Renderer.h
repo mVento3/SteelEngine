@@ -39,6 +39,8 @@
 
 #include "Graphics/ECS_Components/TransformComponent.h"
 
+#include "Graphics/Events/ViewportSizeChangedEvent.h"
+
 #include "Graphics/OpenGL/Renderer.Generated.h"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
@@ -103,6 +105,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         ITexture* GetFinalTexture() override;
 
         void OnEvent(Event::Naive* event) override;
+        void operator()(const ViewportSizeChangedEvent& event);
     };
 
 }}}

@@ -56,7 +56,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         std::vector<HotReloader::InheritanceTrackKeeper*> m_StartMenuWindows;
         std::vector<HotReloader::InheritanceTrackKeeper*> m_UIs;
 
-        Graphics::ITexture* texture;
+        ImVec2 m_CurrentMainViewportSize;
 
         void LoadProject();
         void CreateNewProject();

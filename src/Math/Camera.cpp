@@ -3,6 +3,9 @@
 namespace SteelEngine {
 
     Camera::Camera(const Transform& transform, float aspect, float fov, float near, float far) :
+        m_Fov(fov),
+        m_Near(near),
+        m_Far(far),
         m_Transform(transform)
     {
         m_Projection = glm::perspective(glm::radians(fov), aspect, near, far);

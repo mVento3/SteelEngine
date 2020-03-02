@@ -10,6 +10,8 @@
 
 #include "Profiler/ScopeTimer.h"
 
+#include "Graphics/Events/ViewportSizeChangedEvent.h"
+
 #undef min
 #undef max
 
@@ -164,14 +166,6 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
         Event::GlobalEvent::Add<ChangeSceneEvent>(this);
 
-        int width, height, channels;
-
-        // data = stbi_load("D:/Projects/C++/SteelEngine/bin/Resources/Textures/bricks2.jpg", &width, &height, &channels, 4);
-
-        texture = Graphics::Material::Create("D:/Projects/C++/SteelEngine/bin/Resources/Textures/bricks2.jpg")->Setup();
-
-        texture->Setup();
-
         return SE_TRUE;
     }
 
@@ -179,13 +173,10 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     {
         ImGui::NewFrame();
 
-        ImGui::SetNextWindowBgAlpha(-1.f);
+        // ImGui::SetNextWindowBgAlpha(-1.f);
 
-        ImVec2 vWindowSize = ImGui::GetMainViewport()->Size;
-		ImVec2 vPos0 = ImGui::GetMainViewport()->Pos;
-
-        ImGui::SetNextWindowPos(vPos0, ImGuiCond_Always);
-		ImGui::SetNextWindowSize(vWindowSize, ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos, ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImGui::GetMainViewport()->Size, ImGuiCond_Always);
 
         if(ImGui::Begin("EditorMainMenuBar", 0,
             ImGuiWindowFlags_MenuBar |
@@ -201,8 +192,15 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 			ImGui::DockSpace(dockSpace, ImVec2(0.0f, 0.0f), dockspaceFlags);
             auto central = ImGui::DockBuilderGetCentralNode(dockSpace);
 
+            if(central->Size.x != m_CurrentMainViewportSize.x || central->Size.y != m_CurrentMainViewportSize.y)
+            {
+                m_CurrentMainViewportSize = central->Size;
+
+                Event::GlobalEvent::Broadcast(Graphics::ViewportSizeChangedEvent{ (int)m_CurrentMainViewportSize.x, (int)m_CurrentMainViewportSize.y });
+            }
+
             ImGui::SetCursorPos(central->Pos);
-            ImGui::Image((void*)finalTexture->GetTextureID(), central->Size, { 0, 1 }, { 1, 0 });
+            ImGui::Image((void*)finalTexture->GetTextureID(), m_CurrentMainViewportSize, { 0, 1 }, { 1, 0 });
 
             if(ImGui::BeginMenuBar())
             {
