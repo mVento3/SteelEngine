@@ -69,7 +69,13 @@ namespace SteelEngine {
 		// Mark as function to cast inheritance into ptr
 			CAST_FUNCTION,
 		// Mark as function to serialize properties
-			SERIALIZE_FUNCTION
+			SERIALIZE_FUNCTION,
+			VISUAL_SCRIPT_NODE,
+			VISUAL_SCRIPT_FUNC,
+			VISUAL_SCRIPT_INPUT,
+			VISUAL_SCRIPT_OUTPUT,
+			VISUAL_SCRIPT_FLOW,
+			VISUAL_SCRIPT_RETURN_TYPE
 		};
 
 	private:
@@ -367,6 +373,12 @@ namespace SteelEngine {
 		static MetaDataInfo MetaData(KeyType key, ValueType value)
 		{
 			return MetaDataInfo(key, value);
+		}
+
+		template <typename A>
+		static IFunctionArgument* FucntionArgument(const std::string& name)
+		{
+			return new FunctionArgument<A>(name);
 		}
 
 		static ReflectionEnumElement& EnumElement(const char* name, int value)
