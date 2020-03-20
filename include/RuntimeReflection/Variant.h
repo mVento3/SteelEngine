@@ -223,6 +223,18 @@ namespace SteelEngine {
 			return old;
 		}
 
+		template <typename T>
+		ValuePointer* Reassign(ValuePointer* value)
+		{
+			ValuePointer* old = m_ValuePointer;
+
+			m_ValuePointer = value;
+
+			Recheck<T>();
+
+			return old;
+		}
+
 		ValuePointer* Reassign(Variant* value)
 		{
 			ValuePointer* old = m_ValuePointer;

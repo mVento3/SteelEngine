@@ -16,6 +16,7 @@ namespace SteelEngine {
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 		std::string m_Name;
 		size_t m_ReturnTypeID;
+		std::vector<IFunctionArgument*> m_Arguments;
 
 		ProxyMethod(FunctionCallback func, const std::string& name) :
 			m_FunctionCallback(func),
@@ -52,8 +53,18 @@ namespace SteelEngine {
 
 		Variant Invoke(Args... args) override
 		{
-			static Result noneRes(SE_FALSE, "NONE");
-			static Variant none(noneRes, typeid(noneRes).hash_code());
+			// static Result noneRes(SE_FALSE, "NONE");
+			// static Variant none(noneRes, typeid(noneRes).hash_code());
+			static Variant none;
+
+		//TODO: Check this
+
+			return none;
+		}
+
+		Variant InvokeTuple(ITuple* args) override
+		{
+			static Variant none;
 
 			return none;
 		}
@@ -67,6 +78,11 @@ namespace SteelEngine {
 		{
 			return m_ReturnTypeID;
 		}
+
+		const std::vector<IFunctionArgument*>& GetArguments() const override
+		{
+			return m_Arguments;
+		}
 	};
 
 	template <typename T, typename R, typename ...Args>
@@ -78,6 +94,7 @@ namespace SteelEngine {
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 		std::string m_Name;
 		size_t m_ReturnTypeID;
+		std::vector<IFunctionArgument*> m_Arguments;
 
 		ProxyMethod(FunctionCallback func, const std::string& name) :
 			m_FunctionCallback(func),
@@ -111,8 +128,18 @@ namespace SteelEngine {
 
 		Variant Invoke(Args... args) override
 		{
-			static Result noneRes(SE_FALSE, "NONE");
-			static Variant none(noneRes, typeid(noneRes).hash_code());
+			// static Result noneRes(SE_FALSE, "NONE");
+			// static Variant none(noneRes, typeid(noneRes).hash_code());
+			static Variant none;
+
+		//TODO: Check this
+
+			return none;
+		}
+
+		Variant InvokeTuple(ITuple* args) override
+		{
+			static Variant none;
 
 			return none;
 		}
@@ -126,6 +153,11 @@ namespace SteelEngine {
 		{
 			return m_ReturnTypeID;
 		}
+
+		const std::vector<IFunctionArgument*>& GetArguments() const override
+		{
+			return m_Arguments;
+		}
 	};
 
 	template <typename ...Args>
@@ -137,6 +169,7 @@ namespace SteelEngine {
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 		std::string m_Name;
 		size_t m_ReturnTypeID;
+		std::vector<IFunctionArgument*> m_Arguments;
 
 		ProxyMethod(FunctionCallback func, const std::string& name) :
 			m_FunctionCallback(func),
@@ -162,8 +195,11 @@ namespace SteelEngine {
 
 		Variant Invoke(void* obj, Args... args) override
 		{
-			static Result noneRes(SE_FALSE, "NONE");
-			static Variant none(noneRes, typeid(noneRes).hash_code());
+			// static Result noneRes(SE_FALSE, "NONE");
+			// static Variant none(noneRes, typeid(noneRes).hash_code());
+			static Variant none;
+
+		//TODO: Check this
 
 			return none;
 		}
@@ -172,8 +208,25 @@ namespace SteelEngine {
 		{
 			Call(args...);
 
-			// static Result noneRes(SE_FALSE, "NONE");
-			// static Variant none(noneRes, typeid(noneRes).hash_code());
+			static Variant none;
+
+			return none;
+		}
+
+		Variant InvokeTuple(ITuple* args) override
+		{
+			Tuple<Args...>* tuple = 0;
+
+			if(args->GetTuple())
+			{
+				tuple = (Tuple<Args...>*)args->GetTuple();
+			}
+			else
+			{
+				tuple = (Tuple<Args...>*)args;
+			}
+
+			apply(m_FunctionCallback, tuple->m_Args);
 
 			static Variant none;
 
@@ -189,6 +242,11 @@ namespace SteelEngine {
 		{
 			return m_ReturnTypeID;
 		}
+
+		const std::vector<IFunctionArgument*>& GetArguments() const override
+		{
+			return m_Arguments;
+		}
 	};
 
 	template <typename R, typename ...Args>
@@ -200,6 +258,7 @@ namespace SteelEngine {
 		MetaDataImplementation::MetaDataInfoVector m_MetaData;
 		std::string m_Name;
 		size_t m_ReturnTypeID;
+		std::vector<IFunctionArgument*> m_Arguments;
 
 		ProxyMethod(FunctionCallback func, const std::string& name) :
 			m_FunctionCallback(func),
@@ -225,8 +284,11 @@ namespace SteelEngine {
 
 		Variant Invoke(void* obj, Args... args) override
 		{
-			static Result noneRes(SE_FALSE, "NONE");
-			static Variant none(noneRes, typeid(noneRes).hash_code());
+			// static Result noneRes(SE_FALSE, "NONE");
+			// static Variant none(noneRes, typeid(noneRes).hash_code());
+			static Variant none;
+
+		//TODO: Check this
 
 			return none;
 		}
@@ -234,6 +296,24 @@ namespace SteelEngine {
 		Variant Invoke(Args... args) override
 		{
 			R r(Call(args...));
+
+			return Variant(r, typeid(r).hash_code());
+		}
+
+		Variant InvokeTuple(ITuple* args) override
+		{
+			Tuple<Args...>* tuple = 0;
+
+			if(args->GetTuple())
+			{
+				tuple = (Tuple<Args...>*)args->GetTuple();
+			}
+			else
+			{
+				tuple = (Tuple<Args...>*)args;
+			}
+
+			R r(apply(m_FunctionCallback, tuple->m_Args));
 
 			return Variant(r, typeid(r).hash_code());
 		}
@@ -246,6 +326,11 @@ namespace SteelEngine {
 		size_t GetReturnTypeID() const override
 		{
 			return m_ReturnTypeID;
+		}
+
+		const std::vector<IFunctionArgument*>& GetArguments() const override
+		{
+			return m_Arguments;
 		}
 	};
 

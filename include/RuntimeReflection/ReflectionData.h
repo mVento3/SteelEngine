@@ -5,6 +5,7 @@
 #include "RuntimeReflection/MetaDataInfo.h"
 #include "RuntimeReflection/ReflectionEnumeration.h"
 #include "RuntimeReflection/ReflectionInheritance.h"
+#include "RuntimeReflection/FunctionArgument.h"
 
 #include "RuntimeDatabase/RuntimeDatabase.h"
 
@@ -18,6 +19,12 @@ namespace SteelEngine {
 	void* createType(Args... args)
 	{
 		return new Type(args...);
+	}
+
+	template <typename A>
+	void getTypeID(std::vector<size_t>& typeIDs)
+	{
+		typeIDs.push_back(typeid(A).hash_code());
 	}
 
 	template <typename T>
@@ -222,15 +229,106 @@ namespace SteelEngine {
 
 				if(meth->GetName() == name)
 				{
-					res = meth;
+					std::vector<IFunctionArgument*> args = meth->GetArguments();
+					std::vector<size_t> typeIDs;
 
-					break;
+					int _[] = {0, (getTypeID<Args>(typeIDs), 0)...};
+					(void)_;
+
+					if(typeIDs.size() == args.size())
+					{
+						Type::uint32 i = 0;
+						bool isEqual = true;
+
+						for(IFunctionArgument* arg : args)
+						{
+							if(arg->GetTypeID() != typeIDs[i])
+							{
+								isEqual = false;
+
+								break;
+							}
+
+							i++;
+						}
+
+						if(isEqual)
+						{
+							res = meth;
+
+							break;
+						}
+					}
 				}
 			}
 
 			if(!res)
 			{
 				m_Methods.push_back(new ProxyMethod<B(T::*)(Args...)>(func, name));
+			}
+			else
+			{
+				ProxyMethod<B(T::*)(Args...)>* meth =
+					(ProxyMethod<B(T::*)(Args...)>*)res;
+
+				meth->m_FunctionCallback = func;
+			}
+
+			return *this;
+		}
+
+		template <typename B, typename... Args>
+		ReflectionData& Method(const std::string& name, const std::vector<IFunctionArgument*> arguments, B(T::*func)(Args...))
+		{
+			m_CurrentBind = CurrentBindFlag::METHOD_BIND;
+			IReflectionMethod* res = 0;
+
+			for(Type::uint32 i = 0; i < m_Methods.size(); i++)
+			{
+				IReflectionMethod* meth = m_Methods[i];
+
+				if(meth->GetName() == name)
+				{
+					std::vector<IFunctionArgument*> args = meth->GetArguments();
+					std::vector<size_t> typeIDs;
+
+					int _[] = {0, (getTypeID<Args>(typeIDs), 0)...};
+					(void)_;
+
+					if(typeIDs.size() == args.size())
+					{
+						Type::uint32 i = 0;
+						bool isEqual = true;
+
+						for(IFunctionArgument* arg : args)
+						{
+							if(arg->GetTypeID() != typeIDs[i])
+							{
+								isEqual = false;
+
+								break;
+							}
+
+							i++;
+						}
+
+						if(isEqual)
+						{
+							res = meth;
+
+							break;
+						}
+					}
+				}
+			}
+
+			if(!res)
+			{
+				ProxyMethod<B(T::*)(Args...)>* proxy = new ProxyMethod<B(T::*)(Args...)>(func, name);
+
+				proxy->m_Arguments.insert(proxy->m_Arguments.begin(), arguments.begin(), arguments.end());
+
+				m_Methods.push_back(proxy);
 			}
 			else
 			{
@@ -255,15 +353,106 @@ namespace SteelEngine {
 
 				if(meth->GetName() == name)
 				{
-					res = meth;
+					std::vector<IFunctionArgument*> args = meth->GetArguments();
+					std::vector<size_t> typeIDs;
 
-					break;
+					int _[] = {0, (getTypeID<Args>(typeIDs), 0)...};
+					(void)_;
+
+					if(typeIDs.size() == args.size())
+					{
+						Type::uint32 i = 0;
+						bool isEqual = true;
+
+						for(IFunctionArgument* arg : args)
+						{
+							if(arg->GetTypeID() != typeIDs[i])
+							{
+								isEqual = false;
+
+								break;
+							}
+
+							i++;
+						}
+
+						if(isEqual)
+						{
+							res = meth;
+
+							break;
+						}
+					}
 				}
 			}
 
 			if(!res)
 			{
 				m_Methods.push_back(new ProxyMethod<B(*)(Args...)>(func, name));
+			}
+			else
+			{
+				ProxyMethod<B(*)(Args...)>* meth =
+					(ProxyMethod<B(*)(Args...)>*)res;
+
+				meth->m_FunctionCallback = func;
+			}
+
+			return *this;
+		}
+
+		template <typename B, typename... Args>
+		ReflectionData& Method(const std::string& name, const std::vector<IFunctionArgument*> arguments, B(*func)(Args...))
+		{
+			m_CurrentBind = CurrentBindFlag::METHOD_BIND;
+			IReflectionMethod* res = 0;
+
+			for(Type::uint32 i = 0; i < m_Methods.size(); i++)
+			{
+				IReflectionMethod* meth = m_Methods[i];
+
+				if(meth->GetName() == name)
+				{
+					std::vector<IFunctionArgument*> args = meth->GetArguments();
+					std::vector<size_t> typeIDs;
+
+					int _[] = {0, (getTypeID<Args>(typeIDs), 0)...};
+					(void)_;
+
+					if(typeIDs.size() == args.size())
+					{
+						Type::uint32 i = 0;
+						bool isEqual = true;
+
+						for(IFunctionArgument* arg : args)
+						{
+							if(arg->GetTypeID() != typeIDs[i])
+							{
+								isEqual = false;
+
+								break;
+							}
+
+							i++;
+						}
+
+						if(isEqual)
+						{
+							res = meth;
+
+							break;
+						}
+					}
+				}
+			}
+
+			if(!res)
+			{
+				ProxyMethod<B(*)(Args...)>* proxy = new ProxyMethod<B(*)(Args...)>(func, name);
+
+				proxy->m_Arguments.insert(proxy->m_Arguments.begin(), arguments.begin(), arguments.end());
+
+				m_Methods.push_back(proxy);
 			}
 			else
 			{
