@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Core/PythonScriptableInheritance.h"
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/PythonScriptableInheritance.Generated.h"
+#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/PythonScriptableInheritance.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -16,7 +16,9 @@ SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::NO_SERIALIZE,
 SteelEngine::Reflection::MetaData("sizeof", sizeof(PythonScriptableInheritance))
 )
 .Constructor<>()
-.Method("ProcessInheritance", &PythonScriptableInheritance::ProcessInheritance)
+.Method("ProcessInheritance", { SteelEngine::Reflection::FucntionArgument<const std::vector<IReflectionInheritance*>&>("data"),
+SteelEngine::Reflection::FucntionArgument<IReflectionData*>("type"),
+SteelEngine::Reflection::FucntionArgument<void*>("object") }, &PythonScriptableInheritance::ProcessInheritance)
 ;
 }
 }

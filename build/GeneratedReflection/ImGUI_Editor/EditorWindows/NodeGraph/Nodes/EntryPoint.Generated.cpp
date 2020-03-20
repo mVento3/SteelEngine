@@ -1,0 +1,26 @@
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
+#include "ImGUI_Editor/EditorWindows/NodeGraph/Nodes/EntryPoint.h"
+#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/EditorWindows/NodeGraph/Nodes/EntryPoint.Generated.h"
+
+namespace SteelEngine {
+REGISTER_REFLECTION
+{
+SteelEngine::ReflectionRecorder::Register<EntryPoint>("EntryPoint",{
+"SteelEngine"
+}
+)
+(
+SteelEngine::Reflection::MetaData("sizeof", sizeof(EntryPoint))
+)
+.Constructor<>()
+.Inheritance<VisualScript::NodeTemplate>("VisualScript::NodeTemplate")
+.Method("Func", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
+SteelEngine::Reflection::FucntionArgument<VisualScript::IPinData*>("input") }, &EntryPoint::Func)
+(
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC, true),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FLOW, true)
+)
+;
+}
+}

@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Window/VulkanWindow.h"
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Window/VulkanWindow.Generated.h"
+#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Window/VulkanWindow.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -16,7 +16,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(VulkanWindow))
 )
 .Constructor<>()
 .Inheritance<IWindow>("IWindow")
-.Method("SetProcessEventsCallback", &VulkanWindow::SetProcessEventsCallback)
+.Method("SetProcessEventsCallback", { SteelEngine::Reflection::FucntionArgument<std::function<void(void*,IWindow*)>>("callback") }, &VulkanWindow::SetProcessEventsCallback)
 ;
 }
 }

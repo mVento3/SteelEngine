@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ImGUI_Editor/EditorWindows/SystemsMonitorWindow.h"
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/EditorWindows/SystemsMonitorWindow.Generated.h"
+#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/EditorWindows/SystemsMonitorWindow.Generated.h"
 
 namespace SteelEngine {
 namespace Editor {
@@ -44,6 +44,7 @@ void SystemsMonitorWindow::Serialize(SteelEngine::HotReloader::ISerializer* seri
 {
 SERIALIZE(SystemsMonitorWindow::m_CurrentItem)
 SERIALIZE(SystemsMonitorWindow::m_CurrentReflectionItem)
+SERIALIZE(SystemsMonitorWindow::reflectionRes)
 SERIALIZE(SystemsMonitorWindow::m_Info)
 SERIALIZE(SystemsMonitorWindow::m_Database)
 UserInterface::Serialize(serializer);

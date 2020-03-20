@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Core/UserInterfaceInheritance.h"
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/UserInterfaceInheritance.Generated.h"
+#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/UserInterfaceInheritance.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -17,7 +17,9 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(UserInterfaceInheritance))
 )
 .Constructor<>()
 .Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
-.Method("ProcessInheritance", &UserInterfaceInheritance::ProcessInheritance)
+.Method("ProcessInheritance", { SteelEngine::Reflection::FucntionArgument<const std::vector<IReflectionInheritance*>&>("data"),
+SteelEngine::Reflection::FucntionArgument<IReflectionData*>("type"),
+SteelEngine::Reflection::FucntionArgument<HotReloader::IRuntimeObject*>("object") }, &UserInterfaceInheritance::ProcessInheritance)
 .Method("Serialize", &UserInterfaceInheritance::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)

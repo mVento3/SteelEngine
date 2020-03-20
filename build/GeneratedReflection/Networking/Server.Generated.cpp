@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Networking/Server.h"
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Server.Generated.h"
+#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Server.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -17,9 +17,13 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Server))
 .Constructor<>()
 .Inheritance<Network::INetwork>("Network::INetwork")
 .Method("Start", &Server::Start)
-.Method("Send", &Server::Send)
-.Method("Receive", &Server::Receive)
-.Method("GetCommands", &Server::GetCommands)
+.Method("Send", { SteelEngine::Reflection::FucntionArgument<SOCKET>("sock"),
+SteelEngine::Reflection::FucntionArgument<const char*>("buffer"),
+SteelEngine::Reflection::FucntionArgument<Type::uint32>("size") }, &Server::Send)
+.Method("Receive", { SteelEngine::Reflection::FucntionArgument<SOCKET>("sock"),
+SteelEngine::Reflection::FucntionArgument<char*>("buffer"),
+SteelEngine::Reflection::FucntionArgument<Type::uint32>("size") }, &Server::Receive)
+.Method("GetCommands", { SteelEngine::Reflection::FucntionArgument<SOCKET>("sock") }, &Server::GetCommands)
 ;
 }
 }

@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Networking/Commands/SwapModuleNetCommandEvent.h"
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Commands/SwapModuleNetCommandEvent.Generated.h"
+#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Commands/SwapModuleNetCommandEvent.Generated.h"
 
 namespace SteelEngine {
 namespace Network {
@@ -27,8 +27,10 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(SwapModuleNetCommandEvent))
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NET_VALUE, true)
 )
-.Method("ServerSide", &SwapModuleNetCommandEvent::ServerSide)
-.Method("ClientSide", &SwapModuleNetCommandEvent::ClientSide)
+.Method("ServerSide", { SteelEngine::Reflection::FucntionArgument<Network::INetwork*>("network"),
+SteelEngine::Reflection::FucntionArgument<SOCKET>("sock") }, &SwapModuleNetCommandEvent::ServerSide)
+.Method("ClientSide", { SteelEngine::Reflection::FucntionArgument<Network::INetwork*>("network"),
+SteelEngine::Reflection::FucntionArgument<SOCKET>("sock") }, &SwapModuleNetCommandEvent::ClientSide)
 .Method("Cast_INetworkCommand", &SwapModuleNetCommandEvent::Cast_INetworkCommand)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)

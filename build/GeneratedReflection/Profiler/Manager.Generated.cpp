@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Profiler/Manager.h"
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/Profiler/Manager.Generated.h"
+#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Profiler/Manager.Generated.h"
 
 namespace SteelEngine {
 namespace Profiler {
@@ -18,7 +18,7 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(Manager))
 )
 .Constructor<>()
 .Inheritance<IManager>("IManager")
-.Method("AddTime", &Manager::AddTime)
+.Method("AddTime", { SteelEngine::Reflection::FucntionArgument<Manager::TimeData>("time") }, &Manager::AddTime)
 .Method("GetTime", &Manager::GetTime)
 .Method("Serialize", &Manager::Serialize)
 (

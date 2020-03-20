@@ -21,7 +21,6 @@
 			"$CWD$/external/Vulkan/Include",
 			"$CWD$/external/glm",
 			"$CWD$/external",
-			"$CWD$/external/imgui",
 			"$CWD$/external/json/include",
 			"$CWD$/external/Python/include",
 			"$CWD$/external/glew-2.1.0/include",
@@ -132,6 +131,10 @@
 		},
 		{
 			"name": "HotReloader",
+			"type": "dll"
+		},
+		{
+			"name": "VisualScript",
 			"type": "dll"
 		},
 		{

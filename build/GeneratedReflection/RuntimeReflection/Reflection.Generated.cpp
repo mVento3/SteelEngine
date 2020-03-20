@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "RuntimeReflection/Reflection.h"
-#include "d:\Projects\C++\SteelEngine/build/GeneratedReflection/RuntimeReflection/Reflection.Generated.h"
+#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/RuntimeReflection/Reflection.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -39,7 +39,13 @@ SteelEngine::Reflection::EnumElement("CONSOLE_COMMAND", Reflection::ReflectionAt
 SteelEngine::Reflection::EnumElement("HOT_RELOAD", Reflection::ReflectionAttribute::HOT_RELOAD),
 SteelEngine::Reflection::EnumElement("GENERATE_OWN_SERIALIZE_FUNC", Reflection::ReflectionAttribute::GENERATE_OWN_SERIALIZE_FUNC),
 SteelEngine::Reflection::EnumElement("CAST_FUNCTION", Reflection::ReflectionAttribute::CAST_FUNCTION),
-SteelEngine::Reflection::EnumElement("SERIALIZE_FUNCTION", Reflection::ReflectionAttribute::SERIALIZE_FUNCTION)
+SteelEngine::Reflection::EnumElement("SERIALIZE_FUNCTION", Reflection::ReflectionAttribute::SERIALIZE_FUNCTION),
+SteelEngine::Reflection::EnumElement("VISUAL_SCRIPT_NODE", Reflection::ReflectionAttribute::VISUAL_SCRIPT_NODE),
+SteelEngine::Reflection::EnumElement("VISUAL_SCRIPT_FUNC", Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC),
+SteelEngine::Reflection::EnumElement("VISUAL_SCRIPT_INPUT", Reflection::ReflectionAttribute::VISUAL_SCRIPT_INPUT),
+SteelEngine::Reflection::EnumElement("VISUAL_SCRIPT_OUTPUT", Reflection::ReflectionAttribute::VISUAL_SCRIPT_OUTPUT),
+SteelEngine::Reflection::EnumElement("VISUAL_SCRIPT_FLOW", Reflection::ReflectionAttribute::VISUAL_SCRIPT_FLOW),
+SteelEngine::Reflection::EnumElement("VISUAL_SCRIPT_RETURN_TYPE", Reflection::ReflectionAttribute::VISUAL_SCRIPT_RETURN_TYPE)
 })
 ;
 }
