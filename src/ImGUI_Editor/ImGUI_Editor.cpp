@@ -173,8 +173,6 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     {
         ImGui::NewFrame();
 
-        // ImGui::SetNextWindowBgAlpha(-1.f);
-
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos, ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImGui::GetMainViewport()->Size, ImGuiCond_Always);
 
@@ -186,21 +184,20 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 			ImGuiWindowFlags_NoBringToFrontOnFocus |
 			ImGuiWindowFlags_NoTitleBar))
         {
-            static const ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
 			ImGuiID dockSpace = ImGui::GetID("MainWindowDockspace");
 
-			ImGui::DockSpace(dockSpace, ImVec2(0.0f, 0.0f), dockspaceFlags);
+			ImGui::DockSpace(dockSpace, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
             auto central = ImGui::DockBuilderGetCentralNode(dockSpace);
 
-            if(central->Size.x != m_CurrentMainViewportSize.x || central->Size.y != m_CurrentMainViewportSize.y)
-            {
-                m_CurrentMainViewportSize = central->Size;
+            // if(central->Size.x != m_CurrentMainViewportSize.x || central->Size.y != m_CurrentMainViewportSize.y)
+            // {
+            //     m_CurrentMainViewportSize = central->Size;
 
-                Event::GlobalEvent::Broadcast(Graphics::ViewportSizeChangedEvent{ (int)m_CurrentMainViewportSize.x, (int)m_CurrentMainViewportSize.y });
-            }
+            //     Event::GlobalEvent::Broadcast(Graphics::ViewportSizeChangedEvent{ (int)m_CurrentMainViewportSize.x, (int)m_CurrentMainViewportSize.y });
+            // }
 
-            ImGui::SetCursorPos(central->Pos);
-            ImGui::Image((void*)finalTexture->GetTextureID(), m_CurrentMainViewportSize, { 0, 1 }, { 1, 0 });
+            // ImGui::SetCursorPos(central->Pos);
+            // ImGui::Image((void*)finalTexture->GetTextureID(), m_CurrentMainViewportSize, { 0, 1 }, { 1, 0 });
 
             if(ImGui::BeginMenuBar())
             {
@@ -228,6 +225,21 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
             ImGui::End();
         }
+
+        ImGui::Begin("Viewport");
+        {
+            ImVec2 windowSize = ImGui::GetCurrentWindow()->ContentRegionRect.GetSize();
+
+            if(windowSize.x != m_CurrentMainViewportSize.x || windowSize.y != m_CurrentMainViewportSize.y)
+            {
+                m_CurrentMainViewportSize = windowSize;
+
+                Event::GlobalEvent::Broadcast(Graphics::ViewportSizeChangedEvent{ (int)m_CurrentMainViewportSize.x, (int)m_CurrentMainViewportSize.y });
+            }
+
+            ImGui::Image((void*)finalTexture->GetTextureID(), m_CurrentMainViewportSize, { 0, 1 }, { 1, 0 });
+        }
+        ImGui::End();
 
         if(!GImGui/* || !GImGui->FrameScopeActive*/)
         {
