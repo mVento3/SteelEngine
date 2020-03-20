@@ -358,7 +358,52 @@ namespace SteelEngine {
                     {
                         if((v->m_Protection == Parser::ProtectionLevel::PUBLIC || (v->m_ScopeType == Parser::ScopeType::STRUCT && v->m_Protection == Parser::ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
                         {
-                            file << ".Method(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
+                            file << ".Method(\"" << v->m_Name << "\", ";
+
+                            if(!v->m_Arguments.empty())
+                            {
+                                file << "{ ";
+
+                                for(Type::uint32 i = 0; i < v->m_Arguments.size(); i++)
+                                {
+                                    Parser::Argument arg = v->m_Arguments[i];
+                                    const Parser::ScopeInfo* res = 0;
+                                    std::stack<std::string> names;
+
+                                    names.push(arg.m_Type);
+
+                                    searchForReverse(info, names, &res);
+
+                                    if(res)
+                                    {
+                                        constructNamespace(res, names);
+
+                                        std::string constructed;
+
+                                        while(!names.empty())
+                                        {
+                                            constructed += names.top() + "::";
+
+                                            names.pop();
+                                        }
+
+                                        file << "SteelEngine::Reflection::FucntionArgument<" << constructed << arg.m_Type << ">(\"" << arg.m_Name << "\")";
+                                    }
+                                    else
+                                    {
+                                        file << "SteelEngine::Reflection::FucntionArgument<" << parentsStr << arg.m_Type << ">(\"" << arg.m_Name << "\")";
+                                    }
+
+                                    if(i < v->m_Arguments.size() - 1)
+                                    {
+                                        file << ",\n";
+                                    }
+                                }
+
+                                file << " }, ";
+                            }
+
+                            file << "&" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
                             file << WriteMetaData(v);
                         }
                     }
@@ -387,7 +432,52 @@ namespace SteelEngine {
                                 }
                             }
 
-                            file << ">(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
+                            file << ">(\"" << v->m_Name << "\", ";
+
+                            if(!v->m_Arguments.empty())
+                            {
+                                file << "{ ";
+
+                                for(Type::uint32 i = 0; i < v->m_Arguments.size(); i++)
+                                {
+                                    Parser::Argument arg = v->m_Arguments[i];
+                                    const Parser::ScopeInfo* res = 0;
+                                    std::stack<std::string> names;
+
+                                    names.push(arg.m_Type);
+
+                                    searchForReverse(info, names, &res);
+
+                                    if(res)
+                                    {
+                                        constructNamespace(res, names);
+
+                                        std::string constructed;
+
+                                        while(!names.empty())
+                                        {
+                                            constructed += names.top() + "::";
+
+                                            names.pop();
+                                        }
+
+                                        file << "SteelEngine::Reflection::FucntionArgument<" << constructed << arg.m_Type << ">(\"" << arg.m_Name << "\")";
+                                    }
+                                    else
+                                    {
+                                        file << "SteelEngine::Reflection::FucntionArgument<" << parentsStr << arg.m_Type << ">(\"" << arg.m_Name << "\")";
+                                    }
+
+                                    if(i < v->m_Arguments.size() - 1)
+                                    {
+                                        file << ",\n";
+                                    }
+                                }
+
+                                file << " }, ";
+                            }
+
+                            file << "&" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
                             file << WriteMetaData(v);
                         }
                     }
