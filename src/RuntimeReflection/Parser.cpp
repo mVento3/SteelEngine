@@ -890,6 +890,9 @@ namespace SteelEngine {
                         Lexer lexer;
                         bool wasConst = false;
                         std::vector<std::string> lines;
+                        Type::uint32 braces = 0;
+
+                        wasBracket = false;
 
                         lines.push_back(word);
                         lexer.Load(lines);
@@ -899,7 +902,23 @@ namespace SteelEngine {
                         {
                             lexer++;
 
-                            if(lexer.GetToken() == "const")
+                            if(lexer.GetToken() == "<")
+                            {
+                                braces++;
+
+                                wasBracket = true;
+                            }
+                            else if(lexer.GetToken() == ">")
+                            {
+                                braces--;
+
+                                if(braces == 0)
+                                {
+                                    wasBracket = false;
+                                }
+                            }
+
+                            if(lexer.GetToken() == "const" && !wasBracket)
                             {
                                 wasConst = true;
 
