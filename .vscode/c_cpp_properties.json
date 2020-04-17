@@ -30,7 +30,8 @@
                 "${workspaceFolder}/external/Python/include",
                 "${workspaceFolder}/external/glew-2.1.0/include",
                 "${workspaceFolder}/external/assimp/include",
-                "${workspaceFolder}/external/entt/src"
+                "${workspaceFolder}/external/entt/src",
+                "${workspaceFolder}/include"
             ],
             "defines": [
                 "_DEBUG",
@@ -38,7 +39,7 @@
                 "_UNICODE",
                 "SE_WINDOWS"
             ],
-            "compilerPath": "D:/Programs/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.21.27702/bin/Hostx64/x64/cl.exe",
+            "compilerPath": "D:/Programs/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.25.28610/bin/Hostx64/x64/cl.exe",
             "cppStandard": "c++17",
             "intelliSenseMode": "msvc-x64",
             "browse": {

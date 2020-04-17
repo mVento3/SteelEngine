@@ -8,7 +8,8 @@
 		"definitions": [
 			"SE_WINDOWS",
 			"_WINSOCKAPI_",
-			"SE_PROFILE"
+			"SE_PROFILE",
+			"_MSC_VER=1925"
 		],
 		"dll": [
 			"/MT",
@@ -170,7 +171,7 @@
 			"type": "dll"
 		},
 		{
-			"name": "PythonProcess",
+			"name": "Subprocess",
 			"type": "dll"
 		},
 		{
