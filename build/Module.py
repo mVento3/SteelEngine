@@ -1,5 +1,3 @@
-import PythonProcessWrapper
-import subprocess
 import os
 import hashlib
 
@@ -31,10 +29,10 @@ class Module:
 
     def generateReflection(self):
         for h in self.header_files:
-            try:
-                subprocess.call(['bin/ReflectionGenerator.exe', '-b bin', '-i ' + h, '-cwd ' + self.cwd])
-            except:
-                print(os.sys.exc_info())
+            # try:
+            #     subprocess.call(['bin/ReflectionGenerator.exe', '-b bin', '-i ' + h, '-cwd ' + self.cwd])
+            # except:
+            #     print(os.sys.exc_info())
 
             splitted = h.split(os.sep)
             res = ''
@@ -130,7 +128,8 @@ class Module:
                 process.Wait()
 
                 if process.WasError():
-                    print("Error while compiling:", process.GetErrorMessage())
+                    print("Error while compiling gen obj:", process.GetErrorMessage())
+                    process.SetError(False)
 
                 process.WriteInput('cd ' + self.cwd + '/' + self.working_directory)
                 process.Wait()
@@ -194,7 +193,8 @@ class Module:
                 process.Wait()
 
                 if process.WasError():
-                    print("Error while compiling:", process.GetErrorMessage())
+                    print("Error while compiling obj:", process.GetErrorMessage())
+                    process.SetError(False)
 
                 process.WriteInput('cd ' + self.cwd + '/' + self.working_directory)
                 process.Wait()
@@ -216,7 +216,8 @@ class Module:
                 process.Wait()
 
                 if process.WasError():
-                    print("Error while compiling:", process.GetErrorMessage())
+                    print("Error while compiling lib:", process.GetErrorMessage())
+                    process.SetError(False)
 
             elif self.type == 'dll':
                 for key in self.compile_config['dll']:
@@ -232,7 +233,8 @@ class Module:
                 process.Wait()
 
                 if process.WasError():
-                    print("Error while compiling:", process.GetErrorMessage())
+                    print("Error while compiling dll:", process.GetErrorMessage())
+                    process.SetError(False)
             elif self.type == 'exe':
                 process.WriteInput('cl ' +
                     flags + ' ' +
@@ -244,6 +246,7 @@ class Module:
                 process.Wait()
 
                 if process.WasError():
-                    print("Error while compiling:", process.GetErrorMessage())
+                    print("Error while compiling exe:", process.GetErrorMessage())
+                    process.SetError(False)
 
         return lib_updated

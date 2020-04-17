@@ -1,15 +1,9 @@
 import os
-import PythonProcessWrapper
+import SubprocessWrapper
 import json
 
-# folder_path = 'MemoryModule'
-process = PythonProcessWrapper.PythonProcessWrapper()
 cwd = os.getcwd()
 working_directory = 'build/Windows'
-# j_config = json.load(open(external_path + '/' + folder_path + '/config.json'))
-# j_config = j_config['compiler']
-
-process.Setup()
 
 def compile_dep(process, config, external_folder):
     j_config = config['compiler']
