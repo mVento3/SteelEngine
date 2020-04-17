@@ -9,4 +9,8 @@ return static_cast<InputPin*>(this);\
 VisualScript::IPinData* Cast_IPinData()\
 {\
 return static_cast<InputPin*>(this);\
+}\
+JsonSerialization* Cast_JsonSerialization()\
+{\
+return static_cast<InputPin*>(this);\
 }

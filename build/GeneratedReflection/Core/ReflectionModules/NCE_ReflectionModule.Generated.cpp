@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Core/ReflectionModules/NCE_ReflectionModule.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Core/ReflectionModules/NCE_ReflectionModule.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Core/ReflectionModules/NCE_ReflectionModule.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -15,9 +15,9 @@ SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::REFLECTION_MO
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NCE_ReflectionModule))
 )
-.Constructor<>()
-.Inheritance<IReflectionModule>("IReflectionModule")
-.Method("Serialize", &NCE_ReflectionModule::Serialize)
+.RegisterConstructor<>()
+.RegisterInheritance<IReflectionModule>("IReflectionModule")
+.RegisterMethod("Serialize", &NCE_ReflectionModule::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

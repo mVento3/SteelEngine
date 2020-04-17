@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Networking/Commands/SwapModuleNetCommandEvent.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/Commands/SwapModuleNetCommandEvent.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Networking/Commands/SwapModuleNetCommandEvent.Generated.h"
 
 namespace SteelEngine {
 namespace Network {
@@ -19,23 +19,23 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(SwapModuleNetCommandEvent))
 )
-.Constructor<>()
-.Constructor<const char*>()
-.Inheritance<INetworkCommand>("INetworkCommand")
-.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
-.Property("m_ModuleName", &SwapModuleNetCommandEvent::m_ModuleName)
+.RegisterConstructor<>()
+.RegisterConstructor<const char*>()
+.RegisterInheritance<INetworkCommand>("INetworkCommand")
+.RegisterInheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
+.RegisterProperty("m_ModuleName", &SwapModuleNetCommandEvent::m_ModuleName)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NET_VALUE, true)
 )
-.Method("ServerSide", { SteelEngine::Reflection::FucntionArgument<Network::INetwork*>("network"),
+.RegisterMethod("ServerSide", { SteelEngine::Reflection::FucntionArgument<Network::INetwork*>("network"),
 SteelEngine::Reflection::FucntionArgument<SOCKET>("sock") }, &SwapModuleNetCommandEvent::ServerSide)
-.Method("ClientSide", { SteelEngine::Reflection::FucntionArgument<Network::INetwork*>("network"),
+.RegisterMethod("ClientSide", { SteelEngine::Reflection::FucntionArgument<Network::INetwork*>("network"),
 SteelEngine::Reflection::FucntionArgument<SOCKET>("sock") }, &SwapModuleNetCommandEvent::ClientSide)
-.Method("Cast_INetworkCommand", &SwapModuleNetCommandEvent::Cast_INetworkCommand)
+.RegisterMethod("Cast_INetworkCommand", &SwapModuleNetCommandEvent::Cast_INetworkCommand)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Cast_IRuntimeObject", &SwapModuleNetCommandEvent::Cast_IRuntimeObject)
+.RegisterMethod("Cast_IRuntimeObject", &SwapModuleNetCommandEvent::Cast_IRuntimeObject)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )

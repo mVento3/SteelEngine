@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "PythonCore/PythonCore.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/PythonCore/PythonCore.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/PythonCore/PythonCore.Generated.h"
 
 namespace SteelEngine {
 namespace Script {
@@ -16,9 +16,9 @@ SteelEngine::ReflectionRecorder::Register<PythonCore>("PythonCore",{
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(PythonCore))
 )
-.Constructor<>()
-.Inheritance<IPython>("IPython")
-.Method("Serialize", &PythonCore::Serialize)
+.RegisterConstructor<>()
+.RegisterInheritance<IPython>("IPython")
+.RegisterMethod("Serialize", &PythonCore::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

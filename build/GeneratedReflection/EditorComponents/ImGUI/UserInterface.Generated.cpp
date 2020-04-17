@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "EditorComponents/ImGUI/UserInterface.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/EditorComponents/ImGUI/UserInterface.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/EditorComponents/ImGUI/UserInterface.Generated.h"
 
 namespace SteelEngine {
 namespace EditorComponents {
@@ -19,8 +19,8 @@ SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::RUNTIME_SERIA
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::GENERATE_OWN_SERIALIZE_FUNC, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(UserInterface))
 )
-.Constructor<>()
-.Method("Serialize", &UserInterface::Serialize)
+.RegisterConstructor<>()
+.RegisterMethod("Serialize", &UserInterface::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )
@@ -33,6 +33,7 @@ SERIALIZE(UserInterface::m_Context)
 SERIALIZE(UserInterface::m_Title)
 SERIALIZE(UserInterface::m_Editor)
 SERIALIZE(UserInterface::m_TypeID)
+SERIALIZE(UserInterface::m_IsWindowOpen)
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

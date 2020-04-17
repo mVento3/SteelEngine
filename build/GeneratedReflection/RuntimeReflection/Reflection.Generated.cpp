@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "RuntimeReflection/Reflection.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/RuntimeReflection/Reflection.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/RuntimeReflection/Reflection.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -14,8 +14,8 @@ SteelEngine::ReflectionRecorder::Register<Reflection>("Reflection",{
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Reflection))
 )
-.Inheritance<StaticHelper>("StaticHelper")
-.Enum<Reflection::ReflectionAttribute>("ReflectionAttribute")
+.RegisterInheritance<StaticHelper>("StaticHelper")
+.RegisterEnum<Reflection::ReflectionAttribute>("ReflectionAttribute")
 .Values({
 SteelEngine::Reflection::EnumElement("RUNTIME_SERIALIZE", Reflection::ReflectionAttribute::RUNTIME_SERIALIZE),
 SteelEngine::Reflection::EnumElement("UPDATE", Reflection::ReflectionAttribute::UPDATE),

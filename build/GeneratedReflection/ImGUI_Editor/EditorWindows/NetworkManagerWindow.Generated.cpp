@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ImGUI_Editor/EditorWindows/NetworkManagerWindow.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/EditorWindows/NetworkManagerWindow.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/ImGUI_Editor/EditorWindows/NetworkManagerWindow.Generated.h"
 
 namespace SteelEngine {
 namespace Editor {
@@ -15,29 +15,29 @@ SteelEngine::ReflectionRecorder::Register<NetworkManagerWindow>("NetworkManagerW
 }
 )
 (
-SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE , SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE),
-SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
-SteelEngine::Reflection::MetaData(SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW, true),
+SteelEngine::Reflection::MetaData(Editor::ReflectionAttributes::WINDOW_TYPE , SteelEngine::Editor::WindowType::STATIC),
+SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
+SteelEngine::Reflection::MetaData(Editor::ReflectionAttributes::EDITOR_WINDOW, true),
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NetworkManagerWindow))
 )
-.Constructor<>()
-.Inheritance<EditorComponents::ImGUI::UserInterface>("EditorComponents::ImGUI::UserInterface")
-.Inheritance<Script::Python::Scriptable>("Script::Python::Scriptable")
-.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
-.Method("Cast_UserInterface", &NetworkManagerWindow::Cast_UserInterface)
+.RegisterConstructor<>()
+.RegisterInheritance<EditorComponents::ImGUI::UserInterface>("EditorComponents::ImGUI::UserInterface")
+.RegisterInheritance<Script::Python::Scriptable>("Script::Python::Scriptable")
+.RegisterInheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
+.RegisterMethod("Cast_UserInterface", &NetworkManagerWindow::Cast_UserInterface)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Cast_Scriptable", &NetworkManagerWindow::Cast_Scriptable)
+.RegisterMethod("Cast_Scriptable", &NetworkManagerWindow::Cast_Scriptable)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Cast_IRuntimeObject", &NetworkManagerWindow::Cast_IRuntimeObject)
+.RegisterMethod("Cast_IRuntimeObject", &NetworkManagerWindow::Cast_IRuntimeObject)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Serialize", &NetworkManagerWindow::Serialize)
+.RegisterMethod("Serialize", &NetworkManagerWindow::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

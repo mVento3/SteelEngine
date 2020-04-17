@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ImGUI_Editor/ImGUI_Editor.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/ImGUI_Editor.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/ImGUI_Editor/ImGUI_Editor.Generated.h"
 
 namespace SteelEngine {
 namespace Editor {
@@ -22,18 +22,18 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ImGUI_Editor))
 )
-.Constructor<>()
-.Inheritance<IEditor>("IEditor")
-.Inheritance<EventObserver>("EventObserver")
-.Method("Cast_IEditor", &ImGUI_Editor::Cast_IEditor)
+.RegisterConstructor<>()
+.RegisterInheritance<IEditor>("IEditor")
+.RegisterInheritance<EventObserver>("EventObserver")
+.RegisterMethod("Cast_IEditor", &ImGUI_Editor::Cast_IEditor)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Cast_EventObserver", &ImGUI_Editor::Cast_EventObserver)
+.RegisterMethod("Cast_EventObserver", &ImGUI_Editor::Cast_EventObserver)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Serialize", &ImGUI_Editor::Serialize)
+.RegisterMethod("Serialize", &ImGUI_Editor::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )
@@ -42,14 +42,12 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 void ImGUI_Editor::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(ImGUI_Editor::m_Context)
-SERIALIZE(ImGUI_Editor::m_CurrentScene)
 SERIALIZE(ImGUI_Editor::m_API_Context)
 SERIALIZE(ImGUI_Editor::m_VirtualProjectVisualizer)
 SERIALIZE(ImGUI_Editor::m_NaiveManager)
-SERIALIZE(ImGUI_Editor::m_MainEditorWindows)
-SERIALIZE(ImGUI_Editor::m_StartMenuWindows)
-SERIALIZE(ImGUI_Editor::m_UIs)
+SERIALIZE(ImGUI_Editor::m_Windows)
 SERIALIZE(ImGUI_Editor::m_CurrentMainViewportSize)
+SERIALIZE(ImGUI_Editor::m_IsViewportOpen)
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "FileSystem/FileSystem.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/FileSystem/FileSystem.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/FileSystem/FileSystem.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -13,8 +13,8 @@ SteelEngine::ReflectionRecorder::Register<FileSystem>("FileSystem",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(FileSystem))
 )
-.Constructor<>()
-.Inheritance<IFileSystem>("IFileSystem")
+.RegisterConstructor<>()
+.RegisterInheritance<IFileSystem>("IFileSystem")
 ;
 }
 }

@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/Vulkan/VertexBuffer.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Vulkan/VertexBuffer.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Graphics/Vulkan/VertexBuffer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
@@ -18,8 +18,8 @@ SteelEngine::ReflectionRecorder::Register<VertexBuffer>("VertexBuffer",{
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(VertexBuffer))
 )
-.Constructor<>()
-.Inheritance<Buffer>("Buffer")
+.RegisterConstructor<>()
+.RegisterInheritance<Buffer>("Buffer")
 ;
 }
 }

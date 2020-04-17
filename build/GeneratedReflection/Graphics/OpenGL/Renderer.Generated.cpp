@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/OpenGL/Renderer.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/OpenGL/Renderer.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Graphics/OpenGL/Renderer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
@@ -20,18 +20,18 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 )
-.Constructor<IWindow*>()
-.Inheritance<IRenderer>("IRenderer")
-.Inheritance<EventObserver>("EventObserver")
-.Method("Cast_IRenderer", &Renderer::Cast_IRenderer)
+.RegisterConstructor<IWindow*>()
+.RegisterInheritance<IRenderer>("IRenderer")
+.RegisterInheritance<EventObserver>("EventObserver")
+.RegisterMethod("Cast_IRenderer", &Renderer::Cast_IRenderer)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Cast_EventObserver", &Renderer::Cast_EventObserver)
+.RegisterMethod("Cast_EventObserver", &Renderer::Cast_EventObserver)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Serialize", &Renderer::Serialize)
+.RegisterMethod("Serialize", &Renderer::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

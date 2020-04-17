@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ImGUI_Editor/OpenGL_Context.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/OpenGL_Context.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/ImGUI_Editor/OpenGL_Context.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -14,11 +14,11 @@ SteelEngine::ReflectionRecorder::Register<OpenGL_Context>("OpenGL_Context",{
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(OpenGL_Context))
 )
-.Constructor<>()
-.Inheritance<IContext>("IContext")
-.Method("GetContext", &OpenGL_Context::GetContext)
-.Method("MakeCurrent", &OpenGL_Context::MakeCurrent)
-.Method("Serialize", &OpenGL_Context::Serialize)
+.RegisterConstructor<>()
+.RegisterInheritance<IContext>("IContext")
+.RegisterMethod("GetContext", &OpenGL_Context::GetContext)
+.RegisterMethod("MakeCurrent", &OpenGL_Context::MakeCurrent)
+.RegisterMethod("Serialize", &OpenGL_Context::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

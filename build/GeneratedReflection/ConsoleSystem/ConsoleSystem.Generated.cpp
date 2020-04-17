@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ConsoleSystem/ConsoleSystem.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ConsoleSystem/ConsoleSystem.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/ConsoleSystem/ConsoleSystem.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -14,9 +14,9 @@ SteelEngine::ReflectionRecorder::Register<ConsoleSystem>("ConsoleSystem",{
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ConsoleSystem))
 )
-.Constructor<>()
-.Inheritance<IConsoleSystem>("IConsoleSystem")
-.Method("Serialize", &ConsoleSystem::Serialize)
+.RegisterConstructor<>()
+.RegisterInheritance<IConsoleSystem>("IConsoleSystem")
+.RegisterMethod("Serialize", &ConsoleSystem::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

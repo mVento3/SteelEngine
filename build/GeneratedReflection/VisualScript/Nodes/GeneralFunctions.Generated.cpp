@@ -16,14 +16,14 @@ SteelEngine::ReflectionRecorder::Register<GeneralFunctions>("GeneralFunctions",{
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_NODE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(GeneralFunctions))
 )
-.Constructor<>()
-.Method("EntryPoint", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
+.RegisterConstructor<>()
+.RegisterMethod("EntryPoint", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
 SteelEngine::Reflection::FucntionArgument<VisualScript::IPinData*>("input") }, &GeneralFunctions::EntryPoint)
 (
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC, true),
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_OUTPUT, true)
 )
-.Method("Add", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
+.RegisterMethod("Add", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
 SteelEngine::Reflection::FucntionArgument<VisualScript::IPinData*>("input") }, &GeneralFunctions::Add)
 (
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC, true),

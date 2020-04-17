@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Profiler/Manager.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Profiler/Manager.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Profiler/Manager.Generated.h"
 
 namespace SteelEngine {
 namespace Profiler {
@@ -16,11 +16,11 @@ SteelEngine::ReflectionRecorder::Register<Manager>("Manager",{
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Manager))
 )
-.Constructor<>()
-.Inheritance<IManager>("IManager")
-.Method("AddTime", { SteelEngine::Reflection::FucntionArgument<Manager::TimeData>("time") }, &Manager::AddTime)
-.Method("GetTime", &Manager::GetTime)
-.Method("Serialize", &Manager::Serialize)
+.RegisterConstructor<>()
+.RegisterInheritance<IManager>("IManager")
+.RegisterMethod("AddTime", { SteelEngine::Reflection::FucntionArgument<Manager::TimeData>("time") }, &Manager::AddTime)
+.RegisterMethod("GetTime", &Manager::GetTime)
+.RegisterMethod("Serialize", &Manager::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

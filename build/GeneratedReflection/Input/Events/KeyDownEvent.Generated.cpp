@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Input/Events/KeyDownEvent.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Input/Events/KeyDownEvent.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Input/Events/KeyDownEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -15,8 +15,8 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(KeyDownEvent))
 )
-.Constructor<int>()
-.Inheritance<Event::Naive>("Event::Naive")
+.RegisterConstructor<int>()
+.RegisterInheritance<Event::Naive>("Event::Naive")
 ;
 }
 }

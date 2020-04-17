@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ImGUI_Editor/EditorWindows/ConsoleWindow.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/EditorWindows/ConsoleWindow.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/ImGUI_Editor/EditorWindows/ConsoleWindow.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -11,7 +11,7 @@ SteelEngine::ReflectionRecorder::Register<ConsoleWindow>("ConsoleWindow",{
 }
 )
 (
-SteelEngine::Reflection::MetaData(Editor::ReflectionAttributes::SCENE_TYPE , SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE),
+SteelEngine::Reflection::MetaData(Editor::ReflectionAttributes::WINDOW_TYPE , SteelEngine::Editor::WindowType::STATIC),
 SteelEngine::Reflection::MetaData(Editor::ReflectionAttributes::EDITOR_WINDOW, true),
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS, true),
 SteelEngine::Reflection::MetaData(EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW, true),
@@ -20,28 +20,28 @@ SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::RUNTIME_SERIA
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(ConsoleWindow))
 )
-.Constructor<>()
-.Inheritance<EditorComponents::ImGUI::UserInterface>("EditorComponents::ImGUI::UserInterface")
-.Inheritance<LogDispatcher>("LogDispatcher")
-.Inheritance<EventObserver>("EventObserver")
-.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
-.Method("Cast_UserInterface", &ConsoleWindow::Cast_UserInterface)
+.RegisterConstructor<>()
+.RegisterInheritance<EditorComponents::ImGUI::UserInterface>("EditorComponents::ImGUI::UserInterface")
+.RegisterInheritance<LogDispatcher>("LogDispatcher")
+.RegisterInheritance<EventObserver>("EventObserver")
+.RegisterInheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
+.RegisterMethod("Cast_UserInterface", &ConsoleWindow::Cast_UserInterface)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Cast_LogDispatcher", &ConsoleWindow::Cast_LogDispatcher)
+.RegisterMethod("Cast_LogDispatcher", &ConsoleWindow::Cast_LogDispatcher)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Cast_EventObserver", &ConsoleWindow::Cast_EventObserver)
+.RegisterMethod("Cast_EventObserver", &ConsoleWindow::Cast_EventObserver)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Cast_IRuntimeObject", &ConsoleWindow::Cast_IRuntimeObject)
+.RegisterMethod("Cast_IRuntimeObject", &ConsoleWindow::Cast_IRuntimeObject)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Serialize", &ConsoleWindow::Serialize)
+.RegisterMethod("Serialize", &ConsoleWindow::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

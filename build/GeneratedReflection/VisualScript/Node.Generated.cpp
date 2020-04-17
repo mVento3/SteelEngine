@@ -15,8 +15,8 @@ SteelEngine::ReflectionRecorder::Register<Node>("Node",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Node))
 )
-.Constructor<const std::string&>()
-.Inheritance<INode>("INode")
+.RegisterConstructor<const std::string&>()
+.RegisterInheritance<INode>("INode")
 ;
 }
 }

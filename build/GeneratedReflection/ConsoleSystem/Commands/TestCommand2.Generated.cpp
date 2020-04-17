@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ConsoleSystem/Commands/TestCommand2.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ConsoleSystem/Commands/TestCommand2.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/ConsoleSystem/Commands/TestCommand2.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -15,9 +15,9 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(TestCommand2))
 )
-.Constructor<>()
-.Inheritance<ICommand>("ICommand")
-.Method("Serialize", &TestCommand2::Serialize)
+.RegisterConstructor<>()
+.RegisterInheritance<ICommand>("ICommand")
+.RegisterMethod("Serialize", &TestCommand2::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

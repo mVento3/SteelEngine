@@ -15,9 +15,9 @@ SteelEngine::ReflectionRecorder::Register<EntryPoint>("EntryPoint",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(EntryPoint))
 )
-.Constructor<>()
-.Inheritance<NodeTemplate>("NodeTemplate")
-.Method("Func", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
+.RegisterConstructor<>()
+.RegisterInheritance<NodeTemplate>("NodeTemplate")
+.RegisterMethod("Func", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
 SteelEngine::Reflection::FucntionArgument<VisualScript::IPinData*>("input") }, &EntryPoint::Func)
 (
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC, true),

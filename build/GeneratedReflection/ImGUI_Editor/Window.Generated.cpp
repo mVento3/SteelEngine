@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ImGUI_Editor/Window.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/Window.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/ImGUI_Editor/Window.Generated.h"
 
 namespace SteelEngine {
 namespace Editor {
@@ -17,8 +17,8 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Window))
 )
-.Inheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
-.Method("Serialize", &Window::Serialize)
+.RegisterInheritance<HotReloader::IRuntimeObject>("HotReloader::IRuntimeObject")
+.RegisterMethod("Serialize", &Window::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/Vulkan/Renderer.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Vulkan/Renderer.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Graphics/Vulkan/Renderer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
@@ -19,11 +19,11 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Renderer))
 )
-.Constructor<IWindow*>()
-.Inheritance<IRendererAPI<IRenderer::API::VULKAN_API>>("IRendererAPI<IRenderer::API::VULKAN_API>")
-.Inheritance<EventObserver>("EventObserver")
-.Method("RecreateSwapChain", &Renderer::RecreateSwapChain)
-.Method("Serialize", &Renderer::Serialize)
+.RegisterConstructor<IWindow*>()
+.RegisterInheritance<IRendererAPI<IRenderer::API::VULKAN_API>>("IRendererAPI<IRenderer::API::VULKAN_API>")
+.RegisterInheritance<EventObserver>("EventObserver")
+.RegisterMethod("RecreateSwapChain", &Renderer::RecreateSwapChain)
+.RegisterMethod("Serialize", &Renderer::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

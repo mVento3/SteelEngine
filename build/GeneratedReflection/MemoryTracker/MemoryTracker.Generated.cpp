@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "MemoryTracker/MemoryTracker.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/MemoryTracker/MemoryTracker.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/MemoryTracker/MemoryTracker.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -14,9 +14,9 @@ SteelEngine::ReflectionRecorder::Register<MemoryTracker>("MemoryTracker",{
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(MemoryTracker))
 )
-.Constructor<Memory::Allocator*>()
-.Inheritance<IMemoryTracker>("IMemoryTracker")
-.Method("Serialize", &MemoryTracker::Serialize)
+.RegisterConstructor<Memory::Allocator*>()
+.RegisterInheritance<IMemoryTracker>("IMemoryTracker")
+.RegisterMethod("Serialize", &MemoryTracker::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

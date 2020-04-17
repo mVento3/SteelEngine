@@ -9,4 +9,8 @@ return static_cast<FlowInputPin*>(this);\
 VisualScript::IPinFunction* Cast_IPinFunction()\
 {\
 return static_cast<FlowInputPin*>(this);\
+}\
+JsonSerialization* Cast_JsonSerialization()\
+{\
+return static_cast<FlowInputPin*>(this);\
 }

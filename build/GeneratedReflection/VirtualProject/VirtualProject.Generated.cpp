@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "VirtualProject/VirtualProject.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/VirtualProject/VirtualProject.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/VirtualProject/VirtualProject.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -16,18 +16,18 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(VirtualProject))
 )
-.Constructor<>()
-.Inheritance<IVirtualProject>("IVirtualProject")
-.Inheritance<Script::Python::Scriptable>("Script::Python::Scriptable")
-.Method("Cast_IVirtualProject", &VirtualProject::Cast_IVirtualProject)
+.RegisterConstructor<>()
+.RegisterInheritance<IVirtualProject>("IVirtualProject")
+.RegisterInheritance<Script::Python::Scriptable>("Script::Python::Scriptable")
+.RegisterMethod("Cast_IVirtualProject", &VirtualProject::Cast_IVirtualProject)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Cast_Scriptable", &VirtualProject::Cast_Scriptable)
+.RegisterMethod("Cast_Scriptable", &VirtualProject::Cast_Scriptable)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::CAST_FUNCTION, true)
 )
-.Method("Serialize", &VirtualProject::Serialize)
+.RegisterMethod("Serialize", &VirtualProject::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

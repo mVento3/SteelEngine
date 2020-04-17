@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Event/EventManager.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Event/EventManager.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Event/EventManager.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -13,8 +13,8 @@ SteelEngine::ReflectionRecorder::Register<EventManager>("EventManager",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(EventManager))
 )
-.Constructor<>()
-.Inheritance<IEventManager>("IEventManager")
+.RegisterConstructor<>()
+.RegisterInheritance<IEventManager>("IEventManager")
 ;
 }
 }

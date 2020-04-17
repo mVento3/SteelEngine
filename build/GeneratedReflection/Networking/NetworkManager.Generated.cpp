@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Networking/NetworkManager.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Networking/NetworkManager.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Networking/NetworkManager.Generated.h"
 
 namespace SteelEngine {
 namespace Network {
@@ -15,10 +15,10 @@ SteelEngine::ReflectionRecorder::Register<NetworkManager>("NetworkManager",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(NetworkManager))
 )
-.Constructor<>()
-.Inheritance<INetworkManager>("INetworkManager")
-.Method("GetConnectedClientsCount", &NetworkManager::GetConnectedClientsCount)
-.Method("GetConnectionStatus", &NetworkManager::GetConnectionStatus)
+.RegisterConstructor<>()
+.RegisterInheritance<INetworkManager>("INetworkManager")
+.RegisterMethod("GetConnectedClientsCount", &NetworkManager::GetConnectedClientsCount)
+.RegisterMethod("GetConnectionStatus", &NetworkManager::GetConnectionStatus)
 ;
 }
 }

@@ -15,8 +15,8 @@ SteelEngine::ReflectionRecorder::Register<Pin>("Pin",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Pin))
 )
-.Constructor<Pin::Flow, Pin::PinType, Pin::VariableType>()
-.Inheritance<IPin>("IPin")
+.RegisterConstructor<Pin::Flow, Pin::PinType, Pin::VariableType>()
+.RegisterInheritance<IPin>("IPin")
 ;
 }
 }

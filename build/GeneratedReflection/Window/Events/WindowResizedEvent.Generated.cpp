@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Window/Events/WindowResizedEvent.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Window/Events/WindowResizedEvent.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Window/Events/WindowResizedEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -15,8 +15,8 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(WindowResizedEvent))
 )
-.Constructor<Type::uint32, Type::uint32>()
-.Inheritance<Event::Naive>("Event::Naive")
+.RegisterConstructor<Type::uint32, Type::uint32>()
+.RegisterInheritance<Event::Naive>("Event::Naive")
 ;
 }
 }

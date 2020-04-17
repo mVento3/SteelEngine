@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/Material.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Material.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Graphics/Material.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
@@ -15,8 +15,8 @@ SteelEngine::ReflectionRecorder::Register<Material>("Material",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Material))
 )
-.Constructor<const char*>()
-.Inheritance<IMaterial>("IMaterial")
+.RegisterConstructor<const char*>()
+.RegisterInheritance<IMaterial>("IMaterial")
 ;
 }
 }

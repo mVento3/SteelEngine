@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ImGUI_Editor/Events/AnyItemActiveChangedEvent.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/Events/AnyItemActiveChangedEvent.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/ImGUI_Editor/Events/AnyItemActiveChangedEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -15,8 +15,8 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(AnyItemActiveChangedEvent))
 )
-.Constructor<bool>()
-.Inheritance<Event::Naive>("Event::Naive")
+.RegisterConstructor<bool>()
+.RegisterInheritance<Event::Naive>("Event::Naive")
 ;
 }
 }

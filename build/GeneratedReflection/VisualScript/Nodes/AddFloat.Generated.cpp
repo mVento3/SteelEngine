@@ -15,15 +15,15 @@ SteelEngine::ReflectionRecorder::Register<AddFloat>("AddFloat",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(AddFloat))
 )
-.Constructor<>()
-.Inheritance<NodeTemplate>("NodeTemplate")
-.Method("Func", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
+.RegisterConstructor<>()
+.RegisterInheritance<NodeTemplate>("NodeTemplate")
+.RegisterMethod("Func", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
 SteelEngine::Reflection::FucntionArgument<VisualScript::IPinData*>("input") }, &AddFloat::Func)
 (
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC, true),
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_RETURN_TYPE , typeid(float).hash_code())
 )
-.Method("Func2", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
+.RegisterMethod("Func2", { SteelEngine::Reflection::FucntionArgument<VisualScript::INodeData*>("node"),
 SteelEngine::Reflection::FucntionArgument<VisualScript::IPinData*>("input") }, &AddFloat::Func2)
 (
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC, true),

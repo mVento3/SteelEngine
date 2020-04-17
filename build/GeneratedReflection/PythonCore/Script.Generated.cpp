@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "PythonCore/Script.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/PythonCore/Script.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/PythonCore/Script.Generated.h"
 
 namespace SteelEngine {
 namespace Script {
@@ -17,8 +17,8 @@ SteelEngine::ReflectionRecorder::Register<Script>("Script",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Script))
 )
-.Constructor<>()
-.Inheritance<IScript>("IScript")
+.RegisterConstructor<>()
+.RegisterInheritance<IScript>("IScript")
 ;
 }
 }

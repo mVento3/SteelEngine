@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "PythonCore/Scriptable.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/PythonCore/Scriptable.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/PythonCore/Scriptable.Generated.h"
 
 namespace SteelEngine {
 namespace Script {
@@ -17,9 +17,9 @@ SteelEngine::ReflectionRecorder::Register<Scriptable>("Scriptable",{
 (
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Scriptable))
 )
-.Constructor<const std::string&>()
-.Method("SetPython", { SteelEngine::Reflection::FucntionArgument<IScript*>("python") }, &Scriptable::SetPython)
-.Method("GetScriptName", &Scriptable::GetScriptName)
+.RegisterConstructor<const std::string&>()
+.RegisterMethod("SetPython", { SteelEngine::Reflection::FucntionArgument<IScript*>("python") }, &Scriptable::SetPython)
+.RegisterMethod("GetScriptName", &Scriptable::GetScriptName)
 ;
 }
 }

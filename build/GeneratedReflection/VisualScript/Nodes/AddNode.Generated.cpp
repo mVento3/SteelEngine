@@ -16,9 +16,9 @@ SteelEngine::ReflectionRecorder::Register<AddNode>("AddNode",{
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_NODE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(AddNode))
 )
-.Constructor<>()
-.Inheritance<Node>("Node")
-.Method("SomeFunction", { SteelEngine::Reflection::FucntionArgument<int>("a"),
+.RegisterConstructor<>()
+.RegisterInheritance<Node>("Node")
+.RegisterMethod("SomeFunction", { SteelEngine::Reflection::FucntionArgument<int>("a"),
 SteelEngine::Reflection::FucntionArgument<int>("b") }, &AddNode::SomeFunction)
 (
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC, true)

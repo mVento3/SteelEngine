@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ImGUI_Editor/VulkanContext.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/ImGUI_Editor/VulkanContext.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/ImGUI_Editor/VulkanContext.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION
@@ -14,10 +14,10 @@ SteelEngine::ReflectionRecorder::Register<VulkanContext>("VulkanContext",{
 SteelEngine::Reflection::MetaData(Reflection::ReflectionAttribute::HOT_RELOAD, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(VulkanContext))
 )
-.Constructor<>()
-.Inheritance<IContext>("IContext")
-.Method("GetContext", &VulkanContext::GetContext)
-.Method("Serialize", &VulkanContext::Serialize)
+.RegisterConstructor<>()
+.RegisterInheritance<IContext>("IContext")
+.RegisterMethod("GetContext", &VulkanContext::GetContext)
+.RegisterMethod("Serialize", &VulkanContext::Serialize)
 (
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::SERIALIZE_FUNCTION, true)
 )

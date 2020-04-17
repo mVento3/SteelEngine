@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/Vulkan/IndexBuffer.h"
-#include "D:\Projects\C++\SteelEngine/build/GeneratedReflection/Graphics/Vulkan/IndexBuffer.Generated.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Graphics/Vulkan/IndexBuffer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
@@ -18,8 +18,8 @@ SteelEngine::ReflectionRecorder::Register<IndexBuffer>("IndexBuffer",{
 SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
 SteelEngine::Reflection::MetaData("sizeof", sizeof(IndexBuffer))
 )
-.Constructor<>()
-.Inheritance<Buffer>("Buffer")
+.RegisterConstructor<>()
+.RegisterInheritance<Buffer>("Buffer")
 ;
 }
 }
