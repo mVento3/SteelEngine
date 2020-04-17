@@ -31,7 +31,7 @@ namespace SteelEngine { namespace VisualScript {
             }
             else if(func2)
             {
-                func2->Invoke(node, input);
+                func2->Invoke(node, node, input);
             }
         }
     };

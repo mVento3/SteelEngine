@@ -6,7 +6,8 @@ namespace SteelEngine { namespace Editor {
     {
         EDITOR_WINDOW,
         RANGE,
-        SCENE_TYPE
+    // There will be two options: STATIC and CONTEXT / STATIC mean there will be only one instance of window and CONTEXT mean there will be that much as needed
+        WINDOW_TYPE
     };
 
     struct Range

@@ -46,6 +46,8 @@ namespace SteelEngine {
         Editor::ImGUI::ImGUI_Editor** m_Editor;
         size_t m_TypeID;
 
+        bool m_IsWindowOpen;
+
         virtual void Init();
         virtual void Draw() { }
         void DrawUser();

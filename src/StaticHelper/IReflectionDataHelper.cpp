@@ -23,7 +23,7 @@ namespace SteelEngine {
         }
     }
 
-    bool IReflectionDataHelper::Process(const IReflectionData* data) const
+    bool IReflectionDataHelper::Subprocess(const IReflectionData* data) const
     {
         Variant* isHotReloadAble = data->GetMetaData(Reflection::ReflectionAttribute::HOT_RELOAD);
 

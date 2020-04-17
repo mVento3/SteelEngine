@@ -36,10 +36,10 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
             // TODO: We should delete the thread when complete
 
-            if((*m_VirtualProject)->IsProjectLoadedSuccessful() == SE_TRUE)
-            {
-                Event::GlobalEvent::Broadcast(ChangeSceneEvent{ SceneType::EDITOR_SCENE });
-            }
+            // if((*m_VirtualProject)->IsProjectLoadedSuccessful() == SE_TRUE)
+            // {
+            //     Event::GlobalEvent::Broadcast(ChangeSceneEvent{ SceneType::EDITOR_SCENE });
+            // }
         });
     }
 

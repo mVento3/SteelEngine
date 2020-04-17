@@ -11,7 +11,7 @@ namespace SteelEngine {
         m_Process = 0;
     }
 
-    RuntimeCompiler::RuntimeCompiler(IPythonProcess* process) :
+    RuntimeCompiler::RuntimeCompiler(ISubprocess* process) :
         m_Process(process)
     {
 

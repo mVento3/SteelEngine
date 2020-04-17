@@ -5,7 +5,7 @@
 #include "RuntimeReflection/Macro.h"
 
 #include "ImGUI_Editor/ReflectionAttribs.h"
-#include "ImGUI_Editor/SceneType.h"
+#include "ImGUI_Editor/WindowType.h"
 
 #include "imgui/imgui.h"
 
@@ -26,7 +26,7 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::START_MENU_SCENE,
+        SteelEngine::Editor::ReflectionAttributes::WINDOW_TYPE = SteelEngine::Editor::WindowType::STATIC,
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
         SteelEngine::EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW,
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,

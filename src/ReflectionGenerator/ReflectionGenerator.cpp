@@ -19,17 +19,67 @@
 
 enum Index
 {
-    INCLUDE_FILE,
-    BIN_LOCATION,
     CURRENT_WORKING_DIR
 };
 
 std::vector<SteelEngine::Options::Descriptor> desc =
 {
-    { INCLUDE_FILE, "i" },
-    { BIN_LOCATION, "b" },
     { CURRENT_WORKING_DIR, "cwd" }
 };
+
+void generateReflectionForFile(SteelEngine::IReflectionGenerator* rg, const std::filesystem::path& cwd, const std::filesystem::path& header)
+{
+    try
+    {
+        if(rg->Load(header) == SteelEngine::SE_FALSE)
+        {
+            printf("Failed to load!\n");
+
+            return;
+        }
+    }
+    catch(const std::exception& e)
+    {
+        printf("Exception while loading in ReflectionGenerator.exe: %s!\n", e.what());
+    }
+
+    try
+    {
+        if(rg->Parse() == SteelEngine::SE_FALSE)
+        {
+            printf("Failed to parse!\n");
+
+            return;
+        }
+    }
+    catch(const std::exception& e)
+    {
+        printf("Exception while parsing in ReflectionGenerator.exe: %s!\n", e.what());
+    };
+
+    try
+    {
+        if(rg->Generate(cwd, cwd / "build/GeneratedReflection") == SteelEngine::SE_FALSE)
+        {
+            printf("Failed to generate!\n");
+
+            return;
+        }
+    }
+    catch(const std::exception& e)
+    {
+        printf("Exception while generating in ReflectionGenerator.exe: %s!\n", e.what());
+    };
+
+    try
+    {
+        rg->Clear();
+    }
+    catch(const std::exception& e)
+    {
+        printf("Exception while clearing in ReflectionGenerator.exe: %s!\n", e.what());
+    };
+}
 
 int main(int argc, char* argv[])
 {
@@ -63,60 +113,18 @@ int main(int argc, char* argv[])
         new SteelEngine::InformationTracker()
     );
 
-    printf("Generating reflection for: %s\n", parser[INCLUDE_FILE].m_Result.c_str());
-
     SteelEngine::IReflectionGenerator* rg = (SteelEngine::IReflectionGenerator*)SteelEngine::Reflection::CreateInstance("SteelEngine::ReflectionGenerator");
+    std::filesystem::path cwd = parser[CURRENT_WORKING_DIR].m_Result;
 
-    try
+    for(auto path : std::filesystem::recursive_directory_iterator(cwd / "include"))
     {
-        if(rg->Load(parser[CURRENT_WORKING_DIR].m_Result + "/" + parser[INCLUDE_FILE].m_Result) == SteelEngine::SE_FALSE)
+        if(!path.is_directory() && path.path().extension() == ".h")
         {
-            printf("Failed to load!\n");
+            printf("Generating reflection for: %s\n", path.path().string().c_str());
 
-            return 0;
+            generateReflectionForFile(rg, cwd, path);
         }
     }
-    catch(const std::exception& e)
-    {
-        printf("Exception while loading in ReflectionGenerator.exe: %s!\n", e.what());
-    }
-
-    try
-    {
-        if(rg->Parse() == SteelEngine::SE_FALSE)
-        {
-            printf("Failed to parse!\n");
-
-            return 0;
-        }
-    }
-    catch(const std::exception& e)
-    {
-        printf("Exception while parsing in ReflectionGenerator.exe: %s!\n", e.what());
-    };
-
-    try
-    {
-        if(rg->Generate(parser[CURRENT_WORKING_DIR].m_Result, parser[CURRENT_WORKING_DIR].m_Result + "/build/GeneratedReflection") == SteelEngine::SE_FALSE)
-        {
-            printf("Failed to generate!\n");
-
-            return 0;
-        }
-    }
-    catch(const std::exception& e)
-    {
-        printf("Exception while generating in ReflectionGenerator.exe: %s!\n", e.what());
-    };
-
-    try
-    {
-        rg->Clear();
-    }
-    catch(const std::exception& e)
-    {
-        printf("Exception while clearing in ReflectionGenerator.exe: %s!\n", e.what());
-    };
 
     delete rg;
     rg = 0;

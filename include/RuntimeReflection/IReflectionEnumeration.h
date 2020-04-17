@@ -9,7 +9,7 @@ namespace SteelEngine {
 		typedef std::vector<ReflectionEnumElement> EnumElementVector;
 
 		template <typename Type>
-		bool Compare(const Type& enum_, const char* name)
+		bool Compare(const Type& enum_, const char* name) const
 		{
 			if(typeid(Type).hash_code() != GetTypeID())
 			{
@@ -35,7 +35,7 @@ namespace SteelEngine {
 		}
 
 		template <typename Type>
-		bool Compare(const Type& enum_, const std::string& name)
+		bool Compare(const Type& enum_, const std::string& name) const
 		{
 			return Compare(enum_, name.c_str());
 		}

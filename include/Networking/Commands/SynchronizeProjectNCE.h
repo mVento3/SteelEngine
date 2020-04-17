@@ -9,7 +9,7 @@
 #include "EditorComponents/ImGUI/UserInterface.h"
 
 #include "ImGUI_Editor/ReflectionAttribs.h"
-#include "ImGUI_Editor/SceneType.h"
+#include "ImGUI_Editor/WindowType.h"
 
 #include "Networking/Commands/SynchronizeProjectNCE.Generated.h"
 
@@ -18,7 +18,7 @@ namespace SteelEngine { namespace Network {
     SE_CLASS(
         SteelEngine::Reflection::ReflectionAttribute::NETWORK_COMMAND,
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
-        SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE,
+        SteelEngine::Editor::ReflectionAttributes::WINDOW_TYPE = SteelEngine::Editor::WindowType::STATIC,
         // SteelEngine::EditorComponents::ImGUI::UserInterface::SEPARATE_WINDOW,
         SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
         Reflection::ReflectionAttribute::HOT_RELOAD

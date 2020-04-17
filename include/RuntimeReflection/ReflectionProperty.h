@@ -41,6 +41,21 @@ namespace SteelEngine {
 		{
 			return m_Name;
 		}
+
+		Variant GetValue(void* object) const override
+		{
+			B* type = (B*)object;
+			Variant res = m_Info;
+
+			res.Reassign((ValuePointer*)&(type->*m_Value));
+
+			return res;
+		}
+
+		size_t GetTypeID() const override
+		{
+			return m_TypeID;
+		}
 	};
 
 }

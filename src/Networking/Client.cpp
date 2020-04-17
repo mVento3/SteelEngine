@@ -63,7 +63,7 @@ namespace SteelEngine {
         return SE_TRUE;
     }
 
-    void Client::Process()
+    void Client::Subprocess()
     {
         bool* status = Reflection::GetType("SteelEngine::Network::NetworkManager")->Invoke("GetConnectionStatus", m_NetworkManager).Convert<bool*>();
 

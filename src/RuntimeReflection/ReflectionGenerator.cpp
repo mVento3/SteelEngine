@@ -198,7 +198,7 @@ namespace SteelEngine {
         return result;
     }
 
-    void ReflectionGenerator::Process(Parser::ScopeInfo* info, std::ofstream& file)
+    void ReflectionGenerator::Subprocess(Parser::ScopeInfo* info, std::ofstream& file)
     {
         if(!info)
         {
@@ -317,7 +317,7 @@ namespace SteelEngine {
 
                 for(Parser::ConstructorScope* v : str->m_Constructors)
                 {
-                    file << ".Constructor<";
+                    file << ".RegisterConstructor<";
                     file << WriteArguments(v->m_Arguments, str);
                     file << ">()\n";
                     file << WriteMetaData(v);
@@ -325,7 +325,7 @@ namespace SteelEngine {
 
                 for(Parser::InheritanceScope* v : str->m_Inheritance)
                 {
-                    file << ".Inheritance<" << v->m_Name << ">(\"" << v->m_Name << "\")\n";
+                    file << ".RegisterInheritance<" << v->m_Name << ">(\"" << v->m_Name << "\")\n";
                 }
 
                 for(Parser::PropertyScope* v : str->m_Properties)
@@ -337,7 +337,7 @@ namespace SteelEngine {
 
                     if((v->m_Protection == Parser::ProtectionLevel::PUBLIC || (v->m_ScopeType == Parser::ScopeType::STRUCT && v->m_Protection == Parser::ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
                     {
-                        file << ".Property(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
+                        file << ".RegisterProperty(\"" << v->m_Name << "\", &" << parentsStr << str->m_Name << "::" << v->m_Name << ")\n";
                         file << WriteMetaData(v);
                     }
                 }
@@ -358,7 +358,7 @@ namespace SteelEngine {
                     {
                         if((v->m_Protection == Parser::ProtectionLevel::PUBLIC || (v->m_ScopeType == Parser::ScopeType::STRUCT && v->m_Protection == Parser::ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
                         {
-                            file << ".Method(\"" << v->m_Name << "\", ";
+                            file << ".RegisterMethod(\"" << v->m_Name << "\", ";
 
                             if(!v->m_Arguments.empty())
                             {
@@ -411,7 +411,7 @@ namespace SteelEngine {
                     {
                         if((v->m_Protection == Parser::ProtectionLevel::PUBLIC || (v->m_ScopeType == Parser::ScopeType::STRUCT && v->m_Protection == Parser::ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
                         {
-                            file << ".Method<";
+                            file << ".RegisterMethod<";
 
                             if(!v->m_Arguments.empty())
                             {
@@ -487,7 +487,7 @@ namespace SteelEngine {
                 {
                     if(v->m_IsReflectionLabelSet)
                     {
-                        file << ".Enum<" << parentsStr << str->m_Name << "::" << v->m_Name << ">(\"" << v->m_Name << "\")\n";
+                        file << ".RegisterEnum<" << parentsStr << str->m_Name << "::" << v->m_Name << ">(\"" << v->m_Name << "\")\n";
                         file << ".Values({\n";
 
                         for(Type::uint32 i = 0; i < v->m_Elements.size(); i++)
@@ -518,7 +518,7 @@ namespace SteelEngine {
 
         while(!info->m_Scopes.empty())
         {
-            Process(info->m_Scopes.top(), file);
+            Subprocess(info->m_Scopes.top(), file);
 
             info->m_Scopes.pop();
         }
@@ -672,7 +672,7 @@ namespace SteelEngine {
         {
             Parser::ScopeInfo* scope = m_ParsedStructure->at(i);
 
-            Process(scope, sourceFile);
+            Subprocess(scope, sourceFile);
         }
 
         if(sourceFile.is_open())
@@ -720,6 +720,7 @@ namespace SteelEngine {
 
         m_BeginRecordingOnce = false;
         m_EndRecordingOnce = false;
+        m_GenerateReflection = true;
 
         m_Parser.Clear();
     }

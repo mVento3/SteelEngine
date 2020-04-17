@@ -16,9 +16,6 @@ namespace SteelEngine {
     )
     class ReflectionGenerator : public IReflectionGenerator
     {
-    public:
-        
-
     private:
         std::vector<std::string> m_LoadedLines;
         Parser m_Parser;
@@ -31,13 +28,12 @@ namespace SteelEngine {
         bool m_BeginRecordingOnce;
         bool m_EndRecordingOnce;
 
-        // std::vector<std::string> m_GeneratedSourceLinesByModules;
         std::vector<std::string> m_GeneratedHeaderLinesByModules;
 
         std::string WriteArguments(const std::vector<Parser::Argument>& args, Parser::ScopeInfo* info);
         std::string WriteMetaData(const Parser::ScopeInfo* info);
 
-        void Process(Parser::ScopeInfo* info, std::ofstream& file);
+        void Subprocess(Parser::ScopeInfo* info, std::ofstream& file);
 
     public:
         ReflectionGenerator();

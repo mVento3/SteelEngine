@@ -42,7 +42,7 @@ namespace SteelEngine {
         Result Connect(const char* ip = "127.0.0.1");
 
         SE_METHOD()
-        void Process();
+        void Subprocess();
 
         SE_METHOD()
         int Send(SOCKET sock, const char* buffer, Type::uint32 size) override;

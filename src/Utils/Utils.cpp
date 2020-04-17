@@ -84,8 +84,25 @@ void removeSpaces(std::string& str)
 
 std::filesystem::path getBinaryLocation()
 {
-	char binPath[64];
-	GetModuleFileNameA(GetModuleHandleA(0), binPath, 64);
+	char path[64];
 
-	return std::filesystem::path(binPath).parent_path();
+	HMODULE hm = NULL;
+
+	if(GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCSTR)&getBinaryLocation, &hm) == 0)
+	{
+		int ret = GetLastError();
+
+		fprintf(stderr, "GetModuleHandle failed, error = %d\n", ret);
+	}
+
+	hm = GetModuleHandleA(0);
+
+	if(GetModuleFileNameA(hm, path, sizeof(path)) == 0)
+	{
+		int ret = GetLastError();
+
+		fprintf(stderr, "GetModuleFileName failed, error = %d\n", ret);
+	}
+
+	return std::filesystem::path(path).parent_path();
 }

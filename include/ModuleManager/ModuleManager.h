@@ -9,57 +9,35 @@
 #include "filesystem"
 #include "string"
 
+#include "Utils/Utils.h"
+
 namespace SteelEngine {
 
 	class ModuleManager : public Interface::IModuleManager
 	{
 	public:
-		struct StaticModuleInfo
+		enum ModuleType
 		{
-			std::string m_ModuleName;
-			void*		m_Module;
-			void*		m_Raw;
+			STATIC_MODULE,
+			NON_STATIC_MODULE,
+			REFLECTION_MODULE
 		};
 
 		struct ModuleInfo
 		{
-			std::string				m_ModuleName;
-			AllocatePluginCallback	m_CreateCallback;
-			void*					m_Raw;
-		};
-
-		struct ReflectionModuleInfo
-		{
-			std::string	m_ModuleName;
-			void*		m_Raw;
+			ModuleType m_Type;
+			std::filesystem::path m_Path;
+			void* m_LoadedDLL; // Loaded only once and keept until engine stops
+			void* m_AllocatedStaticObject; // Only if module is static
+			AllocatePluginCallback m_Allocator;
 		};
 
 	private:
-		std::vector<StaticModuleInfo> m_StaticGlobalModules;
-		std::vector<ModuleInfo> m_Modules;
-		std::vector<ReflectionModuleInfo> m_ReflectedModules;
+		std::vector<ModuleInfo*> m_Modules;
 
 		void* GetModuleLocal(const std::string& name) override;
 
 		bool FreeIf(const std::vector<std::string>& a, const std::string& b, Mode mode);
-
-		static ModuleManager* GetModuleManager(const std::filesystem::path& path)
-		{
-			static void* module;
-			static void*(*getStateCallback)();
-
-			if(!module)
-			{
-#ifdef SE_WINDOWS
-				Module::load((path / "ModuleManager.dll").string(), (void**)&module);
-#else
-				Module::load("ModuleManager.so", (void**)&module);
-#endif
-				Module::get("getModuleManager", module, (void**)&getStateCallback);
-			}
-
-			return (ModuleManager*)getStateCallback();
-		}
 
 		static ModuleManager* GetModuleManager()
 		{
@@ -69,7 +47,7 @@ namespace SteelEngine {
 			if(!module)
 			{
 #ifdef SE_WINDOWS
-				Module::load("ModuleManager.dll", (void**)&module);
+				Module::load((getBinaryLocation() / "ModuleManager.dll").string().c_str(), (void**)&module);
 #else
 				Module::load("ModuleManager.so", (void**)&module);
 #endif
@@ -84,7 +62,6 @@ namespace SteelEngine {
 		~ModuleManager();
 
 		void LoadAllImpl() override;
-		void LoadAllImpl(const std::filesystem::path& path) override;
 		void UnloadImpl(const std::string& blackList, Mode mode) override;
 		void LoadImpl(const std::filesystem::path& name) override;
 
@@ -95,23 +72,9 @@ namespace SteelEngine {
 			mm->LoadAllImpl();
 		}
 
-		static void LoadAll(const std::filesystem::path& path)
-		{
-			static ModuleManager* mm = GetModuleManager(path);
-
-			mm->LoadAllImpl(path);
-		}
-
 		static void Load(const std::filesystem::path& name)
 		{
 			static ModuleManager* mm = GetModuleManager();
-
-			mm->LoadImpl(name);
-		}
-
-		static void Load(const std::filesystem::path& path, const std::filesystem::path& name)
-		{
-			static ModuleManager* mm = GetModuleManager(path);
 
 			mm->LoadImpl(name);
 		}

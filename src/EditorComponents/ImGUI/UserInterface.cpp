@@ -7,6 +7,7 @@ namespace SteelEngine { namespace EditorComponents { namespace ImGUI {
     UserInterface::UserInterface()
     {
         m_Draw = true;
+        m_IsWindowOpen = true;
     }
 
     UserInterface::~UserInterface()

@@ -4,7 +4,7 @@
 #include "RuntimeReflection/IReflectionMethod.h"
 
 #include "ImGUI_Editor/ReflectionAttribs.h"
-#include "ImGUI_Editor/SceneType.h"
+#include "ImGUI_Editor/WindowType.h"
 
 #include "ImGUI_Editor/EditorWindows/ColumnHeader.h"
 
@@ -19,7 +19,7 @@
 namespace SteelEngine {
 
     SE_CLASS(
-        SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE,
+        SteelEngine::Editor::ReflectionAttributes::WINDOW_TYPE = SteelEngine::Editor::WindowType::STATIC,
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW,
@@ -32,7 +32,7 @@ namespace SteelEngine {
     private:
         Profiler::IManager** m_Manager;
         IReflectionData* m_Type;
-        IReflectionMethod* m_GetTimeMethod;
+        const IReflectionMethod* m_GetTimeMethod;
         std::vector<Profiler::Manager::TimeData>* m_Timings;
 
     public:

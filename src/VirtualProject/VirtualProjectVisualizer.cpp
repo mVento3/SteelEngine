@@ -38,9 +38,9 @@ namespace SteelEngine {
             HotReloader::InheritanceTrackKeeper* swapper = vp->m_ProjectScripts[i];
             HotReloader::IRuntimeObject* obj = swapper->Get<HotReloader::IRuntimeObject>();
             IReflectionData* type = Reflection::GetType(obj);
-            const std::vector<IReflectionInheritance*>& inhs = type->GetInheritances();
+            const Vector<IReflectionInheritance>& inhs = type->GetInheritances();
 
-            for(Type::uint32 j = 0; j < inhs.size(); j++)
+            for(Type::uint32 j = 0; j < inhs.Size(); j++)
             {
                 if(inhs[j]->GetTypeID() == m_UserInterfaceTypeID)
                 {
@@ -82,9 +82,9 @@ namespace SteelEngine {
             HotReloader::InheritanceTrackKeeper* swapper = vp->m_ProjectScripts[i];
             HotReloader::IRuntimeObject* obj = swapper->Get<HotReloader::IRuntimeObject>();
             IReflectionData* type = Reflection::GetType(obj);
-            const std::vector<IReflectionInheritance*>& inhs = type->GetInheritances();
+            const Vector<IReflectionInheritance>& inhs = type->GetInheritances();
 
-            for(Type::uint32 j = 0; j < inhs.size(); j++)
+            for(Type::uint32 j = 0; j < inhs.Size(); j++)
             {
                 if(inhs[j]->GetTypeID() == typeID)
                 {

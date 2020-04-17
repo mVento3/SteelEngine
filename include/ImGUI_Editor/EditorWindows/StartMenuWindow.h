@@ -6,7 +6,7 @@
 #include "ImGUI_Editor/Window.h"
 #include "ImGUI_Editor/ImGUI_Editor.h"
 #include "ImGUI_Editor/SelectableProject.h"
-#include "ImGUI_Editor/ChangeSceneEvent.h"
+#include "ImGUI_Editor/WindowType.h"
 
 #include "VirtualProject/IVirtualProject.h"
 
@@ -20,7 +20,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     SE_CLASS(
         SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
-        SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::START_MENU_SCENE,
+        SteelEngine::Editor::ReflectionAttributes::WINDOW_TYPE = SteelEngine::Editor::WindowType::STATIC,
         SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         SteelEngine::EditorComponents::ImGUI::UserInterface::Attributes::SEPARATE_WINDOW,

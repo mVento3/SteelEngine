@@ -10,7 +10,6 @@
 #include "ImGUI_Editor/ReflectionAttribs.h"
 #include "ImGUI_Editor/Window.h"
 #include "ImGUI_Editor/SelectableProject.h"
-#include "ImGUI_Editor/ChangeSceneEvent.h"
 
 #include "ImGUI_Editor/Events/AnyItemActiveChangedEvent.h"
 
@@ -21,9 +20,11 @@
 #include "Event/EventObserver.h"
 #include "Event/EventManager.h"
 
-#include "HotReloader/InheritanceTrackKeeper.h"
+#include "HotReloader/ReloadableInheritanceTrackKeeper.h"
 
 #include "Graphics/Material.h"
+
+#include "ImGUI_Editor/Events/OpenWindowEvent.h"
 
 #include "ImGUI_Editor/ImGUI_Editor.Generated.h"
 
@@ -40,26 +41,45 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
     {
         GENERATED_BODY
         friend struct Window;
+    public:
+        // struct Window
+        // {
+        //     Window(HotReloader::InheritanceTrackKeeper* pointer, const std::string& name) :
+        //         m_Pointer(pointer),
+        //         m_Name(name)
+        //     {
+
+        //     }
+
+        //     HotReloader::InheritanceTrackKeeper* m_Pointer;
+        //     std::string m_Name;
+        // };
+
     private:
         const size_t m_FloatTypeID = typeid(float).hash_code();
         const size_t m_IntTypeID = typeid(int).hash_code();
 
         ImGuiContext* m_Context;
-        SceneType m_CurrentScene;
         IContext* m_API_Context;
         IVirtualProjectVisualizer** m_VirtualProjectVisualizer;
         IEventManager* m_NaiveManager;
 
         IReflectionData const* const* m_Types;
 
-        std::vector<HotReloader::InheritanceTrackKeeper*> m_MainEditorWindows;
-        std::vector<HotReloader::InheritanceTrackKeeper*> m_StartMenuWindows;
-        std::vector<HotReloader::InheritanceTrackKeeper*> m_UIs;
+        // std::vector<Window> m_MainEditorWindows;
+        // std::vector<Window> m_StartMenuWindows;
+        // std::vector<Window> m_UIs;
+
+        std::vector<HotReloader::InheritanceTrackKeeper*> m_Windows;
 
         ImVec2 m_CurrentMainViewportSize;
 
+        bool m_IsViewportOpen;
+
         void LoadProject();
         void CreateNewProject();
+
+        void Draw();
 
     public:
         ImGUI_Editor();
@@ -77,7 +97,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
             m_VirtualProjectVisualizer = visualizer;
         }
 
-        void operator()(const ChangeSceneEvent& event);
+        void operator()(const OpenWindowEvent& event);
     };
 
 }}}

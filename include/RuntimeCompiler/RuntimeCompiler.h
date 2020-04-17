@@ -2,7 +2,7 @@
 
 #include "RuntimeCompiler/IRuntimeCompiler.h"
 
-#include "PythonProcess/IPythonProcess.h"
+#include "Subprocess/ISubprocess.h"
 
 #include "RuntimeCompiler/RuntimeCompiler.Generated.h"
 
@@ -13,13 +13,13 @@ namespace SteelEngine {
     {
         GENERATED_BODY
     private:
-        IPythonProcess* m_Process;
+        ISubprocess* m_Process;
 
         static const std::string mcs_CompletionToken;
 
     public:
         RuntimeCompiler();
-        RuntimeCompiler(IPythonProcess* process);
+        RuntimeCompiler(ISubprocess* process);
         ~RuntimeCompiler();
 
         void Setup() override;

@@ -29,6 +29,7 @@ namespace SteelEngine {
         ~Options();
 
         Descriptor operator[](Type::uint32 index);
+        Descriptor operator[](Type::uint32 index) const;
     };
 
 }

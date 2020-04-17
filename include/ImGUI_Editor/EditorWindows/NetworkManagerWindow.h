@@ -3,7 +3,7 @@
 #include "EditorComponents/ImGUI/UserInterface.h"
 
 #include "ImGUI_Editor/ReflectionAttribs.h"
-#include "ImGUI_Editor/SceneType.h"
+#include "ImGUI_Editor/WindowType.h"
 
 #include "VirtualProject/LoadedProjectEvent.h"
 
@@ -19,9 +19,9 @@
 namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     SE_CLASS(
-        SteelEngine::Editor::ReflectionAttributes::SCENE_TYPE = SteelEngine::Editor::SceneType::EDITOR_SCENE | SteelEngine::Editor::SceneType::START_MENU_SCENE,
-        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
-        SteelEngine::Editor::ReflectionAttributes::EDITOR_WINDOW,
+        Editor::ReflectionAttributes::WINDOW_TYPE = SteelEngine::Editor::WindowType::STATIC,
+        Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        Editor::ReflectionAttributes::EDITOR_WINDOW,
         Reflection::ReflectionAttribute::HOT_RELOAD
     )
     class NetworkManagerWindow : public EditorComponents::ImGUI::UserInterface, public Script::Python::Scriptable, public HotReloader::IRuntimeObject

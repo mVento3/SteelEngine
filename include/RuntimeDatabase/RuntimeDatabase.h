@@ -6,6 +6,7 @@
 #include "tuple"
 #include "unordered_map"
 #include "map"
+#include "stack"
 
 #include "Memory/Allocator.h"
 #include "Memory/LinearAllocator.h"
@@ -15,8 +16,6 @@
 
 #include "Memory/Container/Vector.h"
 #include "Memory/Container/Stack.h"
-
-#include "stack"
 
 #ifdef SE_WINDOWS
 #undef max
@@ -28,7 +27,7 @@
 
 #define SE_MAX_OBJECTS 512
 
-#define SE_MAX_VARIANTS 1000
+#define SE_MAX_VARIANTS 10000
 #define SE_MAX_VARIANT_SIZE 512
 
 int main(int argc, char* argv[]);

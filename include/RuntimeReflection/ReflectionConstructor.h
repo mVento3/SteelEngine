@@ -62,12 +62,12 @@ namespace SteelEngine {
 			return object;
 		}
 
-		size_t GetConstructorID() override
+		size_t GetConstructorID() const override
 		{
 			return m_ConstructorID;
 		}
 
-		size_t GetTypeID() override
+		size_t GetTypeID() const override
 		{
 			return m_TypeID;
 		}

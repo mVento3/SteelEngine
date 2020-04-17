@@ -23,7 +23,17 @@
 
 namespace SteelEngine {
 
-	struct IReflectionData : public MetaDataImplementation, public IReflectionDataHelper
+	typedef const IReflectionProperty* const 	Property;
+	typedef const IReflectionMethod* const 		Method;
+	typedef const IReflectionInheritance* const Inheritance;
+	typedef const IReflectionEnumeration* const Enumeration;
+	typedef const IReflectionConstructor* const Constructor;
+
+	class ReflectionRecorder;
+
+	struct IReflectionData :
+		public MetaDataImplementation,
+		public IReflectionDataHelper
 	{
 		friend class Reflection;
 		friend class ReflectionRecorder;
@@ -38,15 +48,14 @@ namespace SteelEngine {
 			return db;
 		}
 
-		// void ProcessInheritance(const std::vector<IReflectionData*>& res, const std::vector<IReflectionInheritance*>& inheritance, HotReloader::IRuntimeObject* createdObject, const IReflectionData* data) const;
-
 	public:
-		typedef std::vector<IReflectionProperty*> PropertiesVector;
-		typedef std::vector<IReflectionMethod*> MethodsVector;
-		typedef std::vector<IReflectionEnumeration*> EnumsVector;
-		typedef std::vector<IReflectionConstructor*> ConstructorsVector;
-		typedef std::vector<IReflectionInheritance*> InheritancesVector;
-		typedef std::vector<std::string> NamespacesVector;
+		typedef Vector<IReflectionProperty> 	PropertiesVector;
+		typedef Vector<IReflectionMethod> 		MethodsVector;
+		typedef Vector<IReflectionEnumeration> 	EnumsVector;
+		typedef Vector<IReflectionConstructor> 	ConstructorsVector;
+		typedef Vector<IReflectionInheritance> 	InheritancesVector;
+
+		typedef std::vector<std::string> 		NamespacesVector;
 
 		enum CurrentBindFlag
 		{
@@ -59,44 +68,16 @@ namespace SteelEngine {
 		};
 
 	protected:
+		typedef std::vector<IReflectionProperty*> 		InternalPropertiesVector;
+		typedef std::vector<IReflectionMethod*> 		InternalMethodsVector;
+		typedef std::vector<IReflectionEnumeration*> 	InternalEnumsVector;
+		typedef std::vector<IReflectionConstructor*> 	InternalConstructorsVector;
+		typedef std::vector<IReflectionInheritance*> 	InternalInheritancesVector;
+
 		void DisableVariant(Variant* var)
 		{
 			var->m_TypeID = RuntimeDatabase::s_InvalidID;
 		}
-
-		// HotReloader::IRuntimeObject* CreateObject(RuntimeDatabase* db, const std::string& typeName)
-		// {
-		// 	for(Type::uint32 j = 0; j < db->m_ReflectionDatabase->m_TypesSize; j++)
-		// 	{
-		// 		IReflectionData* type = (IReflectionData*)db->m_ReflectionDatabase->m_Types[j];
-		// 		std::string name = typeName;
-
-		// 		replaceAll(name, "::", ":");
-
-		// 		std::vector<std::string> splitted = split(name, ':');
-		// 		const NamespacesVector& namespaces = type->GetNamespacesVector();
-
-		// 		if(namespaces.size() == splitted.size() - 1)
-		// 		{
-		// 			bool isEqual = true;
-
-		// 			for(Type::uint32 k = 0; k < splitted.size() - 1; k++)
-		// 			{
-		// 				if(namespaces[k] != splitted[k])
-		// 				{
-		// 					isEqual = false;
-
-		// 					break;
-		// 				}
-		// 			}
-
-		// 			if(strcmp(type->GetTypeName(), splitted[splitted.size() - 1].c_str()) == 0 && isEqual)
-		// 			{
-		// 				return type->Create();
-		// 			}
-		// 		}
-		// 	}
-		// }
 
 		IReflectionData* GetType(RuntimeDatabase* db, const std::string& typeName)
 		{
@@ -132,11 +113,19 @@ namespace SteelEngine {
 			}
 		}
 
-		virtual const NamespacesVector& GetNamespacesVector() = 0;
-		virtual const MethodsVector& GetMethodsVector() const = 0;
-		virtual const PropertiesVector& GetPropertiesVector() const = 0;
-		virtual const EnumsVector& GetEnumsVector() = 0;
-		virtual const ConstructorsVector& GetConstructorsVector() const = 0;
+		virtual NamespacesVector& GetNamespacesVector() = 0;
+
+		virtual InternalMethodsVector& GetMethodsVector() = 0;
+		virtual InternalPropertiesVector& GetPropertiesVector() = 0;
+		virtual InternalEnumsVector& GetEnumsVector() = 0;
+		virtual InternalConstructorsVector& GetConstructorsVector() = 0;
+		virtual InternalInheritancesVector& GetInheritancesVector() = 0;
+
+		virtual const InternalMethodsVector& GetMethodsVector() const = 0;
+		virtual const InternalPropertiesVector& GetPropertiesVector() const = 0;
+		virtual const InternalEnumsVector& GetEnumsVector() const = 0;
+		virtual const InternalConstructorsVector& GetConstructorsVector() const = 0;
+		virtual const InternalInheritancesVector& GetInheritancesVector() const = 0;
 
 		const MetaDataInfoVector* GetMetaDataInfoVectorA(MetaDataImplementation* meta) const
 		{
@@ -152,12 +141,17 @@ namespace SteelEngine {
 		virtual void ProcessMetaData(RuntimeDatabase* db, MetaDataImplementation* main, MetaDataInfoVector& infos) = 0;
 
 		virtual Variant GetProperty(const char* name, void* object) const = 0;
-		virtual IReflectionProperty* GetProperty(const char* name) = 0;
-		virtual IReflectionMethod* GetMethod(const std::string& name) = 0;
-		virtual IReflectionEnumeration* GetEnum(const std::string& name) = 0;
+		virtual Property GetProperty(const char* name) const = 0;
+		virtual Method GetMethod(const std::string& name) const = 0;
+		virtual Enumeration GetEnum(const std::string& name) const = 0;
 
-		virtual const std::vector<IReflectionInheritance*>& GetInheritances() = 0;
-		virtual const std::vector<IReflectionInheritance*>& GetInheritances() const = 0;
+		virtual const NamespacesVector& GetNamespaces() const = 0;
+
+		virtual InheritancesVector GetInheritances() const = 0;
+		virtual PropertiesVector GetProperties() const = 0;
+		virtual MethodsVector GetMethods() const = 0;
+		virtual EnumsVector GetEnums() const = 0;
+		virtual ConstructorsVector GetConstructors() const = 0;
 
 		template <typename... Args>
 		void* Create(Args... args) const
@@ -176,7 +170,7 @@ namespace SteelEngine {
 					ReflectionConstructor<Args...>* con_ = (ReflectionConstructor<Args...>*)cons;
 					void* obj = con_->m_Function(args...);
 
-					if(Process(this))
+					if(Subprocess(this))
 					{
 						HotReloader::IRuntimeObject* createdObject = (HotReloader::IRuntimeObject*)obj;
 
@@ -195,7 +189,7 @@ namespace SteelEngine {
 						res.push_back((IReflectionData*)db->m_ReflectionDatabase->m_Types[i]);
 					}
 
-					ProcessInheritance(res, GetInheritances(), obj, this);
+					ProcessInheritance(res, GetInheritancesVector(), obj, this);
 
 					return obj;
 				}
@@ -222,7 +216,7 @@ namespace SteelEngine {
 					void* obj = con_->m_Function(args...);
 					void** obj2;
 
-					if(Process(this))
+					if(Subprocess(this))
 					{
 						Variant caster = Invoke("Cast_IRuntimeObject", obj);
 						HotReloader::IRuntimeObject* createdObject = (HotReloader::IRuntimeObject*)obj;
@@ -249,7 +243,7 @@ namespace SteelEngine {
 						res.push_back((IReflectionData*)db->m_ReflectionDatabase->m_Types[i]);
 					}
 
-					ProcessInheritance(res, GetInheritances(), obj, this);
+					ProcessInheritance(res, GetInheritancesVector(), obj, this);
 
 					return obj2;
 				}
@@ -258,40 +252,24 @@ namespace SteelEngine {
 			return 0;
 		}
 
-		const std::vector<IReflectionEnumeration*> GetEnums()
-		{
-			return GetEnumsVector();
-		}
-
-		const PropertiesVector& GetProperties()
-		{
-			return GetPropertiesVector();
-		}
-
-		const PropertiesVector& GetProperties() const
-		{
-			return GetPropertiesVector();
-		}
-
-		const MethodsVector& GetMethods() const
-		{
-			return GetMethodsVector();
-		}
-
 		template <typename... Args>
-		IReflectionConstructor* GetConstructor()
+		Constructor GetConstructor() const
 		{
-			for(IReflectionConstructor* cons : GetConstructorsVector())
+			const Vector<IReflectionConstructor>& cons = GetConstructors();
+
+			for(Type::uint32 i = 0; i < cons.Size(); i++)
 			{
-				if (cons->GetConstructorID() == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
+				const IReflectionConstructor* con = cons[i];
+
+				if(con->GetConstructorID() == typeid(HotReloader::IRuntimeObject*(Args...)).hash_code())
 				{
-					return cons;
+					return con;
 				}
 			}
 		}
 
 		template <typename... Args>
-		Variant Invoke(IReflectionMethod* method, void* object, Args... args)
+		Variant Invoke(const IReflectionMethod* const method, void* object, Args... args) const
 		{
 			IProxyMethod<Args...>* meth = (IProxyMethod<Args...>*)method;
 
@@ -301,7 +279,7 @@ namespace SteelEngine {
 		template <typename... Args>
 		Variant Invoke(const std::string& name, void* object, Args... args) const
 		{
-			const MethodsVector& vec = GetMethodsVector();
+			const InternalMethodsVector& vec = GetMethodsVector();
 			IProxyMethod<Args...>* res = 0;
 
 			for(Type::uint32 i = 0; i < vec.size(); i++)
@@ -318,8 +296,6 @@ namespace SteelEngine {
 
 			if(!res)
 			{
-				// static Result noneRes(SE_FALSE, "NONE");
-				// static Variant none(noneRes, typeid(noneRes).hash_code());
 				static Variant none;
 
 				return none;
@@ -329,9 +305,9 @@ namespace SteelEngine {
 		}
 
 		template <typename... Args>
-		Variant InvokeStatic(const std::string& name, Args... args)
+		Variant InvokeStatic(const std::string& name, Args... args) const
 		{
-			const MethodsVector& vec = GetMethodsVector();
+			const InternalMethodsVector& vec = GetMethodsVector();
 			IProxyMethod<Args...>* res = 0;
 
 			for(Type::uint32 i = 0; i < vec.size(); i++)
@@ -348,8 +324,6 @@ namespace SteelEngine {
 
 			if(!res)
 			{
-				// static Result noneRes(SE_FALSE, "NONE");
-				// static Variant none(noneRes, typeid(noneRes).hash_code());
 				static Variant none;
 
 				return none;

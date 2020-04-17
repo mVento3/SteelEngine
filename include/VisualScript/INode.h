@@ -18,8 +18,8 @@ namespace SteelEngine { namespace VisualScript {
         virtual const std::string& GetNodeName() const = 0;
         virtual int GetNodeID() const = 0;
 
-        virtual void SetNodeTemplate(NodeTemplate* template_) override = 0;
-        virtual NodeTemplate* GetNodeTemplate() const override = 0;
+        virtual void Serialize(Utils::json& j) override = 0;
+        virtual void Deserialize(const Utils::json& j) override = 0;
 
         virtual void Invoke(Type::uint32 index) = 0;
     };

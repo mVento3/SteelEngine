@@ -4,6 +4,8 @@
 
 #include "Core/Core.h"
 
+#include "HotReloader/ReloadableInheritanceTrackKeeper.h"
+
 namespace SteelEngine { namespace Network {
 
     NetworkManager::NetworkManager()
@@ -29,7 +31,7 @@ namespace SteelEngine { namespace Network {
             {
                 void** comm = type->Create_();
 
-                HotReloader::InheritanceTrackKeeper* swapper = new HotReloader::InheritanceTrackKeeper(type, comm);
+                HotReloader::InheritanceTrackKeeper* swapper = new HotReloader::ReloadableIneritanceTrackKeeper(type, comm);
 
                 swapper->Get<Network::INetworkCommand>()->m_Commands = &m_CommandTypes;
 
@@ -102,7 +104,7 @@ namespace SteelEngine { namespace Network {
 
             *m_Connected = true;
 
-            Reflection::GetType("SteelEngine::Client")->Invoke("Process", m_Network);
+            Reflection::GetType("SteelEngine::Client")->Invoke("Subprocess", m_Network);
         }
 
         m_Network->m_DisconnectEvent.Add(this);

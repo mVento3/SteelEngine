@@ -21,7 +21,7 @@ namespace SteelEngine {
     {
         if(m_GenerateCastFunctions)
         {
-            IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+            const IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
             out.push_back("public:");
 
@@ -65,7 +65,7 @@ namespace SteelEngine {
     {
         m_Methods = &info->m_Functions;
 
-        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+        const IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
         for(Parser::MetaData meta : info->m_MetaData)
         {

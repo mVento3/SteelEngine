@@ -20,7 +20,7 @@
 
 #include "Networking/Config.h"
 
-#include "PythonProcess/IPythonProcess.h"
+#include "Subprocess/ISubprocess.h"
 
 #include "Core/GetCompileConfigEvent.h"
 
@@ -33,7 +33,7 @@ namespace SteelEngine { namespace HotReloader {
     {
         GENERATED_BODY
     public:
-        typedef IPythonProcess*(*ProcessAllocator)();
+        typedef ISubprocess*(*ProcessAllocator)();
 
         struct Thread
         {
@@ -57,7 +57,7 @@ namespace SteelEngine { namespace HotReloader {
     private:
         FileWatcher*                    m_SourceFileWatcher;
         IReflectionGenerator*           m_ReflectionGenerator;
-        IPythonProcess*                 m_Process;
+        ISubprocess*                 m_Process;
         IRuntimeCompiler*               m_Compiler;
 
         std::filesystem::path m_BinaryLocation;

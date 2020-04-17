@@ -73,20 +73,11 @@ namespace SteelEngine {
             {
                 for(Type::uint32 i = 0; i < m_Structure.size(); i++)
                 {
-                    m_Structure[i]->Clear();
+                    delete m_Structure[i];
+                    m_Structure[i] = 0;
                 }
 
-                if(!m_Parent)
-                {
-                    return;
-                }
-
-                for(Type::uint32 i = 0; i < m_Parent->m_Structure.size(); i++)
-                {
-                    delete m_Parent->m_Structure[i];
-
-                    m_Parent->m_Structure.pop_back();
-                }
+                m_Structure.clear();
             }
         };
 
@@ -193,6 +184,8 @@ namespace SteelEngine {
             {
 
             }
+
+            std::vector<EnumScope*> m_Enums;
         };
 
         struct InheritanceScope : public ScopeInfo

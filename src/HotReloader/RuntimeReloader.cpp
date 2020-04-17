@@ -21,7 +21,7 @@
 
 #include "Profiler/ScopeTimer.h"
 
-#include "HotReloader/InheritanceTrackKeeper.h"
+#include "HotReloader/ReloadableInheritanceTrackKeeper.h"
 
 #ifdef SE_WINDOWS
 #include "crtdefs.h"
@@ -75,8 +75,8 @@ namespace SteelEngine { namespace HotReloader {
 
 		void* dll;
 		ProcessAllocator allocate;
-		SteelEngine::Module::load("PythonProcess.dll", &dll);
-		SteelEngine::Module::get("PythonProcess_new", dll, (void**)&allocate);
+		SteelEngine::Module::load("Subprocess.dll", &dll);
+		SteelEngine::Module::get("Subprocess_new", dll, (void**)&allocate);
 
 		m_Process = allocate();
 
@@ -189,7 +189,7 @@ namespace SteelEngine { namespace HotReloader {
 						// TODO: Fix memory leak, but we cant just delete it right after broadcasting, but after command finish
 							IReflectionData* type = Reflection::GetType("SteelEngine::Network::SwapModuleNetCommandEvent");
 							void** ev = type->Create_((m_ModuleName + "\0").c_str());
-							InheritanceTrackKeeper* swapper = new InheritanceTrackKeeper(type, ev);
+							InheritanceTrackKeeper* swapper = new ReloadableIneritanceTrackKeeper(type, ev);
 
 							Event::GlobalEvent::Broadcast_(swapper->Get<Network::INetworkCommand>());
 
@@ -438,7 +438,7 @@ namespace SteelEngine { namespace HotReloader {
 
 		try
 		{
-			Module::load(moduleName, &hotReloadedModule);
+			Module::load(moduleName.c_str(), &hotReloadedModule);
 			Module::get("allocateRuntimeObject", hotReloadedModule, (void**)&getPerModule);
 
 			HotModule hot;
@@ -487,7 +487,7 @@ namespace SteelEngine { namespace HotReloader {
 
 			HotReloader::IRuntimeObject* currentObject = db->m_HotReloaderDatabase->m_Objects->At(i).m_Object;
 			IReflectionData* type = Reflection::GetType(currentObject->m_TypeID);
-			const std::vector<IReflectionInheritance*>& inhs = type->GetInheritances();
+			const Vector<IReflectionInheritance>& inhs = type->GetInheritances();
 			static size_t _IRuntimeObejctTypeID = Reflection::GetType<HotReloader::IRuntimeObject>()->GetTypeID();
 			Variant* generateCastFuncs = type->GetMetaData(Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS);
 
@@ -495,8 +495,10 @@ namespace SteelEngine { namespace HotReloader {
 			obj = org;
 			old = currentObject->m_Object;
 
-			for(const IReflectionInheritance* inh : inhs)
+			for(Type::uint32 i = 0; i < inhs.Size(); i++)
 			{
+				const IReflectionInheritance* inh = inhs[i];
+
 				if(inh->GetTypeID() == _IRuntimeObejctTypeID && generateCastFuncs->IsValid() && generateCastFuncs->Convert<bool>())
 				{
 					obj = Reflection::GetType(currentObject->m_TypeID)->Invoke("Cast_IRuntimeObject", obj).Convert<HotReloader::IRuntimeObject*>();

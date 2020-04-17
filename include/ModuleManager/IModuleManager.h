@@ -19,7 +19,6 @@ namespace SteelEngine { namespace Interface {
 
 	public:
 		virtual void LoadAllImpl() { }
-		virtual void LoadAllImpl(const std::filesystem::path& path) { }
 		virtual void UnloadImpl(const std::string& blackList, Mode mode) { }
 		virtual void LoadImpl(const std::filesystem::path& name) { }
 	};

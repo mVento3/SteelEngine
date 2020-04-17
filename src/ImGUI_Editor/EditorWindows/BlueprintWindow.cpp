@@ -14,6 +14,22 @@
 
 #include "SDL.h"
 
+#include "ImGUI_Editor/EditorWindows/NodeGraph/Nodes/GetValue.h"
+
+#include "Profiler/ScopeTimer.h"
+
+static void to_json(SteelEngine::Utils::json& j, const ImVec2& d)
+{
+    j["x"] = d.x;
+    j["y"] = d.y;
+}
+
+static void from_json(const SteelEngine::Utils::json& j, ImVec2& d)
+{
+    d.x = j["x"];
+    d.y = j["y"];
+}
+
 namespace SteelEngine {
 
     struct ImProjectResult
@@ -267,6 +283,98 @@ namespace SteelEngine {
         }
     }
 
+    NodeGraph::INode* BlueprintWindow::AddNode(const ImVec2& position, const ImVec2& size, const IReflectionData* nodeType, bool init)
+    {
+        NodeGraph::INode* renderableNode = (NodeGraph::INode*)nodeType->Create();
+        const Vector<IReflectionMethod>& meths = nodeType->GetMethods();
+
+        renderableNode->m_Position = position;
+        renderableNode->m_Size = size;
+
+        for(Type::uint32 i = 0; i < meths.Size(); i++)
+        {
+            const IReflectionMethod* meth = meths[i];
+            Variant* variant = meth->GetMetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC);
+
+            if(!variant || !variant->IsValid())
+            {
+                continue;
+            }
+
+            Variant* variableTypeVariant = meth->GetMetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_RETURN_TYPE);
+            VisualScript::IPin::VariableType variableType = VisualScript::IPin::VariableType::NONE;
+
+            if(variableTypeVariant && variableTypeVariant->IsValid())
+            {
+                size_t typeID = variableTypeVariant->Convert<size_t>();
+
+                if(typeID == typeid(float).hash_code())
+                {
+                    variableType = VisualScript::IPin::VariableType::FLOAT;
+                }
+                else if(typeID == typeid(int).hash_code())
+                {
+                    variableType = VisualScript::IPin::VariableType::INTEGER;
+                }
+            }
+
+            Variant* isFlow = meth->GetMetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FLOW);
+
+            NodeGraph::OutputPin* renderablePin = new NodeGraph::OutputPin(
+                (isFlow && (isFlow->IsValid() || isFlow->Convert<bool>()) ? VisualScript::IPin::PinType::FLOW : VisualScript::IPin::PinType::VARIABLE),
+                (isFlow && (isFlow->IsValid() || isFlow->Convert<bool>()) ? VisualScript::IPin::VariableType::NONE : variableType)
+            );
+
+            renderablePin->m_Name = meth->GetName();
+            renderablePin->m_ID = GetID();
+
+            renderablePin->SetFunc((VisualScript::IPinFunction::ReflectedOutputFunction*)meth);
+            renderableNode->AddOutputNode(renderablePin);
+        }
+
+        for(VisualScript::IPin* pin : renderableNode->GetInputs())
+        {
+            pin->SetID(GetID());
+            pin->SetNode(renderableNode);
+
+            if(pin->GetPinType() == VisualScript::IPin::PinType::VARIABLE)
+            {
+                NodeGraph::InputPin* renderablePin = (NodeGraph::InputPin*)pin;
+
+                if(renderablePin->GetVariableType() == VisualScript::IPin::VariableType::INTEGER)
+                {
+                    renderablePin->m_TextColor = INTEGER_COLOR;
+                    renderablePin->m_Color = INTEGER_COLOR;
+                    renderablePin->m_BorderColor = INTEGER_BORDER_COLOR;
+
+                    renderablePin->m_Data = new int();
+                    renderablePin->m_ValueTypeID = typeid(int).hash_code();
+                }
+                else if(renderablePin->m_VariableType == VisualScript::IPin::VariableType::FLOAT)
+                {
+                    renderablePin->m_TextColor = FLOAT_COLOR;
+                    renderablePin->m_Color = FLOAT_COLOR;
+                    renderablePin->m_BorderColor = FLOAT_BORDER_COLOR;
+
+                    renderablePin->m_Data = new float();
+                    renderablePin->m_ValueTypeID = typeid(float).hash_code();
+                }
+            }
+        }
+
+        renderableNode->m_Name = nodeType->GetTypeName();
+        renderableNode->m_ID = GetID();
+
+        if(init)
+        {
+            renderableNode->Init(true);
+        }
+
+        m_Nodes.push_back(renderableNode);
+
+        return renderableNode;
+    }
+
     BlueprintWindow::BlueprintWindow()
     {
         m_SelectedNodeID = -1;
@@ -281,6 +389,8 @@ namespace SteelEngine {
         }
 
         m_SavingChanged = false;
+
+        m_PropertyDragging = 0;
     }
 
     BlueprintWindow::~BlueprintWindow()
@@ -290,7 +400,7 @@ namespace SteelEngine {
 
     void BlueprintWindow::Init()
     {
-        for(Type::uint32 i = 0; i < 10000; i++)
+        for(Type::uint32 i = 0; i < 1000; i++)
         {
             m_AvailableIDs.push(i);
         }
@@ -300,49 +410,18 @@ namespace SteelEngine {
         for(Type::uint32 i = 0; i < Reflection::GetTypesSize(); i++)
         {
             IReflectionData const* type = types[i];
-            Variant* meta = type->GetMetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_NODE);
-            std::vector<IReflectionInheritance*> inhs = type->GetInheritances();
+            const Vector<IReflectionInheritance>& inhs = type->GetInheritances();
 
-            // if(meta && (meta->IsValid() || meta->Convert<bool>()))
+            for(Type::uint32 i = 0; i < inhs.Size(); i++)
             {
-                // bool found = false;
+                const IReflectionInheritance* inh = inhs[i];
 
-                for(IReflectionInheritance* inh : inhs)
+                if(inh->GetTypeID() == typeid(NodeGraph::INode).hash_code())
                 {
-                    if(inh->GetTypeID() == typeid(VisualScript::NodeTemplate).hash_code())
-                    {
-                        // VisualScript::INode* node = (VisualScript::INode*)type->Create();
+                    m_AvailableTemplates.push_back(type);
 
-                        // node->Init(type);
-
-                        // m_AvailableNodes.push_back(node);
-
-                        // found = true;
-
-                        VisualScript::NodeTemplate* template_ = (VisualScript::NodeTemplate*)type->Create();
-
-                        template_->SetType(type);
-
-                        m_AvailableTemplates.push_back(template_);
-
-                        break;
-                    }
+                    break;
                 }
-
-                // if(!found)
-                // {
-                //     std::vector<IReflectionMethod*> meths = type->GetMethods();
-
-                //     for(IReflectionMethod* meth : meths)
-                //     {
-                //         Variant* methMeta = meth->GetMetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC);
-
-                //         if(methMeta && (methMeta->IsValid() || methMeta->Convert<bool>()))
-                //         {
-                //             m_AvailableMethods.push_back(meth);
-                //         }
-                //     }
-                // }
             }
         }
 
@@ -357,11 +436,113 @@ namespace SteelEngine {
         m_HoveredConnection = m_Connections.end();
         m_HoveredNodeID = -1;
 
-        ImGui::BeginChild("nodes_region", ImVec2(0, 0), true, ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_::ImGuiWindowFlags_NoMove);
-        {
-            ImVec2 offset = ImGui::GetCursorScreenPos() + m_View;
-            auto* drawList = ImGui::GetWindowDrawList();
+        ImVec2 offset = ImGui::GetCursorScreenPos() + m_View;
+        auto* drawList = ImGui::GetWindowDrawList();
 
+        ImGui::BeginChild("properties_region", ImVec2(200, 0), true, ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_::ImGuiWindowFlags_NoMove);
+        {
+            if(ImGui::Button("Simulate"))
+            {
+                VisualScript::INodeData* startPoint = 0;
+
+                for(NodeGraph::INode* node : m_Nodes)
+                {
+                    if(node->m_Name == "EntryPoint")
+                    {
+                        startPoint = node;
+
+                        break;
+                    }
+                }
+
+                if(startPoint != NULL)
+                {
+                    VisualScript::IPin* flowOutPin = startPoint->GetOutputs()[0];
+                    VisualScript::IPinFunction* flowOutRaw = Reflection::GetType("SteelEngine::NodeGraph::OutputPin")->Invoke("Cast_IPinFunction", (NodeGraph::OutputPin*)flowOutPin).Convert<VisualScript::IPinFunction*>();
+                    std::vector<VisualScript::IPin*> flowConns = flowOutPin->GetConnections();
+
+                    for(VisualScript::IPin* flowConn : flowConns)
+                    {
+                        if(flowConn->GetPinType() == VisualScript::IPin::PinType::FLOW)
+                        {
+                            VisualScript::IPinFunction* flowConnRaw = Reflection::GetType("SteelEngine::NodeGraph::FlowInputPin")->Invoke("Cast_IPinFunction", (NodeGraph::FlowInputPin*)flowConn).Convert<VisualScript::IPinFunction*>();
+
+                            flowConnRaw->Call(flowConn->GetNode(), (VisualScript::IPinData*)flowOutPin); 
+                        }
+                    }
+                }
+            }
+
+            const Vector<IReflectionProperty>& props = m_Type->GetProperties();
+
+            static bool isItemClicked = false;
+
+            for(Type::uint32 i = 0; i < props.Size(); i++)
+            {
+                const IReflectionProperty* prop = props[i];
+                // ImGui::Text("%f", m_Type->GetProperty(prop->GetName().c_str(), m_Object->GetObject_()).Convert<float>());
+                ImGui::Text("%s", prop->GetName().c_str());
+
+                if(ImGui::IsItemHovered())
+                {
+                    ImGui::BeginTooltip();
+                    {
+                        ImGui::Text("%f", prop->GetValue(m_Object->GetObject_()).Convert<float>());
+                    }
+                    ImGui::EndTooltip();
+                }
+
+                if(ImGui::IsItemClicked(ImGuiMouseButton_::ImGuiMouseButton_Left))
+                {
+                    isItemClicked = true;
+
+                    m_PropertyDragging = prop;
+                }
+
+                if(isItemClicked && ImGui::IsMouseReleased(ImGuiMouseButton_::ImGuiMouseButton_Left))
+                {
+                    isItemClicked = false;
+
+                    const IReflectionData* type = Reflection::GetType<GetValue>();
+                    const Vector<IReflectionMethod> meths = type->GetMethods();
+                    GetValue* node = (GetValue*)AddNode(ImGui::GetMousePos() - offset, ImVec2(0, 0), type);
+
+
+                    node->m_Object = m_Object;
+                    node->m_PropertyType = m_Type;
+                    node->m_Property = m_PropertyDragging;
+
+                    for(Type::uint32 i = 0; i < meths.Size(); i++)
+                    {
+                        const IReflectionMethod* meth = meths[i];
+                        Variant* meta = meth->GetMetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_RETURN_TYPE);
+
+                        if(meta && meta->IsValid())
+                        {
+                            if(meta->Convert<size_t>() == m_PropertyDragging->GetTypeID())
+                            {
+                                node->ChangeFunc(meth);
+
+                                break;
+                            }
+                        }
+                    }
+
+                    m_PropertyDragging = 0;
+                }
+
+                if(isItemClicked && ImGui::IsMouseDragging(ImGuiMouseButton_::ImGuiMouseButton_Left))
+                {
+                    // Eventually animate dragging
+                }
+            }
+        }
+        ImGui::EndChild();
+
+        ImGui::SameLine();
+
+        if(ImGui::BeginChild("nodes_region", ImVec2(0, 0), true, ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_::ImGuiWindowFlags_NoMove))
+        {
             ImU32 GRID_COLOR = IM_COL32(5, 5, 5, 40);
             float GRID_SZ = 64.0f;
             ImVec2 win_pos = ImGui::GetCursorScreenPos();
@@ -386,7 +567,7 @@ namespace SteelEngine {
         // Nodes drawing
             for(Type::uint32 i = 0; i < m_Nodes.size(); i++)
             {
-                NodeGraph::Node* node = m_Nodes[i];
+                NodeGraph::INode* node = m_Nodes[i];
 
                 ImVec2 nodeRectMin = offset + node->m_Position;
                 ImVec2 nodeRectMax = nodeRectMin + node->m_Size;
@@ -415,7 +596,7 @@ namespace SteelEngine {
                 {
                     VisualScript::IPin* pin = node->m_Outputs[j];
                     VisualScript::IPinFunction* notCasted = Reflection::GetType("SteelEngine::NodeGraph::OutputPin")->Invoke("Cast_IPinFunction", (NodeGraph::OutputPin*)pin).Convert<VisualScript::IPinFunction*>();
-                    ImVec2 position = offset + node->GetOutputSlotPosition(pin->GetID()) /*ImVec2(node->m_Position.x + node->m_Size.x, node->m_Position.y + (j * ((NODE_SLOT_RADIUS * 4))))*/;
+                    ImVec2 position = offset + node->GetOutputSlotPosition(pin->GetID());
                     const char* title = pin->GetName().c_str();
                     ImVec2 titleSize = ImGui::CalcTextSize(title);
 
@@ -480,7 +661,7 @@ namespace SteelEngine {
                     VisualScript::IPin* pin = node->m_Inputs[j];
                     VisualScript::IPinData* notCasted = Reflection::GetType("SteelEngine::NodeGraph::InputPin")->Invoke("Cast_IPinData", (NodeGraph::InputPin*)pin).Convert<VisualScript::IPinData*>();
                     NodeGraph::InputPin* pin2 = static_cast<NodeGraph::InputPin*>(pin);
-                    ImVec2 position = offset + node->GetInputSlotPosition(pin->GetID()) /*ImVec2(node->m_Position.x, node->m_Position.y + (j * ((NODE_SLOT_RADIUS * 4))))*/;
+                    ImVec2 position = offset + node->GetInputSlotPosition(pin->GetID());
                     const char* title = pin->GetName().c_str();
                     ImVec2 titleSize = ImGui::CalcTextSize(title);
 
@@ -632,7 +813,7 @@ namespace SteelEngine {
 
                 if(start->GetFlowType() == VisualScript::IPin::Flow::INPUT)
                 {
-                    NodeGraph::Node* node = (NodeGraph::Node*)start->GetNode();
+                    NodeGraph::INode* node = (NodeGraph::INode*)start->GetNode();
 
                     p0 = offset + node->GetInputSlotPosition(start->GetID());
                     p1 = offset + node->GetInputSlotPosition(start->GetID()) + ImVec2(-50, 0);
@@ -640,7 +821,7 @@ namespace SteelEngine {
                 }
                 else if(start->GetFlowType() == VisualScript::IPin::Flow::OUTPUT)
                 {
-                    NodeGraph::Node* node = (NodeGraph::Node*)start->GetNode();
+                    NodeGraph::INode* node = (NodeGraph::INode*)start->GetNode();
 
                     p2 = offset + node->GetOutputSlotPosition(start->GetID()) + ImVec2(50, 0);
                     p3 = offset + node->GetOutputSlotPosition(start->GetID());
@@ -648,14 +829,14 @@ namespace SteelEngine {
 
                 if(end->GetFlowType() == VisualScript::IPin::Flow::INPUT)
                 {
-                    NodeGraph::Node* node = (NodeGraph::Node*)end->GetNode();
+                    NodeGraph::INode* node = (NodeGraph::INode*)end->GetNode();
 
                     p0 = offset + node->GetInputSlotPosition(end->GetID());
                     p1 = offset + node->GetInputSlotPosition(end->GetID()) + ImVec2(-50, 0);
                 }
                 else if(end->GetFlowType() == VisualScript::IPin::Flow::OUTPUT)
                 {
-                    NodeGraph::Node* node = (NodeGraph::Node*)end->GetNode();
+                    NodeGraph::INode* node = (NodeGraph::INode*)end->GetNode();
 
                     p2 = offset + node->GetOutputSlotPosition(end->GetID()) + ImVec2(50, 0);
                     p3 = offset + node->GetOutputSlotPosition(end->GetID());
@@ -752,7 +933,7 @@ namespace SteelEngine {
             {
                 if(m_SelectedOutputPin)
                 {
-                    NodeGraph::Node* node = (NodeGraph::Node*)m_SelectedOutputPin->GetNode();
+                    NodeGraph::INode* node = (NodeGraph::INode*)m_SelectedOutputPin->GetNode();
 
                     ImVec2 p0 = offset + node->GetOutputSlotPosition(m_SelectedOutputPin->GetID());
                     ImVec2 p1 = offset + node->GetOutputSlotPosition(m_SelectedOutputPin->GetID()) + ImVec2(50, 0);
@@ -770,7 +951,7 @@ namespace SteelEngine {
                 }
                 else if(m_SelectedInputPin)
                 {
-                    NodeGraph::Node* node = (NodeGraph::Node*)m_SelectedInputPin->GetNode();
+                    NodeGraph::INode* node = (NodeGraph::INode*)m_SelectedInputPin->GetNode();
 
                     ImVec2 p3 = offset + node->GetInputSlotPosition(m_SelectedInputPin->GetID());
                     ImVec2 p2 = offset + node->GetInputSlotPosition(m_SelectedInputPin->GetID()) + ImVec2(-50, 0);
@@ -795,111 +976,11 @@ namespace SteelEngine {
 
                 if(ImGui::BeginMenu("Add..."))
                 {
-                    for(VisualScript::NodeTemplate* template_ : m_AvailableTemplates)
+                    for(const IReflectionData* template_ : m_AvailableTemplates)
                     {
-                        const IReflectionData* type = template_->GetType();
-
-                        if(ImGui::MenuItem(type->GetTypeName()))
+                        if(ImGui::MenuItem(template_->GetTypeName()))
                         {
-                            NodeGraph::Node* renderableNode = new NodeGraph::Node(scenePos, ImVec2(0, 0), type->GetTypeName());
-
-                            for(VisualScript::NodeTemplate::PinTemplate pinTemplate : template_->GetInputPinTemplates())
-                            {
-                                VisualScript::IPin::VariableType variableType = VisualScript::IPin::VariableType::NONE;
-
-                                if(pinTemplate.m_TypeID == typeid(float).hash_code())
-                                {
-                                    variableType = VisualScript::IPin::VariableType::FLOAT;
-                                }
-                                else if(pinTemplate.m_TypeID == typeid(int).hash_code())
-                                {
-                                    variableType = VisualScript::IPin::VariableType::INTEGER;
-                                }
-
-                                if(pinTemplate.m_PinType == VisualScript::IPin::PinType::VARIABLE)
-                                {
-                                    NodeGraph::InputPin* renderablePin = new NodeGraph::InputPin(
-                                        VisualScript::IPin::PinType::VARIABLE,
-                                        variableType
-                                    );
-
-                                    if(renderablePin->m_VariableType == VisualScript::IPin::VariableType::INTEGER)
-                                    {
-                                        renderablePin->m_TextColor = INTEGER_COLOR;
-                                        renderablePin->m_Color = INTEGER_COLOR;
-                                        renderablePin->m_BorderColor = INTEGER_BORDER_COLOR;
-
-                                        renderablePin->m_Data = new int();
-                                        renderablePin->m_TypeID = typeid(int).hash_code();
-                                    }
-                                    else if(renderablePin->m_VariableType == VisualScript::IPin::VariableType::FLOAT)
-                                    {
-                                        renderablePin->m_TextColor = FLOAT_COLOR;
-                                        renderablePin->m_Color = FLOAT_COLOR;
-                                        renderablePin->m_BorderColor = FLOAT_BORDER_COLOR;
-
-                                        renderablePin->m_Data = new float();
-                                        renderablePin->m_TypeID = typeid(float).hash_code();
-                                    }
-
-                                    renderablePin->m_Name = pinTemplate.m_Name;
-                                    renderablePin->m_ID = GetID();
-
-                                    renderableNode->AddInputNode(renderablePin);
-                                }
-                                else if(pinTemplate.m_PinType == VisualScript::IPin::PinType::FLOW)
-                                {
-                                    NodeGraph::FlowInputPin* renderablePin = new NodeGraph::FlowInputPin();
-
-                                    renderablePin->m_Name = pinTemplate.m_Name;
-                                    renderablePin->m_ID = GetID();
-                                    renderablePin->m_VariableType = VisualScript::IPin::VariableType::NONE;
-                                    renderablePin->SetFunc(pinTemplate.m_Callback);
-
-                                    renderableNode->AddInputNode(renderablePin);
-                                }
-                            }
-
-                            for(IReflectionMethod* meth : type->GetMethods())
-                            {
-                                Variant* variableTypeVariant = meth->GetMetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_RETURN_TYPE);
-                                VisualScript::IPin::VariableType variableType = VisualScript::IPin::VariableType::NONE;
-
-                                if(variableTypeVariant)
-                                {
-                                    size_t typeID = variableTypeVariant->Convert<size_t>();
-
-                                    if(typeID == typeid(float).hash_code())
-                                    {
-                                        variableType = VisualScript::IPin::VariableType::FLOAT;
-                                    }
-                                    else if(typeID == typeid(int).hash_code())
-                                    {
-                                        variableType = VisualScript::IPin::VariableType::INTEGER;
-                                    }
-                                }
-
-                                Variant* isFlow = meth->GetMetaData(Reflection::ReflectionAttribute::VISUAL_SCRIPT_FLOW);
-
-                                NodeGraph::OutputPin* renderablePin = new NodeGraph::OutputPin(
-                                    (isFlow && (isFlow->IsValid() || isFlow->Convert<bool>()) ? VisualScript::IPin::PinType::FLOW : VisualScript::IPin::PinType::VARIABLE),
-                                    (isFlow && (isFlow->IsValid() || isFlow->Convert<bool>()) ? VisualScript::IPin::VariableType::NONE : variableType)
-                                );
-
-                                renderablePin->m_Name = meth->GetName();
-                                renderablePin->m_ID = GetID();
-                                renderablePin->SetFunc((VisualScript::IPinFunction::ReflectedOutputFunction*)meth);
-
-                                renderableNode->AddOutputNode(renderablePin);
-                            }
-
-                            renderableNode->m_Name = type->GetTypeName();
-                            renderableNode->m_ID = GetID();
-
-                            renderableNode->SetNodeTemplate(template_);
-                            renderableNode->Init(true);
-
-                            m_Nodes.push_back(renderableNode);
+                            AddNode(scenePos, ImVec2(0, 0), template_);
                         }
                     }
 
@@ -911,12 +992,12 @@ namespace SteelEngine {
 
             if(m_SelectedNodeID != -1 && ImGui::BeginPopup("node_context"))
             {
-                NodeGraph::Node* node = 0;
+                NodeGraph::INode* node = 0;
                 Type::uint32 index = 0;
 
                 for(Type::uint32 i = 0; i < m_Nodes.size(); i++)
                 {
-                    NodeGraph::Node* node_ = m_Nodes[i];
+                    NodeGraph::INode* node_ = m_Nodes[i];
 
                     if(node_->m_ID == m_SelectedNodeID)
                     {
@@ -933,7 +1014,24 @@ namespace SteelEngine {
 
                     if(ImGui::Button("Delete node"))
                     {
+                        NodeGraph::INode* node = m_Nodes[index];
+
+                        m_AvailableIDs.push(node->GetNodeID());
+
+                        for(VisualScript::IPin* pin : node->GetInputs())
+                        {
+                            m_AvailableIDs.push(pin->GetID());
+                        }
+
+                        for(VisualScript::IPin* pin : node->GetOutputs())
+                        {
+                            m_AvailableIDs.push(pin->GetID());
+                        }
+
                         m_Nodes.erase(m_Nodes.begin() + index);
+
+                        delete node;
+                        node = 0;
 
                         std::stack<Type::uint32> connectionToErase;
 
@@ -989,8 +1087,6 @@ namespace SteelEngine {
                             connectionToErase.pop();
                         }
 
-                        m_AvailableIDs.push(m_SelectedNodeID);
-
                         m_SelectedNodeID = -1;
 
                         ImGui::CloseCurrentPopup();
@@ -1028,34 +1124,29 @@ namespace SteelEngine {
 
             if(m_Keys[SDL_SCANCODE_S] && m_Keys[SDL_SCANCODE_LCTRL])
             {
+            // TODO: Instead of simulating it, we should save the blueprint here lol
+
                 if(!m_SavingChanged)
                 {
-                    VisualScript::INodeData* startPoint = 0;
-                    std::vector<VisualScript::INodeData*> nodesVec;
+                    std::ofstream file(m_Path);
+                    Utils::json res;
 
-                    for(NodeGraph::Node* node : m_Nodes)
+                    res["nodes"] = Utils::json::array();
+                    res["name"] = m_Name;
+                    res["type"] = getFullTypename(m_Type);
+
+                    for(NodeGraph::INode* node : m_Nodes)
                     {
-                        if(node->m_Name == "EntryPoint")
-                        {
-                            startPoint = node;
+                        Utils::json jNode;
 
-                            break;
-                        }
+                        node->Serialize(jNode);
+
+                        res["nodes"].push_back(jNode);
                     }
 
-                    VisualScript::IPin* flowOutPin = startPoint->GetOutputs()[0];
-                    VisualScript::IPinFunction* flowOutRaw = Reflection::GetType("SteelEngine::NodeGraph::OutputPin")->Invoke("Cast_IPinFunction", (NodeGraph::OutputPin*)flowOutPin).Convert<VisualScript::IPinFunction*>();
-                    std::vector<VisualScript::IPin*> flowConns = flowOutPin->GetConnections();
+                    file << res.dump(4);
 
-                    for(VisualScript::IPin* flowConn : flowConns)
-                    {
-                        if(flowConn->GetPinType() == VisualScript::IPin::PinType::FLOW)
-                        {
-                            VisualScript::IPinFunction* flowConnRaw = Reflection::GetType("SteelEngine::NodeGraph::FlowInputPin")->Invoke("Cast_IPinFunction", (NodeGraph::FlowInputPin*)flowConn).Convert<VisualScript::IPinFunction*>();
-
-                            flowConnRaw->Call(flowConn->GetNode(), (VisualScript::IPinData*)flowOutPin);
-                        }
-                    }
+                    file.close();
 
                     m_SavingChanged = true;
                 }
@@ -1064,8 +1155,9 @@ namespace SteelEngine {
             {
                 m_SavingChanged = false;
             }
+
+            ImGui::EndChild();
         }
-        ImGui::EndChild();
     }
 
     int BlueprintWindow::GetID()
@@ -1075,6 +1167,55 @@ namespace SteelEngine {
         m_AvailableIDs.pop();
 
         return id;
+    }
+
+    void BlueprintWindow::Import(const Utils::json& nodes)
+    {
+        for(auto it = nodes["nodes"].begin(); it != nodes["nodes"].end(); ++it)
+        {
+            Utils::json item = *it;
+            NodeGraph::INode* node = AddNode(item["position"], item["size"], Reflection::GetType(item["type"].get<std::string>()), false);
+
+            if(node->m_TypeID == typeid(GetValue).hash_code())
+            {
+                ((GetValue*)node)->m_Object = m_Object;
+                ((GetValue*)node)->m_PropertyType = m_Type;
+            }
+
+            node->Deserialize(item);
+            node->Init(true);
+        }
+
+        std::vector<VisualScript::INode*> nodesVec;
+
+        for(NodeGraph::INode* node : m_Nodes)
+        {
+            nodesVec.push_back(node);
+        }
+
+        for(NodeGraph::INode* node : m_Nodes)
+        {
+            m_AvailableIDs.pop();
+
+            for(VisualScript::IPin* pin : node->GetInputs())
+            {
+                pin->ConnectPendingPins(nodesVec);
+
+                for(VisualScript::IPin* conn : pin->GetConnections())
+                {
+                    m_Connections.push_back(Connection{ pin, conn });
+                }
+
+                m_AvailableIDs.pop();
+            }
+
+            for(VisualScript::IPin* pin : node->GetOutputs())
+            {
+                pin->ConnectPendingPins(nodesVec);
+
+                m_AvailableIDs.pop();
+            }
+        }
     }
 
     void BlueprintWindow::OnEvent(Event::Naive* event)

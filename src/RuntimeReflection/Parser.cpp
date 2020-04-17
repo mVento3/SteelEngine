@@ -4,6 +4,20 @@
 
 namespace SteelEngine {
 
+    void clearRecursive(Parser::ScopeInfo* info)
+    {
+        while(!info->m_Scopes.empty())
+        {
+            Parser::ScopeInfo* scope = info->m_Scopes.top();
+
+            clearRecursive(scope);
+
+            info->m_Scopes.pop();
+        }
+
+        info->Clear();
+    }
+
     void Parser::ProcessMetaData(std::vector<MetaData>& meta)
     {
         Type::uint32 braces = 0;
@@ -252,6 +266,22 @@ namespace SteelEngine {
             }
             else if(m_Lexer.GetToken() == "#define")
             {
+                while(1)
+                {
+                    std::string line = m_Lexer.GetCurrentLine();
+
+                    if(line[line.size() - 1] == '\\')
+                    {
+                        m_Lexer.SkipLine();
+
+                        m_Lexer++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
                 m_Lexer.SkipLine();
             }
             else if(m_Lexer.GetToken() == "{")
@@ -282,6 +312,11 @@ namespace SteelEngine {
             }
             else if(m_Lexer.GetToken() == "}")
             {
+                if(m_CurrentWorkingScope == NULL)
+                {
+                    break;
+                }
+
                 m_CurrentWorkingScope = m_CurrentWorkingScope->m_Parent;
 
                 if(m_CurrentWorkingScope)
@@ -429,7 +464,28 @@ namespace SteelEngine {
             {
                 if(!m_CurrentScopeToAddByMeta)
                 {
-                    m_CurrentScopeToAdd = new EnumScope(m_Lexer++.GetToken());
+                    std::string token = m_Lexer++.GetToken();
+
+                    if(token != "{")
+                    {
+                        m_CurrentScopeToAdd = new EnumScope(token);
+                    }
+                    else
+                    {
+                        while(1)
+                        {
+                            if(m_Lexer.GetToken() == "}")
+                            {
+                                m_Lexer++;
+
+                                break;
+                            }
+
+                            m_Lexer++;
+                        }
+
+                        continue;
+                    }
                 }
                 else
                 {
@@ -439,7 +495,20 @@ namespace SteelEngine {
                 }
 
                 EnumScope* eS = (EnumScope*)m_CurrentScopeToAdd;
-                StructScope* structScope = (StructScope*)m_CurrentWorkingScope;
+                std::vector<Parser::EnumScope*>* enums = 0;
+
+                if(m_CurrentWorkingScope->m_ScopeType == ScopeType::STRUCT || m_CurrentWorkingScope->m_ScopeType == ScopeType::CLASS)
+                {
+                    StructScope* scope = (StructScope*)m_CurrentWorkingScope;
+
+                    enums = &scope->m_Enums;
+                }
+                else if(m_CurrentWorkingScope->m_ScopeType == ScopeType::NAMESPACE)
+                {
+                    NamespaceScope* scope = (NamespaceScope*)m_CurrentWorkingScope;
+
+                    enums = &scope->m_Enums;
+                }
 
                 bool waitForCloseBrace = false;
                 std::string word;
@@ -514,9 +583,9 @@ namespace SteelEngine {
                     }
                 }
 
-                eS->m_Parent = structScope;
+                eS->m_Parent = m_CurrentWorkingScope;
 
-                structScope->m_Enums.push_back(eS);
+                enums->push_back(eS);
 
                 m_CurrentWorkingScope->m_Scopes.push(eS);
                 m_CurrentWorkingScope->m_Structure.push_back(eS);
@@ -684,6 +753,7 @@ namespace SteelEngine {
                     if(m_CurrentWorkingScope && m_Lexer.GetToken() == m_CurrentWorkingScope->m_Name)
                     {
                         std::string token = m_Lexer.GetToken();
+                        bool space = m_Lexer.Space();
 
                         if(m_Lexer++.GetToken() == "(")
                         {
@@ -738,11 +808,17 @@ namespace SteelEngine {
                         else
                         {
                             saved = token;
+
+                            if(space)
+                            {
+                                saved += " ";
+                            }
                         }
                     }
                     else if(m_CurrentWorkingScope && m_Lexer.GetToken() == "~" + m_CurrentWorkingScope->m_Name)
                     {
                         std::string token = m_Lexer.GetToken();
+                        bool space = m_Lexer.Space();
 
                         if(m_Lexer++.GetToken() == "(")
                         {
@@ -772,6 +848,11 @@ namespace SteelEngine {
                         else
                         {
                             saved = token;
+
+                            if(space)
+                            {
+                                saved += " ";
+                            }
                         }
                     }
                 }
@@ -977,20 +1058,16 @@ namespace SteelEngine {
 
     void Parser::Clear()
     {
-        for(Type::uint32 i = 0; i < m_Structure.size(); i++)
+        while(!m_Scopes.empty())
         {
-            m_Structure[i]->Clear();
+            ScopeInfo* scope = m_Scopes.top();
 
-            delete m_Structure[i];
-            m_Structure[i] = 0;
+            clearRecursive(scope);
+
+            m_Scopes.pop();
         }
 
         m_Structure.clear();
-
-        while(!m_Scopes.empty())
-        {
-            m_Scopes.pop();
-        }
     }
 
 }

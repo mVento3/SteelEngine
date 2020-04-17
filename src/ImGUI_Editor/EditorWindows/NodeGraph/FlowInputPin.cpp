@@ -1,6 +1,39 @@
 #include "ImGUI_Editor/EditorWindows/NodeGraph/FlowInputPin.h"
 
+#include "ImGUI_Editor/EditorWindows/BlueprintWindow.h"
+
 namespace SteelEngine { namespace NodeGraph {
+
+    void FlowInputPin::Serialize(Utils::json& j)
+    {
+        j["id"] = GetID();
+        j["pin"] = "SteelEngine::NodeGraph::FlowInputPin";
+        j["connections"] = Utils::json::array();
+
+        for(VisualScript::IPin* conn : m_Connections)
+        {
+            Utils::json jConn;
+
+            jConn["id"] = conn->GetID();
+            jConn["flow"] = conn->GetFlowType();
+
+            j["connections"].push_back(jConn);
+        }
+    }
+
+    void FlowInputPin::Deserialize(const Utils::json& j)
+    {
+        SetID(j["id"]);
+
+        Utils::json jConns = j["connections"];
+
+        for(Utils::json::iterator it = jConns.begin(); it != jConns.end(); ++it)
+        {
+            Utils::json item = *it;
+
+            m_PendingConnections.push(PendingConnection{ item["id"].get<int>(), item["flow"].get<VisualScript::IPin::Flow>() });
+        }
+    }
 
     FlowInputPin::FlowInputPin()
     {
@@ -11,6 +44,8 @@ namespace SteelEngine { namespace NodeGraph {
         m_Flow = VisualScript::IPin::Flow::INPUT;
         m_Type = IPin::PinType::FLOW;
         m_VariableType = IPin::VariableType::NONE;
+
+        m_TypeID = Reflection::GetType<FlowInputPin>()->GetTypeID();
     }
 
     FlowInputPin::~FlowInputPin()

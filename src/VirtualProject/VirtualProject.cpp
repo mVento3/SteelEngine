@@ -17,6 +17,8 @@
 
 #include "Profiler/ScopeTimer.h"
 
+#include "HotReloader/ReloadableInheritanceTrackKeeper.h"
+
 namespace SteelEngine {
 
     void VirtualProject::ProcessFile(const std::filesystem::path& toRemove, const std::filesystem::path& filePath)
@@ -327,10 +329,10 @@ namespace SteelEngine {
         if(!m_Process)
         {
             void* dll;
-            PythonProcess_new allocator; 
+            Subprocess_new allocator; 
 
-            Module::load("PythonProcess.dll", &dll);
-            Module::get("PythonProcess_new", dll, (void**)&allocator);
+            Module::load("Subprocess.dll", &dll);
+            Module::get("Subprocess_new", dll, (void**)&allocator);
 
             m_Process = allocator();
 
@@ -571,9 +573,9 @@ namespace SteelEngine {
             return;
         }
 
-        Module::load(dllFilename, &m_ProjectDLL);
+        Module::load(dllFilename.c_str(), &m_ProjectDLL);
         Event::GlobalEvent::Add<LoadedProjectEvent>(this);
-        Event::GlobalEvent::Broadcast(LoadedProjectEvent{  });
+        Event::GlobalEvent::Broadcast(LoadedProjectEvent{ this });
 
         m_ProjectConfig = Utils::loadJsonFile(m_LoadedProject / "project.json");
     }
@@ -612,7 +614,7 @@ namespace SteelEngine {
 
             if(data->GetMetaData(Reflection::ReflectionAttribute::GAME_SCRIPT)->Convert<bool>())
             {
-                m_ProjectScripts.push_back(new HotReloader::InheritanceTrackKeeper(data, data->Create_()));
+                m_ProjectScripts.push_back(new HotReloader::ReloadableIneritanceTrackKeeper(data, data->Create_()));
             }
         }
 
@@ -673,7 +675,7 @@ namespace SteelEngine {
 
                 if(!found)
                 {
-                    m_ProjectScripts.push_back(new HotReloader::InheritanceTrackKeeper(data, data->Create_()));
+                    m_ProjectScripts.push_back(new HotReloader::ReloadableIneritanceTrackKeeper(data, data->Create_()));
                 }
             }
         }

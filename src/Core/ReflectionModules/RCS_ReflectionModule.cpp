@@ -105,7 +105,7 @@ namespace SteelEngine {
 
     void RCS_ReflectionModule::ProcessStructure(Parser::StructScope* info) 
     {
-        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+        const IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
         bool hotReload = false;
 
         m_StructName = info->m_Name;
@@ -195,9 +195,9 @@ namespace SteelEngine {
 
             if(type)
             {
-                std::vector<IReflectionInheritance*> inhs = type->GetInheritances();
+                const Vector<IReflectionInheritance>& inhs = type->GetInheritances();
 
-                for(Type::uint32 i = 0; i < inhs.size(); i++)
+                for(Type::uint32 i = 0; i < inhs.Size(); i++)
                 {
                     size_t typeID = inhs[i]->GetTypeID();
                     const IReflectionData* inhType = Reflection::GetType(typeID);
@@ -232,7 +232,7 @@ namespace SteelEngine {
     {
         if(m_SerializeAll)
         {
-            IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+            const IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
             if(!info->m_MetaData.empty())
             {

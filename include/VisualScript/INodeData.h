@@ -3,12 +3,11 @@
 #include "vector"
 #include "functional"
 
-#include "VisualScript/IPinData.h"
-#include "VisualScript/IPinFunction.h"
-#include "VisualScript/IPin.h"
-#include "VisualScript/NodeTemplate.h"
+#include "Utils/Json.h"
 
 namespace SteelEngine { namespace VisualScript {
+
+    struct IPin;
 
     struct INodeData
     {
@@ -18,8 +17,8 @@ namespace SteelEngine { namespace VisualScript {
         virtual void AddOutputNode(IPin* pin) = 0;
         virtual void AddInputNode(IPin* pin) = 0;
 
-        virtual void SetNodeTemplate(NodeTemplate* template_) = 0;
-        virtual NodeTemplate* GetNodeTemplate() const = 0;
+        virtual void Serialize(Utils::json& j) = 0;
+        virtual void Deserialize(const Utils::json& j) = 0;
 
         virtual void Invoke(Type::uint32 index) = 0;
     };

@@ -16,22 +16,31 @@ namespace SteelEngine {
         {
             CREATED,
             MODIFIED,
-            DELETED
+            DELETED,
+            NONE
         };
 
         typedef std::function<void(const std::filesystem::path&, FileStatus)> ActionFunction;
 
     private:
+        typedef std::function<void()> UpdateFunction;
+
         std::unordered_map<std::string, std::filesystem::file_time_type> m_Paths;
         bool m_Running;
         ActionFunction m_Action;
 
+        UpdateFunction m_UpdateFunction;
+
         bool Contains(const std::string& key);
+
+        void UpdateRecursive();
+        void UpdateNonRecursive();
 
     public:
         FileWatcher(
             const std::filesystem::path& path,
-            ActionFunction action
+            ActionFunction action,
+            bool recursive = true
         );
         ~FileWatcher();
 

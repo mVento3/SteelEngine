@@ -4,14 +4,25 @@
 #include "ImGUI_Editor/EditorWindows/NodeGraph/OutputPin.h"
 #include "ImGUI_Editor/EditorWindows/NodeGraph/FlowInputPin.h"
 
+static void to_json(SteelEngine::Utils::json& j, const ImVec2& d)
+{
+    j["x"] = d.x;
+    j["y"] = d.y;
+}
+
+static void from_json(const SteelEngine::Utils::json& j, ImVec2& d)
+{
+    d.x = j["x"];
+    d.y = j["y"];
+}
+
 namespace SteelEngine {
 
     AddFloat::AddFloat()
     {
-        m_InputPin = Reflection::GetType("SteelEngine::NodeGraph::InputPin");
-        m_OutputPin = Reflection::GetType("SteelEngine::NodeGraph::OutputPin");
+        NodeGraph::FlowInputPin* flow = new NodeGraph::FlowInputPin();
 
-        AddInputPin([&](VisualScript::INodeData* node, VisualScript::IPinData* input)
+        flow->SetFunc([](VisualScript::INodeData* node, VisualScript::IPinData* input)
         {
             std::vector<VisualScript::IPin*> inputs = node->GetInputs();
 
@@ -23,8 +34,8 @@ namespace SteelEngine {
 
                     for(VisualScript::IPin* conn : conns)
                     {
-                        VisualScript::IPinFunction* func = m_OutputPin->Invoke("Cast_IPinFunction", (NodeGraph::OutputPin*)conn).Convert<VisualScript::IPinFunction*>();
-                        VisualScript::IPinData* in = m_InputPin->Invoke("Cast_IPinData", (NodeGraph::InputPin*)pin).Convert<VisualScript::IPinData*>();
+                        VisualScript::IPinFunction* func = Reflection::GetType<NodeGraph::OutputPin>()->Invoke("Cast_IPinFunction", (NodeGraph::OutputPin*)conn).Convert<VisualScript::IPinFunction*>();
+                        VisualScript::IPinData* in = Reflection::GetType<NodeGraph::InputPin>()->Invoke("Cast_IPinData", (NodeGraph::InputPin*)pin).Convert<VisualScript::IPinData*>();
 
                         func->Call(conn->GetNode(), in);
                     }
@@ -32,7 +43,7 @@ namespace SteelEngine {
             }
 
             VisualScript::IPin* flowOutPin = node->GetOutputs()[1];
-            VisualScript::IPinFunction* flowOutRaw = m_OutputPin->Invoke("Cast_IPinFunction", (NodeGraph::OutputPin*)flowOutPin).Convert<VisualScript::IPinFunction*>();
+            VisualScript::IPinFunction* flowOutRaw = Reflection::GetType<NodeGraph::OutputPin>()->Invoke("Cast_IPinFunction", (NodeGraph::OutputPin*)flowOutPin).Convert<VisualScript::IPinFunction*>();
             std::vector<VisualScript::IPin*> flowConns = flowOutPin->GetConnections();
 
             for(VisualScript::IPin* flowConn : flowConns)
@@ -46,8 +57,13 @@ namespace SteelEngine {
                 }
             }
         });
-        AddInputPin<float>(VisualScript::IPin::PinType::VARIABLE, "a");
-        AddInputPin<float>(VisualScript::IPin::PinType::VARIABLE, "b");
+
+        m_Inputs.push_back(flow);
+
+        AddInputNode(SetupInputPin<float>(VisualScript::IPin::PinType::VARIABLE));
+        AddInputNode(SetupInputPin<float>(VisualScript::IPin::PinType::VARIABLE));
+
+        m_TypeID = Reflection::GetType<AddFloat>()->GetTypeID();
     }
 
     AddFloat::~AddFloat()
@@ -55,19 +71,29 @@ namespace SteelEngine {
 
     }
 
-    void AddFloat::Func(VisualScript::INodeData* node, VisualScript::IPinData* input)
+    void AddFloat::Func(NodeGraph::INode* node, VisualScript::IPinData* input)
     {
-        AddFloat* template_ = (AddFloat*)node->GetNodeTemplate();
-
-        VisualScript::IPinData* pin1 = template_->m_InputPin->Invoke("Cast_IPinData", (NodeGraph::InputPin*)node->GetInputs()[1]).Convert<VisualScript::IPinData*>();
-        VisualScript::IPinData* pin2 = template_->m_InputPin->Invoke("Cast_IPinData", (NodeGraph::InputPin*)node->GetInputs()[2]).Convert<VisualScript::IPinData*>();
+        VisualScript::IPinData* pin1 = Reflection::GetType<NodeGraph::InputPin>()->Invoke("Cast_IPinData", (NodeGraph::InputPin*)node->GetInputs()[1]).Convert<VisualScript::IPinData*>();
+        VisualScript::IPinData* pin2 = Reflection::GetType<NodeGraph::InputPin>()->Invoke("Cast_IPinData", (NodeGraph::InputPin*)node->GetInputs()[2]).Convert<VisualScript::IPinData*>();
 
         input->SetData(pin1->GetData<float>() + pin2->GetData<float>());
     }
 
-    void AddFloat::Func2(VisualScript::INodeData* node, VisualScript::IPinData* input)
+    void AddFloat::Func2(NodeGraph::INode* node, VisualScript::IPinData* input)
     {
 
+    }
+
+    void AddFloat::Serialize(Utils::json& j)
+    {
+        INode::Serialize(j);
+
+        j["type"] = getFullTypename(Reflection::GetType<AddFloat>());
+    }
+
+    void AddFloat::Deserialize(const Utils::json& j)
+    {
+        INode::Deserialize(j);
     }
 
 }

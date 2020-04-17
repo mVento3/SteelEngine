@@ -42,7 +42,7 @@ namespace SteelEngine {
 
     void NaiveEventReflectionModule::ProcessStructure(Parser::StructScope* info)
     {
-        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+        const IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
         for(Parser::MetaData meta : info->m_MetaData)
         {

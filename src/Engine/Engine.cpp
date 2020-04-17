@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
         SteelEngine::Reflection::CreateInstance("SteelEngine::FileSystem")
     );
 
-    // Then after that we need to prepare file system
+// Then after that we need to prepare file system
     SteelEngine::FileSystem::Map("bin", getBinaryLocation());
     SteelEngine::FileSystem::Map("se_init_log", getBinaryLocation() / "se_init_log.log");
 
@@ -106,8 +106,6 @@ int main(int argc, char* argv[])
     }
 
     SteelEngine::Reflection::GetType("SteelEngine::Core")->Invoke("Start", core);
-
-    while(1) { }
 
     return EXIT_SUCCESS;
 }

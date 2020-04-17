@@ -32,21 +32,21 @@ namespace SteelEngine {
 	{
 		friend class ReflectionRecorder;
 	private:
-		// std::string		m_TypeName;
 		char			m_TypeName[30];
 		size_t			m_TypeID;
 		CurrentBindFlag	m_CurrentBind;
 		std::string		m_CurrentBindName;
 
-		ConstructorsVector	m_Constructors;
-		PropertiesVector	m_Properties;
-		MethodsVector		m_Methods;
-		EnumsVector			m_Enums;
-		InheritancesVector	m_Inheritances;
+		InternalConstructorsVector	m_Constructors;
+		InternalPropertiesVector	m_Properties;
+		InternalMethodsVector		m_Methods;
+		InternalEnumsVector			m_Enums;
+		InternalInheritancesVector	m_Inheritances;
+
 		NamespacesVector	m_Namespaces;
 		MetaDataInfoVector 	m_MetaData;
 
-		ConstructorsVector m_ConstructorsToClear;
+		InternalConstructorsVector m_ConstructorsToClear;
 
 		void ProcessMetaData(
 			RuntimeDatabase* db,
@@ -112,29 +112,59 @@ namespace SteelEngine {
 			}
 		}
 
-		const NamespacesVector& GetNamespacesVector() override
+		NamespacesVector& GetNamespacesVector() override
 		{
 			return m_Namespaces;
 		}
 
-		const MethodsVector& GetMethodsVector() const override
+		InternalMethodsVector& GetMethodsVector() override
 		{
 			return m_Methods;
 		}
 
-		const PropertiesVector& GetPropertiesVector() const override
+		InternalPropertiesVector& GetPropertiesVector() override
 		{
 			return m_Properties;
 		}
 
-		const EnumsVector& GetEnumsVector() override
+		InternalEnumsVector& GetEnumsVector() override
 		{
 			return m_Enums;
 		}
 
-		const ConstructorsVector& GetConstructorsVector() const override
+		InternalConstructorsVector& GetConstructorsVector() override
 		{
 			return m_Constructors;
+		}
+
+		InternalInheritancesVector& GetInheritancesVector() override
+		{
+			return m_Inheritances;
+		}
+
+		const InternalMethodsVector& GetMethodsVector() const override
+		{
+			return m_Methods;
+		}
+
+		const InternalPropertiesVector& GetPropertiesVector() const override
+		{
+			return m_Properties;
+		}
+
+		const InternalEnumsVector& GetEnumsVector() const override
+		{
+			return m_Enums;
+		}
+
+		const InternalConstructorsVector& GetConstructorsVector() const override
+		{
+			return m_Constructors;
+		}
+
+		const InternalInheritancesVector& GetInheritancesVector() const override
+		{
+			return m_Inheritances;
 		}
 
 		const MetaDataInfoVector* GetMetaDataInfoVector() const override
@@ -158,18 +188,8 @@ namespace SteelEngine {
 
 		}
 
-		const std::vector<IReflectionInheritance*>& GetInheritances() override
-		{
-			return m_Inheritances;
-		}
-
-		const std::vector<IReflectionInheritance*>& GetInheritances() const override
-		{
-			return m_Inheritances;
-		}
-
 		template <typename... Args>
-		ReflectionData& Constructor()
+		ReflectionData& RegisterConstructor()
 		{
 			m_CurrentBind = CurrentBindFlag::CONSTRUCTOR_BIND;
 
@@ -184,7 +204,7 @@ namespace SteelEngine {
 		}
 
 		template <typename A, typename B>
-		ReflectionData& Property(const char* name, A B::* arg)
+		ReflectionData& RegisterProperty(const char* name, A B::* arg)
 		{
 			m_CurrentBind = CurrentBindFlag::PROPERTY_BIND;
 			m_CurrentBindName = name;
@@ -218,7 +238,7 @@ namespace SteelEngine {
 		}
 
 		template <typename B, typename... Args>
-		ReflectionData& Method(const std::string& name, B(T::*func)(Args...))
+		ReflectionData& RegisterMethod(const std::string& name, B(T::*func)(Args...))
 		{
 			m_CurrentBind = CurrentBindFlag::METHOD_BIND;
 			IReflectionMethod* res = 0;
@@ -278,7 +298,7 @@ namespace SteelEngine {
 		}
 
 		template <typename B, typename... Args>
-		ReflectionData& Method(const std::string& name, const std::vector<IFunctionArgument*> arguments, B(T::*func)(Args...))
+		ReflectionData& RegisterMethod(const std::string& name, const std::vector<IFunctionArgument*> arguments, B(T::*func)(Args...))
 		{
 			m_CurrentBind = CurrentBindFlag::METHOD_BIND;
 			IReflectionMethod* res = 0;
@@ -342,7 +362,7 @@ namespace SteelEngine {
 		}
 
 		template <typename B, typename... Args>
-		ReflectionData& Method(const std::string& name, B(*func)(Args...))
+		ReflectionData& RegisterMethod(const std::string& name, B(*func)(Args...))
 		{
 			m_CurrentBind = CurrentBindFlag::METHOD_BIND;
 			IReflectionMethod* res = 0;
@@ -402,7 +422,7 @@ namespace SteelEngine {
 		}
 
 		template <typename B, typename... Args>
-		ReflectionData& Method(const std::string& name, const std::vector<IFunctionArgument*> arguments, B(*func)(Args...))
+		ReflectionData& RegisterMethod(const std::string& name, const std::vector<IFunctionArgument*> arguments, B(*func)(Args...))
 		{
 			m_CurrentBind = CurrentBindFlag::METHOD_BIND;
 			IReflectionMethod* res = 0;
@@ -466,7 +486,7 @@ namespace SteelEngine {
 		}
 
 		template <typename A>
-		ReflectionEnumeration<T, A>& Enum(const std::string& name)
+		ReflectionEnumeration<T, A>& RegisterEnum(const std::string& name)
 		{
 			m_CurrentBind = CurrentBindFlag::ENUM_BIND;
 
@@ -501,13 +521,43 @@ namespace SteelEngine {
 		}
 
 		template <typename A>
-		ReflectionData& Inheritance(const std::string& name)
+		ReflectionData& RegisterInheritance(const std::string& name)
 		{
 			m_CurrentBind = CurrentBindFlag::INHERITANCE_BIND;
 
 			m_Inheritances.push_back(new ReflectionInheritance(name, typeid(A).hash_code()));
 
 			return *this;
+		}
+
+		const NamespacesVector& GetNamespaces() const override
+		{
+			return m_Namespaces;
+		}
+
+		InheritancesVector GetInheritances() const override
+		{
+			return Vector(m_Inheritances);
+		}
+
+		PropertiesVector GetProperties() const override
+		{
+			return Vector(m_Properties);
+		}
+
+		MethodsVector GetMethods() const override
+		{
+			return Vector(m_Methods);
+		}
+
+		EnumsVector GetEnums() const override
+		{
+			return Vector(m_Enums);
+		}
+
+		ConstructorsVector GetConstructors() const override
+		{
+			return Vector(m_Constructors);
 		}
 
 		template <typename... Args>
@@ -545,40 +595,16 @@ namespace SteelEngine {
 
 		Variant GetProperty(const char* name, void* object) const override
 		{
-			ReflectionProperty<Variant, T>* te = 0;
+			Property prop = GetProperty(name);
 
-			for(Type::uint32 i = 0; i < m_Properties.size(); i++)
-			{
-				IReflectionProperty* prop = m_Properties[i];
-
-				if(strcmp(prop->GetName().c_str(), name) == 0)
-				{
-					te = (ReflectionProperty<Variant, T>*)prop;
-
-					break;
-				}
-			}
-
-			if(!te)
-			{
-				static Variant wrong;
-
-				return wrong;
-			}
-
-			T* object_ = (T*)object;
-			Variant res = GetInfo(te);
-
-			res.Reassign((ValuePointer*)&(object_->*(te->m_Value)));
-
-			return res;
+			return prop->GetValue(object);
 		}
 
-		IReflectionProperty* GetProperty(const char* name) override
+		Property GetProperty(const char* name) const override
 		{
 			for(Type::uint32 i = 0; i < m_Properties.size(); i++)
 			{
-				IReflectionProperty* prop = m_Properties[i];
+				const IReflectionProperty* prop = m_Properties[i];
 
 				if(strcmp(prop->GetName().c_str(), name) == 0)
 				{
@@ -589,11 +615,11 @@ namespace SteelEngine {
 			return 0;
 		}
 
-		IReflectionMethod* GetMethod(const std::string& name) override
+		Method GetMethod(const std::string& name) const override
 		{
 			for(Type::uint32 i = 0; i < m_Methods.size(); i++)
 			{
-				IReflectionMethod* meth = m_Methods[i];
+				const IReflectionMethod* meth = m_Methods[i];
 
 				if(meth->GetName() == name)
 				{
@@ -604,11 +630,11 @@ namespace SteelEngine {
 			return 0;
 		}
 
-		IReflectionEnumeration* GetEnum(const std::string& name) override
+		Enumeration GetEnum(const std::string& name) const override
 		{
 			for(Type::uint32 i = 0; i < m_Enums.size(); i++)
 			{
-				IReflectionEnumeration* enum_ = m_Enums[i];
+				const IReflectionEnumeration* enum_ = m_Enums[i];
 
 				if(enum_->GetName() == name)
 				{

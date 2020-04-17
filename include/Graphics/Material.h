@@ -26,6 +26,11 @@ namespace SteelEngine { namespace Graphics {
             return material;
         }
 
+        static IMaterial* Create(const std::filesystem::path& file)
+        {
+            return Create(file.string().c_str());
+        }
+
         ITexture* Setup() override;
     };
 

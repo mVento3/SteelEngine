@@ -15,12 +15,15 @@ namespace SteelEngine {
 
 	};
 
+	struct VoidVariant;
+
 	class Variant : public StaticHelper
 	{
 		friend struct MetaDataImplementation;
 		friend struct MetaDataInfo;
 		friend struct IReflectionData;
 		friend struct IReflectionProperty;
+		friend struct VoidVariant;
 	private:
 		size_t m_TypeID = RuntimeDatabase::s_InvalidID;
 		ValuePointer* m_ValuePointer;
@@ -45,6 +48,7 @@ namespace SteelEngine {
 			m_IsFloatingPoint	= std::is_floating_point<T>::value;
 			m_IsReference		= std::is_reference<T>::value;
 			m_IsEmpty			= std::is_empty<T>::value;
+			m_IsVoid			= std::is_void<T>::value;
 
 			m_TypeID = typeid(T).hash_code();
 		}
@@ -62,6 +66,7 @@ namespace SteelEngine {
 		bool m_IsFloatingPoint	= false;
 		bool m_IsReference		= false;
 		bool m_IsEmpty			= false;
+		bool m_IsVoid			= false;
 
 		Variant()
 		{
@@ -87,6 +92,37 @@ namespace SteelEngine {
 			m_IsFloatingPoint	= false;
 			m_IsReference		= false;
 			m_IsEmpty			= false;
+			m_IsVoid			= false;
+
+			m_VariantID = ms_RuntimeDatabase->GetNextPerVariantID();
+		}
+
+		template <typename T>
+		Variant()
+		{
+			if(!ms_RuntimeDatabase)
+			{
+				ms_RuntimeDatabase = (RuntimeDatabase*)ModuleManager::GetModule("RuntimeDatabase");
+			}
+
+			m_TypeID = typeid(A).hash_code();
+			m_ValuePointer = 0;
+			m_AutoDelete = true;
+			m_ToDelete = true;
+
+			m_IsPointer			= std::is_pointer<T>::value;
+			m_IsArray			= std::is_array<T>::value;
+			m_IsArithmetic		= std::is_arithmetic<T>::value;
+			m_IsAbstract		= std::is_abstract<T>::value;
+			m_IsClass			= std::is_class<T>::value;
+			m_IsCompound		= std::is_compound<T>::value;
+			m_IsConst			= std::is_const<T>::value;
+			m_IsEnum			= std::is_enum<T>::value;
+			m_IsIntegral		= std::is_integral<T>::value;
+			m_IsFloatingPoint	= std::is_floating_point<T>::value;
+			m_IsReference		= std::is_reference<T>::value;
+			m_IsEmpty			= std::is_empty<T>::value;
+			m_IsVoid			= std::is_void<T>::value;
 
 			m_VariantID = ms_RuntimeDatabase->GetNextPerVariantID();
 		}
@@ -116,6 +152,7 @@ namespace SteelEngine {
 			m_IsFloatingPoint	= std::is_floating_point<T>::value;
 			m_IsReference		= std::is_reference<T>::value;
 			m_IsEmpty			= std::is_empty<T>::value;
+			m_IsVoid			= std::is_void<T>::value;
 
 			m_VariantID = ms_RuntimeDatabase->GetNextPerVariantID();
 		}
@@ -144,6 +181,7 @@ namespace SteelEngine {
 			m_IsFloatingPoint	= std::is_floating_point<T>::value;
 			m_IsReference		= std::is_reference<T>::value;
 			m_IsEmpty			= std::is_empty<T>::value;
+			m_IsVoid			= std::is_void<T>::value;
 
 			m_VariantID = ms_RuntimeDatabase->GetNextPerVariantID();
 		}
@@ -170,6 +208,7 @@ namespace SteelEngine {
 			m_IsFloatingPoint	= value.m_IsFloatingPoint;
 			m_IsReference		= value.m_IsReference;
 			m_IsEmpty			= value.m_IsEmpty;
+			m_IsVoid			= value.m_IsVoid;
 
 			m_TypeID = value.m_TypeID;
 		}
@@ -293,6 +332,16 @@ namespace SteelEngine {
 		inline const bool IsValid()
 		{
 			return m_TypeID != RuntimeDatabase::s_InvalidID;
+		}
+	};
+
+	struct VoidVariant
+	{
+		Variant m_Void;
+
+		VoidVariant()
+		{
+			m_Void.Recheck<void>();
 		}
 	};
 

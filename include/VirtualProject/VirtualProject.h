@@ -13,7 +13,7 @@
 #include "VirtualProject/CreateNewProjectEvent.h"
 #include "VirtualProject/FileTemplateCreator.h"
 
-#include "PythonProcess/IPythonProcess.h"
+#include "Subprocess/ISubprocess.h"
 
 #include "RuntimeCompiler/IRuntimeCompiler.h"
 
@@ -34,12 +34,14 @@ namespace SteelEngine {
         SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         Reflection::ReflectionAttribute::HOT_RELOAD
     )
-    class VirtualProject : public IVirtualProject, public Script::Python::Scriptable
+    class VirtualProject :
+        public IVirtualProject,
+        public Script::Python::Scriptable
     {
         GENERATED_BODY
         friend class VirtualProjectVisualizer;
     public:
-        typedef IPythonProcess*(*PythonProcess_new)();
+        typedef ISubprocess*(*Subprocess_new)();
 
     private:
         std::string m_EnginePath;
@@ -48,7 +50,7 @@ namespace SteelEngine {
         std::string m_ProjectName;
 
         IReflectionGenerator*   m_ReflectionGenerator;
-        IPythonProcess*         m_Process;
+        ISubprocess*            m_Process;
         IRuntimeCompiler*       m_Compiler;
         void*                   m_ProjectDLL;
 
@@ -84,6 +86,8 @@ namespace SteelEngine {
         }
 
         Result IsProjectLoadedSuccessful() const override;
+
+        const std::vector<HotReloader::InheritanceTrackKeeper*>& GetProjectScripts() const override { return m_ProjectScripts; }
 
         void operator()(const LoadedProjectEvent& event);
         void operator()(LoadProjectEvent* event);

@@ -1,15 +1,55 @@
 #include "ImGUI_Editor/EditorWindows/NodeGraph/OutputPin.h"
 
+#include "ImGUI_Editor/EditorWindows/BlueprintWindow.h"
+
 namespace SteelEngine { namespace NodeGraph {
 
-    OutputPin::OutputPin(VisualScript::IPin::PinType type, VisualScript::IPin::VariableType variableType) :
-        m_Type(type),
-        m_VariableType(variableType)
+    void OutputPin::Serialize(Utils::json& j)
+    {
+        j["id"] = GetID();
+        j["pin"] = "SteelEngine::NodeGraph::OutputPin";
+        j["connections"] = Utils::json::array();
+
+        for(VisualScript::IPin* conn : m_Connections)
+        {
+            Utils::json jConn;
+
+            jConn["id"] = conn->GetID();
+            jConn["flow"] = conn->GetFlowType();
+
+            j["connections"].push_back(jConn);
+        }
+    }
+
+    void OutputPin::Deserialize(const Utils::json& j)
+    {
+        SetID(j["id"]);
+
+        Utils::json jConns = j["connections"];
+
+        for(Utils::json::iterator it = jConns.begin(); it != jConns.end(); ++it)
+        {
+            Utils::json item = *it;
+
+            m_PendingConnections.push(PendingConnection{ item["id"].get<int>(), item["flow"].get<VisualScript::IPin::Flow>() });
+        }
+    }
+
+    OutputPin::OutputPin()
     {
         m_Connected = false;
         m_Color = ImColor(150, 150, 150);
         m_BorderColor = ImColor(255, 255, 255);
         m_Flow = VisualScript::IPin::Flow::OUTPUT;
+
+        m_TypeID = Reflection::GetType<OutputPin>()->GetTypeID();
+    }
+
+    OutputPin::OutputPin(VisualScript::IPin::PinType type, VisualScript::IPin::VariableType variableType) :
+        OutputPin()
+    {
+        m_Type = type;
+        m_VariableType = variableType;
     }
 
     OutputPin::~OutputPin()

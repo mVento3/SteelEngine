@@ -4,43 +4,41 @@
 #include "RuntimeReflection/Reflection.h"
 
 #include "VisualScript/INode.h"
-#include "VisualScript/NodeTemplate.h"
+#include "VisualScript/IPinData.h"
+
+#include "ImGUI_Editor/EditorWindows/NodeGraph/INode.h"
+
+#include "ImGUI_Editor/EditorWindows/NodeGraph/Nodes/AddFloat.Generated.h"
 
 namespace SteelEngine {
 
     SE_CLASS(
         // Reflection::ReflectionAttribute::VISUAL_SCRIPT_NODE
     )
-    class AddFloat : public VisualScript::NodeTemplate
+    class AddFloat :
+        public NodeGraph::INode
     {
+        GENERATED_BODY
     private:
-        PinTemplateVector m_PinTemplates;
-
-        const IReflectionData* m_Type;
-
-        IReflectionData* m_InputPin;
-        IReflectionData* m_OutputPin;
 
     public:
         AddFloat();
         ~AddFloat();
 
-        PinTemplateVector& GetInputPinTemplates() override { return m_PinTemplates; }
-
-        void SetType(const IReflectionData* type) override { m_Type = type; }
-        const IReflectionData* GetType() const override { return m_Type; }
-
         SE_METHOD(
             Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC,
             Reflection::ReflectionAttribute::VISUAL_SCRIPT_RETURN_TYPE = typeid(float).hash_code()
         )
-        static void Func(VisualScript::INodeData* node, VisualScript::IPinData* input);
+        void Func(NodeGraph::INode* node, VisualScript::IPinData* input);
 
         SE_METHOD(
             Reflection::ReflectionAttribute::VISUAL_SCRIPT_FUNC,
             Reflection::ReflectionAttribute::VISUAL_SCRIPT_FLOW
         )
-        static void Func2(VisualScript::INodeData* node, VisualScript::IPinData* input);
+        void Func2(NodeGraph::INode* node, VisualScript::IPinData* input);
+
+        void Serialize(Utils::json& j) override;
+        void Deserialize(const Utils::json& j) override;
     };
 
 }

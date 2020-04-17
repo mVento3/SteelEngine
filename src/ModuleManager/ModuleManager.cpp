@@ -2,8 +2,6 @@
 
 #include "HotReloader/IRuntimeObject.h"
 
-#include "Utils/Utils.h"
-
 extern "C"
 {
 	__declspec(dllexport) void* getModuleManager()
@@ -18,19 +16,13 @@ namespace SteelEngine {
 
 	void* ModuleManager::GetModuleLocal(const std::string& name)
 	{
-		for(StaticModuleInfo info : m_StaticGlobalModules)
+		for(ModuleInfo* module : m_Modules)
 		{
-			if(info.m_ModuleName == name)
-			{
-				return info.m_Module;
-			}
-		}
+			std::string filename = split(module->m_Path.filename().string(), '.')[0];
 
-		for(ModuleInfo info : m_Modules)
-		{
-			if(info.m_ModuleName == name)
+			if(filename == name)
 			{
-				return info.m_CreateCallback(0, 0);
+				return module->m_AllocatedStaticObject != NULL ? module->m_AllocatedStaticObject : module->m_Allocator(0, 0);
 			}
 		}
 
@@ -62,7 +54,7 @@ namespace SteelEngine {
 
 	ModuleManager::ModuleManager()
 	{
-		
+
 	}
 
 	ModuleManager::~ModuleManager()
@@ -76,17 +68,36 @@ namespace SteelEngine {
 		{
 			std::filesystem::path path = entry.path();
 
-			Load(path);
-		}
-	}
+			if(std::filesystem::is_directory(path))
+			{
+				continue;
+			}
 
-	void ModuleManager::LoadAllImpl(const std::filesystem::path& name)
-	{
-		for(const auto& entry : std::filesystem::directory_iterator(name))
-		{
-			std::filesystem::path path = entry.path();
+#ifdef SE_WINDOWS
+			if(path.extension().string() != ".dll")
+#else
+			if(path.extension().string() != ".so")
+#endif
+			{
+				continue;
+			}
 
-			Load(path);
+			bool found = false;
+
+			for(ModuleInfo* module : m_Modules)
+			{
+				if(module->m_Path == path)
+				{
+					found = true;
+
+					break;
+				}
+			}
+
+			if(!found)
+			{
+				Load(path);
+			}
 		}
 	}
 
@@ -94,117 +105,87 @@ namespace SteelEngine {
 	{
 		std::vector<std::string> splitted = split(blackList, ' ');
 
-		for(ReflectionModuleInfo info : m_ReflectedModules)
+		for(ModuleInfo* module : m_Modules)
 		{
-			if(!FreeIf(splitted, info.m_ModuleName, mode))
+			if(!FreeIf(splitted, module->m_Path.stem().string(), mode))
 			{
-				Module::free(&info.m_Raw);
+				Module::free(&module->m_LoadedDLL);
 			}
 		}
 
-		for(ModuleInfo info : m_Modules)
-		{
-			if(!FreeIf(splitted, info.m_ModuleName, mode))
-			{
-				Module::free(&info.m_Raw);
-			}
-		}
+		// for(ReflectionModuleInfo info : m_ReflectedModules)
+		// {
+		// 	if(!FreeIf(splitted, info.m_ModuleName, mode))
+		// 	{
+		// 		Module::free(&info.m_Raw);
+		// 	}
+		// }
 
-		for(StaticModuleInfo info : m_StaticGlobalModules)
-		{
-			if(!FreeIf(splitted, info.m_ModuleName, mode))
-			{
-				Module::free(&info.m_Raw);
-			}
-		}
+		// for(ModuleInfo info : m_Modules)
+		// {
+		// 	if(!FreeIf(splitted, info.m_ModuleName, mode))
+		// 	{
+		// 		Module::free(&info.m_Raw);
+		// 	}
+		// }
+
+		// for(StaticModuleInfo info : m_StaticGlobalModules)
+		// {
+		// 	if(!FreeIf(splitted, info.m_ModuleName, mode))
+		// 	{
+		// 		Module::free(&info.m_Raw);
+		// 	}
+		// }
 	}
 
 	void ModuleManager::LoadImpl(const std::filesystem::path& name)
 	{
-#ifdef SE_WINDOWS
-		if(name.extension().string() == ".dll")
-#else
-		if(name.extension().string() == ".so")
-#endif
+		void* dll;
+		Module::Details* dllInfo;
+		ModuleInfo* moduleInfo = new ModuleInfo();
+		bool added = false;
+
+		moduleInfo->m_Path = name;
+
+		m_Modules.push_back(moduleInfo);
+
+		Module::load(name.string().c_str(), (void**)&dll);
+
+		if(dll == NULL)
 		{
-			void* module;
+			return;
+		}
 
-			Module::load(name.string(), (void**)&module);
+		Module::get("exports", dll, (void**)&dllInfo);
 
-			Module::Details* info;
-
-			Module::get("exports", module, (void**)&info);
-
-			if(info)
+		if(dllInfo)
+		{
+			if(dllInfo->m_PluginFlags == Module::Details::PluginFlag::ONCE)
 			{
-				for(ModuleInfo info_ : m_Modules)
-				{
-					if(info_.m_ModuleName == info->m_PluginName)
-					{
-						Module::free((void**)&module);
+				moduleInfo->m_LoadedDLL = dll;
+				moduleInfo->m_AllocatedStaticObject = dllInfo->m_AllocateCallback(0, 0);
 
-						return;
-					}
-				}
-
-				for(StaticModuleInfo info_ : m_StaticGlobalModules)
-				{
-					if(info_.m_ModuleName == info->m_PluginName)
-					{
-						Module::free((void**)&module);
-
-						return;
-					}
-				}
-
-				if(info->m_PluginFlags == Module::Details::PluginFlag::ONCE)
-				{
-					StaticModuleInfo moduleInfo;
-
-					moduleInfo.m_Module = info->m_AllocateCallback(0, 0);
-					moduleInfo.m_ModuleName = info->m_PluginName;
-					moduleInfo.m_Raw = module;
-
-					m_StaticGlobalModules.push_back(moduleInfo);
-				}
-				else
-				{
-					ModuleInfo moduleInfo;
-
-					moduleInfo.m_ModuleName = info->m_PluginName;
-					moduleInfo.m_CreateCallback = info->m_AllocateCallback;
-					moduleInfo.m_Raw = module;
-
-					m_Modules.push_back(moduleInfo);
-				}
+				added = true;
 			}
 			else
 			{
-				bool found = false;
+				moduleInfo->m_LoadedDLL = dll;
+				moduleInfo->m_Allocator = dllInfo->m_AllocateCallback;
 
-				for(ReflectionModuleInfo info_ : m_ReflectedModules)
-				{
-					if(info_.m_ModuleName == name)
-					{
-						found = true;
-						break;
-					}
-				}
-
-				if(!found)
-				{
-					ReflectionModuleInfo moduleInfo;
-
-					moduleInfo.m_ModuleName = name.string();
-					moduleInfo.m_Raw = module;
-
-					m_ReflectedModules.push_back(moduleInfo);
-				}
-				else
-				{
-					Module::free((void**)&module);
-				}
+				added = true;
 			}
+		}
+		else
+		{
+			moduleInfo->m_LoadedDLL = dll;
+
+			added = true;
+		}
+
+		if(!added)
+		{
+			delete moduleInfo;
+			moduleInfo = 0;
 		}
 	}
 

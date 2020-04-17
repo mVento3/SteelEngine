@@ -8,6 +8,8 @@
 
 namespace SteelEngine {
 
+    // Only for vulkan
+
     struct Vertex
     {
         Vertex(const glm::vec3& position, const glm::vec3& color) :

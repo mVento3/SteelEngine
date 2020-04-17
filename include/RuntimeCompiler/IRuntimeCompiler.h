@@ -2,7 +2,7 @@
 
 #include "HotReloader/IRuntimeObject.h"
 
-#include "PythonProcess/IPythonProcess.h"
+#include "Subprocess/ISubprocess.h"
 
 #include "Utils/Json.h"
 

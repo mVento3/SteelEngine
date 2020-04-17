@@ -10,6 +10,6 @@ namespace SteelEngine {
     struct RecompiledEvent
     {
 
-    };    
+    };
 
 }

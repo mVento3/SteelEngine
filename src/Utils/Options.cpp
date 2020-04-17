@@ -66,4 +66,9 @@ namespace SteelEngine {
         return m_Descriptor->at(index);
     }
 
+    Options::Descriptor Options::operator[](Type::uint32 index) const
+    {
+        return m_Descriptor->at(index);
+    }
+
 }

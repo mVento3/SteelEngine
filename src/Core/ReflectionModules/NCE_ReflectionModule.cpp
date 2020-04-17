@@ -20,7 +20,7 @@ namespace SteelEngine {
     {
         m_Methods = &info->m_Functions;
 
-        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+        const IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
         for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
         {
@@ -48,7 +48,7 @@ namespace SteelEngine {
 
     void NCE_ReflectionModule::ProcessProperty(Parser::PropertyScope* info)
     {
-        IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
+        const IReflectionEnumeration* enum_ = Reflection::GetType("SteelEngine::Reflection")->GetEnum("ReflectionAttribute");
 
         for(Type::uint32 i = 0; i < info->m_MetaData.size(); i++)
         {

@@ -14,8 +14,8 @@ namespace SteelEngine {
 	{
 		virtual HotReloader::IRuntimeObject* Invoke(ITuple* args) { return 0; }
 
-		virtual size_t GetConstructorID() = 0;
-		virtual size_t GetTypeID() = 0;
+		virtual size_t GetConstructorID() const = 0;
+		virtual size_t GetTypeID() const = 0;
 	};
 
 }

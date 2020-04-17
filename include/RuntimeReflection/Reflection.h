@@ -183,8 +183,6 @@ namespace SteelEngine {
 				}
 			}
 
-			// throw TypeNotFoundException(name);
-
 			return 0;
 		}
 
@@ -200,8 +198,6 @@ namespace SteelEngine {
 				}
 			}
 
-			// throw TypeNotFoundException();
-
 			return 0;
 		}
 
@@ -216,8 +212,6 @@ namespace SteelEngine {
 					return type;
 				}
 			}
-
-			// throw TypeNotFoundException();
 
 			return 0;
 		}
@@ -236,8 +230,6 @@ namespace SteelEngine {
 					return type;
 				}
 			}
-
-			// throw TypeNotFoundException(SE_GET_TYPE_NAME(T));
 
 			return 0;
 		}
@@ -277,8 +269,6 @@ namespace SteelEngine {
 				}
 			}
 
-			// throw TypeNotFoundException(name);
-
 			return 0;
 		}
 
@@ -317,8 +307,6 @@ namespace SteelEngine {
 				}
 			}
 
-			// throw TypeNotFoundException(name);
-
 			return 0;
 		}
 
@@ -337,8 +325,6 @@ namespace SteelEngine {
 				}
 			}
 
-			// throw TypeNotFoundException(SE_GET_TYPE_NAME(T));
-
 			return 0;
 		}
 
@@ -356,8 +342,6 @@ namespace SteelEngine {
 					return type->Create_(args...);
 				}
 			}
-
-			// throw TypeNotFoundException(SE_GET_TYPE_NAME(T));
 
 			return 0;
 		}
