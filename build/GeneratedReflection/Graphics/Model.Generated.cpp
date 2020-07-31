@@ -16,6 +16,7 @@ SteelEngine::ReflectionRecorder::Register<Model>("Model",{
 SteelEngine::Reflection::MetaData("sizeof", sizeof(Model))
 )
 .RegisterConstructor<const char*>()
+.RegisterConstructor<std::vector<glm::vec3>, std::vector<glm::vec2>, std::vector<Type::uint32>>()
 .RegisterInheritance<IModel>("IModel")
 ;
 }

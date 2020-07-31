@@ -1,17 +1,17 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
-#include "Graphics/OpenGL/Renderer.h"
-#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Graphics/OpenGL/Renderer.Generated.h"
+#include "Graphics/TestRenderer/Renderer.h"
+#include "D:\Projects\C++\SteelEngine\build/GeneratedReflection/Graphics/TestRenderer/Renderer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {
-namespace OpenGL {
+namespace TestRenderer {
 REGISTER_REFLECTION
 {
 SteelEngine::ReflectionRecorder::Register<Renderer>("Renderer",{
 "SteelEngine",
 "Graphics",
-"OpenGL"
+"TestRenderer"
 }
 )
 (
@@ -39,30 +39,12 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 }
 void Renderer::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
+SERIALIZE(Renderer::m_RenderContext)
 SERIALIZE(Renderer::m_Window)
-SERIALIZE(Renderer::m_Camera)
-SERIALIZE(Renderer::m_QuadShader)
-SERIALIZE(Renderer::m_QuadMesh)
-SERIALIZE(Renderer::m_Lights)
-SERIALIZE(Renderer::m_Texture)
-SERIALIZE(Renderer::m_NormalMapTexture)
-SERIALIZE(Renderer::m_DispMapTexture)
-SERIALIZE(Renderer::m_G_Shader)
-SERIALIZE(Renderer::m_PositionTexture)
-SERIALIZE(Renderer::m_NormalTexture)
 SERIALIZE(Renderer::m_AlbedoTexture)
-SERIALIZE(Renderer::m_ShadowTexture)
-SERIALIZE(Renderer::m_G_Buffer)
-SERIALIZE(Renderer::m_ShadowShader)
-SERIALIZE(Renderer::m_ShadowCamera)
-SERIALIZE(Renderer::m_SpotLight)
-SERIALIZE(Renderer::m_SpotRotation)
-SERIALIZE(Renderer::m_DirectionalLight)
-SERIALIZE(Renderer::m_DirectionalLightTransform)
-SERIALIZE(Renderer::m_Keys)
-SERIALIZE(Renderer::m_RotateCamera)
-SERIALIZE(Renderer::m_Controlls)
-SERIALIZE(Renderer::m_Scene)
+SERIALIZE(Renderer::m_GBuffer)
+SERIALIZE(Renderer::m_QuadMesh)
+SERIALIZE(Renderer::m_QuadShader)
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

@@ -16,7 +16,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(OpenGL_Window))
 )
 .RegisterConstructor<>()
 .RegisterInheritance<IWindow>("IWindow")
-.RegisterMethod("SetProcessEventsCallback", { SteelEngine::Reflection::FucntionArgument<std::function<void(void*,IWindow*)>>("callback") }, &OpenGL_Window::SetProcessEventsCallback)
 .RegisterMethod("GetContext", &OpenGL_Window::GetContext)
 .RegisterMethod("MakeCurrent", &OpenGL_Window::MakeCurrent)
 ;

@@ -16,7 +16,6 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(VulkanWindow))
 )
 .RegisterConstructor<>()
 .RegisterInheritance<IWindow>("IWindow")
-.RegisterMethod("SetProcessEventsCallback", { SteelEngine::Reflection::FucntionArgument<std::function<void(void*,IWindow*)>>("callback") }, &VulkanWindow::SetProcessEventsCallback)
 ;
 }
 }
