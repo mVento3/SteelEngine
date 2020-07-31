@@ -324,7 +324,9 @@ namespace SteelEngine {
 
     Result VirtualProject::Init()
     {
-        m_EnginePath = Call("getCWD")->ToString();
+    // TODO: Remove python
+        // m_EnginePath = Call("getCWD")->ToString();
+        m_EnginePath = getBinaryLocation().parent_path().string();
 
         if(!m_Process)
         {
@@ -543,9 +545,9 @@ namespace SteelEngine {
             if(m_Compiler->WasError())
             {
                 m_Process->SetError(false);
-                SE_ERROR("Error while compiling project: %s", m_Compiler->GetErrorMessage().c_str());
-
                 m_Process->Reset();
+
+                SE_ERROR("Error while compiling project: %s", m_Compiler->GetErrorMessage().c_str());
 
                 return;
             }
@@ -630,7 +632,7 @@ namespace SteelEngine {
         std::vector<std::string> toCompile = UpdateState(m_LoadedProject / "build/state.json", m_LoadedProject);
         LoadProject(toCompile);
 
-        (*m_Visualizer)->OnProjectLoad();
+        // (*m_Visualizer)->OnProjectLoad();
     }
 
     void VirtualProject::operator()(GetLoadedProjectPathEvent* event)

@@ -18,7 +18,7 @@ namespace SteelEngine {
 			}
 
 			RuntimeDatabase::GetStateCallback get;
-			SteelEngine::Module::get("getModuleManager", module, (void**)&get);
+			SteelEngine::Module::get("get_module_manager", module, (void**)&get);
 
 			static RuntimeDatabase* db;
 

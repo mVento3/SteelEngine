@@ -14,6 +14,8 @@ namespace SteelEngine { namespace Network {
     {
         m_Header = SE_GET_TYPE_NAME(SwapModuleNetCommandEvent);
 
+        printf("Swapping module over network: %s\n", moduleName);
+
         m_Buffer = new char[1024];
     }
 

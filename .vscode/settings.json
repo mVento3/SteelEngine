@@ -104,7 +104,8 @@
         "variant": "cpp",
         "parentbad": "cpp",
         "*.mm": "cpp",
-        "concepts": "cpp"
+        "concepts": "cpp",
+        "compare": "cpp"
     },
     "python.pythonPath": "D:\\Programs\\Microsoft Visual Studio\\Shared\\Python37_64\\python.exe",
     "python.linting.pylintEnabled": true,

@@ -22,7 +22,7 @@ namespace SteelEngine {
 
         void Init() override;
 
-        entt::registry* GetCurrentScene() override;
+        entt::registry& GetCurrentScene() override;
     };
 
 }

@@ -39,9 +39,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         void Bind(GLint texture) const;
 
-        unsigned int GetTextureID() override { return m_Texture; }
-        unsigned int GetTextureWidth() override { return m_Width; }
-        unsigned int GetTextureHeight() override { return m_Height; }
+        unsigned int GetTextureID() const override { return m_Texture; }
+        unsigned int GetTextureWidth() const override { return m_Width; }
+        unsigned int GetTextureHeight() const override { return m_Height; }
     };
 
 }}}

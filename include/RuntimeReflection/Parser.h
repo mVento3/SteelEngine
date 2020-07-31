@@ -201,6 +201,15 @@ namespace SteelEngine {
             {
 
             }
+
+            InheritanceScope(const std::string& name, const std::string& templateName) :
+                ScopeInfo(ScopeType::INHERITANCE, name),
+                m_TemplateName(templateName)
+            {
+
+            }
+
+            std::string m_TemplateName;
         };
 
         struct StructScope : public ScopeInfo

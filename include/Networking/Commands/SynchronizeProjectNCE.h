@@ -8,8 +8,8 @@
 
 #include "EditorComponents/ImGUI/UserInterface.h"
 
-#include "ImGUI_Editor/ReflectionAttribs.h"
-#include "ImGUI_Editor/WindowType.h"
+#include "Editor/ImGUI/ReflectionAttribs.h"
+#include "Editor/ImGUI/WindowType.h"
 
 #include "Networking/Commands/SynchronizeProjectNCE.Generated.h"
 

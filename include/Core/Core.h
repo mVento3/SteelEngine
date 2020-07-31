@@ -13,14 +13,15 @@
 #include "Utils/Utils.h"
 #include "Utils/Time.h"
 
+#include "Utils/Graphics/Renderer3D.h"
+
 #include "Logger/Logger.h"
 
 #include "Graphics/IRenderer.h"
 #include "Graphics/IEditor.h"
-#include "Graphics/Renderer.h"
 #include "Graphics/IContext.h"
 
-#include "Window/IWindow.h"
+#include "Utils/Window.h"
 
 #include "VirtualProject/IVirtualProject.h"
 #include "VirtualProject/LoadedProjectEvent.h"
@@ -37,10 +38,18 @@
 
 #include "SceneSystem/ISceneManager.h"
 
+#include "AssetManager/IAssetManager.h"
+
+#include "Utils/Graphics/RenderContext.h"
+
+#include "PlatformDll/Graphics/RenderDeviceDOD.h"
+
 #include "Core/Core.Generated.h"
 
 // 1. Fix problem with properties in proper class, especially while nesting
 // 2. Replace ImGUI_Program from vulkan to editor module, to do this i need create good render api
+
+// Not sure if Core should be dll lol...
 
 namespace SteelEngine {
 
@@ -68,22 +77,25 @@ namespace SteelEngine {
             EVENT_MANAGER, // This is for normal events
             MEMORY_TRACKER,
             NETWORK_MANAGER,
-            PROFILER
+            PROFILER,
+            ASSET_MANAGER
         };
 
     private:
         HotReloader::RuntimeReloader* m_RuntimeReloader;
         IReflectionGenerator*       m_ReflectionGenerator;
         ILogger*                    m_Logger;
-        Graphics::IRenderer**       m_Renderer;
+        Utils::RenderContext*       m_RenderContext;
         IWindow*                    m_Window;
-        Editor::IEditor**           m_Editor;
+        // IEditorContext*             m_EditorContext;
+        Editor::IEditor*            m_Editor;
         IVirtualProject**           m_VirtualProject;
         Network::INetworkManager*   m_NetworkManager;
         Script::IPython*            m_Python;
-        IContext*                   m_ImGUI_ContextAPI;
+    // It is typically for imgui
         IEventManager*              m_EventManager;
         ISceneManager*              m_SceneManager;
+        IAssetManager*              m_AssetManager;
 
         Variant* m_DeltaTimeVariant;
 

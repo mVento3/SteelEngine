@@ -55,8 +55,8 @@ namespace SteelEngine {
         }
 
         m_Context = SDL_GL_CreateContext(m_Window);
-        SDL_GL_MakeCurrent(m_Window, m_Context);
 
+        SDL_GL_MakeCurrent(m_Window, m_Context);
         SDL_GL_SetSwapInterval(0);
 
         Event::GlobalEvent::Add<ChangeMousePositionEvent>(this);
@@ -122,6 +122,12 @@ namespace SteelEngine {
             else if(m_Event.type == SDL_MOUSEMOTION)
             {
                 MouseMotionEvent* event = new MouseMotionEvent(m_Event.motion.x, m_Event.motion.y);
+
+                m_EventManager->DispatchEvent(event);
+            }
+            else if(m_Event.type == SDL_MOUSEWHEEL)
+            {
+                MouseWheelEvent* event = new MouseWheelEvent(m_Event.wheel.y);
 
                 m_EventManager->DispatchEvent(event);
             }

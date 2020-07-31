@@ -35,6 +35,8 @@ namespace SteelEngine { namespace Network {
         SE_VALUE(SteelEngine::Reflection::ReflectionAttribute::NET_VALUE)
         std::string m_Header;
 
+        HotReloader::InheritanceTrackKeeper* m_Swapper;
+
         bool m_Deserialized = false;
         bool m_Busy = false;
 

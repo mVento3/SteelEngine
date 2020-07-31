@@ -4,7 +4,7 @@
 
 extern "C"
 {
-	__declspec(dllexport) void* getModuleManager()
+	__declspec(dllexport) void* get_module_manager()
 	{
 		static SteelEngine::ModuleManager state;
 
@@ -112,30 +112,6 @@ namespace SteelEngine {
 				Module::free(&module->m_LoadedDLL);
 			}
 		}
-
-		// for(ReflectionModuleInfo info : m_ReflectedModules)
-		// {
-		// 	if(!FreeIf(splitted, info.m_ModuleName, mode))
-		// 	{
-		// 		Module::free(&info.m_Raw);
-		// 	}
-		// }
-
-		// for(ModuleInfo info : m_Modules)
-		// {
-		// 	if(!FreeIf(splitted, info.m_ModuleName, mode))
-		// 	{
-		// 		Module::free(&info.m_Raw);
-		// 	}
-		// }
-
-		// for(StaticModuleInfo info : m_StaticGlobalModules)
-		// {
-		// 	if(!FreeIf(splitted, info.m_ModuleName, mode))
-		// 	{
-		// 		Module::free(&info.m_Raw);
-		// 	}
-		// }
 	}
 
 	void ModuleManager::LoadImpl(const std::filesystem::path& name)
@@ -149,6 +125,8 @@ namespace SteelEngine {
 
 		m_Modules.push_back(moduleInfo);
 
+		printf("Attempt to load: %s\n", name.string().c_str());
+
 		Module::load(name.string().c_str(), (void**)&dll);
 
 		if(dll == NULL)
@@ -156,7 +134,7 @@ namespace SteelEngine {
 			return;
 		}
 
-		Module::get("exports", dll, (void**)&dllInfo);
+		Module::get("se_exports", dll, (void**)&dllInfo);
 
 		if(dllInfo)
 		{

@@ -19,12 +19,16 @@
 
 enum Index
 {
-    CURRENT_WORKING_DIR
+    CURRENT_WORKING_DIR,
+    BIN_DIR,
+    INCLUDE_DIR
 };
 
 std::vector<SteelEngine::Options::Descriptor> desc =
 {
-    { CURRENT_WORKING_DIR, "cwd" }
+    { CURRENT_WORKING_DIR, "cwd" },
+    { BIN_DIR, "bin" },
+    { INCLUDE_DIR, "i" }
 };
 
 void generateReflectionForFile(SteelEngine::IReflectionGenerator* rg, const std::filesystem::path& cwd, const std::filesystem::path& header)
@@ -86,7 +90,7 @@ int main(int argc, char* argv[])
     SteelEngine::Options parser(argv, argc, desc);
 
 // Allocate main/root memory chunk
-    size_t rootMemorySize = 1024 * 1024LL;
+    size_t rootMemorySize = 4096 * 1024LL;
     void* rootMemory = malloc(rootMemorySize);
 	SteelEngine::Memory::Allocator* rootMemoryAllocator;
 
@@ -114,16 +118,24 @@ int main(int argc, char* argv[])
     );
 
     SteelEngine::IReflectionGenerator* rg = (SteelEngine::IReflectionGenerator*)SteelEngine::Reflection::CreateInstance("SteelEngine::ReflectionGenerator");
-    std::filesystem::path cwd = parser[CURRENT_WORKING_DIR].m_Result;
 
-    for(auto path : std::filesystem::recursive_directory_iterator(cwd / "include"))
+    if(!parser[INCLUDE_DIR].m_IsSet)
     {
-        if(!path.is_directory() && path.path().extension() == ".h")
-        {
-            printf("Generating reflection for: %s\n", path.path().string().c_str());
+        std::filesystem::path cwd = parser[CURRENT_WORKING_DIR].m_Result;
 
-            generateReflectionForFile(rg, cwd, path);
+        for(auto path : std::filesystem::recursive_directory_iterator(cwd / "include"))
+        {
+            if(!path.is_directory() && path.path().extension() == ".h")
+            {
+                printf("Generating reflection for: %s\n", path.path().string().c_str());
+
+                generateReflectionForFile(rg, cwd, path);
+            }
         }
+    }
+    else
+    {
+        generateReflectionForFile(rg, parser[CURRENT_WORKING_DIR].m_Result, parser[CURRENT_WORKING_DIR].m_Result + "/" + parser[INCLUDE_DIR].m_Result);
     }
 
     delete rg;

@@ -4,6 +4,8 @@
 
 #include "Core/Result.h"
 
+#include "functional"
+
 namespace SteelEngine {
 
     struct IWindow
@@ -63,7 +65,9 @@ namespace SteelEngine {
             return 0;
         }
 
-        // Vulkan
+        virtual void SetProcessEventsCallback(std::function<void(void*, IWindow*)> callback) = 0;
+
+    // Vulkan
         virtual Result GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames)
         {
             return SE_NOT_IMPLEMENTED;

@@ -51,7 +51,7 @@ namespace SteelEngine {
 #else
 				Module::load("ModuleManager.so", (void**)&module);
 #endif
-				Module::get("getModuleManager", module, (void**)&getStateCallback);
+				Module::get("get_module_manager", module, (void**)&getStateCallback);
 			}
 
 			return (ModuleManager*)getStateCallback();

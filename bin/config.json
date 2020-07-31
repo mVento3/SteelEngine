@@ -3,13 +3,13 @@
 		"flags": [
 			"/Od",
 			"/Zi",
-			"/std:c++17"
+			"/std:c++17",
+			"/MP"
 		],
 		"definitions": [
 			"SE_WINDOWS",
 			"_WINSOCKAPI_",
-			"SE_PROFILE",
-			"_MSC_VER=1925"
+			"SE_PROFILE"
 		],
 		"dll": [
 			"/MT",
@@ -75,6 +75,10 @@
 			"type": "lib"
 		},
 		{
+			"name": "Platform",
+			"type": "lib"
+		},
+		{
 			"name": "Utils",
 			"type": "lib"
 		},
@@ -84,6 +88,10 @@
 		},
 		{
 			"name": "Profiler",
+			"type": "lib"
+		},
+		{
+			"name": "Serialization",
 			"type": "lib"
 		},
 		{
@@ -111,7 +119,7 @@
 			"type": "dll"
 		},
 		{
-			"name": "ImGUI_Editor",
+			"name": "Editor",
 			"type": "dll"
 		},
 		{
@@ -176,6 +184,14 @@
 		},
 		{
 			"name": "SceneSystem",
+			"type": "dll"
+		},
+		{
+			"name": "PlatformDll",
+			"type": "dll"
+		},
+		{
+			"name": "AssetManager",
 			"type": "dll"
 		},
 		{

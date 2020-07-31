@@ -76,7 +76,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/ReflectionGenerator.exe",
-            "args": ["-b bin", "-i include/Core/Core.h", "-cwd D:/Projects/C++/SteelEngine"],
+            "args": ["-b bin", "-i include/Graphics/OpenGL/Renderer.h", "-cwd D:/Projects/C++/SteelEngine"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

@@ -3,7 +3,6 @@
 #include "RuntimeDatabase/IRuntimeDatabase.h"
 
 #include "vector"
-#include "tuple"
 #include "unordered_map"
 #include "map"
 #include "stack"
@@ -17,6 +16,8 @@
 #include "Memory/Container/Vector.h"
 #include "Memory/Container/Stack.h"
 
+#include "Utils/TupleMaker.h"
+
 #ifdef SE_WINDOWS
 #undef max
 #undef min
@@ -27,7 +28,7 @@
 
 #define SE_MAX_OBJECTS 512
 
-#define SE_MAX_VARIANTS 10000
+#define SE_MAX_VARIANTS 2000
 #define SE_MAX_VARIANT_SIZE 512
 
 int main(int argc, char* argv[]);
@@ -47,60 +48,21 @@ namespace SteelEngine {
 
 	}
 
-	struct ITuple
-	{
-		virtual ITuple* GetTuple() = 0;
-	};
+	namespace Graphics {
 
-	template <typename... Args>
-	struct Tuple : public ITuple
-	{
-		Tuple(std::tuple<Args...> args) :
-			m_Args(args)
-		{
+	namespace Utils {
 
-		}
+		class Renderer3D;
 
-		Tuple(Args... args)
-		{
-			m_Args = std::make_tuple(args...);
-		}
+	}
 
-		~Tuple()
-		{
+	}
 
-		}
+	namespace Utils {
 
-		std::tuple<Args...> m_Args;
+		class RenderContext;
 
-		ITuple* GetTuple()
-		{
-			return 0;
-		}
-	};
-
-	struct TupleMaker : public ITuple
-	{
-	private:
-		ITuple* m_Tuple;
-
-	public:
-		template <typename... Args>
-		TupleMaker(Args... args)
-		{
-			m_Tuple = new Tuple<Args...>(args...);
-		}
-
-		~TupleMaker()
-		{
-
-		}
-
-		ITuple* GetTuple() override
-		{
-			return m_Tuple;
-		}
-	};
+	}
 
 	struct ConstrucedObject
 	{
@@ -173,6 +135,17 @@ namespace SteelEngine {
 			void Init(Memory::Allocator* allocator) override;
 		};
 
+		struct RenderContext : public ISubDatabase
+		{
+			friend class RuntimeDatabase;
+			friend class SteelEngine::Graphics::Utils::Renderer3D;
+			friend struct SteelEngine::Utils::RenderContext;
+		private:
+			Utils::RenderContext* m_Context;
+
+			void Init(Memory::Allocator* allocator) override;
+		};
+
   	private:
 		void Init() override;
 
@@ -187,6 +160,7 @@ namespace SteelEngine {
 		RuntimeDatabase::Reflection* m_ReflectionDatabase;
 		RuntimeDatabase::HotReloader* m_HotReloaderDatabase;
 		RuntimeDatabase::Variant* m_VariantDatabase;
+		RuntimeDatabase::RenderContext* m_RenderContextDatabase;
 
 		size_t GetNextPerVariantID() override;
 		void PushPerVariantID(size_t id) override;

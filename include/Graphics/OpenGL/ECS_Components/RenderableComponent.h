@@ -11,8 +11,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     struct RenderableComponent
     {
-        RenderableComponent(const Mesh* mesh, const Shader* shader, bool castShadow = true) :
-            m_CastShadow(castShadow)
+        RenderableComponent(const Mesh* mesh, const Shader* shader, const Transform& transform = Transform(), bool castShadow = true) :
+            m_CastShadow(castShadow),
+            m_Transform(transform)
         {
             m_VAO = mesh->GetVAO();
             m_DrawCount = mesh->GetDrawCount();
@@ -23,6 +24,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         Type::uint32 m_DrawCount;
         Type::uint32 m_ShaderID;
         bool m_CastShadow;
+        Transform m_Transform;
     };
 
 }}}

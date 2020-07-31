@@ -4,7 +4,7 @@ namespace SteelEngine {
 
     SceneManager::SceneManager()
     {
-        // m_Scene = new entt::registry();
+
     }
 
     SceneManager::~SceneManager()
@@ -14,12 +14,12 @@ namespace SteelEngine {
 
     void SceneManager::Init()
     {
-
+        // m_Scene = new entt::registry();
     }
 
-    entt::registry* SceneManager::GetCurrentScene()
+    entt::registry& SceneManager::GetCurrentScene()
     {
-        return &m_Scene;
+        return m_Scene;
     }
 
 }

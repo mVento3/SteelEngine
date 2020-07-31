@@ -9,28 +9,48 @@
 #include "entt/entt.hpp"
 
 #include "Graphics/IModel.h"
+#include "Graphics/ITexture.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 
 #include "Math/Transform.h"
 
 #include "Event/LocalEvent.h"
 
-#include "Graphics/ITexture.h"
+#include "Window/IWindow.h"
 
-#include "Graphics/Events/AddModelEvent.h"
+namespace SteelEngine {
 
-namespace SteelEngine { namespace Graphics {
+    namespace Utils {
+
+        class RenderContext;
+
+    }
+
+    namespace Graphics {
 
     struct IRenderer : public HotReloader::IRuntimeObject
     {
     protected:
-        virtual entt::entity AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform, bool castShadow = true) { return scene->create(); }
+        virtual entt::entity AddModel(IMesh* mesh, ISceneManager* scene, const Transform& transform, bool castShadow = true) { return (entt::entity)0; }
 
     public:
         enum API
         {
-            OPENGL_API,
-            VULKAN_API,
-            SELECTED_RENDER_API
+            NONE,
+            OPENGL,
+            VULKAN,
+            DIRECTX_10,
+            DIRECTX_11,
+            DIRECTX_12,
+        // Own implementation of renderer, not supported yet
+            SOFTWARE
+        };
+
+        enum
+        {
+        // Used for specify for which renderer this implementation is
+            RENDERER
         };
 
     // General functions
@@ -39,19 +59,18 @@ namespace SteelEngine { namespace Graphics {
         virtual void Cleanup() { }
 
         virtual void PreRender() { }
-        virtual void Render(entt::registry* scene) { }
+        virtual void Render(entt::registry& scene) { }
         virtual void PostRender() { }
 
-        virtual ITexture* GetFinalTexture() { return 0; }
+        virtual void* GetFinalTexture() { return 0; }
 
-        entt::entity AddModel(IModel* model, entt::registry* scene, const Transform& transform, bool castShadow = true)
+        virtual void SetRenderTarget(IWindow* window) = 0;
+        virtual void SetSceneManager(ISceneManager* scene) = 0;
+        virtual void SetRenderContext(SteelEngine::Utils::RenderContext* context) { };
+
+        entt::entity AddModel(IModel* model, ISceneManager* scene, const Transform& transform, bool castShadow = true)
         {
-            auto res = AddModel(model->Setup(), scene, transform, castShadow);
-
-            delete model;
-            model = 0;
-
-            return res;
+            return AddModel(model->Setup(), scene, transform, castShadow);
         }
     };
 

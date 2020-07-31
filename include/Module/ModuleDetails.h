@@ -1,10 +1,10 @@
 #pragma once
 
-#define BIT(x) 1 << x
-#define PLUGIN_EXPORT __declspec(dllexport)
+#define SE_BIT(x) 1 << x
+#define SE_PLUGIN_EXPORT __declspec(dllexport)
 
 typedef void* (*AllocatePluginCallback)(void* mainAllocator, void* allocator);
-typedef void(*DeallocatePluginCallback)(void* mainAllocator, void* object);
+typedef void (*DeallocatePluginCallback)(void* mainAllocator, void* object);
 
 namespace SteelEngine { namespace Module {
 
@@ -19,8 +19,8 @@ namespace SteelEngine { namespace Module {
 		enum PluginFlag
 		{
 			NONE = 0,
-			ONCE = BIT(1),
-			THREADED = BIT(2)
+			ONCE = SE_BIT(1),
+			THREADED = SE_BIT(2)
 		};
 
 		const char*					m_FileName;

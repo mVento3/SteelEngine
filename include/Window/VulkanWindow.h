@@ -52,8 +52,7 @@ namespace SteelEngine {
         Result GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames) override;
         Result CreateVulkanSurface(void* instance, void** surface) override;
 
-        SE_METHOD()
-        inline void SetProcessEventsCallback(std::function<void(void*, IWindow*)> callback)
+        void SetProcessEventsCallback(std::function<void(void*, IWindow*)> callback) override
         {
             m_ProcessEventsCallback = callback;
         }

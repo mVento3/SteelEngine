@@ -56,6 +56,7 @@ namespace SteelEngine { namespace HotReloader {
     RuntimeReloader::RuntimeReloader()
     {
 		m_IsSwapComplete = true;
+		m_Paused = false;
     }
 
     RuntimeReloader::~RuntimeReloader()
@@ -91,6 +92,8 @@ namespace SteelEngine { namespace HotReloader {
 
 		m_BinaryLocation = getBinaryLocation();
 
+		printf("WatchDog is watching at: %s\n", ppp.string().c_str());
+
         m_SourceFileWatcher = new FileWatcher(
 			ppp / "src",
 			[this, ppp](const std::filesystem::path& file, FileWatcher::FileStatus status)
@@ -111,6 +114,8 @@ namespace SteelEngine { namespace HotReloader {
 								if(file.extension() == ".cpp")
 								{
 									std::string dirPath = file.parent_path().string();
+
+									printf("File changed: %s\n", dirPath.c_str());
 
 									replaceAll(dirPath, "/", "\\");
 
@@ -225,7 +230,7 @@ namespace SteelEngine { namespace HotReloader {
 		// TODO: Change to some state variable
 			while(1)
 			{
-				Sleep(100);
+				Sleep(10);
 
 				if(!m_Paused && m_Initialized)
 				{

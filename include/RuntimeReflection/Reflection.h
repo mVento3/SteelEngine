@@ -225,7 +225,7 @@ namespace SteelEngine {
 			{
 				IReflectionData* type = (IReflectionData*)ms_RuntimeDatabase->m_ReflectionDatabase->m_Types[i];
 
-				if (type->GetTypeID() == typeID)
+				if(type->GetTypeID() == typeID)
 				{
 					return type;
 				}
@@ -311,7 +311,7 @@ namespace SteelEngine {
 		}
 
 		template <typename T, typename... Args>
-		static void* CreateInstance(Args... args)
+		static T* CreateInstance(Args... args)
 		{
 			size_t typeID = typeid(T).hash_code();
 
@@ -321,7 +321,7 @@ namespace SteelEngine {
 
 				if(type->GetTypeID() == typeID)
 				{
-					return type->Create(args...);
+					return (T*)type->Create(args...);
 				}
 			}
 

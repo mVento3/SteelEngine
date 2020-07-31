@@ -13,7 +13,18 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         m_Uniforms[Uniforms::DISP_MAP_OFFSET] = GetUniformLocation("dispMapOffset");
     }
 
-    void TestShader::UpdateCustom(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2)
+    TestShader::TestShader() :
+        Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/gBuffer")
+    {
+
+    }
+
+    TestShader::~TestShader()
+    {
+
+    }
+
+    void TestShader::UpdateCustom(const Camera& camera)
     {
         SetVec3(m_Uniforms[Uniforms::EYE_POSITION], camera.GetTransform().GetPosition());
 
@@ -25,17 +36,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         SetFloat(m_Uniforms[Uniforms::DISP_MAP_SCALE], m_DispMapScale);
         SetFloat(m_Uniforms[Uniforms::DISP_MAP_OFFSET], m_DispMapOffset);
-    }
-
-    TestShader::TestShader() :
-        Shader("D:/Projects/C++/SteelEngine/bin/Resources/Shaders/OpenGL/gBuffer")
-    {
-
-    }
-
-    TestShader::~TestShader()
-    {
-
     }
 
 }}}

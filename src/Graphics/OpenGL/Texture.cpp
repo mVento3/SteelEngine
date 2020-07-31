@@ -1,6 +1,6 @@
 #include "Graphics/OpenGL/Texture.h"
 
-#define STB_IMAGE_IMPLEMENTATION
+// #define STB_IMAGE_IMPLEMENTATION
 #include "stbi/stb_image.h"
 
 namespace SteelEngine { namespace Graphics { namespace OpenGL {

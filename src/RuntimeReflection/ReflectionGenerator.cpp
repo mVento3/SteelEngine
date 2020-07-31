@@ -325,7 +325,7 @@ namespace SteelEngine {
 
                 for(Parser::InheritanceScope* v : str->m_Inheritance)
                 {
-                    file << ".RegisterInheritance<" << v->m_Name << ">(\"" << v->m_Name << "\")\n";
+                    file << ".RegisterInheritance<" << v->m_Name + v->m_TemplateName << ">(\"" << v->m_Name << "\")\n";
                 }
 
                 for(Parser::PropertyScope* v : str->m_Properties)
@@ -356,7 +356,7 @@ namespace SteelEngine {
 
                     if(!found)
                     {
-                        if((v->m_Protection == Parser::ProtectionLevel::PUBLIC || (v->m_ScopeType == Parser::ScopeType::STRUCT && v->m_Protection == Parser::ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
+                        if((v->m_Protection == Parser::ProtectionLevel::PUBLIC || (v->m_Parent->m_ScopeType == Parser::ScopeType::STRUCT && v->m_Protection == Parser::ProtectionLevel::NONE)) && v->m_IsReflectionLabelSet)
                         {
                             file << ".RegisterMethod(\"" << v->m_Name << "\", ";
 

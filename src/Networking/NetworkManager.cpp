@@ -6,6 +6,8 @@
 
 #include "HotReloader/ReloadableInheritanceTrackKeeper.h"
 
+#include "EditorComponents/ImGUI/UserInterface.h"
+
 namespace SteelEngine { namespace Network {
 
     NetworkManager::NetworkManager()
@@ -34,6 +36,19 @@ namespace SteelEngine { namespace Network {
                 HotReloader::InheritanceTrackKeeper* swapper = new HotReloader::ReloadableIneritanceTrackKeeper(type, comm);
 
                 swapper->Get<Network::INetworkCommand>()->m_Commands = &m_CommandTypes;
+                swapper->Get<Network::INetworkCommand>()->m_Swapper = swapper;
+
+                IReflectionData::InheritancesVector& inhs = type->GetInheritances();
+
+                for(Type::uint32 i = 0; i < inhs.Size(); i++)
+                {
+                    if(inhs[i]->GetTypeID() == typeid(EditorComponents::ImGUI::UserInterface).hash_code())
+                    {
+                        swapper->Get<EditorComponents::ImGUI::UserInterface>()->Init();
+
+                        break;
+                    }
+                }
 
                 m_CommandTypes.push_back(swapper);
             }

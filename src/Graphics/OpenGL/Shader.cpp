@@ -123,11 +123,11 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         glDeleteProgram(m_Program);
     }
 
-    void Shader::Update(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2)
+    void Shader::UpdatePerModel(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2)
     {
         glm::mat4 model = transform.GetModel();
 
-        Update(transform, camera);
+        UpdatePerModel(transform, camera);
 
         if(shadow && shadow2)
         {
@@ -140,10 +140,10 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
             glUniformMatrix4fv(m_Uniforms[LIGHT_MATRIX2_U], 1, GL_FALSE, &lightMatrix[0][0]);
         }
 
-        UpdateCustom(transform, camera, shadow, shadow2);
+        // UpdateCustom(transform, camera, shadow, shadow2);
     }
 
-    void Shader::Update(const Transform& transform, const Camera& camera)
+    void Shader::UpdatePerModel(const Transform& transform, const Camera& camera)
     {
         glm::mat4 model = transform.GetModel();
         glm::mat4 projection = camera.GetProjection();
@@ -153,7 +153,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         glUniformMatrix4fv(m_Uniforms[PROJECTION_U], 1, GL_FALSE, &projection[0][0]);
         glUniformMatrix4fv(m_Uniforms[VIEW_U], 1, GL_FALSE, &view[0][0]);
 
-        UpdateCustom(transform, camera, 0, 0);
+        // UpdateCustom(transform, camera, 0, 0);
     }
 
     void Shader::Bind() const

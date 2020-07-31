@@ -22,8 +22,18 @@
 #include "entt/entt.hpp"
 
 #include "Graphics/Model.h"
+#include "Graphics/IndexBuffer.h"
+#include "Graphics/VertexBuffer.h"
+
+#include "AssetManager/AssetManager.h"
+
+#include "AssetManager/Events/LoadAssetEvent.h"
 
 #include "Graphics/ECS_Components/TransformComponent.h"
+
+#include "Editor/ImGUI/ImGUI_Editor.h"
+
+#include "Platform/Graphics/RenderDevice.h"
 
 namespace SteelEngine {
 
@@ -34,7 +44,7 @@ namespace SteelEngine {
             Update();
         }
 
-        (*m_Renderer)->Cleanup();
+        m_RenderContext->GetCurrentRenderer()->Cleanup();
         m_Window->Close();
 
         Cleanup();
@@ -92,10 +102,6 @@ namespace SteelEngine {
         }
 
         Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::PYTHON, m_Python);
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(
-            Graphics::IRenderer::SELECTED_RENDER_API,
-            Graphics::IRenderer::OPENGL_API
-        );
 
         std::vector<SteelEngine::IReflectionData*> types =
             Reflection::GetTypesByMetaData(Reflection::ReflectionAttribute::REFLECTION_MODULE, [](Variant* key) -> bool
@@ -108,7 +114,7 @@ namespace SteelEngine {
             m_ReflectionModules.push_back(types[i]->Create());
         }
 
-        Reflection::GetType("SteelEngine::Core")->SetMetaData(GlobalSystems::DELTA_TIME, Reflection::CreateInstance("SteelEngine::DeltaTime"));
+        Reflection::GetType<Core>()->SetMetaData(GlobalSystems::DELTA_TIME, Reflection::CreateInstance("SteelEngine::DeltaTime"));
 
         m_DeltaTimeVariant = Reflection::GetType("SteelEngine::Core")->GetMetaData(GlobalSystems::DELTA_TIME);
 
@@ -141,36 +147,31 @@ namespace SteelEngine {
         (*m_VirtualProject)->Init();
 
     // Graphics stuff
-        m_Window = (IWindow*)Reflection::CreateInstance("SteelEngine::OpenGL_Window");
-        m_Renderer = (Graphics::IRenderer**)Reflection::CreateInstance_("SteelEngine::Graphics::OpenGL::Renderer", m_Window);
-        m_Editor = (Editor::IEditor**)Reflection::CreateInstance_("SteelEngine::Editor::ImGUI::ImGUI_Editor");
-
+        m_RenderContext = Reflection::CreateInstance<Utils::RenderContext>();
         m_SceneManager = (ISceneManager*)Reflection::CreateInstance("SteelEngine::SceneManager");
 
-        // entt::registry* reg = (*m_SceneManager)->GetCurrentScene();
-
-        // auto ent = reg->create();
+        SetScene(m_RenderContext, m_SceneManager);
 
         m_SceneManager->Init();
+        m_RenderContext->Initialize();
+        m_RenderContext->SelectPlatform(Graphics::IRenderer::API::OPENGL);
+        m_RenderContext->SelectRenderer("SteelEngine::Graphics::OpenGL::Renderer");
 
-        EventObserver* eve = Reflection::GetType("SteelEngine::Graphics::OpenGL::Renderer")->Invoke("Cast_EventObserver", *m_Renderer).Convert<EventObserver*>();
-        EventObserver* eve2 = Reflection::GetType("SteelEngine::Editor::ImGUI::ImGUI_Editor")->Invoke("Cast_EventObserver", *m_Editor).Convert<EventObserver*>();
-
-        m_EventManager->AddEventObserver(eve);
-        m_EventManager->AddEventObserver(eve2);
-
-        m_Window->SetTitle("Test Window!");
-        m_Window->SetWidth(1920);
-        m_Window->SetHeight(1080);
+        m_Editor = Reflection::CreateInstance<Editor::ImGUI::ImGUI_Editor>();
 
         std::function<void(void*, IWindow*)> func = [&](void* event_, IWindow* window)
         {
             SDL_Event* event = (SDL_Event*)event_;
 
-            (*m_Editor)->ProcessEvents(event);
+            m_Editor->ProcessEvents(event);
         };
 
-        Reflection::GetType("SteelEngine::OpenGL_Window")->Invoke("SetProcessEventsCallback", m_Window, func);
+        m_Window = Window::Create(Window::WindowAPI::SDL);
+
+        m_Window->SetProcessEventsCallback(func);
+        m_Window->SetTitle("Test Window!");
+        m_Window->SetWidth(1920);
+        m_Window->SetHeight(1080);
 
         if(m_Window->Create() == SE_FALSE)
         {
@@ -179,44 +180,44 @@ namespace SteelEngine {
             return SE_FALSE;
         }
 
-        Event::GlobalEvent::Add<IWindow::WindowCloseEvent>(this);
+        m_RenderContext->GetCurrentRenderer()->SetRenderTarget(m_Window);
+        m_RenderContext->GetCurrentRenderer()->SetRenderContext(m_RenderContext);
 
-        FileSystem::Map("shaders", getBinaryLocation() / "Resources/Shaders");
+        uint32_t extensionsCount;
+        const char** extensions;
 
-        if((*m_Renderer)->Init() == SE_FALSE)
+        m_Window->GetVulkanInstanceExtensions(&extensionsCount, NULL);
+        extensions = new const char*[extensionsCount];
+        m_Window->GetVulkanInstanceExtensions(&extensionsCount, extensions);
+
+        m_RenderContext->GetRenderDevice()->SetWindow(m_Window);
+        m_RenderContext->GetRenderDevice()->SetVulkanExtensions(extensionsCount, extensions);
+        m_RenderContext->GetRenderDevice()->Initialize();
+        m_RenderContext->GetRenderDevice()->SetEditorCommands(m_Editor->GetEditorCommands());
+        m_RenderContext->GetRenderDevice()->SetUpdate(m_Editor->GetUpdate());
+        m_Editor->SetVirtualProjectVisualizer((*m_VirtualProject)->GetVisualizer());
+        m_Editor->Init(m_RenderContext, m_Window);
+        m_RenderContext->GetRenderDevice()->PostInitialize();
+
+        if(m_RenderContext->GetCurrentRenderer()->Init() == SE_FALSE)
         {
             printf("Renderer init failed!\n");
 
             return SE_FALSE;
         }
 
-        m_ImGUI_ContextAPI = (IContext*)Reflection::CreateInstance("SteelEngine::OpenGL_Context");
+    // TODO: IDK about that, i mean event system
+        m_EventManager->AddEventObserver(
+            Reflection::GetType("SteelEngine::Editor::ImGUI::ImGUI_Editor")->Invoke("Cast_EventObserver", m_Editor).Convert<EventObserver*>()
+        );
 
-        if(m_ImGUI_ContextAPI)
-        {
-            m_ImGUI_ContextAPI->Init(m_Window, *m_Renderer);
+        Event::GlobalEvent::Add<IWindow::WindowCloseEvent>(this);
 
-            SE_INFO("Editor API context initialization success!");
+        FileSystem::Map("shaders", getBinaryLocation() / "Resources/Shaders");
 
-            (*m_Editor)->SetVirtualProjectVisualizer((*m_VirtualProject)->GetVisualizer());
+        m_AssetManager = (IAssetManager*)Reflection::CreateInstance<AssetManager>();
 
-            if((*m_Editor)->Init(*m_Renderer, m_ImGUI_ContextAPI) == SE_FALSE)
-            {
-                SE_FATAL("Editor initialization failed!");
-
-                return SE_FALSE;
-            }
-            else
-            {
-                SE_INFO("Editor initialization success!");
-            }
-
-            Reflection::GetType("SteelEngine::OpenGL_Context")->Invoke("MakeCurrent", m_ImGUI_ContextAPI);
-        }
-        else
-        {
-            SE_FATAL("Problem with editor API context!");
-        }
+        Reflection::GetType<Core>()->SetMetaData(GlobalSystems::ASSET_MANAGER, m_AssetManager);
 
     // ---------------------------------------------------------------------
 
@@ -224,40 +225,29 @@ namespace SteelEngine {
 
         Event::GlobalEvent::Add<LoadedProjectEvent>(this);
 
-        ent = (*m_Renderer)->AddModel
-            (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj"),
-            m_SceneManager->GetCurrentScene(),
-            Transform(glm::vec3(0, 20, 10))
-        );
+        LoadAssetEvent loadAsset;
 
-        for(Type::uint32 i = 0; i < 50; i++)
-        {
-            (*m_Renderer)->AddModel
-                (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/cube.obj"),
-                m_SceneManager->GetCurrentScene(),
-                Transform(glm::vec3(i * 2, 1, 0))
-            );
-        }
+        loadAsset.m_Path = "D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj";
 
-        for(Type::uint32 i = 0; i < 10; i++)
-        {
-            for(Type::uint32 j = 0; j < 30; j++)
-            {
-                (*m_Renderer)->AddModel
-                    (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/a.obj"),
-                    m_SceneManager->GetCurrentScene(),
-                    Transform(glm::vec3(j * 2, (i * 2) + 5, 0))
-                );
-            }
-        }
+        Event::GlobalEvent::Broadcast_(&loadAsset);
 
         Transform trans;
 
         trans.SetScale(glm::vec3(100, 100, 100));
 
-        (*m_Renderer)->AddModel
-            (Graphics::Model::Create("D:/Projects/C++/SteelEngine/bin/Resources/Models/test.obj"),
-            m_SceneManager->GetCurrentScene(),
+        m_RenderContext->GetCurrentRenderer()->AddModel(
+            ((AssetItem<Graphics::IModel>*)loadAsset.m_Result)->GetAsset(),
+            m_SceneManager,
+            trans
+        );
+
+        Event::GlobalEvent::Broadcast_(&loadAsset);
+
+        trans.SetPosition(glm::vec3(0, -10, 0));
+
+        m_RenderContext->GetCurrentRenderer()->AddModel(
+            ((AssetItem<Graphics::IModel>*)loadAsset.m_Result)->GetAsset(),
+            m_SceneManager,
             trans
         );
 
@@ -287,10 +277,16 @@ namespace SteelEngine {
             ProcessEvents(m_EventManager);
         }
 
-        // The runtime compiler file watcher is not too perform
+    // The runtime compiler file watcher is not too perform
         if(m_RuntimeReloader)
         {
             m_RuntimeReloader->Update();
+        }
+
+        {
+            SE_PROFILE_SCOPE("Project");
+
+            (*m_VirtualProject)->Update();
         }
 
         m_OneSecondTime += time->GetDeltaTime();
@@ -307,53 +303,27 @@ namespace SteelEngine {
 
             m_Logger->Update();
         }
-    
+
         m_Window->Update();
-
-        {
-            SE_PROFILE_SCOPE("Graphics");
-
-            {
-                SE_PROFILE_SCOPE("Graphics::Update");
-
-                (*m_Renderer)->Update();
-            }
-
-            {
-                SE_PROFILE_SCOPE("Graphics::PreRender");
-
-                (*m_Renderer)->PreRender();
-            }
-
-            {
-                SE_PROFILE_SCOPE("Graphics::Render");
-
-                (*m_Renderer)->Render(m_SceneManager->GetCurrentScene());
-            }
-
-            {
-                SE_PROFILE_SCOPE("Graphics::PostRender");
-
-                (*m_Renderer)->PostRender();
-            }
-        }
 
         {
             SE_PROFILE_SCOPE("Editor");
 
-            m_ImGUI_ContextAPI->Update();
-            (*m_Editor)->Draw((*m_Renderer)->GetFinalTexture());
+            m_Editor->Draw(m_RenderContext->GetCurrentRenderer()->GetFinalTexture());
         }
-
-        m_ImGUI_ContextAPI->UploadDrawData();
-
-        m_Window->SwapBuffers();
 
         {
-            SE_PROFILE_SCOPE("Project");
+            SE_PROFILE_SCOPE("Graphics");
 
-            (*m_VirtualProject)->Update();
+            Graphics::IRenderer* renderer = m_RenderContext->GetCurrentRenderer();
+
+            renderer->Update();
+            renderer->PreRender();
+            renderer->Render(m_SceneManager->GetCurrentScene());
+            renderer->PostRender();
         }
+
+        m_Window->SwapBuffers();
     }
 
     void Core::Start()

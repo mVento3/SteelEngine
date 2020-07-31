@@ -27,7 +27,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         GLuint m_Uniforms[Uniforms::SIZE];
 
         void InitCustom() override;
-        void UpdateCustom(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2) override;
 
     public:
         TestShader();
@@ -39,6 +38,8 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         float m_SpecularPower;
         float m_DispMapScale;
         float m_DispMapOffset;
+
+        void UpdateCustom(const Camera& camera) override;
     };
 
 }}}

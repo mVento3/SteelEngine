@@ -12,6 +12,8 @@
 
 #include "imgui/imgui.h"
 
+#include "Editor/ImGUI/Events/OpenWindowEvent.h"
+
 #include "fstream"
 
 namespace SteelEngine { namespace Network {
@@ -99,6 +101,8 @@ namespace SteelEngine { namespace Network {
                 state = State::NONE;
             }
 
+            printf("Sending %s\n", filename.c_str());
+
             std::ifstream file(
                 event.m_Path.string() + "\\" + filename,
                 std::ios::binary
@@ -142,6 +146,8 @@ namespace SteelEngine { namespace Network {
             }
 
             file.close();
+
+            printf("Sended\n");
         }
 
         Event::GlobalEvent::Broadcast(StartRecompilingEvent{});
@@ -220,26 +226,37 @@ namespace SteelEngine { namespace Network {
                     network->Send(sock, "UPDATE", m_BufferSize);
                     network->Receive(sock, m_Buffer, m_BufferSize);
 
+                    printf("Downloading %s\n", filename.c_str());
+
                     std::ofstream file(
                         event.m_Path.string() + "\\" + filename,
                         std::ios::binary
                     );
 
+                    char* fileBuf = new char[m_BufferSize];
+
                     for(size_t j = 0; j < fileSize; j += m_BufferSize)
                     {
-                        std::string fileBuf;
-
-                        fileBuf.resize(m_BufferSize);
+                        memset(fileBuf, 0, m_BufferSize);
 
                         network->Send(sock, "DONE", m_BufferSize);
-                        network->Receive(sock, &fileBuf[0], m_BufferSize);
+                        network->Receive(sock, fileBuf, m_BufferSize);
 
-                        file.write(&fileBuf[0], m_BufferSize);
+                        if(fileSize - j <= m_BufferSize)
+                        {   
+                            file.write(fileBuf, fileSize - j);
+                        }
+                        else
+                        {
+                            file.write(fileBuf, m_BufferSize);
+                        }
                     }
 
-                    printf("Downloaded %s\n", filename.c_str());
-
                     file.close();
+
+                    delete[] fileBuf;
+
+                    printf("Downloaded\n");
                 }
                 else
                 {
@@ -291,13 +308,13 @@ namespace SteelEngine { namespace Network {
             }
         }
 
+        printf("Updating project done!\n");
+
         Event::GlobalEvent::Broadcast(StartRecompilingEvent{});
     }
 
     void SynchronizeProjectNCE::Init()
-    {
-        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
-
+    {    
         m_ShouldOverrideEvent.Add_(this);
     }
 
@@ -353,6 +370,10 @@ namespace SteelEngine { namespace Network {
 
     void SynchronizeProjectNCE::operator()(ShouldOverrideEvent* event)
     {
+        Event::GlobalEvent::Broadcast(OpenWindowEvent{ m_Swapper, "AAAA" });
+
+        ImGui::SetCurrentContext((ImGuiContext*)m_Context);
+
         m_ShouldOverrideEventData = event;
         m_DrawShouldOverridePopup = true;
     }

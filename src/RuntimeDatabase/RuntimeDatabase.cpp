@@ -121,6 +121,11 @@ namespace SteelEngine {
         }
     }
 
+    void RuntimeDatabase::RenderContext::Init(Memory::Allocator* allocator)
+    {
+
+    }
+
     void RuntimeDatabase::Init()
     {    
         m_ReflectionDatabase = Memory::allocate<RuntimeDatabase::Reflection>(*m_RootMemoryAllocator);
@@ -130,6 +135,10 @@ namespace SteelEngine {
         m_VariantDatabase->Init(m_RootMemoryAllocator);
         m_ReflectionDatabase->Init(m_RootMemoryAllocator);
         m_HotReloaderDatabase->Init(m_RootMemoryAllocator);
+
+        m_RenderContextDatabase = new RuntimeDatabase::RenderContext();
+
+        m_RenderContextDatabase->Init(m_RootMemoryAllocator);
     }
 
     RuntimeDatabase::RuntimeDatabase()

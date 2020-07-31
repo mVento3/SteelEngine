@@ -32,7 +32,6 @@ namespace SteelEngine {
         GENERATED_BODY
     public:
         typedef std::map<SOCKET, std::queue<Network::INetworkCommand*>> SocketMap;
-        typedef std::vector<Network::ClientThread*> ClientThreadVector;
 
     private:
         SOCKET      m_ListeningSocket;
@@ -40,7 +39,16 @@ namespace SteelEngine {
         SocketMap   m_Commands;
         std::string m_Header;
 
-        ClientThreadVector m_ClientsThreads;
+        fd_set m_ReadFDS;
+        int m_MaxSD;
+        static constexpr uint32_t MAX_CLIENTS = 32;
+        int m_SD;
+        int m_Clients[MAX_CLIENTS];
+        int m_Activity;
+        int m_NewConnection;
+        sockaddr_in hint;
+        int hintLen;
+        char m_Buffer[1024];
 
         std::thread* m_WaitForConnectionThread;
 
@@ -48,7 +56,7 @@ namespace SteelEngine {
 
         Event::LocalEvent<Network::ClientDisconnectedEvent> m_Disconnected;
 
-        void ProcessClient(Network::ClientThread* info);
+        void ProcessClient();
 
     public:
         Server();

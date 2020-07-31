@@ -4,8 +4,6 @@
 
 #include "GL/glew.h"
 
-#include "Window/IWindow.h"
-
 #include "Graphics/OpenGL/Shader.h"
 #include "Graphics/OpenGL/Mesh.h"
 #include "Graphics/OpenGL/Texture.h"
@@ -31,11 +29,16 @@
 #include "Event/GlobalEvent.h"
 #include "Event/EventObserver.h"
 
-#include "ImGUI_Editor/Events/AnyItemActiveChangedEvent.h"
+#include "Editor/ImGUI/Events/AnyItemActiveChangedEvent.h"
 
 #include "vector"
 
 #include "Graphics/OpenGL/ECS_Components/RenderableComponent.h"
+#include "Graphics/OpenGL/ECS_Components/DirectionalLightComponent.h"
+#include "Graphics/OpenGL/ECS_Components/ShaderComponent.h"
+#include "Graphics/OpenGL/ECS_Components/CameraComponent.h"
+#include "Graphics/OpenGL/ECS_Components/ShadowShaderComponent.h"
+#include "Graphics/OpenGL/ECS_Components/ShadowCameraComponent.h"
 
 #include "Graphics/ECS_Components/TransformComponent.h"
 
@@ -46,11 +49,13 @@
 namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     SE_CLASS(
-        SteelEngine::Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
-        SteelEngine::Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
+        Reflection::ReflectionAttribute::RUNTIME_SERIALIZE,
+        Reflection::ReflectionAttribute::GENERATE_CAST_FUNCTIONS,
         Reflection::ReflectionAttribute::HOT_RELOAD
     )
-    class Renderer : public IRenderer, public EventObserver
+    class Renderer :
+        public IRenderer,
+        public EventObserver
     {
         GENERATED_BODY
     private:
@@ -88,21 +93,26 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         bool m_Controlls;
 
-        entt::entity AddModel(IMesh* mesh, entt::registry* scene, const Transform& transform, bool castShadow = true) override;
+        entt::entity AddModel(IMesh* mesh, ISceneManager* scene, const Transform& transform, bool castShadow = true) override;
 
     public:
-        Renderer(IWindow* window);
+        Renderer();
         ~Renderer();
+
+        ISceneManager* m_Scene;
 
         Result Init() override;
         void Update() override;
         void Cleanup() override;
 
         void PreRender() override;
-        void Render(entt::registry* scene) override;
+        void Render(entt::registry& scene) override;
         void PostRender() override;
 
-        ITexture* GetFinalTexture() override;
+        void* GetFinalTexture() override;
+
+        void SetRenderTarget(IWindow* window) override { m_Window = window; }
+        void SetSceneManager(ISceneManager* scene) override { m_Scene = scene; }
 
         void OnEvent(Event::Naive* event) override;
         void operator()(const ViewportSizeChangedEvent& event);

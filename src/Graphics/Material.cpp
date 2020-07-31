@@ -8,6 +8,8 @@
 
 #include "Core/Core.h"
 
+#include "Utils/Graphics/RenderContext.h"
+
 namespace SteelEngine { namespace Graphics {
 
     Material::Material(const char* file) :
@@ -23,15 +25,14 @@ namespace SteelEngine { namespace Graphics {
 
     ITexture* Material::Setup()
     {
-        static IRenderer::API api = Reflection::GetType("SteelEngine::Core")->GetMetaData(IRenderer::API::SELECTED_RENDER_API)->Convert<IRenderer::API>();
-
-        switch(api)
+        switch(SteelEngine::Utils::RenderContext::GetCurrentAPI())
         {
-        case IRenderer::API::OPENGL_API:
+        case IRenderer::API::OPENGL:
             return new OpenGL::Texture(m_Filename);
-        case IRenderer::API::VULKAN_API:
+        case IRenderer::API::VULKAN:
             SE_INFO("Vulkan api is not available yet!");
-            break;
+
+            return 0;
         default:
             SE_WARNING("Requested graphics api is not available!");
             break;

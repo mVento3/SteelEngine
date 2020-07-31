@@ -19,6 +19,7 @@
 #include "Input/Events/KeyUpEvent.h"
 #include "Input/Events/MouseMotionEvent.h"
 #include "Input/Events/ChangeMousePositionEvent.h"
+#include "Input/Events/MouseWheelEvent.h"
 
 namespace SteelEngine {
 
@@ -57,8 +58,7 @@ namespace SteelEngine {
         void GetWindowSize(Type::uint32& width, Type::uint32& height) override;
         void* GetWindow() const override;
 
-        SE_METHOD()
-        inline void SetProcessEventsCallback(std::function<void(void*, IWindow*)> callback)
+        void SetProcessEventsCallback(std::function<void(void*, IWindow*)> callback) override
         {
             m_ProcessEventsCallback = callback;
         }

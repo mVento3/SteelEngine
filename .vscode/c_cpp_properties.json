@@ -31,7 +31,8 @@
                 "${workspaceFolder}/external/glew-2.1.0/include",
                 "${workspaceFolder}/external/assimp/include",
                 "${workspaceFolder}/external/entt/src",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/external/Vulkan/Include"
             ],
             "defines": [
                 "_DEBUG",
@@ -39,8 +40,8 @@
                 "_UNICODE",
                 "SE_WINDOWS"
             ],
-            "compilerPath": "D:/Programs/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.25.28610/bin/Hostx64/x64/cl.exe",
-            "cppStandard": "c++17",
+            "compilerPath": "D:/Programs/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.26.28801/bin/Hostx64/x64/cl.exe",
+            "cppStandard": "c++20",
             "intelliSenseMode": "msvc-x64",
             "browse": {
                "path": [

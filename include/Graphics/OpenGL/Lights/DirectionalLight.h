@@ -13,8 +13,7 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
     public:
         enum Uniforms
         {
-            BASE_LIGHT = BaseLight::SIZE,
-            ROTATION,
+            ROTATION = BaseLight::SIZE,
 
             SIZE
         };

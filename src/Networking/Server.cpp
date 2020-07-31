@@ -8,10 +8,10 @@
 
 namespace SteelEngine {
 
-    void Server::ProcessClient(Network::ClientThread* info)
+    void Server::ProcessClient()
     {
         Type::uint32 bufferSize = m_ServerInfo->Convert<ServerInfo>().m_BufferSize;
-        int bytesIn = Receive(info->m_Socket, info->m_Buffer, bufferSize);
+        int bytesIn = Receive(m_SD, m_Buffer, bufferSize);
         size_t size = 0;
         size_t size2 = 0;
         std::string buf;
@@ -19,8 +19,8 @@ namespace SteelEngine {
         Utils::receiveWholeDataS(
             this,
             buf,
-            info->m_Buffer,
-            info->m_Socket,
+            m_Buffer,
+            m_SD,
             bufferSize
         );
 
@@ -28,28 +28,28 @@ namespace SteelEngine {
         {
             printf("Client disconnected!\n");
 #ifdef SE_WINDOWS
-            closesocket(info->m_Socket);
+            closesocket(m_SD);
 #else
             closes(info->m_Socket);
 #endif
-            m_ClientDisconnectedEvent.BroadcastVariadic(info->m_Socket);
-            info->m_Signal.set_value();
+            m_ClientDisconnectedEvent.BroadcastVariadic(m_SD);
         }
         else if(bytesIn == 0)
         {
             printf("Client disconnected!\n");
 #ifdef SE_WINDOWS
-            closesocket(info->m_Socket);
+            closesocket(m_SD);
 #else
             closes(info->m_Socket);
 #endif
-            m_ClientDisconnectedEvent.BroadcastVariadic(info->m_Socket);
-            info->m_Signal.set_value();
+            m_ClientDisconnectedEvent.BroadcastVariadic(m_SD);
         }
         else
         {
             if(buf != "get")
             {
+                printf("Getting command!\n");
+
                 size_t* strSizePtr = (size_t*)&buf[0];
                 size_t strSize = *strSizePtr;
 
@@ -80,9 +80,9 @@ namespace SteelEngine {
                         command->CalculateSize(size);
                         command->Deserialize(&buf[0], size);
 
-                        Send(info->m_Socket, "DONE", 1024);
+                        Send(m_SD, "DONE", 1024);
 
-                        command->ServerSide(this, info->m_Socket);
+                        command->ServerSide(this, m_SD);
                         command->CalculateSize(size);
 
                         data = new char[size];
@@ -94,8 +94,8 @@ namespace SteelEngine {
 
                         while(1)
                         {
-                            Receive(info->m_Socket, info->m_Buffer, 1024);
-                            Send(info->m_Socket, data, 1024);
+                            Receive(m_SD, m_Buffer, 1024);
+                            Send(m_SD, data, 1024);
 
                             if(size2 > 0)
                             {
@@ -109,8 +109,8 @@ namespace SteelEngine {
                             }
                             else
                             {
-                                Receive(info->m_Socket, info->m_Buffer, 1024);
-                                Send(info->m_Socket, "END", 1024);
+                                Receive(m_SD, m_Buffer, 1024);
+                                Send(m_SD, "END", 1024);
 
                                 break;
                             }
@@ -124,10 +124,12 @@ namespace SteelEngine {
             }
             else
             {
-                std::queue<Network::INetworkCommand*>* commands = &m_Commands[info->m_Socket];
+                std::queue<Network::INetworkCommand*>* commands = &m_Commands[m_SD];
 
                 if(!commands->empty())
                 {
+                    printf("Sending command!\n");
+
                     Network::INetworkCommand* command = commands->front();
 
                     size_t size = 0;
@@ -140,16 +142,16 @@ namespace SteelEngine {
                     command->m_Flow = Network::CommunicationFlow::SERVER_TO_CLIENT;
                     command->Serialize(data, size);
 
-                    Send(info->m_Socket, data, 1024);
-                    Receive(info->m_Socket, info->m_Buffer, 1024);
+                    Send(m_SD, data, 1024);
+                    Receive(m_SD, m_Buffer, 1024);
 
-                    command->ServerSide(this, info->m_Socket);
+                    command->ServerSide(this, m_SD);
 
-                    Receive(info->m_Socket, info->m_Buffer, 1024);
-                    Send(info->m_Socket, "DONE", 1024);
+                    Receive(m_SD, m_Buffer, 1024);
+                    Send(m_SD, "DONE", 1024);
 
                     command->CalculateSize(size);
-                    command->Deserialize(info->m_Buffer, size);
+                    command->Deserialize(m_Buffer, size);
 
                     delete[] data;
 
@@ -157,7 +159,7 @@ namespace SteelEngine {
                 }
                 else
                 {
-                    Send(info->m_Socket, "none", 1024);
+                    Send(m_SD, "none", 1024);
                 }
             }
         }
@@ -166,6 +168,12 @@ namespace SteelEngine {
     Server::Server()
     {
         m_ServerInfo = Reflection::GetType("SteelEngine::Server")->GetMetaData(SERVER_INFO);
+        memset(m_Buffer, 0, 1024);
+
+        for(uint32_t i = 0; i < MAX_CLIENTS; i++)
+        {
+            m_Clients[i] = 0;
+        }
     }
 
     Server::~Server()
@@ -194,15 +202,14 @@ namespace SteelEngine {
             return;
         }
 
-        sockaddr_in hint;
-
         hint.sin_family = AF_INET;
         hint.sin_port = htons(m_ServerInfo->Convert<ServerInfo>().m_Port);
 
         inet_pton(AF_INET, "0.0.0.0", &hint.sin_addr);
 
-        bind(m_ListeningSocket, (sockaddr*)&hint, sizeof(hint));
-        listen(m_ListeningSocket, SOMAXCONN);
+        hintLen = sizeof(hint);
+
+        bind(m_ListeningSocket, (sockaddr*)&hint, hintLen);
 
         IReflectionData const* const* types = Reflection::GetTypes();
 
@@ -218,7 +225,7 @@ namespace SteelEngine {
             }
         }
 
-        Event::GlobalEvent::Add_<Network::INetworkCommand>(this);
+        listen(m_ListeningSocket, 3);
 
         m_WaitForConnectionThread = new std::thread([this]()
         {
@@ -230,50 +237,76 @@ namespace SteelEngine {
             }
         });
 
+        Event::GlobalEvent::Add_<Network::INetworkCommand>(this);
+
         m_Disconnected.Add(this);
     }
 
     void Server::Update()
     {
-        sockaddr_in clientAddress;
-        int clientAddressSize = sizeof(clientAddress);
-        SOCKET client = accept(
-            m_ListeningSocket,
-            (sockaddr*)&clientAddress,
-            &clientAddressSize
-        );
+        FD_ZERO(&m_ReadFDS);
 
-        printf(
-            "New connection: %s:%i\n",
-            inet_ntoa(clientAddress.sin_addr),
-            ntohs(clientAddress.sin_port)
-        );
+        FD_SET(m_ListeningSocket, &m_ReadFDS);
 
-        m_Commands[client] = std::queue<Network::INetworkCommand*>();
+        m_MaxSD = m_ListeningSocket;
 
-        Network::ClientInfo clientInfo = Network::ClientInfo(clientAddress, this, client);
-
-        clientInfo.m_ConnectedToServer = true;
-
-        m_ClientConnectedEvent.Broadcast(Network::ClientConnectedEvent{ clientInfo });
-
-        Network::ClientThread* thread = new Network::ClientThread(client);
-
-        thread->m_Thread = std::thread([this, &thread](std::future<void> object)
+        for(uint32_t i = 0; i < MAX_CLIENTS; i++)
         {
-            Type::uint32 bufferSize = m_ServerInfo->Convert<ServerInfo>().m_BufferSize;
+            m_SD = m_Clients[i];
 
-            thread->m_Buffer = new char[bufferSize];
-
-            while(object.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout)
+            if(m_SD > 0)
             {
-                ProcessClient(thread);
+                FD_SET(m_SD, &m_ReadFDS);
             }
 
-            m_Disconnected.Broadcast(Network::ClientDisconnectedEvent(thread->m_Socket));
-        }, std::move(thread->m_FutureObject));
+            if(m_SD > m_MaxSD)
+            {
+                m_MaxSD = m_SD;
+            }
+        }
 
-        m_ClientsThreads.push_back(thread);
+        m_Activity = select(m_MaxSD + 1, &m_ReadFDS, NULL, NULL, NULL);
+
+        if(m_Activity < 0)
+        {
+            printf("Select error!\n");
+        }
+
+        if(FD_ISSET(m_ListeningSocket, &m_ReadFDS))
+        {
+            if((m_NewConnection = accept(m_ListeningSocket, (sockaddr*)&hint, &hintLen)) < 0)
+            {
+                printf("Accept error!\n");
+            }
+
+            for(uint32_t i = 0; i < MAX_CLIENTS; i++)
+            {
+                if(m_Clients[i] == 0)
+                {
+                    m_Clients[i] = m_NewConnection;
+
+                    break;
+                }
+            }
+
+            m_Commands[m_NewConnection] = std::queue<Network::INetworkCommand*>();
+
+            Network::ClientInfo clientInfo = Network::ClientInfo(hint, this, m_NewConnection);
+
+            clientInfo.m_ConnectedToServer = true;
+
+            m_ClientConnectedEvent.Broadcast(Network::ClientConnectedEvent{ clientInfo });
+        }
+
+        for(uint32_t i = 0; i < MAX_CLIENTS; i++)
+        {
+            m_SD = m_Clients[i];
+
+            if(FD_ISSET(m_SD, &m_ReadFDS))
+            {
+                ProcessClient();
+            }
+        }
     }
 
     int Server::Send(SOCKET sock, const char* buffer, Type::uint32 size)
@@ -303,17 +336,17 @@ namespace SteelEngine {
 
     void Server::operator()(const Network::ClientDisconnectedEvent& event)
     {
-        for(Type::uint32 i = 0; i < m_ClientsThreads.size(); i++)
-        {
-            Network::ClientThread* thread = m_ClientsThreads[i];
+        // for(Type::uint32 i = 0; i < m_ClientsThreads.size(); i++)
+        // {
+        //     Network::ClientThread* thread = m_ClientsThreads[i];
 
-            if(thread->m_Socket == event.m_Socket)
-            {
-                m_ClientsThreads.erase(m_ClientsThreads.begin() + i);
+        //     if(thread->m_Socket == event.m_Socket)
+        //     {
+        //         m_ClientsThreads.erase(m_ClientsThreads.begin() + i);
 
-                break;
-            }
-        }
+        //         break;
+        //     }
+        // }
     }
 
 }

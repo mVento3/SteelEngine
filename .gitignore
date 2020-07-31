@@ -58,4 +58,5 @@ external/json-develop/**
 external/Python/**
 !external/Python/.gitkeep
 build/GeneratedReflection/imgui/**
-!build/PythonProcess.dll
+copy_to_test_project.py
+server.py

@@ -356,8 +356,11 @@ namespace SteelEngine {
                 if(m_Lexer++.GetToken() == ":")
                 {
                     std::string word;
+                    std::string templateName;
                     ProtectionLevel protection;
                     StructScope* str = (StructScope*)m_CurrentScopeToAdd;
+                    bool hasTemplate = false;
+                    bool isTemplate = false;
 
                     while(1)
                     {
@@ -388,6 +391,19 @@ namespace SteelEngine {
 
                             ProcessMetaData(m_CurrentScopeToAddByMeta->m_MetaData);
                         }
+                        else if(m_Lexer.GetToken() == "<")
+                        {
+                            hasTemplate = true;
+                            isTemplate = true;
+
+                            templateName += m_Lexer.GetToken();
+                        }
+                        else if(m_Lexer.GetToken() == ">")
+                        {
+                            isTemplate = false;
+
+                            templateName += m_Lexer.GetToken();
+                        }
                         else if(m_Lexer.GetToken() == ",")
                         {
                             if(!m_CurrentScopeToAddByMeta)
@@ -405,9 +421,15 @@ namespace SteelEngine {
 
                             inherit->m_Protection = protection;
 
+                            if(hasTemplate)
+                            {
+                               inherit->m_TemplateName = templateName; 
+                            }
+
                             str->m_Inheritance.push_back(inherit);
 
                             word.clear();
+                            templateName.clear();
                         }
                         else if(m_Lexer.GetToken() == "{")
                         {
@@ -426,17 +448,27 @@ namespace SteelEngine {
 
                             inherit->m_Protection = protection;
 
+                            if(hasTemplate)
+                            {
+                               inherit->m_TemplateName = templateName; 
+                            }
+
                             str->m_Inheritance.push_back(inherit);
 
                             word.clear();
+                            templateName.clear();
 
                             m_Lexer.SaveToken(m_Lexer.GetToken());
 
                             break;
                         }
-                        else
+                        else if(!isTemplate)
                         {
                             word += m_Lexer.GetToken();
+                        }
+                        else
+                        {
+                            templateName += m_Lexer.GetToken();
                         }
                     }
 

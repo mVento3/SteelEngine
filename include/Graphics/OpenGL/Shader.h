@@ -45,7 +45,6 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
     protected:
         virtual void InitCustom() { }
-        virtual void UpdateCustom(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2) { }
 
     public:
         Shader(const std::string& filename);
@@ -54,9 +53,11 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         void Init();
         void Cleanup();
 
-        void Update(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2);
-        void Update(const Transform& transform, const Camera& camera);
+        void UpdatePerModel(const Transform& transform, const Camera& camera, const ShadowInfo* shadow, const ShadowInfo* shadow2);
+        void UpdatePerModel(const Transform& transform, const Camera& camera);
         void Bind() const;
+
+        virtual void UpdateCustom(const Camera& camera) { }
 
         void SetInt(const std::string& name, int value) const;
         void SetFloat(const std::string& name, float value) const;

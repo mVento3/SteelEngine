@@ -8,7 +8,7 @@ namespace SteelEngine {
     {
         virtual void Init() = 0;
 
-        virtual entt::registry* GetCurrentScene() = 0;
+        virtual entt::registry& GetCurrentScene() = 0;
     };
 
 }

@@ -45,7 +45,7 @@ namespace SteelEngine {
 
                     std::vector<std::string> splitted = split(name, ':');
 
-                    out.push_back(inh->m_Name + "* Cast_" + splitted[splitted.size() - 1] + "()");
+                    out.push_back(inh->m_Name + inh->m_TemplateName + "* Cast_" + splitted[splitted.size() - 1] + "()");
                     out.push_back("{");
                     {
                         out.push_back("return static_cast<" + m_ClassName + "*>(this);");

@@ -71,7 +71,7 @@ for i in range(0, threads_count):
 
     processes.append(process_)
 
-# subprocess.call(['bin/ReflectionGenerator.exe', '-cwd ' + cwd])
+subprocess.call(['bin/ReflectionGenerator.exe', '-cwd ' + cwd])
 
 for file in os.listdir('external'):
     if file.endswith('.json'):
@@ -189,3 +189,5 @@ print('Compile time:', time.time() - start_time)
 
 with open('build/state.json', 'w') as f:
     json.dump(state, f, indent=4)
+
+# exec(open('copy_to_test_project.py').read())

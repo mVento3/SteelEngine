@@ -67,12 +67,14 @@ namespace SteelEngine {
     {
         bool* status = Reflection::GetType("SteelEngine::Network::NetworkManager")->Invoke("GetConnectionStatus", m_NetworkManager).Convert<bool*>();
 
-        m_Thread = new std::thread([this, status]()
+        m_Thread = new std::thread([this]()
         {
-            while(*status)
+            while(1)
             {
                 if(!m_Commands.empty())
                 {
+                    printf("Sending command!\n");
+
                     Network::INetworkCommand* command = m_Commands.front();
 
                     size_t size = 0;
@@ -158,6 +160,8 @@ namespace SteelEngine {
 
                     if(strcmp(m_Buffer, "none") != 0)
                     {
+                        printf("Getting command!\n");
+
                         size_t* strSizePtr = (size_t*)m_Buffer;
                         size_t strSize = *strSizePtr;
                         strSizePtr++;
