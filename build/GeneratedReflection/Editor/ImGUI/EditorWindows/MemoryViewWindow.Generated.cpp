@@ -37,7 +37,6 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 }
 void MemoryViewWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
-UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

@@ -51,7 +51,6 @@ SERIALIZE(AssetBrowserWindow::m_Thread)
 SERIALIZE(AssetBrowserWindow::m_SelectedType)
 SERIALIZE(AssetBrowserWindow::m_Types)
 SERIALIZE(AssetBrowserWindow::m_TypeNames)
-UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

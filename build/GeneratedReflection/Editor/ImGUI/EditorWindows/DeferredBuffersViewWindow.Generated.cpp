@@ -43,7 +43,6 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 void DeferredBuffersViewWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(DeferredBuffersViewWindow::m_Textures)
-UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

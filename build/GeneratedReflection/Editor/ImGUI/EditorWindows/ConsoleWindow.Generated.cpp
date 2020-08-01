@@ -54,7 +54,6 @@ SERIALIZE(ConsoleWindow::m_ScrollDown)
 SERIALIZE(ConsoleWindow::m_CommandBuffer)
 SERIALIZE(ConsoleWindow::m_Keys)
 SERIALIZE(ConsoleWindow::m_ConsoleSystem)
-UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
