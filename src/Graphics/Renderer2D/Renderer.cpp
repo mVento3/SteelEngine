@@ -49,7 +49,7 @@ namespace SteelEngine { namespace Graphics { namespace Renderer2D {
     {
         entt::registry& scene = m_Scene->GetCurrentScene();
         entt::entity quad = scene.create();
-        QuadComponent& quadC = scene.assign<QuadComponent>(quad);
+        QuadComponent& quadC = scene.emplace<QuadComponent>(quad);
         Vertex* vert = (Vertex*)quadC.m_Vertices;
 
         vert = createQuad(vert, x, y, texID);

@@ -27,7 +27,8 @@
 			"$CWD$/external/glew-2.1.0/include",
 			"$CWD$/external/assimp/include",
 			"$CWD$/external/assimp/build/include",
-			"$CWD$/external/entt/src"
+			"$CWD$/external/entt/src",
+			"$CWD$/external/imgui"
 		],
 		"lib_paths": [
 			"$CWD$/bin",

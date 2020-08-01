@@ -73,8 +73,8 @@ namespace SteelEngine { namespace Graphics { namespace Renderer3D {
 
         entt::registry& scene = m_Scene->GetCurrentScene();
         entt::entity e0 = scene.create();
-        VAO_Component& comp0 = scene.assign<VAO_Component>(e0);
-        TextureComponent& comp1 = scene.assign<TextureComponent>(e0);
+        VAO_Component& comp0 = scene.emplace<VAO_Component>(e0);
+        TextureComponent& comp1 = scene.emplace<TextureComponent>(e0);
 
         comp0.m_VAO = mesh.m_VAO;
         comp0.m_DrawCount = mesh.m_DrawCount;

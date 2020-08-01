@@ -21,10 +21,12 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
 
         auto model = reg.create();
 
-        reg.assign<RenderableComponent>(model, RenderableComponent(casted, m_G_Shader, transform, castShadow));
-        ShaderComponent& shader = reg.assign<ShaderComponent>(model);
         // DirectionalLightComponent& dirLightComp = reg.assign<DirectionalLightComponent>(model, DirectionalLightComponent());
-        CameraComponent& camera = reg.assign<CameraComponent>(model, CameraComponent(1920 / 1080));
+
+        reg.emplace<RenderableComponent>(model, RenderableComponent(casted, m_G_Shader, transform, castShadow));
+
+        ShaderComponent& shader = reg.emplace<ShaderComponent>(model);
+        CameraComponent& camera = reg.emplace<CameraComponent>(model, CameraComponent(1920 / 1080));
 
         // dirLightComp.m_FBO = m_DirectionalLight->GetShadowFramebuffer()->GetFBO();
         // dirLightComp.m_TextureID = m_DirectionalLight->GetShadowMapTexture()->GetTextureID();
@@ -190,9 +192,9 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         entt::registry& scene = m_Scene->GetCurrentScene();
         entt::entity light = scene.create();
 
-        DirectionalLightComponent& dirLightComp = scene.assign<DirectionalLightComponent>(light, DirectionalLightComponent());
-        ShadowShaderComponent& shader = scene.assign<ShadowShaderComponent>(light);
-        ShadowCameraComponent& camera = scene.assign<ShadowCameraComponent>(light);
+        DirectionalLightComponent& dirLightComp = scene.emplace<DirectionalLightComponent>(light, DirectionalLightComponent());
+        ShadowShaderComponent& shader = scene.emplace<ShadowShaderComponent>(light);
+        ShadowCameraComponent& camera = scene.emplace<ShadowCameraComponent>(light);
 
         camera.m_Far = m_ShadowCamera->m_Far;
         camera.m_Near = m_ShadowCamera->m_Near;
