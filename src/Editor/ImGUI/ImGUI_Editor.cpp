@@ -16,6 +16,8 @@
 
 #include "Editor/ImGUI/WindowType.h"
 
+#include "SDL2-2.0.9/include/SDL.h"
+
 #undef min
 #undef max
 
@@ -123,8 +125,6 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         m_IsViewportOpen = true;
 
         ImGui::SetCurrentContext(m_Context);
-
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_::ImGuiConfigFlags_DockingEnable;
 
         ImGuiStyle& st = ImGui::GetStyle();
 
@@ -575,6 +575,14 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
         ImGui::Render();
 
         m_API_Context->UploadDrawData();
+
+        SDL_Window* window = SDL_GL_GetCurrentWindow();
+        SDL_GLContext ctx = SDL_GL_GetCurrentContext();
+
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+
+        SDL_GL_MakeCurrent(window, ctx);
     }
 
     void ImGUI_Editor::ProcessEvents(void* event)

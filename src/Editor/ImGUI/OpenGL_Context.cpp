@@ -26,6 +26,11 @@ namespace SteelEngine {
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
+        io.ConfigFlags |= ImGuiConfigFlags_::ImGuiConfigFlags_DockingEnable;
+        io.ConfigFlags |= ImGuiConfigFlags_::ImGuiConfigFlags_ViewportsEnable;
+
+        m_Context = ImGui::GetCurrentContext();
+
         ImGui::StyleColorsDark();
 
         Variant cont = windowType->Invoke("GetContext", window);
@@ -39,8 +44,6 @@ namespace SteelEngine {
 
         ImGui_ImplSDL2_InitForOpenGL((SDL_Window*)window->GetWindow(), cont.Convert<void*>());
         ImGui_ImplOpenGL3_Init("#version 130");
-
-        m_Context = ImGui::GetCurrentContext();
 
         windowType->Invoke("MakeCurrent", window);
     }
