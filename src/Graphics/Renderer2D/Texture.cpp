@@ -1,7 +1,7 @@
 #include "Graphics/Renderer2D/Texture.h"
 
 // #define STB_IMAGE_IMPLEMENTATION
-#include "stbi/stb_image.h"
+#include "stb/stb_image.h"
 
 namespace SteelEngine { namespace Graphics { namespace Renderer2D {
 

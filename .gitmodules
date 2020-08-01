@@ -22,3 +22,6 @@
 [submodule "external/GLEW"]
 	path = external/GLEW
 	url = https://github.com/mVento3/GLEW.git
+[submodule "external/stb"]
+	path = external/stb
+	url = https://github.com/nothings/stb.git

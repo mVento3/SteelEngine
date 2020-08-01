@@ -24,6 +24,7 @@ def compile_dep(process, config, external_folder):
             break
 
     files_to_compile = []
+    files_to_exclude = []
 
     if found_group:
         for file in src_files['src_files']:
@@ -34,10 +35,41 @@ def compile_dep(process, config, external_folder):
                     for file_ in files:
                         if file_.endswith('.cpp') or file_.endswith('.c'):
                             files_to_compile.append(subdir + '/' + file_)
+            elif file.find('$NOT$') >= 0:
+                file = file.replace('$NOT$', '')
+
+                files_to_exclude.append(file)
             else:
                 files_to_compile.append(cwd + '/external/' + external_folder + '/' + file)
     else:
         print('Please specify files to compile!')
+
+    for i in range(len(files_to_compile)):
+        files_to_compile[i] = os.path.normpath(files_to_compile[i])
+
+    for i in range(len(files_to_exclude)):
+        files_to_exclude[i] = os.path.normpath(files_to_exclude[i])
+
+    files_to_compile_new = []
+
+    for file in files_to_compile:
+        found = False
+
+        for exclude in files_to_exclude:
+            if file.find(exclude) >= 0:
+                found = True
+
+                break
+
+        if not found:
+            files_to_compile_new.append(file)
+
+    files_to_compile.clear()
+
+    files_to_compile = files_to_compile_new
+
+    for file in files_to_compile:
+        print(file)
 
     process.WriteInput('cd ' + cwd + '/' + working_directory)
     process.Wait()

@@ -1,6 +1,6 @@
 #include "Graphics/TestRenderer/Texture.h"
 
-#include "stbi/stb_image.h"
+#include "stb/stb_image.h"
 
 namespace SteelEngine { namespace Graphics { namespace TestRenderer {
 

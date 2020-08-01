@@ -3,7 +3,7 @@
 #include "fstream"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stbi/stb_image.h"
+#include "stb/stb_image.h"
 
 namespace SteelEngine { namespace Graphics {
 

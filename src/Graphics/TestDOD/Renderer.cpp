@@ -2,7 +2,7 @@
 
 #include "Utils/Graphics/RenderContext.h"
 
-#include "stbi/stb_image.h"
+#include "stb/stb_image.h"
 
 #include "fstream"
 #include "string"
