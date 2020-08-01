@@ -41,6 +41,7 @@ void TimingsViewWindow::Serialize(SteelEngine::HotReloader::ISerializer* seriali
 SERIALIZE(TimingsViewWindow::m_Manager)
 SERIALIZE(TimingsViewWindow::m_Type)
 SERIALIZE(TimingsViewWindow::m_Timings)
+UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

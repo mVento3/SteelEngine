@@ -61,6 +61,7 @@ SERIALIZE(BlueprintWindow::m_Path)
 SERIALIZE(BlueprintWindow::m_Type)
 SERIALIZE(BlueprintWindow::m_Name)
 SERIALIZE(BlueprintWindow::m_Object)
+UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

@@ -50,6 +50,7 @@ SERIALIZE(StartMenuWindow::m_ProjectInitialized)
 SERIALIZE(StartMenuWindow::m_SelectableProjects)
 SERIALIZE(StartMenuWindow::m_NewProjectName)
 SERIALIZE(StartMenuWindow::m_Size)
+UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

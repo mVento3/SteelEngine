@@ -39,6 +39,7 @@ SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::
 void FileBrowserWindow::Serialize(SteelEngine::HotReloader::ISerializer* serializer)
 {
 SERIALIZE(FileBrowserWindow::m_WorkingPath)
+UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)

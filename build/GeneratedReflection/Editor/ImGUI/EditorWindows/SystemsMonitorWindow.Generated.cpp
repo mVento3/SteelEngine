@@ -47,6 +47,7 @@ SERIALIZE(SystemsMonitorWindow::m_CurrentReflectionItem)
 SERIALIZE(SystemsMonitorWindow::reflectionRes)
 SERIALIZE(SystemsMonitorWindow::m_Info)
 SERIALIZE(SystemsMonitorWindow::m_Database)
+UserInterface::Serialize(serializer);
 }
 #ifdef RUNTIME_COMPILE
 extern "C" __declspec(dllexport) TypeInfo* allocateRuntimeObject(SteelEngine::RuntimeDatabase::ConstructedObjectsVector* typeInfo)
