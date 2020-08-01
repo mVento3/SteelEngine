@@ -24,7 +24,7 @@
 			"$CWD$/external",
 			"$CWD$/external/json/include",
 			"$CWD$/external/Python/include",
-			"$CWD$/external/glew-2.1.0/include",
+			"$CWD$/external/GLEW/include",
 			"$CWD$/external/assimp/include",
 			"$CWD$/external/assimp/build/include",
 			"$CWD$/external/entt/src",
@@ -34,8 +34,7 @@
 			"$CWD$/bin",
 			"$CWD$/external/Vulkan/Lib",
 			"$CWD$/external/SDL2-2.0.9/lib/x64",
-			"$CWD$/external/Python/libs",
-			"$CWD$/external/glew-2.1.0/lib/Release/x64"
+			"$CWD$/external/Python/libs"
 		],
 		"libs": [
 			"SDL2.lib",
@@ -43,7 +42,7 @@
 			"Ws2_32.lib",
 			"imgui.lib",
 			"python37.lib",
-			"glew32.lib",
+			"glew.lib",
 			"OpenGL32.lib",
 			"assimp-vc142-mt.lib",
 			"MemoryModule.lib"

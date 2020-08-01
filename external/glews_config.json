@@ -1,18 +1,19 @@
 {
 	"type": "external_lib_config",
 	"out_type": "lib",
-	"name": "MemoryModule",
+	"name": "glew",
 	"compiler": {
 		"flags": [
-			"Od",
-			"Zi",
+			"O2",
+			"ZI",
+			"DEBUG:FASTLINK",
 			"std:c++17"
 		],
 		"definitions": [
 			
 		],
 		"includes": [
-			
+			"$CWD$/external/GLEW/include"
 		],
 		"lib_paths": [
 			
@@ -24,7 +25,7 @@
 			{
 				"name": "MAIN",
 				"src_files": [
-					"MemoryModule.c"
+					"src/glew.c"
 				]
 			}
 		]

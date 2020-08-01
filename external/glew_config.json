@@ -1,0 +1,38 @@
+{
+	"type": "external_lib_config",
+	"out_type": "dll",
+	"name": "glew",
+	"compiler": {
+		"flags": [
+			"O2",
+			"ZI",
+			"DEBUG:FASTLINK",
+			"std:c++17",
+			"MT",
+			"LD"
+		],
+		"definitions": [
+			"GLEW_BUILD",
+			"VC_EXTRALEAN",
+			"GLEW_NO_GLU",
+			"glew_EXPORTS"
+		],
+		"includes": [
+			"$CWD$/external/GLEW/include"
+		],
+		"lib_paths": [
+			
+		],
+		"libs": [
+			"OpenGL32.lib"
+		],
+		"groups": [
+			{
+				"name": "MAIN",
+				"src_files": [
+					"src/glew.c"
+				]
+			}
+		]
+	}
+}

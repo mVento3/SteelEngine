@@ -88,8 +88,18 @@ def compile_dep(process, config, external_folder):
             obj_files += file_to_compile
 
     if obj_files != '':
-        process.WriteInput('lib ' + obj_files + '/OUT:' + cwd + '/bin/' + external_folder + '.lib')
-        process.Wait()
+        if config['out_type'] == 'lib':
+            process.WriteInput('lib ' + obj_files + '/OUT:' + cwd + '/bin/' + external_folder + '.lib')
+            process.Wait()
+        elif config['out_type'] == 'dll':
+            process.WriteInput('cl ' +
+                flags + ' ' +
+                defs + ' ' +
+                includes + ' ' +
+                ' /Fe' + cwd + '/bin/' + external_folder + '.dll' + ' ' +
+                obj_files + '/link ' + external_libs
+            )
+            process.Wait()
 
         if process.WasError():
             print("Error while compiling:", process.GetErrorMessage())

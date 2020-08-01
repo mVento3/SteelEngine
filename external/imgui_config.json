@@ -1,5 +1,6 @@
 {
 	"type": "external_lib_config",
+	"out_type": "lib",
 	"name": "imgui",
 	"compiler": {
 		"flags": [
