@@ -31,6 +31,7 @@ namespace SteelEngine {
         std::thread* m_Thread;
         std::queue<Network::INetworkCommand*> m_Commands;
         char* m_Buffer;
+        uint32_t m_BufferSize;
 
         Network::INetworkManager* m_NetworkManager;
 

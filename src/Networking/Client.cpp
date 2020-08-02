@@ -13,7 +13,7 @@ namespace SteelEngine {
 
     Client::Client()
     {
-        m_Buffer = new char[1024];
+
     }
 
     Client::~Client()
@@ -60,6 +60,9 @@ namespace SteelEngine {
 
         Event::GlobalEvent::Add_<Network::INetworkCommand>(this);
 
+        m_BufferSize = Reflection::GetType("SteelEngine::Server")->GetMetaData(SteelEngine::SERVER_INFO)->Convert<ServerInfo>().m_BufferSize;
+        m_Buffer = new char[m_BufferSize];
+
         return SE_TRUE;
     }
 
@@ -67,14 +70,12 @@ namespace SteelEngine {
     {
         bool* status = Reflection::GetType("SteelEngine::Network::NetworkManager")->Invoke("GetConnectionStatus", m_NetworkManager).Convert<bool*>();
 
-        m_Thread = new std::thread([this]()
+        m_Thread = new std::thread([this, status]()
         {
-            while(1)
+            while(*status)
             {
                 if(!m_Commands.empty())
                 {
-                    printf("Sending command!\n");
-
                     Network::INetworkCommand* command = m_Commands.front();
 
                     size_t size = 0;
@@ -91,12 +92,12 @@ namespace SteelEngine {
 
                     size2 += sizeof(size_t);
 
-                    SendSerialized(data, 1024);
-                    Receive(m_Socket, m_Buffer, 1024);
+                    SendSerialized(data, m_BufferSize);
+                    Receive(m_Socket, m_Buffer, m_BufferSize);
 
-                    if(size2 > 1024)
+                    if(size2 > m_BufferSize)
                     {
-                        size2 -= 1024;
+                        size2 -= m_BufferSize;
 
                         char* tmp = &data[0];
 
@@ -106,7 +107,7 @@ namespace SteelEngine {
                             {
                                 size_t size3 = size2;
 
-                                for(Type::uint32 i = 0; i < 1024 && i < size3; i++)
+                                for(Type::uint32 i = 0; i < m_BufferSize && i < size3; i++)
                                 {
                                     tmp++;
                                     size2--;
@@ -114,14 +115,14 @@ namespace SteelEngine {
                             }
                             else
                             {
-                                Send(m_Socket, "DONE", 1024);
-                                Receive(m_Socket, m_Buffer, 1024);
+                                Send(m_Socket, "DONE", m_BufferSize);
+                                Receive(m_Socket, m_Buffer, m_BufferSize);
 
                                 break;
                             }
 
-                            Send(m_Socket, tmp, 1024);
-                            Receive(m_Socket, m_Buffer, 1024);
+                            Send(m_Socket, tmp, m_BufferSize);
+                            Receive(m_Socket, m_Buffer, m_BufferSize);
                         }
                     }
 
@@ -130,12 +131,12 @@ namespace SteelEngine {
                     std::string data2;
                     std::string buf;
 
-                    buf.resize(1024);
+                    buf.resize(m_BufferSize);
 
                     while(1)
                     {
-                        Send(m_Socket, "DONE", 1024);
-                        Receive(m_Socket, &buf[0], 1024);
+                        Send(m_Socket, "DONE", m_BufferSize);
+                        Receive(m_Socket, &buf[0], m_BufferSize);
 
                         if(strcmp(&buf[0], "END") == 0)
                         {
@@ -155,13 +156,11 @@ namespace SteelEngine {
                 }
                 else
                 {
-                    SendSerialized("get", 1024);
-                    Receive(m_Socket, m_Buffer, 1024);
+                    SendSerialized("get", m_BufferSize);
+                    Receive(m_Socket, m_Buffer, m_BufferSize);
 
                     if(strcmp(m_Buffer, "none") != 0)
                     {
-                        printf("Getting command!\n");
-
                         size_t* strSizePtr = (size_t*)m_Buffer;
                         size_t strSize = *strSizePtr;
                         strSizePtr++;
@@ -177,7 +176,6 @@ namespace SteelEngine {
 
                         for(Type::uint32 i = 0; i < m_NetworkManager->GetCommands().size(); i++)
                         {
-                            // Network::INetworkCommand* command = m_NetworkManager->GetCommands()[i];
                             HotReloader::InheritanceTrackKeeper* swapper = m_NetworkManager->GetCommands()[i];
                             Network::INetworkCommand* command = swapper->Get<Network::INetworkCommand>();
 
@@ -188,7 +186,7 @@ namespace SteelEngine {
 
                                 command->CalculateSize(size);
                                 command->Deserialize(m_Buffer, size);
-                                Send(m_Socket, "DONE", 1024);
+                                Send(m_Socket, "DONE", m_BufferSize);
                                 command->ClientSide(this, m_Socket);
                                 command->CalculateSize(size);
 
@@ -196,8 +194,8 @@ namespace SteelEngine {
 
                                 command->m_Flow = Network::CommunicationFlow::CLIENT_TO_SERVER;
                                 command->Serialize(data, size);
-                                Send(m_Socket, data, 1024);
-                                Receive(m_Socket, m_Buffer, 1024);
+                                Send(m_Socket, data, m_BufferSize);
+                                Receive(m_Socket, m_Buffer, m_BufferSize);
 
                                 delete[] data;
 

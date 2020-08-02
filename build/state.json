@@ -1096,7 +1096,7 @@
             "files": [
                 {
                     "filename": "Client.cpp",
-                    "hash": "ad7c2eec584417a6d7e1de498337874348ef934fb194a95c6223969146b815f38325cc3b885bafbfd0cd70129d2cde5d4fe8a5717c0a5205f5f8636383679ee9"
+                    "hash": "9942459608b709fa8fd147df04570fd9cd8532610499ed024d13f6376d86c8a788d29efd7dd4bd184cafa4bcde2f8aa991a557bc8a3638ed6a529939ff19c4be"
                 },
                 {
                     "filename": "NetworkManager.cpp",
@@ -1104,7 +1104,7 @@
                 },
                 {
                     "filename": "Server.cpp",
-                    "hash": "98d506f87443d32aca9cff1ebe58e7fd38c567618989b13a0869c3a13de6d7d86afb7d4e0759302c60617e83eb957719b20b7cd2629b14fa27a8a87ae754f8a7"
+                    "hash": "565d8f5e3af5cea1a9d4a70eeed942bd7f5733d1f97f535f28d478c17012b4efcb58598037f6e600697ab5ba917df2248d4450bd414b4c1a28b7139563c39603"
                 }
             ]
         },

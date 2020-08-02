@@ -48,8 +48,6 @@ namespace SteelEngine {
         {
             if(buf != "get")
             {
-                printf("Getting command!\n");
-
                 size_t* strSizePtr = (size_t*)&buf[0];
                 size_t strSize = *strSizePtr;
 
@@ -66,7 +64,6 @@ namespace SteelEngine {
 
                 for(Type::uint32 i = 0; i < m_NetworkManager->GetCommands().size(); i++)
                 {
-                    // Network::INetworkCommand* command = m_NetworkManager->GetCommands()[i];
                     HotReloader::InheritanceTrackKeeper* swapper = m_NetworkManager->GetCommands()[i];
                     Network::INetworkCommand* command = swapper->Get<Network::INetworkCommand>();
 
@@ -128,8 +125,6 @@ namespace SteelEngine {
 
                 if(!commands->empty())
                 {
-                    printf("Sending command!\n");
-
                     Network::INetworkCommand* command = commands->front();
 
                     size_t size = 0;
