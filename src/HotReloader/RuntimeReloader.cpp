@@ -148,7 +148,7 @@ namespace SteelEngine { namespace HotReloader {
 								}
 
 								m_ReflectionGenerator->Parse();
-								m_ReflectionGenerator->Generate(FileSystem::Get("fileWatcherPath"), FileSystem::Get("fileWatcherPath") / "build/GeneratedReflection");
+								m_ReflectionGenerator->Generate(FileSystem::Get("fileWatcherPath"), FileSystem::Get("fileWatcherPath") / "__generated_reflection__");
 								m_ReflectionGenerator->Clear();
 						// 	},
 						// 	{
@@ -287,7 +287,7 @@ namespace SteelEngine { namespace HotReloader {
 		generatedFile = splitted[splitted.size() - 1];
 		generatedFile = split(generatedFile, '.')[0];
 		generatedFile = generatedFile + ".Generated.cpp";
-		generatedFile = "build/GeneratedReflection/" + generatedFile;
+		generatedFile = "__generated_reflection__/" + generatedFile;
 
 		if(!filesystem::exists(generatedFile))
 		{
@@ -311,7 +311,7 @@ namespace SteelEngine { namespace HotReloader {
 
 		std::vector<std::string> splitted = split(generatedFile, '/');
 
-		generatedFile = FileSystem::Get("fileWatcherPath").string() + "/build/GeneratedReflection/";
+		generatedFile = FileSystem::Get("fileWatcherPath").string() + "/__generated_reflection__/";
 		std::string res = "";
 		std::string l = FileSystem::Get("fileWatcherPath").string();
 
@@ -360,7 +360,7 @@ namespace SteelEngine { namespace HotReloader {
 		}
 
 		includeVector.push_back(FileSystem::Get("fileWatcherPath").string() + "/include");
-		includeVector.push_back(FileSystem::Get("fileWatcherPath").string() + "/build/GeneratedReflection");
+		includeVector.push_back(FileSystem::Get("fileWatcherPath").string() + "/__generated_reflection__");
 
 		m_ObjFilesToDelete.push_back(FileSystem::Get("fileWatcherPath").string() + "/build/Windows/" + split(splitted[splitted.size() - 1], '.')[0] + ".obj ");
 		m_ObjFilesToDelete.push_back(FileSystem::Get("fileWatcherPath").string() + "/build/Windows/" + split(splitted[splitted.size() - 1], '.')[0] + ".Generated.obj");

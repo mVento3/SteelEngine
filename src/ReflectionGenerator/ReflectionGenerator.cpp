@@ -63,7 +63,7 @@ void generateReflectionForFile(SteelEngine::IReflectionGenerator* rg, const std:
 
     try
     {
-        if(rg->Generate(cwd, cwd / "build/GeneratedReflection") == SteelEngine::SE_FALSE)
+        if(rg->Generate(cwd, cwd / "__generated_reflection__") == SteelEngine::SE_FALSE)
         {
             printf("Failed to generate!\n");
 

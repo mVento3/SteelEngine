@@ -1,0 +1,22 @@
+#include "HotReloader/IRuntimeObject.h"
+#include "RuntimeReflection/ReflectionRecorder.h"
+#include "Networking/Events/ShouldOverrideEvent.h"
+#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Networking/Events/ShouldOverrideEvent.Generated.h"
+
+namespace SteelEngine {
+namespace Network {
+REGISTER_REFLECTION
+{
+SteelEngine::ReflectionRecorder::Register<ShouldOverrideEvent>("ShouldOverrideEvent",{
+"SteelEngine",
+"Network"
+}
+)
+(
+SteelEngine::Reflection::MetaData(SteelEngine::Reflection::ReflectionAttribute::NO_SERIALIZE, true),
+SteelEngine::Reflection::MetaData("sizeof", sizeof(ShouldOverrideEvent))
+)
+;
+}
+}
+}

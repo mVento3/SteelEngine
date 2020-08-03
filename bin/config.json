@@ -17,7 +17,7 @@
 		],
 		"includes": [
 			"$CWD$/include",
-			"$CWD$/build/GeneratedReflection",
+			"$CWD$/__generated_reflection__",
 			"$CWD$/external/SDL2-2.0.9/include",
 			"$CWD$/external/Vulkan/Include",
 			"$CWD$/external/glm",

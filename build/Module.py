@@ -42,7 +42,7 @@ class Module:
 
             res += splitted[len(splitted) - 1].split('.')[0] + '.Generated.cpp'
 
-            if os.path.isfile(self.cwd + '/build/GeneratedReflection/' + res):
+            if os.path.isfile(self.cwd + '/__generated_reflection__/' + res):
                 self.reflection_src_files.append(res)
 
     def compileWhole(self, lib_updated, process):
@@ -108,23 +108,23 @@ class Module:
                         if f['filename'] == os.path.basename(src):
                             found2 = True
 
-                            if f['hash'] == sha512(self.cwd + '/build/GeneratedReflection/' + src):
+                            if f['hash'] == sha512(self.cwd + '/__generated_reflection__/' + src):
                                 compile = False
                                 break
                             else:
-                                f['hash'] = sha512(self.cwd + '/build/GeneratedReflection/' + src)
+                                f['hash'] = sha512(self.cwd + '/__generated_reflection__/' + src)
 
                     if not found2:
-                        key['files'].append({ 'filename': os.path.basename(src), 'hash': sha512(self.cwd + '/build/GeneratedReflection/' + src) })
+                        key['files'].append({ 'filename': os.path.basename(src), 'hash': sha512(self.cwd + '/__generated_reflection__/' + src) })
                     else:
                         break
 
             if not found:
-                self.hashes.append({ 'folder': res, 'files': [{ 'filename': os.path.basename(src), 'hash': sha512(self.cwd + '/build/GeneratedReflection/' + src) }] })
+                self.hashes.append({ 'folder': res, 'files': [{ 'filename': os.path.basename(src), 'hash': sha512(self.cwd + '/__generated_reflection__/' + src) }] })
 
             if compile or not os.path.isfile(dir_ + '/' + splitted[len(splitted) - 1].split('.')[0] + '.Generated.obj'):
                 whole_compile = True
-                process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + self.cwd + '/build/GeneratedReflection/' + src)
+                process.WriteInput('cl ' + flags + ' ' + defs + ' ' + includes + ' /c ' + self.cwd + '/__generated_reflection__/' + src)
                 process.Wait()
 
                 if process.WasError():

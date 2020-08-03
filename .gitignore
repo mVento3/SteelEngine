@@ -57,6 +57,6 @@ external/json-develop/**
 !external/json-develop/.gitkeep
 external/Python/**
 !external/Python/.gitkeep
-build/GeneratedReflection/imgui/**
+__generated_reflection__/imgui/**
 copy_to_test_project.py
 server.py

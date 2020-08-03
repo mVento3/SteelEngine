@@ -78,7 +78,7 @@ for type in project_types:
         splitted = new_a.split(os.sep)
         objects.append(working_directory + os.sep + os.path.splitext(splitted[len(splitted) - 1])[0] + '.o')
         generatedCpp = splitted[len(splitted) - 1]
-        generatedCppFinal = 'build/GeneratedReflection/' + generatedCpp.split('.')[0] + '.Generated.cpp'
+        generatedCppFinal = '__generated_reflection__/' + generatedCpp.split('.')[0] + '.Generated.cpp'
 
         if os.path.isfile(generatedCppFinal):
             if index < len(type[2]) - 1:

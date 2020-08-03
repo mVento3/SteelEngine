@@ -48,7 +48,7 @@ namespace SteelEngine {
         {
             m_ReflectionGenerator->Load(res);
             m_ReflectionGenerator->Parse();
-            m_ReflectionGenerator->Generate(m_LoadedProject, m_LoadedProject / "build/GeneratedReflection");
+            m_ReflectionGenerator->Generate(m_LoadedProject, m_LoadedProject / "__generated_reflection__");
             m_ReflectionGenerator->Clear();
         }
 
@@ -94,7 +94,7 @@ namespace SteelEngine {
 		}
 
         includeVector.push_back((m_LoadedProject / "include").string());
-		includeVector.push_back((m_LoadedProject / "build/GeneratedReflection").string());
+		includeVector.push_back((m_LoadedProject / "__generated_reflection__").string());
 
         m_Compiler->Compile(filePath.string(), flagVector, definitionVector, includeVector, libPathVector, libVector);
         m_Compiler->WaitUntilComplete();
@@ -424,7 +424,7 @@ namespace SteelEngine {
                 if(p.path().extension() == ".cpp")
                 {
                     std::string orgPath = m_LoadedProject.string();
-                    std::string res = (m_LoadedProject / "build/GeneratedReflection").string();
+                    std::string res = (m_LoadedProject / "__generated_reflection__").string();
                     std::string path = p.path().string();
 
                     replaceAll(path, "\\", "/");
@@ -441,7 +441,7 @@ namespace SteelEngine {
 
                     res.append("/").append(split(std::filesystem::path(path).filename().string(), '.')[0] + ".Generated.cpp");
 
-                    ProcessFile(m_LoadedProject / "build/GeneratedReflection", res);
+                    ProcessFile(m_LoadedProject / "__generated_reflection__", res);
                 }
             }
 
@@ -454,7 +454,7 @@ namespace SteelEngine {
                 for(std::string file : additionalFilesToCompile)
                 {
                     std::string orgPath = m_LoadedProject.string();
-                    std::string res = (m_LoadedProject / "build/GeneratedReflection").string();
+                    std::string res = (m_LoadedProject / "__generated_reflection__").string();
 
                     replaceAll(file, "\\", "/");
                     replaceAll(orgPath, "\\", "/");
@@ -470,7 +470,7 @@ namespace SteelEngine {
 
                     res.append("/").append(split(std::filesystem::path(file).filename().string(), '.')[0] + ".Generated.cpp");
 
-                    ProcessFile(m_LoadedProject / "build/GeneratedReflection", res);
+                    ProcessFile(m_LoadedProject / "__generated_reflection__", res);
                 }
 
                 compile = true;
@@ -509,7 +509,7 @@ namespace SteelEngine {
             }
 
             includeVector.push_back((m_LoadedProject / "include").string());
-            includeVector.push_back((m_LoadedProject / "build/GeneratedReflection").string());
+            includeVector.push_back((m_LoadedProject / "__generated_reflection__").string());
 
             Utils::json dllOptions = m_CompileConfig["dll"];
 
