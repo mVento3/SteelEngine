@@ -33,7 +33,7 @@ def compile_dep(process, config, external_folder):
 
                 for subdir, dirs, files in os.walk(cwd + '/external/' + external_folder + '/' + file):
                     for file_ in files:
-                        if file_.endswith('.cpp') or file_.endswith('.c'):
+                        if file_.endswith('.cpp') or file_.endswith('.c') or file_.endswith('.cc'):
                             files_to_compile.append(subdir + '/' + file_)
             elif file.find('$NOT$') >= 0:
                 file = file.replace('$NOT$', '')

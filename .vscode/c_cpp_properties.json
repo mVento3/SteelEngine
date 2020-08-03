@@ -28,7 +28,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/external/json/include",
                 "${workspaceFolder}/external/Python/include",
-                "${workspaceFolder}/external/glew-2.1.0/include",
+                "${workspaceFolder}/external/GLEW/include",
                 "${workspaceFolder}/external/assimp/include",
                 "${workspaceFolder}/external/entt/src",
                 "${workspaceFolder}/include",
