@@ -5,6 +5,8 @@ project(SteelEngine)
 option(VS_CODE "VS Code project")
 set(SE_BuildSystemVersion "1.0.0" CACHE STRING "SE Build System version")
 
+set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
+
 if(VS_CODE)
     set(build_system SteelEngineBuildSystem-${SE_BuildSystemVersion})
     set(SE_BuildSystemVersionFinal https://github.com/mVento3/SteelEngineBuildSystem/archive/v${SE_BuildSystemVersion}.zip)
@@ -139,3 +141,5 @@ else()
 endif()
 
 add_subdirectory(external)
+
+set_property(TARGET GLEW PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
