@@ -60,3 +60,4 @@ external/Python/**
 __generated_reflection__/imgui/**
 copy_to_test_project.py
 server.py
+build
