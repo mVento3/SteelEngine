@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.18)
 
 project(SteelEngine)
 
-option(VS_CODE "VS Code project")
-set(SE_BuildSystemVersion "1.0.0" CACHE STRING "SE Build System version")
+option(VS_CODE "VS Code project" ON)
+set(SE_BuildSystemVersion "1.1.2" CACHE STRING "SE Build System version")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
 
@@ -143,3 +143,5 @@ endif()
 add_subdirectory(external)
 
 set_property(TARGET GLEW PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set_property(TARGET GLEW PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin)
+set_property(TARGET GLEW PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
