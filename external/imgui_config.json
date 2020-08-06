@@ -19,10 +19,10 @@
 			"$CWD$/external/Vulkan/Include"
 		],
 		"lib_paths": [
-			"$CWD$/external/Vulkan/Lib"
+			
 		],
 		"libs": [
-			"vulkan-1.lib"
+			
 		],
 		"groups": [
 			{
