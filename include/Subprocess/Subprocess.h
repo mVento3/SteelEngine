@@ -2,6 +2,7 @@
 
 #include "Subprocess/ISubprocess.h"
 
+#define _WINSOCKAPI_
 #include "windows.h"
 #include "stdio.h"
 #include "string"
