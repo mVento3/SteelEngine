@@ -14,7 +14,7 @@ extern "C"
 
 namespace SteelEngine {
 
-	void* ModuleManager::GetModuleLocal(const std::string& name)
+	void* ModuleManager::GetModuleLocal(const char* name)
 	{
 		for(ModuleInfo* module : m_Modules)
 		{

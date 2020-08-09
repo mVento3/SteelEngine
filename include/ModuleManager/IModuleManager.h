@@ -15,7 +15,7 @@ namespace SteelEngine { namespace Interface {
 		};
 
 	protected:
-		virtual void* GetModuleLocal(const std::string& name) { return 0; }
+		virtual void* GetModuleLocal(const char* name) { return 0; }
 
 	public:
 		virtual void LoadAllImpl() { }

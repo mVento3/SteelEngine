@@ -69,7 +69,7 @@ namespace SteelEngine { namespace Editor { namespace ImGUI {
 
     void StartMenuWindow::Init()
     {
-        m_ProjectsPath = Reflection::GetType("SteelEngine::Core")->GetMetaData(Reflection::ReflectionAttribute::PROJECTS_PATH)->Convert<const char*>();
+        m_ProjectsPath = Reflection::GetType("SteelEngine::Core")->GetMetaData(Reflection::ReflectionAttribute::PROJECTS_PATH)->Convert<std::string>();
 
         printf("Projects path: %s\n", m_ProjectsPath.string().c_str());
 

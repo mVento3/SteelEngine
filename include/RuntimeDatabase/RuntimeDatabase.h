@@ -18,7 +18,7 @@
 
 #include "Utils/TupleMaker.h"
 
-#ifdef SE_WINDOWS
+#if defined(SE_WINDOWS) || defined(_WINDOWS)
 #undef max
 #undef min
 #endif

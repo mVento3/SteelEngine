@@ -119,7 +119,7 @@ namespace SteelEngine {
 
                     if(((buffer.find("error") != std::string::npos) || (buffer.find("fatal error") != std::string::npos)) && (buffer.find("note") == std::string::npos))
                     {
-                        pImpl->m_ErrorMessage = buffer;
+                        pImpl->m_ErrorMessage.append(buffer + "\n");
                         pImpl->m_Error = true;
                     }
                 }

@@ -70,6 +70,8 @@ namespace SteelEngine {
     // Vulkan
         virtual Result GetVulkanInstanceExtensions(Type::uint32* enabledExtensionCount, const char** extensionNames)
         {
+            *enabledExtensionCount = 0;
+
             return SE_NOT_IMPLEMENTED;
         }
 

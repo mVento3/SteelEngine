@@ -64,6 +64,8 @@ namespace SteelEngine {
 	    rr->data = data;
 
         data->command_buffers = se_slot_array_new(command_buffer_t);
+
+        return true;
     }
 
 }

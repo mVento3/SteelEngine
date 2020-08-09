@@ -35,7 +35,7 @@ namespace SteelEngine {
 	private:
 		std::vector<ModuleInfo*> m_Modules;
 
-		void* GetModuleLocal(const std::string& name) override;
+		void* GetModuleLocal(const char* name) override;
 
 		bool FreeIf(const std::vector<std::string>& a, const std::string& b, Mode mode);
 
@@ -86,7 +86,7 @@ namespace SteelEngine {
 			mm->UnloadImpl(blackList, mode);
 		}
 
-		static void* GetModule(const std::string& name)
+		static void* GetModule(const char* name)
 		{
 			static ModuleManager* mm = GetModuleManager();
 

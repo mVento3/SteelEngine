@@ -187,8 +187,12 @@ namespace SteelEngine {
         const char** extensions;
 
         m_Window->GetVulkanInstanceExtensions(&extensionsCount, NULL);
-        extensions = new const char*[extensionsCount];
-        m_Window->GetVulkanInstanceExtensions(&extensionsCount, extensions);
+
+        if(extensionsCount)
+        {
+            extensions = new const char*[extensionsCount];
+            m_Window->GetVulkanInstanceExtensions(&extensionsCount, extensions);
+        }
 
         m_RenderContext->GetRenderDevice()->SetWindow(m_Window);
         m_RenderContext->GetRenderDevice()->SetVulkanExtensions(extensionsCount, extensions);
