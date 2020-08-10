@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Editor/ImGUI/EditorWindows/FileBrowserWindow.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Editor/ImGUI/EditorWindows/FileBrowserWindow.Generated.h"
+#include "Editor/ImGUI/EditorWindows/FileBrowserWindow.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Networking/Server.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Networking/Server.Generated.h"
+#include "Networking/Server.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

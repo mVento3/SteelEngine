@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Input/Events/MouseMotionEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Input/Events/MouseMotionEvent.Generated.h"
+#include "Input/Events/MouseMotionEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

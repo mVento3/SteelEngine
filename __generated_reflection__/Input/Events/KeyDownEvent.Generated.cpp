@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Input/Events/KeyDownEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Input/Events/KeyDownEvent.Generated.h"
+#include "Input/Events/KeyDownEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

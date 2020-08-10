@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Editor/ImGUI/EditorWindows/NodeGraph/InputPin.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Editor/ImGUI/EditorWindows/NodeGraph/InputPin.Generated.h"
+#include "Editor/ImGUI/EditorWindows/NodeGraph/InputPin.Generated.h"
 
 namespace SteelEngine {
 namespace NodeGraph {

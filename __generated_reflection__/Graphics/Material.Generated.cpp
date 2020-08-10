@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/Material.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Graphics/Material.Generated.h"
+#include "Graphics/Material.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {

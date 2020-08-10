@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "MemoryTracker/MemoryTracker.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/MemoryTracker/MemoryTracker.Generated.h"
+#include "MemoryTracker/MemoryTracker.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

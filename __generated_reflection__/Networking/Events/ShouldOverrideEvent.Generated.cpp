@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Networking/Events/ShouldOverrideEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Networking/Events/ShouldOverrideEvent.Generated.h"
+#include "Networking/Events/ShouldOverrideEvent.Generated.h"
 
 namespace SteelEngine {
 namespace Network {

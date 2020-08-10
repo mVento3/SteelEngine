@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Editor/ImGUI/EditorWindows/TimingsViewWindow.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Editor/ImGUI/EditorWindows/TimingsViewWindow.Generated.h"
+#include "Editor/ImGUI/EditorWindows/TimingsViewWindow.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

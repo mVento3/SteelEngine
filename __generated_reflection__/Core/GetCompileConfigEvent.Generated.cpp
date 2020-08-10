@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Core/GetCompileConfigEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Core/GetCompileConfigEvent.Generated.h"
+#include "Core/GetCompileConfigEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

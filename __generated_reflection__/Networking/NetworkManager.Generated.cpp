@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Networking/NetworkManager.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Networking/NetworkManager.Generated.h"
+#include "Networking/NetworkManager.Generated.h"
 
 namespace SteelEngine {
 namespace Network {

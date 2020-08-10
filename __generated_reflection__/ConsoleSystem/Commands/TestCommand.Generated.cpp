@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "ConsoleSystem/Commands/TestCommand.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/ConsoleSystem/Commands/TestCommand.Generated.h"
+#include "ConsoleSystem/Commands/TestCommand.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

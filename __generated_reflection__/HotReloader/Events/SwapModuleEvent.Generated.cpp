@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "HotReloader/Events/SwapModuleEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/HotReloader/Events/SwapModuleEvent.Generated.h"
+#include "HotReloader/Events/SwapModuleEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

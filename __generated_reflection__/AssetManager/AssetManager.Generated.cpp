@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "AssetManager/AssetManager.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/AssetManager/AssetManager.Generated.h"
+#include "AssetManager/AssetManager.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

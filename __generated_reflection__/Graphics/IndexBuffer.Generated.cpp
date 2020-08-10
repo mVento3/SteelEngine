@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/IndexBuffer.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Graphics/IndexBuffer.Generated.h"
+#include "Graphics/IndexBuffer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {

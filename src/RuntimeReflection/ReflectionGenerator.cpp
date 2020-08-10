@@ -658,14 +658,12 @@ namespace SteelEngine {
             }
 		}
 
-        includePath.append(splitted_[splitted_.size() - 1]);
-
         std::ofstream sourceFile(finalPath + m_Filename.stem().string() + ".Generated.cpp");
 
 		sourceFile << "#include \"HotReloader/IRuntimeObject.h\"\n";
 		sourceFile << "#include \"RuntimeReflection/ReflectionRecorder.h\"\n";
-        sourceFile << "#include \"" << includePath << "\"\n";
-        sourceFile << "#include \"" << finalPath << m_Filename.stem().string() << ".Generated.h" << "\"\n";
+        sourceFile << "#include \"" << includePath << splitted_[splitted_.size() - 1] << "\"\n";
+        sourceFile << "#include \"" << includePath << m_Filename.stem().string() << ".Generated.h" << "\"\n";
 		sourceFile << "\n";
 
         for(Type::uint32 i = 0; i < m_ParsedStructure->size(); i++)

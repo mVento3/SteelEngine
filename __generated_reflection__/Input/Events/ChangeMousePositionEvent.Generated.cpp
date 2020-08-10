@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Input/Events/ChangeMousePositionEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Input/Events/ChangeMousePositionEvent.Generated.h"
+#include "Input/Events/ChangeMousePositionEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

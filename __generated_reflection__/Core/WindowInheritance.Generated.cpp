@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Core/WindowInheritance.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Core/WindowInheritance.Generated.h"
+#include "Core/WindowInheritance.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Core/DeltaTime.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Core/DeltaTime.Generated.h"
+#include "Core/DeltaTime.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

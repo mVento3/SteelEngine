@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/TestRenderer/Mesh.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Graphics/TestRenderer/Mesh.Generated.h"
+#include "Graphics/TestRenderer/Mesh.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {

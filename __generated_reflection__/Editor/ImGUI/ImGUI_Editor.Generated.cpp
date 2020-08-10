@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Editor/ImGUI/ImGUI_Editor.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Editor/ImGUI/ImGUI_Editor.Generated.h"
+#include "Editor/ImGUI/ImGUI_Editor.Generated.h"
 
 namespace SteelEngine {
 namespace Editor {

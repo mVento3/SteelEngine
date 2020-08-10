@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Core/ReflectionModules/CasterReflectionModule.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Core/ReflectionModules/CasterReflectionModule.Generated.h"
+#include "Core/ReflectionModules/CasterReflectionModule.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

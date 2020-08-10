@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Core/ReflectionModules/NaiveEventReflectionModule.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Core/ReflectionModules/NaiveEventReflectionModule.Generated.h"
+#include "Core/ReflectionModules/NaiveEventReflectionModule.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

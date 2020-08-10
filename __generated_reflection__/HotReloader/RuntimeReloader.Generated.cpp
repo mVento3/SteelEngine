@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "HotReloader/RuntimeReloader.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/HotReloader/RuntimeReloader.Generated.h"
+#include "HotReloader/RuntimeReloader.Generated.h"
 
 namespace SteelEngine {
 namespace HotReloader {

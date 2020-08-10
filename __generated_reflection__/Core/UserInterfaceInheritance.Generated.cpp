@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Core/UserInterfaceInheritance.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Core/UserInterfaceInheritance.Generated.h"
+#include "Core/UserInterfaceInheritance.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/VertexBuffer.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Graphics/VertexBuffer.Generated.h"
+#include "Graphics/VertexBuffer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {

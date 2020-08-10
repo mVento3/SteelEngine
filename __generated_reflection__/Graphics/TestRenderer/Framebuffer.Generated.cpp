@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Graphics/TestRenderer/Framebuffer.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Graphics/TestRenderer/Framebuffer.Generated.h"
+#include "Graphics/TestRenderer/Framebuffer.Generated.h"
 
 namespace SteelEngine {
 namespace Graphics {

@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Networking/Commands/SwapModuleNetCommandEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Networking/Commands/SwapModuleNetCommandEvent.Generated.h"
+#include "Networking/Commands/SwapModuleNetCommandEvent.Generated.h"
 
 namespace SteelEngine {
 namespace Network {
