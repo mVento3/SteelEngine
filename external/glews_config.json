@@ -1,0 +1,33 @@
+{
+	"type": "external_lib_config",
+	"out_type": "lib",
+	"name": "glew",
+	"compiler": {
+		"flags": [
+			"O2",
+			"ZI",
+			"DEBUG:FASTLINK",
+			"std:c++17"
+		],
+		"definitions": [
+			
+		],
+		"includes": [
+			"$CWD$/external/GLEW/include"
+		],
+		"lib_paths": [
+			
+		],
+		"libs": [
+			
+		],
+		"groups": [
+			{
+				"name": "MAIN",
+				"src_files": [
+					"src/glew.c"
+				]
+			}
+		]
+	}
+}
