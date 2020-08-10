@@ -6,11 +6,11 @@ list(APPEND STATIC_LIBRARIES "")
 list(APPEND LIBS
     "OpenGL32.lib"
     "${CMAKE_SOURCE_DIR}/external/Vulkan/Lib/vulkan-1.lib"
-    "${CMAKE_SOURCE_DIR}/bin/glew.lib"
-    "${CMAKE_SOURCE_DIR}/bin/imgui.lib"
+    "${CMAKE_SOURCE_DIR}/build/external/GLEW/Debug/GLEWd.lib"
+    "${CMAKE_SOURCE_DIR}/build/external/Debug/imguid.lib"
     "${CMAKE_SOURCE_DIR}/external/SDL2-2.0.9/lib/x64/SDL2.lib"
     "Ws2_32.lib"
-    "${CMAKE_SOURCE_DIR}/bin/assimp-vc142-mt.lib"
+    "${CMAKE_SOURCE_DIR}/build/external/assimp/lib/Debug/assimp-vc142-mtd.lib"
     "${CMAKE_SOURCE_DIR}/external/Python/libs/python37.lib"
 )
 list(APPEND INCLUDES

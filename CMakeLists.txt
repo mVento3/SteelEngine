@@ -7,6 +7,8 @@ set(SE_BuildSystemVersion "1.1.4" CACHE STRING "SE Build System version")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
 
+add_subdirectory(external)
+
 if(VS_CODE)
     set(build_system SteelEngineBuildSystem-${SE_BuildSystemVersion})
     set(SE_BuildSystemVersionFinal https://github.com/mVento3/SteelEngineBuildSystem/archive/v${SE_BuildSystemVersion}.zip)
@@ -27,8 +29,6 @@ if(VS_CODE)
 else()
     add_subdirectory(include)
 endif()
-
-add_subdirectory(external)
 
 set_property(TARGET GLEW PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set_property(TARGET GLEW PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin)
