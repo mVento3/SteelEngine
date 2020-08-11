@@ -544,7 +544,20 @@ namespace SteelEngine { namespace Graphics { namespace OpenGL {
         //     camera.m_Projection = glm::perspectiveFov(camera.m_FOV, (float)event.m_X, (float)event.m_Y, camera.m_Near, camera.m_Far);
         // });
 
-        m_Camera->SetProjection(glm::perspectiveFov(m_Camera->m_Fov, (float)event.m_X, (float)event.m_Y, m_Camera->m_Near, m_Camera->m_Far));
+        int x = event.m_X;
+        int y = event.m_Y;
+
+        if(x <= 0)
+        {
+            x = 1;
+        }
+
+        if(y <= 0)
+        {
+            y = 1;
+        }
+
+        m_Camera->SetProjection(glm::perspectiveFov(m_Camera->m_Fov, (float)x, (float)y, m_Camera->m_Near, m_Camera->m_Far));
     }
 
 }}}

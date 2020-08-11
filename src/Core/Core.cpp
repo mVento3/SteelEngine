@@ -184,18 +184,17 @@ namespace SteelEngine {
         m_RenderContext->GetCurrentRenderer()->SetRenderContext(m_RenderContext);
 
         uint32_t extensionsCount;
-        const char** extensions;
 
         m_Window->GetVulkanInstanceExtensions(&extensionsCount, NULL);
 
         if(extensionsCount)
         {
-            extensions = new const char*[extensionsCount];
+            const char** extensions = new const char*[extensionsCount];
             m_Window->GetVulkanInstanceExtensions(&extensionsCount, extensions);
+            m_RenderContext->GetRenderDevice()->SetVulkanExtensions(extensionsCount, extensions);
         }
 
         m_RenderContext->GetRenderDevice()->SetWindow(m_Window);
-        m_RenderContext->GetRenderDevice()->SetVulkanExtensions(extensionsCount, extensions);
         m_RenderContext->GetRenderDevice()->Initialize();
         m_RenderContext->GetRenderDevice()->SetEditorCommands(m_Editor->GetEditorCommands());
         m_RenderContext->GetRenderDevice()->SetUpdate(m_Editor->GetUpdate());
