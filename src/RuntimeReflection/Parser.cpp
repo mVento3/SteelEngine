@@ -1107,6 +1107,11 @@ namespace SteelEngine {
         }
 
         m_Structure.clear();
+
+        m_CurrentWorkingScope = 0;
+        m_CurrentScopeToAddByMeta = 0;
+        m_CurrentProtectionLevel = ProtectionLevel::NONE;
+        m_ShouldParse = true;
     }
 
 }
