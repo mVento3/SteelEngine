@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "VirtualProject/VirtualProject.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/VirtualProject/VirtualProject.Generated.h"
+#include "VirtualProject/VirtualProject.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

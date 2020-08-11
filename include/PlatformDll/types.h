@@ -8,6 +8,10 @@
 #include <string.h> 	// memset
 #include <float.h>		// FLT_MAX
 
+#include "RuntimeReflection/Macro.h"
+
+SE_DONT_PARSE
+
 #define _inline 			static inline
 #define _local_persist 		static
 #define _global 			static

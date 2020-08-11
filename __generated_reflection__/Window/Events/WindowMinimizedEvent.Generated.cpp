@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Window/Events/WindowMinimizedEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Window/Events/WindowMinimizedEvent.Generated.h"
+#include "Window/Events/WindowMinimizedEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

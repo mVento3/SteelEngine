@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Window/VulkanWindow.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Window/VulkanWindow.Generated.h"
+#include "Window/VulkanWindow.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

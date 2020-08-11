@@ -4,6 +4,10 @@
 
 #include "PlatformDll/containers.h"
 
+#include "RuntimeReflection/Macro.h"
+
+SE_DONT_PARSE
+
 namespace SteelEngine {
 
     se_declare_resource_type(command_buffer);

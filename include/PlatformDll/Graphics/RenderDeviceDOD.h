@@ -5,6 +5,10 @@
 
 #include "Graphics/IRenderer.h"
 
+#include "RuntimeReflection/Macro.h"
+
+SE_DONT_PARSE
+
 namespace SteelEngine { namespace Platform { namespace Graphics {
 
     typedef enum texture_format 

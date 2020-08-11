@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Profiler/Manager.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Profiler/Manager.Generated.h"
+#include "Profiler/Manager.Generated.h"
 
 namespace SteelEngine {
 namespace Profiler {

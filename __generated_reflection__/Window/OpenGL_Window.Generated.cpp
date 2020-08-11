@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Window/OpenGL_Window.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Window/OpenGL_Window.Generated.h"
+#include "Window/OpenGL_Window.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

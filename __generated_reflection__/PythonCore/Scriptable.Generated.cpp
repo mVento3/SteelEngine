@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "PythonCore/Scriptable.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/PythonCore/Scriptable.Generated.h"
+#include "PythonCore/Scriptable.Generated.h"
 
 namespace SteelEngine {
 namespace Script {

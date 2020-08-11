@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Window/Events/WindowMaximizedEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Window/Events/WindowMaximizedEvent.Generated.h"
+#include "Window/Events/WindowMaximizedEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

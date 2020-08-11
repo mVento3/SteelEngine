@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Utils/Graphics/RenderContext.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Utils/Graphics/RenderContext.Generated.h"
+#include "Utils/Graphics/RenderContext.Generated.h"
 
 namespace SteelEngine {
 namespace Utils {
@@ -17,6 +17,10 @@ SteelEngine::Reflection::MetaData("sizeof", sizeof(RenderContext))
 )
 .RegisterConstructor<>()
 ;
+}
+}
+namespace Platform {
+namespace Graphics {
 }
 }
 namespace Graphics {

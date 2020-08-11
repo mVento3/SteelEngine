@@ -5,6 +5,10 @@
 #include "PlatformDll/types.h"
 #include "PlatformDll/utils.h"
 
+#include "RuntimeReflection/Macro.h"
+
+SE_DONT_PARSE
+
 namespace SteelEngine {
 
 /*===================================

@@ -9,3 +9,4 @@
 #define SE_DESTRUCTOR(...)
 #define SE_ENUM(...)
 #define SE_ELEMENT(...)
+#define SE_DONT_PARSE

@@ -600,6 +600,13 @@ namespace SteelEngine {
     {
         Result res = m_Parser.Parse();
 
+        if(!m_Parser.ShouldParse())
+        {
+            m_GenerateReflection = false;
+
+            return SE_TRUE;
+        }
+
         m_ParsedStructure = &m_Parser.GetParsed();
 
         if(!m_ParsedStructure->empty())

@@ -229,6 +229,7 @@ namespace SteelEngine {
         m_CurrentWorkingScope = 0;
         m_CurrentScopeToAddByMeta = 0;
         m_CurrentProtectionLevel = ProtectionLevel::NONE;
+        m_ShouldParse = true;
     }
 
     Parser::~Parser()
@@ -256,7 +257,13 @@ namespace SteelEngine {
         {
             m_Lexer++;
 
-            if(m_Lexer.GetToken() == "#pragma")
+            if(m_Lexer.GetToken() == "SE_DONT_PARSE")
+            {
+                m_ShouldParse = false;
+
+                break;
+            }
+            else if(m_Lexer.GetToken() == "#pragma")
             {
                 m_Lexer++;
             }

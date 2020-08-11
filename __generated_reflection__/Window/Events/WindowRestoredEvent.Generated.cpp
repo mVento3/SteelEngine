@@ -1,7 +1,7 @@
 #include "HotReloader/IRuntimeObject.h"
 #include "RuntimeReflection/ReflectionRecorder.h"
 #include "Window/Events/WindowRestoredEvent.h"
-#include "D:\Projects\C++\SteelEngine\__generated_reflection__/Window/Events/WindowRestoredEvent.Generated.h"
+#include "Window/Events/WindowRestoredEvent.Generated.h"
 
 namespace SteelEngine {
 REGISTER_REFLECTION

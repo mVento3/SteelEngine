@@ -273,6 +273,8 @@ namespace SteelEngine {
         std::stack<ScopeInfo*> m_Scopes;
         std::vector<ScopeInfo*> m_Structure;
 
+        bool m_ShouldParse;
+
         void ProcessMetaData(std::vector<MetaData>& meta);
         void ProcessArguments(std::vector<Argument>& args);
 
@@ -286,6 +288,7 @@ namespace SteelEngine {
         void Clear();
 
         inline const std::vector<ScopeInfo*>& GetParsed() { return m_Structure; }
+        inline bool ShouldParse() { return m_ShouldParse; }
     };
 
 }

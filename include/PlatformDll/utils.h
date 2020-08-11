@@ -7,6 +7,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "RuntimeReflection/Macro.h"
+
+SE_DONT_PARSE
+
 	// Helper macro for compiling to nothing
 #define se_empty_instruction( ... )
 
